@@ -124,6 +124,8 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .mic-btn{padding:0 12px;background:#f2ead8;border:1px solid rgba(184,134,11,0.35);border-radius:6px;cursor:pointer;font-size:1.1rem;color:#b8860b}
 .mic-btn.recording{background:rgba(220,50,50,0.1);border-color:rgba(220,50,50,0.5);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.speak-btn{display:block;margin-top:4px;font-size:0.68rem;padding:2px 10px;background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:10px;cursor:pointer;color:#7a6b52;font-family:'Noto Serif JP',serif}
+.speak-btn:hover{background:#e8dcc4}
 @media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
 </head>
@@ -483,7 +485,6 @@ function openPrint(){
 <div class="ai-panel" id="aiPanel">
   <div class="ai-header">
     <span>🌸 花人占術AI（無料）</span>
-    <span><button onclick="speechEnabled=!speechEnabled;this.textContent=speechEnabled?'🔊 ON':'🔇 OFF'" style="background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;padding:2px 8px;border-radius:10px;cursor:pointer;font-size:0.72rem">🔇 OFF</button></span>
     <button onclick="toggleAiPanel()">✕</button>
   </div>
   <div class="ai-messages" id="aiMessages">
@@ -500,7 +501,7 @@ function openPrint(){
   </div>
   <div class="ai-input-row">
     <textarea id="aiInput" placeholder="質問を入力してください..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"></textarea>
-    <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="音声入力">🎤</button>
+    <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="音声入力" style="display:none">🎤</button>
     <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">➤</button>
   </div>
 </div>
@@ -844,6 +845,14 @@ function addAiMsg(role, text){
   el.textContent = text;
   const msgs = document.getElementById('aiMessages');
   msgs.appendChild(el);
+  // AI回答には読み上げボタンを追加
+  if(role === 'ai'){
+    const btn = document.createElement('button');
+    btn.className = 'speak-btn';
+    btn.textContent = '🔊 読み上げ';
+    btn.onclick = () => speakText(text, btn);
+    msgs.appendChild(btn);
+  }
   msgs.scrollTop = msgs.scrollHeight;
   return el;
 }
@@ -1009,6 +1018,12 @@ function toggleMic(){
   startMic();
 }
 
+// マイク対応ブラウザのみボタンを表示
+if('SpeechRecognition' in window || 'webkitSpeechRecognition' in window){
+  const mb = document.getElementById('micBtn');
+  if(mb) mb.style.display = '';
+}
+
 function startMic(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
@@ -1037,16 +1052,22 @@ function stopMic(){
 }
 
 // ===== 読み上げ =====
-let speechEnabled = false;
 
-function speakText(text){
-  if(!speechEnabled) return;
-  if(!window.speechSynthesis) return;
+function speakText(text, btn){
+  if(!window.speechSynthesis){ alert('このブラウザは読み上げに対応していません。'); return; }
   window.speechSynthesis.cancel();
+  if(btn && btn.dataset.playing === 'true'){
+    btn.textContent = '🔊 読み上げ';
+    btn.dataset.playing = 'false';
+    return;
+  }
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'ja-JP';
   utter.rate = 1.0;
   utter.pitch = 1.0;
+  utter.onstart = () => { if(btn){ btn.textContent = '⏹ 停止'; btn.dataset.playing = 'true'; } };
+  utter.onend = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } };
+  utter.onerror = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } };
   window.speechSynthesis.speak(utter);
 }
 </script>
