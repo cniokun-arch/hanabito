@@ -857,13 +857,26 @@ function addAiMsg(role, text){
     btn.className = 'speak-btn';
     btn.textContent = '🔊 読み上げ';
     const cleanText = text
-      .replace(/[#*【】「」『』〔〕（）\[\]{}|\^~`]/g, '')
-      .replace(/[\-]{2,}/g, '')
+      .replace(/[#*]/g, '')
+      .replace(/[【】「」『』〔〕（）]/g, '')
+      .replace(/《|》|〈|〉/g, '')
+      .replace(/-{2,}/g, '')
       .replace(/
 {3,}/g, '
 
 ')
-      .replace(/風花人/g, 'ふうかじん').replace(/天花人/g, 'てんかじん').replace(/水花人/g, 'すいかじん').replace(/白花人/g, 'はくかじん').replace(/離花人/g, 'りかじん').replace(/仙花人/g, 'せんかじん').replace(/大殺界/g, 'だいさっかい').replace(/十二運気/g, 'じゅうにうんき').replace(/大運/g, 'だいうん').replace(/＋/g, 'ぷらす').replace(/－/g, 'まいなす').replace(/\+/g, 'ぷらす').replace(/\-/g, 'まいなす').replace(/＋/g, 'ぷらす').replace(/－/g, 'まいなす')
+      .replace(/風花人/g, 'ふうかじん')
+      .replace(/天花人/g, 'てんかじん')
+      .replace(/水花人/g, 'すいかじん')
+      .replace(/白花人/g, 'はくかじん')
+      .replace(/離花人/g, 'りかじん')
+      .replace(/仙花人/g, 'せんかじん')
+      .replace(/大殺界/g, 'だいさっかい')
+      .replace(/十二運気/g, 'じゅうにうんき')
+      .replace(/大運/g, 'だいうん')
+      .replace(/＋/g, 'ぷらす')
+      .replace(/－/g, 'まいなす')
+      .replace(/[+]/g, 'ぷらす')
       .trim();
     btn.onclick = () => speakText(cleanText, btn);
     msgs.appendChild(btn);
