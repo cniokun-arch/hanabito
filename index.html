@@ -915,7 +915,10 @@ async function sendAiMsg(){
     if(aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
   }catch(e){
     loadingEl.remove();
-    addAiMsg('ai', '⚠ ' + e.message);
+    const msg = e.message.includes('Overloaded') || e.message.includes('overloaded')
+      ? '⚠ ただいまサーバーが混雑しています。しばらく待ってから再度お試しください。'
+      : '⚠ ' + e.message;
+    addAiMsg('ai', msg);
   }finally{
     document.getElementById('aiSendBtn').disabled = false;
   }
