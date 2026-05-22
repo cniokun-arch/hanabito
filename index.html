@@ -262,7 +262,7 @@ function makeInlineSvg(nenData,currIdx,totalW,graphH){
   const n=nenData.length,rawVals=nenData.map(r=>r.w);
   const smooth=catmullRom(rawVals,8),ns=smooth.length;
   const pT=6,pB=6,gH=graphH-pT-pB,minV=-4.5,maxV=6;
-  const pxR=i=>i/(n-1)*totalW, pxS=i=>i/(ns-1)*totalW;
+  const pxR=i=>i/(n-1)*(totalW-CW)+CW/2, pxS=i=>i/(ns-1)*(totalW-CW)+CW/2;
   const py=v=>pT+gH*(1-(Math.max(minV,Math.min(maxV,v))-minV)/(maxV-minV));
   const mid=py(0),uid='g'+Math.random().toString(36).slice(2,6);
   let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${graphH}" viewBox="0 0 ${totalW} ${graphH}" style="display:block">`;
