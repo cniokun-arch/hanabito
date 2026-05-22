@@ -485,7 +485,13 @@ function openPrint(){
 <div class="ai-panel" id="aiPanel">
   <div class="ai-header">
     <span>🌸 花人占術AI（無料）</span>
-    <button onclick="toggleAiPanel()">✕</button>
+    <span style="display:flex;align-items:center;gap:6px">
+      <select id="ttsGender" style="font-size:0.68rem;padding:2px 4px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:#fff;border-radius:4px;cursor:pointer">
+        <option value="female">女声</option>
+        <option value="male">男声</option>
+      </select>
+      <button onclick="toggleAiPanel()">✕</button>
+    </span>
   </div>
   <div class="ai-messages" id="aiMessages">
     <div class="ai-msg ai">こんにちは！花人占術AIです🌸
@@ -1053,22 +1059,38 @@ function stopMic(){
 
 // ===== 読み上げ =====
 
-function speakText(text, btn){
-  if(!window.speechSynthesis){ alert('このブラウザは読み上げに対応していません。'); return; }
-  window.speechSynthesis.cancel();
-  if(btn && btn.dataset.playing === 'true'){
-    btn.textContent = '🔊 読み上げ';
-    btn.dataset.playing = 'false';
+let currentAudio = null;
+
+async function speakText(text, btn){
+  // 再生中なら停止
+  if(currentAudio && !currentAudio.paused){
+    currentAudio.pause();
+    currentAudio = null;
+    if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; }
     return;
   }
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'ja-JP';
-  utter.rate = 1.0;
-  utter.pitch = 1.0;
-  utter.onstart = () => { if(btn){ btn.textContent = '⏹ 停止'; btn.dataset.playing = 'true'; } };
-  utter.onend = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } };
-  utter.onerror = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } };
-  window.speechSynthesis.speak(utter);
+  if(btn){ btn.textContent = '⏳ 生成中...'; btn.disabled = true; }
+  try{
+    const gender = document.getElementById('ttsGender')?.value || 'female';
+    const res = await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text, gender })
+    });
+    if(!res.ok) throw new Error('TTS失敗');
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    // Base64のMP3を再生
+    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    currentAudio = audio;
+    audio.onplay = () => { if(btn){ btn.textContent = '⏹ 停止'; btn.dataset.playing = 'true'; btn.disabled = false; } };
+    audio.onended = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } currentAudio = null; };
+    audio.onerror = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; btn.disabled = false; } currentAudio = null; };
+    await audio.play();
+  }catch(e){
+    if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; btn.disabled = false; }
+    console.error('TTS error:', e);
+  }
 }
 </script>
 
