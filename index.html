@@ -832,6 +832,36 @@ async function speakText(text, btn){
     console.error('TTS error:', e);
   }
 }
+
+// 年・日のセレクトボックスを動的生成
+document.addEventListener('DOMContentLoaded', function(){
+  var byEl = document.getElementById('by');
+  var bdEl = document.getElementById('bd');
+  var bmEl = document.getElementById('bm');
+  if(!byEl || !bdEl || !bmEl) return;
+  var cy = new Date().getFullYear();
+  for(var y = cy; y >= 1900; y--){
+    var op = document.createElement('option');
+    op.value = y; op.textContent = y + '年';
+    byEl.appendChild(op);
+  }
+  function updateDays(){
+    var y = +byEl.value || cy;
+    var m = +bmEl.value;
+    var maxD = m ? new Date(y, m, 0).getDate() : 31;
+    var cur = +bdEl.value;
+    bdEl.innerHTML = '<option value="">日</option>';
+    for(var i=1;i<=maxD;i++){
+      var op = document.createElement('option');
+      op.value = i; op.textContent = i + '日';
+      if(i===cur) op.selected = true;
+      bdEl.appendChild(op);
+    }
+  }
+  updateDays();
+  bmEl.addEventListener('change', updateDays);
+  byEl.addEventListener('change', updateDays);
+});
 </script>
 
 </body>
