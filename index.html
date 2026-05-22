@@ -856,28 +856,7 @@ function addAiMsg(role, text){
     const btn = document.createElement('button');
     btn.className = 'speak-btn';
     btn.textContent = '🔊 読み上げ';
-    const cleanText = text
-      .replace(/[#*]/g, '')
-      .replace(/[【】「」『』〔〕（）]/g, '')
-      .replace(/《|》|〈|〉/g, '')
-      .replace(/-{2,}/g, '')
-      .replace(/
-{3,}/g, '
-
-')
-      .replace(/風花人/g, 'ふうかじん')
-      .replace(/天花人/g, 'てんかじん')
-      .replace(/水花人/g, 'すいかじん')
-      .replace(/白花人/g, 'はくかじん')
-      .replace(/離花人/g, 'りかじん')
-      .replace(/仙花人/g, 'せんかじん')
-      .replace(/大殺界/g, 'だいさっかい')
-      .replace(/十二運気/g, 'じゅうにうんき')
-      .replace(/大運/g, 'だいうん')
-      .replace(/＋/g, 'ぷらす')
-      .replace(/－/g, 'まいなす')
-      .replace(/[+]/g, 'ぷらす')
-      .trim();
+    const cleanText = text.replace(/[#*]/g, '').replace(/\u3010|\u3011|\u300c|\u300d|\u300e|\u300f|\u3014|\u3015|\uff08|\uff09/g, '').replace(/\u300a|\u300b|\u3008|\u3009/g, '').replace(/-{2,}/g, '').replace(/\n{3,}/g, '\n\n').replace(/\u98a8\u82b1\u4eba/g, '\u3075\u3046\u304b\u3058\u3093').replace(/\u5929\u82b1\u4eba/g, '\u3066\u3093\u304b\u3058\u3093').replace(/\u6c34\u82b1\u4eba/g, '\u3059\u3044\u304b\u3058\u3093').replace(/\u767d\u82b1\u4eba/g, '\u306f\u304f\u304b\u3058\u3093').replace(/\u96e2\u82b1\u4eba/g, '\u308a\u304b\u3058\u3093').replace(/\u4ed9\u82b1\u4eba/g, '\u305b\u3093\u304b\u3058\u3093').replace(/\u5927\u6bba\u754c/g, '\u3060\u3044\u3055\u3063\u304b\u3044').replace(/\u5341\u4e8c\u904b\u6c17/g, '\u3058\u3085\u3046\u306b\u3046\u3093\u304d').replace(/\u5927\u904b/g, '\u3060\u3044\u3046\u3093').replace(/\uff0b/g, '\u3077\u3089\u3059').replace(/\uff0d/g, '\u307e\u3044\u306a\u3059').replace(/[+]/g, '\u3077\u3089\u3059').trim();
     btn.onclick = () => speakText(cleanText, btn);
     msgs.appendChild(btn);
   }
