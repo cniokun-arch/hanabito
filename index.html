@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>四柱推命 命式・大運アプリ</title>
+<title>花人占術</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap');
@@ -130,9 +130,9 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 </style>
 </head>
 <body>
-<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">四柱推命 命式・大運・一生運命グラフ自動計算アプリ</h2>
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">花人占術 命式・大運・一生運命グラフ自動計算アプリ</h2>
 <div class="app">
-  <div class="header"><h1>四 柱 推 命</h1><p>生年月日と性別を入力すると、命式・大運・一生分の運命の推移を自動計算します</p></div>
+  <div class="header"><h1>花 人 占 術</h1><p>生年月日と性別を入力すると、花人と運命の推移を自動計算します</p></div>
   <div class="input-panel">
     <h2>◆ 命式入力</h2>
     <div class="input-row">
@@ -381,7 +381,7 @@ function calculate(){
     while(bi<MAX_AGE){const dk=A2D[bi];let end=bi;while(end+1<MAX_AGE&&A2D[end+1].ks===dk.ks)end++;const sp=end-bi+1;BLK.push({sa:bi,sp,ks:dk.ks,kan:dk.kan,shi:dk.shi,th:(T||[])[JIKKAN.indexOf(dk.kan)]||'—',jos:(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',ku:KN[A2K[bi]]||'',isSk:sats.includes(dk.shi)});bi=end+1;}
     function cH(lbl,kan,shi,zo,th,zth,js,jn){return`<div class="meishiki-col"><div class="col-label">${lbl}</div><div class="kanshi-big">${kan}<span class="kanshi-shi">${shi}</span></div><div class="zokan">蔵干：${zo}</div><div class="tsuhen">${th}${zth&&zth!=='—'?'・'+zth:''}</div><div class="jusei">${js}</div><div class="juni" style="color:${getJuniColor(jn)}">${jn}</div></div>`;}
     document.getElementById('meishiki-grid').innerHTML=cH('年　柱',nenKan,nenShi,nZ,T[nenKanIdx]||'—',T[JIKKAN.indexOf(nZ)]||'—',nJus,nJu)+cH('月　柱',tsuKan,tsuShi,tZ,T[tsuKanIdx]||'—',T[JIKKAN.indexOf(tZ)]||'—',tJus,tJu)+cH('日　柱（本人）',nichiKan,nichiShi,niZ,'—',T[JIKKAN.indexOf(niZ)]||'—',niJus,niJu);
-    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">星　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">宿命大殺界</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月に要注意</div></div>`;
+    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">宿命大殺界</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月に要注意</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWave=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
     const lifeCurrIdx=A2D.findIndex((_,i)=>y+i===CY);
@@ -495,12 +495,12 @@ function openPrint(){
   </div>
   <div class="ai-messages" id="aiMessages">
     <div class="ai-msg ai">こんにちは！花人占術AIです🌸
-生年月日を入力した後に、星人・運気・大運など何でも聞いてください。
+生年月日を入力した後に、花人・運気・大運など何でも聞いてください。
 無料でご利用いただけます。</div>
   </div>
   <div class="ai-quick">
     <button onclick="quickAsk('今年の運気について教えて')">今年の運気</button>
-    <button onclick="quickAsk('私の星人の特徴を教えて')">星人の特徴</button>
+    <button onclick="quickAsk('私の花人の特徴を教えて')">花人の特徴</button>
     <button onclick="quickAsk('大殺界の過ごし方を教えて')">大殺界の過ごし方</button>
     <button onclick="quickAsk('今の大運について教えて')">今の大運</button>
     <button onclick="quickAsk('これからの転換期はいつ？')">転換期はいつ？</button>
@@ -583,15 +583,15 @@ function buildSystemPrompt(){
     const daiunJu = currA2D ? getJuniUnki(G.ht, currA2D.shi) : '不明';
     userInfo = `【相談者の命式情報】
 ・生年月日: ${G.y}年${G.m}月${G.d}日 / 性別: ${G.gender}
-・星人: ${G.ht} / 年齢: ${age}歳
+・花人: ${G.ht} / 年齢: ${age}歳
 ・今年の十二運気: ${currJu}
 ・今の大運の十二運気: ${daiunJu}
 ・宿命大殺界: ${G.sats ? G.sats.join('・') : '不明'}の年支`;
   }
   // 関連知識だけ抽出してプロンプトを軽量化
   const htKey = (typeof G !== 'undefined' && G.ht) ? G.ht.replace(/[＋－]/g,'') : null;
-  const starInfo = htKey && KB['星人'] && KB['星人'][htKey]
-    ? '【' + htKey + 'の特徴】' + KB['星人'][htKey]['説明'] + ' 性格：' + KB['星人'][htKey]['性格']
+  const starInfo = htKey && KB['花人'] && KB['花人'][htKey]
+    ? '【' + htKey + 'の特徴】' + KB['花人'][htKey]['説明'] + ' 性格：' + KB['花人'][htKey]['性格']
     : '';
   const juniInfo = Object.entries(KB['十二運気'] || {}).map(([k,v])=>
     k + '：' + v['説明'] + (v['独自解釈'] ? ' ' + v['独自解釈'] : '')
