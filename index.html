@@ -136,7 +136,23 @@ tr:hover td{background:rgba(184,134,11,0.05)}
   <div class="input-panel">
     <h2>◆ 命式入力</h2>
     <div class="input-row">
-      <div class="field"><label>生年月日</label><input type="date" id="birthdate" value="1980-07-24" min="1900-01-01" max="2024-12-31"></div>
+      <div class="field"><label>生年月日</label>
+<div style="display:flex;gap:0.5rem;align-items:center">
+  <select id="by" style="flex:2;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
+    <option value="">年</option>
+  </select>
+  <select id="bm" style="flex:1;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
+    <option value="">月</option>
+    <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+    <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+    <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+    <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+  </select>
+  <select id="bd" style="flex:1;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
+    <option value="">日</option>
+  </select>
+</div>
+</div>
       <div class="field"><label>性別</label><select id="gender"><option value="男">男（陽）</option><option value="女">女（陰）</option></select></div>
       <div class="field"><label>　</label><button class="btn" onclick="calculate()">命 式 を 出 す</button></div>
     </div>
@@ -358,9 +374,12 @@ let myChart=null,G={};
 function calculate(){
   document.getElementById('errmsg').style.display='none';
   try{
-    const dv=document.getElementById('birthdate').value,gender=document.getElementById('gender').value;
-    if(!dv){document.getElementById('errmsg').textContent='⚠ 生年月日を入力してください';document.getElementById('errmsg').style.display='block';return;}
-    const[yS,mS,dS]=dv.split('-'),y=+yS,m=+mS,d=+dS;
+    const gender=document.getElementById('gender').value;
+    const byVal=document.getElementById('by').value;
+    const bmVal=document.getElementById('bm').value;
+    const bdVal=document.getElementById('bd').value;
+    if(!byVal||!bmVal||!bdVal){document.getElementById('errmsg').textContent='⚠ 生年月日を入力してください';document.getElementById('errmsg').style.display='block';return;}
+    const y=+byVal,m=+bmVal,d=+bdVal;
     const nenKS=getYearKS(y,m,d),nenKan=nenKS[0],nenShi=nenKS[1],nenKanIdx=JIKKAN.indexOf(nenKan);
     const tsuKS=getMonthKS(y,m,d),tsuKan=tsuKS[0],tsuShi=tsuKS[1],tsuKanIdx=JIKKAN.indexOf(tsuKan),tsuShiIdx=JUNISHI.indexOf(tsuShi);
     const nichiKS=getDayKS(y,m,d),nichiKan=nichiKS[0],nichiShi=nichiKS[1],nichiKanIdx=JIKKAN.indexOf(nichiKan);
