@@ -856,7 +856,16 @@ function addAiMsg(role, text){
     const btn = document.createElement('button');
     btn.className = 'speak-btn';
     btn.textContent = '🔊 読み上げ';
-    btn.onclick = () => speakText(text, btn);
+    const cleanText = text
+      .replace(/[#*【】「」『』〔〕（）\[\]{}|\^~`]/g, '')
+      .replace(/[\-]{2,}/g, '')
+      .replace(/
+{3,}/g, '
+
+')
+      .replace(/風花人/g, 'ふうかじん').replace(/天花人/g, 'てんかじん').replace(/水花人/g, 'すいかじん').replace(/白花人/g, 'はくかじん').replace(/離花人/g, 'りかじん').replace(/仙花人/g, 'せんかじん').replace(/大殺界/g, 'だいさっかい').replace(/十二運気/g, 'じゅうにうんき').replace(/大運/g, 'だいうん').replace(/＋/g, 'ぷらす').replace(/－/g, 'まいなす').replace(/[+]/g, 'ぷらす').replace(/[-]/g, 'まいなす')
+      .trim();
+    btn.onclick = () => speakText(cleanText, btn);
     msgs.appendChild(btn);
   }
   msgs.scrollTop = msgs.scrollHeight;
@@ -879,13 +888,22 @@ function buildSystemPrompt(){
 ・今の大運の十二運気: ${daiunJu}
 ・宿命大殺界: ${G.sats ? G.sats.join('・') : '不明'}の年支`;
   }
-  return `あなたは「花人占術AI」です。花人占術の専門家として相談者の運命を丁寧に解説してください。
+  // 関連知識だけ抽出してプロンプトを軽量化
+  const htKey = (typeof G !== 'undefined' && G.ht) ? G.ht.replace(/[＋－]/g,'') : null;
+  const starInfo = htKey && KB['星人'] && KB['星人'][htKey]
+    ? '【' + htKey + 'の特徴】' + KB['星人'][htKey]['説明'] + ' 性格：' + KB['星人'][htKey]['性格']
+    : '';
+  const juniInfo = Object.entries(KB['十二運気'] || {}).map(([k,v])=>
+    k + '：' + v['説明'] + (v['独自解釈'] ? ' ' + v['独自解釈'] : '')
+  ).join('\n');
+  const daiInfo = KB['大殺界']
+    ? '【大殺界】' + KB['大殺界']['説明'] + ' ' + KB['大殺界']['過ごし方'] + ' ' + KB['大殺界']['独自解釈']
+    : '';
 
-知識ベース：${JSON.stringify(KB)}
-
-${userInfo}
-
-回答ルール：親しみやすい日本語で、花人占術の独自名称（天花人・仙花人など）を使う。六星占術という言葉は使わない。200〜400文字で簡潔かつ具体的に。`;
+  return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
+    + '【知識ベース】\n' + starInfo + '\n\n【十二運気】\n' + juniInfo + '\n\n' + daiInfo + '\n\n'
+    + userInfo
+    + '\n\n回答ルール：親しみやすい日本語で話す。花人占術の独自名称（天花人・仙花人など）を使う。六星占術という言葉は使わない。200〜400文字で簡潔かつ具体的に。記号（#や*など）は使わず普通の文章で書く。';
 }
 
 async function sendAiMsg(){
