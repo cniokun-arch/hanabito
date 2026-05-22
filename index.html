@@ -112,6 +112,19 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .ai-send{padding:0 14px;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:1.1rem}
 .ai-send:hover{opacity:0.9}
 .ai-send:disabled{opacity:0.4;cursor:not-allowed}
+
+/* 印刷ボタン */
+.print-btn{background:#4a3c28;color:#fff;border:none;padding:0.45rem 1.1rem;font-family:'Noto Serif JP',serif;font-size:0.8rem;cursor:pointer;border-radius:2px;display:inline-flex;align-items:center;gap:0.35rem}
+.print-btn:hover{background:#2a1c08}
+.print-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.print-section-header .section-title{margin-bottom:0;border-bottom:none;padding-bottom:0}
+/* 音声ボタン */
+.voice-btn{background:none;border:1px solid rgba(124,58,237,0.35);color:#7c3aed;padding:4px 8px;border-radius:12px;cursor:pointer;font-size:0.75rem;margin-left:6px;vertical-align:middle}
+.voice-btn.active{background:rgba(124,58,237,0.1)}
+.mic-btn{padding:0 12px;background:#f2ead8;border:1px solid rgba(184,134,11,0.35);border-radius:6px;cursor:pointer;font-size:1.1rem;color:#b8860b}
+.mic-btn.recording{background:rgba(220,50,50,0.1);border-color:rgba(220,50,50,0.5);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
 </head>
 <body>
@@ -128,10 +141,12 @@ tr:hover td{background:rgba(184,134,11,0.05)}
   </div>
   <div class="errmsg" id="errmsg"></div>
   <div class="result" id="result">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
-      <button class="btn-print" onclick="openPrint()">🖨 印刷用ページを生成・ダウンロード</button>
-    </div>
-    <div class="section"><div class="section-title">◆ 命式（四柱）</div><div class="meishiki-grid" id="meishiki-grid"></div></div>
+
+    <div class="section" id="print-section-1">
+      <div class="print-section-header">
+        <div class="section-title">◆ 命式（四柱）</div>
+        <button class="print-btn" onclick="printSection1()">🖨 命式・大運表を印刷</button>
+      </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
     <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section">
@@ -146,8 +161,11 @@ tr:hover td{background:rgba(184,134,11,0.05)}
         <div class="unsei-outer"><div class="unsei-inner" id="unsei-outer"></div></div>
       </div>
     </div>
-    <div class="section">
-      <div class="section-title">◆ 命運グラフ（30年ブロック）― 0〜119歳</div>
+    <div class="section" id="print-section-2">
+      <div class="print-section-header">
+        <div class="section-title">◆ 命運グラフ（30年ブロック）― 0〜119歳</div>
+        <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
+      </div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
         <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>健弱　
@@ -465,6 +483,7 @@ function openPrint(){
 <div class="ai-panel" id="aiPanel">
   <div class="ai-header">
     <span>🌸 花人占術AI（無料）</span>
+    <span><button onclick="speechEnabled=!speechEnabled;this.textContent=speechEnabled?'🔊 ON':'🔇 OFF'" style="background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;padding:2px 8px;border-radius:10px;cursor:pointer;font-size:0.72rem">🔇 OFF</button></span>
     <button onclick="toggleAiPanel()">✕</button>
   </div>
   <div class="ai-messages" id="aiMessages">
@@ -481,6 +500,7 @@ function openPrint(){
   </div>
   <div class="ai-input-row">
     <textarea id="aiInput" placeholder="質問を入力してください..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"></textarea>
+    <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="音声入力">🎤</button>
     <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">➤</button>
   </div>
 </div>
@@ -892,5 +912,144 @@ async function sendAiMsg(){
   &nbsp;|&nbsp;
   花人占術 &copy; 2026
 </div>
+<script>
+// ===== 印刷機能 =====
+function printSection1(){
+  // 命式・大運表のみ印刷
+  const w = window.open('', '_blank');
+  const content = document.getElementById('print-section-1').innerHTML
+    + '<div style="margin-top:20px">' + document.getElementById('info-row').outerHTML + '</div>'
+    + '<div style="margin-top:20px"><h2 style="font-family:serif;color:#b8860b;border-bottom:1px solid #b8860b;padding-bottom:4px;margin-bottom:8px">大運表（0〜119歳）</h2>'
+    + document.getElementById('daiunTable').outerHTML + '</div>';
+  const G_info = (typeof G !== 'undefined' && G.y) ? `${G.y}年${G.m}月${G.d}日生　${G.gender}　${G.ht}` : '';
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>花人占術 命式・大運表</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Serif JP',serif;color:#111;padding:15mm;font-size:10pt}
+h1{font-family:'Zen Old Mincho',serif;font-size:16pt;color:#b8860b;text-align:center;margin-bottom:4mm}
+.sub{text-align:center;font-size:8pt;color:#888;margin-bottom:6mm}
+.section-title,.print-section-header{display:none}
+.print-btn{display:none}
+.meishiki-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(184,134,11,0.25);border:1px solid rgba(184,134,11,0.25);margin-bottom:5mm}
+.meishiki-col{background:#fff;text-align:center;padding:3mm 2mm}
+.col-label{font-size:7pt;color:#999;margin-bottom:1mm}
+.kanshi-big{font-family:'Zen Old Mincho',serif;font-size:18pt}
+.kanshi-shi{color:#555}
+.zokan,.tsuhen,.jusei,.juni{font-size:7pt;margin-top:1mm}
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm;margin-bottom:5mm}
+.info-card{border:1px solid rgba(184,134,11,0.3);padding:2mm 3mm;text-align:center}
+.ic-label{font-size:6pt;color:#999}.ic-val{font-size:9pt;font-weight:700}.ic-sub{font-size:6pt;color:#b8860b}
+table{width:100%;border-collapse:collapse;font-size:8pt}
+th{background:#e8dcc4;padding:1.5mm 1mm;border:0.5pt solid rgba(184,134,11,0.3);font-size:7pt}
+td{padding:1.5mm 1mm;border:0.5pt solid #ddd;text-align:center}
+.sk-row td{background:#fff2f2}.td-cu{background:#fffbee}
+h2{font-family:'Zen Old Mincho',serif;font-size:10pt;color:#b8860b;border-bottom:0.5pt solid #b8860b;padding-bottom:1mm;margin-bottom:3mm}
+</style></head><body>
+<h1>花 人 占 術</h1><div class="sub">${G_info}</div>
+<h2>◆ 命式（四柱）</h2>
+${document.getElementById('meishiki-grid').outerHTML}
+${document.getElementById('info-row').outerHTML}
+<h2 style="margin-top:5mm">◆ 大運表（0〜119歳）</h2>
+<table>${document.getElementById('daiunTable').innerHTML}</table>
+<script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+function printSection2(){
+  // グラフセクションを印刷
+  const w = window.open('', '_blank');
+  const G_info = (typeof G !== 'undefined' && G.y) ? `${G.y}年${G.m}月${G.d}日生　${G.gender}　${G.ht}` : '';
+  // SVGグラフをコピー
+  const blocksHtml = document.getElementById('unsei-blocks').innerHTML;
+  // Chart.jsのcanvasをpng画像に変換
+  const canvas = document.getElementById('lifeChart');
+  const chartImg = canvas ? `<img src="${canvas.toDataURL()}" style="width:100%;max-height:200px;object-fit:contain">` : '';
+  w.document.write(`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
+<title>花人占術 命運グラフ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Noto Serif JP',serif;color:#111;padding:10mm;font-size:9pt}
+h1{font-family:'Zen Old Mincho',serif;font-size:14pt;color:#b8860b;text-align:center;margin-bottom:2mm}
+.sub{text-align:center;font-size:7pt;color:#888;margin-bottom:4mm}
+h2{font-family:'Zen Old Mincho',serif;font-size:9pt;color:#b8860b;border-bottom:0.5pt solid #b8860b;padding-bottom:1mm;margin:4mm 0 2mm}
+.ub-wrap{background:#fff;border:0.5pt solid rgba(184,134,11,0.22);border-radius:2px;margin-bottom:3mm;overflow:hidden}
+.ub-header{background:#e8dcc4;font-family:'Zen Old Mincho',serif;font-size:8pt;color:#4a3c28;padding:2px 6px}
+.ub-row{display:flex;border-bottom:0.3pt solid rgba(184,134,11,0.1);align-items:stretch}
+.ub-graph-row{display:flex;border-bottom:1pt solid rgba(184,134,11,0.3);align-items:stretch}
+.ub-lbl{flex:0 0 55px;font-size:5.5pt;color:#7a6b52;padding:2px 4px;border-right:1pt solid rgba(184,134,11,0.35);background:#f2ead8;display:flex;align-items:center;font-weight:500}
+.ub-dl{background:#e8dcc4;color:#4a3c28}
+.ub-cells{display:flex;flex:1;overflow:hidden}
+.ub-blks{display:flex;flex:1;overflow:hidden}
+.ub-blk{display:flex;align-items:center;justify-content:center;border-right:1pt solid rgba(184,134,11,0.4);overflow:hidden;padding:0 1px;height:18pt}
+.ub-blk:last-child{border-right:none}
+.ub-sep{border-top:1pt solid rgba(184,134,11,0.35)}
+</style></head><body>
+<h1>花 人 占 術　命運グラフ</h1><div class="sub">${G_info}</div>
+<h2>◆ 命運グラフ（30年ブロック）</h2>
+${blocksHtml}
+<h2>◆ 大運グラフ（一生分）</h2>
+${chartImg}
+<script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+// ===== 音声入力 =====
+let recognition = null;
+let isRecording = false;
+
+function toggleMic(){
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    alert('お使いのブラウザは音声入力に対応していません。Chromeをお試しください。');
+    return;
+  }
+  if(isRecording){ stopMic(); return; }
+  startMic();
+}
+
+function startMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'ja-JP';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onresult = e => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('aiInput').value = text;
+    stopMic();
+    sendAiMsg();
+  };
+  recognition.onerror = () => stopMic();
+  recognition.onend = () => stopMic();
+  recognition.start();
+  isRecording = true;
+  const btn = document.getElementById('micBtn');
+  if(btn){ btn.classList.add('recording'); btn.title='録音中... クリックで停止'; }
+}
+
+function stopMic(){
+  if(recognition){ try{ recognition.stop(); }catch(e){} }
+  isRecording = false;
+  const btn = document.getElementById('micBtn');
+  if(btn){ btn.classList.remove('recording'); btn.title='音声入力'; }
+}
+
+// ===== 読み上げ =====
+let speechEnabled = false;
+
+function speakText(text){
+  if(!speechEnabled) return;
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ja-JP';
+  utter.rate = 1.0;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+</script>
+
 </body>
 </html>
