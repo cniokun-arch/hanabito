@@ -424,14 +424,26 @@ function calculate(){
     const KN=['初句','1句','2句','3句','4句','5句','6句','7句','8句','9句','10句','11句','12句'];
     const BLK=[];let bi=0;
     while(bi<MAX_AGE){const dk=A2D[bi];let end=bi;while(end+1<MAX_AGE&&A2D[end+1].ks===dk.ks)end++;const sp=end-bi+1;BLK.push({sa:bi,sp,ks:dk.ks,kan:dk.kan,shi:dk.shi,th:(T||[])[JIKKAN.indexOf(dk.kan)]||'—',jos:(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',ku:KN[A2K[bi]]||'',isSk:sats.includes(dk.shi)});bi=end+1;}
-    function cH(lbl,kan,shi,zo,th,zth,js,jn){
-  const gKan=gogyoBadge(kan), gShi=gogyoBadge(shi);
+    function gogyoTag(char){
+  const g=getGogyo(char);
+  if(!g)return '';
+  const col=GOGYO_COLOR[g['行']]||'#666';
+  return '<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;margin-left:3px">'
+    +'<span style="font-size:0.55rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px;white-space:nowrap">'+g['行']+'</span>'
+    +'<span style="font-size:0.55rem;color:'+col+';margin-top:1px">'+g['陰陽']+'</span>'
+    +'</div>';
+}
+function cH(lbl,kan,shi,zo,th,zth,js,jn){
   return `<div class="meishiki-col">
     <div class="col-label">${lbl}</div>
-    <div style="display:flex;align-items:center;justify-content:center">
-      <div class="kanshi-big">${kan}<span class="kanshi-shi">${shi}</span></div>
-      <div style="display:flex;gap:2px;margin-left:4px">
-        ${gKan}${gShi}
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center">
+        <span style="font-family:'Zen Old Mincho',serif;font-size:1.7rem;color:#1a1208">${kan}</span>
+        ${gogyoTag(kan)}
+      </div>
+      <div style="display:flex;align-items:center">
+        <span style="font-family:'Zen Old Mincho',serif;font-size:1.7rem;color:#4a3c28">${shi}</span>
+        ${gogyoTag(shi)}
       </div>
     </div>
     <div class="zokan">蔵干：${zo}</div>
