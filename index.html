@@ -669,20 +669,32 @@ function buildSystemPrompt(){
 ・今の大運の十二運気: ${daiunJu}
 ・宿命大殺界: ${G.sats ? G.sats.join('・') : '不明'}の年支`;
   }
-  // 関連知識だけ抽出してプロンプトを軽量化
+  // KBの星人キーを確認（星人または花人）
+  const starKey = KB['星人'] ? '星人' : (KB['花人'] ? '花人' : null);
   const htKey = (typeof G !== 'undefined' && G.ht) ? G.ht.replace(/[＋－]/g,'') : null;
-  const starInfo = htKey && KB['花人'] && KB['花人'][htKey]
-    ? '【' + htKey + 'の特徴】' + KB['花人'][htKey]['説明'] + ' 性格：' + KB['花人'][htKey]['性格']
+  const starInfo = htKey && starKey && KB[starKey] && KB[starKey][htKey]
+    ? '【' + htKey + 'の特徴】' + (KB[starKey][htKey]['説明']||'') + ' 性格：' + (KB[starKey][htKey]['性格']||'')
     : '';
   const juniInfo = Object.entries(KB['十二運気'] || {}).map(([k,v])=>
-    k + '：' + v['説明'] + (v['独自解釈'] ? ' ' + v['独自解釈'] : '')
+    k + '：' + (v['説明']||'') + (v['独自解釈'] ? ' ' + v['独自解釈'] : '')
   ).join('\n');
+  // カスタムセクション（十二支・十干など）も全部参照
+  const standardKeys = ['_meta','星人','花人','十二運気','大殺界','十二大従星','大運','使い方ガイド'];
+  const customInfo = Object.entries(KB).filter(([k])=>!standardKeys.includes(k)).map(([k,v])=>{
+    if(typeof v !== 'object') return '【'+k+'】'+v;
+    const items = Object.entries(v).map(([name,data])=>{
+      if(typeof data === 'object') return name+'('+Object.entries(data).map(([fk,fv])=>fk+':'+fv).join(',')+')';
+      return name+':'+data;
+    }).join(' / ');
+    return '【'+k+'】'+items;
+  }).join('\n');
   const daiInfo = KB['大殺界']
     ? '【大殺界】' + KB['大殺界']['説明'] + ' ' + KB['大殺界']['過ごし方'] + ' ' + KB['大殺界']['独自解釈']
     : '';
 
   return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
     + '【知識ベース】\n' + starInfo + '\n\n【十二運気】\n' + juniInfo + '\n\n' + daiInfo + '\n\n'
+    + (customInfo ? '【追加知識】\n' + customInfo + '\n\n' : '')
     + userInfo
     + '\n\n回答ルール：親しみやすい日本語で話す。花人占術の独自名称（天花人・仙花人など）を使う。六星占術という言葉は使わない。200〜400文字で簡潔かつ具体的に。記号（#や*など）は使わず普通の文章で書く。';
 }
