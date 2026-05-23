@@ -614,7 +614,10 @@ loadKB();
 let aiHistory = [];
 
 function toggleAiPanel(){
-  document.getElementById('aiPanel').classList.toggle('open');
+  const panel = document.getElementById('aiPanel');
+  const fab = document.querySelector('.ai-fab');
+  panel.classList.toggle('open');
+  if (fab) fab.style.display = panel.classList.contains('open') ? 'none' : 'flex';
 }
 
 function quickAsk(q){
