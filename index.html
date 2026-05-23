@@ -202,6 +202,32 @@ tr:hover td{background:rgba(184,134,11,0.05)}
   </div>
 </div>
 <script>
+
+// 五行データ
+const GOGYO = {
+  '甲':{'行':'木','陰陽':'＋'},'乙':{'行':'木','陰陽':'－'},
+  '丙':{'行':'火','陰陽':'＋'},'丁':{'行':'火','陰陽':'－'},
+  '戊':{'行':'土','陰陽':'＋'},'己':{'行':'土','陰陽':'－'},
+  '庚':{'行':'金','陰陽':'＋'},'辛':{'行':'金','陰陽':'－'},
+  '壬':{'行':'水','陰陽':'＋'},'癸':{'行':'水','陰陽':'－'},
+  '子':{'行':'水','陰陽':'＋'},'丑':{'行':'土','陰陽':'－'},
+  '寅':{'行':'木','陰陽':'＋'},'卯':{'行':'木','陰陽':'－'},
+  '辰':{'行':'土','陰陽':'＋'},'巳':{'行':'火','陰陽':'－'},
+  '午':{'行':'火','陰陽':'＋'},'未':{'行':'土','陰陽':'－'},
+  '申':{'行':'金','陰陽':'＋'},'酉':{'行':'金','陰陽':'－'},
+  '戌':{'行':'土','陰陽':'＋'},'亥':{'行':'水','陰陽':'－'}
+};
+const GOGYO_COLOR = {'木':'#2d7a3a','火':'#c0392b','土':'#b8860b','金':'#7a6b52','水':'#1a5a8a'};
+function getGogyo(char) { return GOGYO[char] || null; }
+function gogyoBadge(char) {
+  const g = getGogyo(char);
+  if (!g) return '';
+  const col = GOGYO_COLOR[g['行']] || '#666';
+  return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-left:4px;line-height:1.2">'
+    + '<span style="font-size:0.6rem;color:' + col + ';font-weight:700;border:1px solid ' + col + ';border-radius:2px;padding:0 3px">' + g['行'] + '</span>'
+    + '<span style="font-size:0.58rem;color:' + col + ';margin-top:1px">' + g['陰陽'] + '</span>'
+    + '</div>';
+}
 const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
@@ -265,7 +291,7 @@ function makeInlineSvg(nenData,currIdx,totalW,graphH){
   const pxR=i=>i/(n-1)*(totalW-CW)+CW/2, pxS=i=>i/(ns-1)*(totalW-CW)+CW/2;
   const py=v=>pT+gH*(1-(Math.max(minV,Math.min(maxV,v))-minV)/(maxV-minV));
   const mid=py(0),uid='g'+Math.random().toString(36).slice(2,6);
-  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${graphH}" viewBox="0 0 ${totalW} ${graphH}" style="display:block">`;
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${graphH}" viewBox="0 0 ${totalW} ${graphH}" preserveAspectRatio="none" style="display:block;overflow:visible">`;
   s+=`<defs><linearGradient id="gp${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a8c4a" stop-opacity="0.28"/><stop offset="100%" stop-color="#2a8c4a" stop-opacity="0.04"/></linearGradient><linearGradient id="gn${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#882222" stop-opacity="0.04"/><stop offset="100%" stop-color="#882222" stop-opacity="0.22"/></linearGradient></defs>`;
   s+=`<line x1="0" y1="${mid}" x2="${totalW}" y2="${mid}" stroke="rgba(0,0,0,0.12)" stroke-width="0.5"/>`;
   const{posPath,negPath}=buildFillPaths(rawVals,pxR,py,mid);
@@ -362,7 +388,7 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">${cells('',44,r=>`<span style="font-size:0.48rem;color:${tc(r,'#4a3c28')};line-height:1.15;text-align:center">${String(r.yr).split('').join('<br>')}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
-  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:hidden;height:${graphH}px">${svg}</div></div>
+  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px">${svg}</div></div>
   <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</span>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</span>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</span>`;})}</div></div>
@@ -398,7 +424,22 @@ function calculate(){
     const KN=['初句','1句','2句','3句','4句','5句','6句','7句','8句','9句','10句','11句','12句'];
     const BLK=[];let bi=0;
     while(bi<MAX_AGE){const dk=A2D[bi];let end=bi;while(end+1<MAX_AGE&&A2D[end+1].ks===dk.ks)end++;const sp=end-bi+1;BLK.push({sa:bi,sp,ks:dk.ks,kan:dk.kan,shi:dk.shi,th:(T||[])[JIKKAN.indexOf(dk.kan)]||'—',jos:(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',ku:KN[A2K[bi]]||'',isSk:sats.includes(dk.shi)});bi=end+1;}
-    function cH(lbl,kan,shi,zo,th,zth,js,jn){return`<div class="meishiki-col"><div class="col-label">${lbl}</div><div class="kanshi-big">${kan}<span class="kanshi-shi">${shi}</span></div><div class="zokan">蔵干：${zo}</div><div class="tsuhen">${th}${zth&&zth!=='—'?'・'+zth:''}</div><div class="jusei">${js}</div><div class="juni" style="color:${getJuniColor(jn)}">${jn}</div></div>`;}
+    function cH(lbl,kan,shi,zo,th,zth,js,jn){
+  const gKan=gogyoBadge(kan), gShi=gogyoBadge(shi);
+  return `<div class="meishiki-col">
+    <div class="col-label">${lbl}</div>
+    <div style="display:flex;align-items:center;justify-content:center">
+      <div class="kanshi-big">${kan}<span class="kanshi-shi">${shi}</span></div>
+      <div style="display:flex;gap:2px;margin-left:4px">
+        ${gKan}${gShi}
+      </div>
+    </div>
+    <div class="zokan">蔵干：${zo}</div>
+    <div class="tsuhen">${th}${zth&&zth!=='—'?'・'+zth:''}</div>
+    <div class="jusei">${js}</div>
+    <div class="juni" style="color:${getJuniColor(jn)}">${jn}</div>
+  </div>`;
+}
     document.getElementById('meishiki-grid').innerHTML=cH('年　柱',nenKan,nenShi,nZ,T[nenKanIdx]||'—',T[JIKKAN.indexOf(nZ)]||'—',nJus,nJu)+cH('月　柱',tsuKan,tsuShi,tZ,T[tsuKanIdx]||'—',T[JIKKAN.indexOf(tZ)]||'—',tJus,tJu)+cH('日　柱（本人）',nichiKan,nichiShi,niZ,'—',T[JIKKAN.indexOf(niZ)]||'—',niJus,niJu);
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">宿命大殺界</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月に要注意</div></div>`;
     const CY=new Date().getFullYear();
