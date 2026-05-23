@@ -41,15 +41,15 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .ic-label{font-size:0.68rem;color:#7a6b52;margin-bottom:0.3rem}
 .ic-val{font-size:1rem;color:#1a1208;font-weight:500}
 .ic-sub{font-size:0.7rem;color:#b8860b;margin-top:0.2rem}
-.chart-wrap{background:#faf6ef;border:1px solid rgba(184,134,11,0.25);border-radius:2px;padding:1rem}
+.chart-wrap{background:#faf6ef;border:1px solid rgba(184,134,11,0.25);border-radius:2px;padding:1rem;overflow:visible}
 .legend{display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;font-size:0.68rem;color:#7a6b52}
 .ld{display:flex;align-items:center;gap:0.3rem}
 .ldot{width:16px;height:3px;border-radius:2px;flex-shrink:0}
 /* 横スクロール表: 二層構造でstickyを正常動作させる */
-.unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:2px;overflow:hidden}
+.unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:2px}
 .unsei-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
 .u-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch;width:max-content;min-width:100%}
-.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%}
+.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%;overflow:visible}
 .u-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:3px 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500;position:sticky;left:0;z-index:3;box-shadow:2px 0 5px rgba(0,0,0,0.08)}
 .u-lbl.dl{background:#e8dcc4;color:#4a3c28;border-top:2px solid rgba(184,134,11,0.4)}
 .u-lbl.graph-lbl{background:#f8f4ec;color:#7a6b52;border-top:1px solid rgba(184,134,11,0.2);font-size:0.58rem}
