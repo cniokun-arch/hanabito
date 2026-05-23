@@ -126,6 +126,8 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .speak-btn{display:block;margin-top:4px;font-size:0.68rem;padding:2px 10px;background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:10px;cursor:pointer;color:#7a6b52;font-family:'Noto Serif JP',serif}
 .speak-btn:hover{background:#e8dcc4}
+@media(max-width:700px){#unsei-scroll-section{display:none!important}.mobile-unsei-note{display:block!important}}
+@media(min-width:701px){.mobile-unsei-note{display:none!important}}
 @media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
 </head>
@@ -167,7 +169,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
       </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
     <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
-    <div class="section">
+    <div class="section" id="unsei-scroll-section">
       <div class="section-title">◆ 命運グラフ（横型）― 0〜119歳</div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
@@ -178,6 +180,9 @@ tr:hover td{background:rgba(184,134,11,0.05)}
       <div class="chart-wrap" style="padding:0.5rem">
         <div class="unsei-outer"><div class="unsei-inner" id="unsei-outer"></div></div>
       </div>
+    </div>
+    <div class="mobile-unsei-note" style="display:none;background:#f2ead8;border:1px solid rgba(184,134,11,0.25);border-radius:4px;padding:0.7rem 1rem;margin:0.5rem 0;font-size:0.8rem;color:#7a6b52;line-height:1.6">
+      ※ 横スクロール版はPCでご覧ください。以下の30年ブロック版でも全期間を確認できます。
     </div>
     <div class="section" id="print-section-2">
       <div class="print-section-header">
@@ -196,7 +201,11 @@ tr:hover td{background:rgba(184,134,11,0.05)}
       <div class="section-title">◆ 大運グラフ（一生分・0〜119歳）</div>
       <div class="chart-wrap">
         <div class="legend" id="life-legend"></div>
-        <div style="position:relative;width:100%;height:240px"><canvas id="lifeChart" role="img" aria-label="大運グラフ"></canvas></div>
+        <div style="position:relative;width:100%;height:240px"><p style="font-size:0.78rem;color:#7a6b52;margin-bottom:0.8rem;line-height:1.7">
+  ※ あなたの人生（120年）の中で、落とし穴になる時期や安定する時期を分かりやすく表示しています。<br>
+  ※ スマートフォンなら指で、パソコンならカーソルでグラフをなぞるとその時の年齢が分かります。
+</p>
+<canvas id="lifeChart" role="img" aria-label="大運グラフ"></canvas></div>
       </div>
     </div>
   </div>
