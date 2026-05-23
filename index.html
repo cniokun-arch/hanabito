@@ -659,7 +659,7 @@ function addAiMsg(role, text){
   return el;
 }
 
-function buildSystemPrompt(){
+function buildSystemPrompt(isPersonal){
   let userInfo = '';
   if(typeof G !== 'undefined' && G && G.y){
     const CY = new Date().getFullYear();
@@ -684,16 +684,16 @@ function buildSystemPrompt(){
   const juniInfo = Object.entries(KB['十二運気'] || {}).map(([k,v])=>
     k + '：' + (v['説明']||'') + (v['独自解釈'] ? ' ' + v['独自解釈'] : '')
   ).join('\n');
-  // カスタムセクション（十二支・十干など）も全部参照
+  // カスタムセクション（十二支・十干など）は総合質問の時だけ参照
   const standardKeys = ['_meta','星人','花人','十二運気','大殺界','十二大従星','大運','使い方ガイド'];
-  const customInfo = Object.entries(KB).filter(([k])=>!standardKeys.includes(k)).map(([k,v])=>{
+  const customInfo = isPersonal ? Object.entries(KB).filter(([k])=>!standardKeys.includes(k)).map(([k,v])=>{
     if(typeof v !== 'object') return '【'+k+'】'+v;
     const items = Object.entries(v).map(([name,data])=>{
       if(typeof data === 'object') return name+'('+Object.entries(data).map(([fk,fv])=>fk+':'+fv).join(',')+')';
       return name+':'+data;
     }).join(' / ');
     return '【'+k+'】'+items;
-  }).join('\n');
+  }).join('\n') : '';
   const daiInfo = KB['大殺界']
     ? '【大殺界】' + KB['大殺界']['説明'] + ' ' + KB['大殺界']['過ごし方'] + ' ' + KB['大殺界']['独自解釈']
     : '';
@@ -722,10 +722,12 @@ async function sendAiMsg(){
   aiHistory.push({role:'user', content: q});
   const loadingEl = addAiMsg('loading', '考え中...');
   try{
+    // メッセージの意図を判定（総合質問かどうか）
+    const isPersonal = /私|僕|俺|自分|どんな人|深層|本質|欲求|強み|弱み|性格|特徴を教えて|どう生き|人生|運命|向いて/.test(q);
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({system: buildSystemPrompt(), messages: aiHistory})
+      body: JSON.stringify({system: buildSystemPrompt(isPersonal), messages: aiHistory})
     });
     if(!res.ok){
       const err = await res.json().catch(()=>({}));
