@@ -944,6 +944,24 @@ async function speakText(text, btn){
     if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; }
     return;
   }
+  // テキストを読み仮名に変換
+  var t = text;
+  var removes = ['#','*','【','】','「」','『』','〔〕','（','）','《','》','〈','〉'];
+  removes.forEach(function(c){ while(t.indexOf(c)>=0) t=t.replace(c,''); });
+  var reads = [
+    ['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
+    ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
+    ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','だいうん'],
+    ['＋','ぷらす'],['－','まいなす'],['+','ぷらす'],
+    ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
+    ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
+    ['壬','みずのえ'],['癸','みずのと'],
+    ['子','ね'],['丑','うし'],['寅','とら'],['卯','う'],
+    ['辰','たつ'],['巳','み'],['午','うま'],['未','ひつじ'],
+    ['申','さる'],['酉','とり'],['戌','いぬ'],['亥','い']
+  ];
+  reads.forEach(function(p){ while(t.indexOf(p[0])>=0) t=t.replace(p[0],p[1]); });
+  text = t;
   if(btn){ btn.textContent = '⏳ 生成中...'; btn.disabled = true; }
   try{
     const gender = document.getElementById('ttsGender')?.value || 'female';
