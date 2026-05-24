@@ -684,8 +684,7 @@ function buildSystemPrompt(isPersonal){
         }
       });
       return found.join(' ');
-    }).filter(Boolean).join('
-');
+    }).filter(Boolean).join('\n');
 
     userInfo = `【相談者の命式情報】
 ・生年月日: ${G.y}年${G.m}月${G.d}日 / 性別: ${G.gender}
