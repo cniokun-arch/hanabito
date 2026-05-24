@@ -693,15 +693,14 @@ function buildSystemPrompt(isPersonal){
       return results.join(' / ');
     })();
 
-    userInfo = `【相談者の命式情報】
-・生年月日: ${G.y}年${G.m}月${G.d}日 / 性別: ${G.gender}
-・花人: ${G.ht} / 年齢: ${age}歳
-・年柱: ${G.nenKan}${G.nenShi} / 月柱: ${G.tsuKan}${G.tsuShi} / 日柱: ${G.nichiKan}${G.nichiShi}
-・今年の十二運気: ${currJu}
-・今の大運の十二運気: ${daiunJu}
-・宿命大殺界: ${G.sats ? G.sats.join('・') : '不明'}の年支
-${kanshiKBInfo ? '・命式の干支に関する知識ベース情報:
-'+kanshiKBInfo : ''}`;
+    userInfo = '【相談者の命式情報】\n'
+      + '・生年月日: ' + G.y + '年' + G.m + '月' + G.d + '日 / 性別: ' + G.gender + '\n'
+      + '・花人: ' + G.ht + ' / 年齢: ' + age + '歳\n'
+      + '・年柱: ' + G.nenKan + G.nenShi + ' / 月柱: ' + G.tsuKan + G.tsuShi + ' / 日柱: ' + G.nichiKan + G.nichiShi + '\n'
+      + '・今年の十二運気: ' + currJu + '\n'
+      + '・今の大運の十二運気: ' + daiunJu + '\n'
+      + '・宿命大殺界: ' + (G.sats ? G.sats.join('・') : '不明') + 'の年支\n'
+      + (kanshiKBInfo ? '・命式の干支に関する知識ベース情報:\n' + kanshiKBInfo : '');
   }
   // KBの星人キーを確認（星人または花人）
   const starKey = KB['星人'] ? '星人' : (KB['花人'] ? '花人' : null);
