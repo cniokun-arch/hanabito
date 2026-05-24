@@ -670,21 +670,28 @@ function buildSystemPrompt(isPersonal){
     const daiunJu = currA2D ? getJuniUnki(G.ht, currA2D.shi) : '不明';
     // 命式の干支から知識ベースの該当データを取得
     const allKanShi = [G.nenKan, G.nenShi, G.tsuKan, G.tsuShi, G.nichiKan, G.nichiShi].filter(Boolean);
-    const kanshiKBInfo = allKanShi.map(ks => {
-      // 全セクションから該当する干支のデータを探す
-      const found = [];
-      Object.entries(KB).forEach(([secKey, secVal]) => {
-        if (typeof secVal !== 'object') return;
-        if (secVal[ks]) {
-          const d = secVal[ks];
-          const desc = typeof d === 'object' 
-            ? Object.entries(d).map(([k,v])=>k+'：'+v).join('、')
-            : String(d);
-          found.push('['+ks+'('+secKey+')] '+desc);
+    const kanshiKBInfo = (function(){
+      var results = [];
+      for(var ki=0; ki<allKanShi.length; ki++){
+        var ks = allKanShi[ki];
+        var found = [];
+        var kbKeys = Object.keys(KB);
+        for(var ki2=0; ki2<kbKeys.length; ki2++){
+          var secKey = kbKeys[ki2];
+          var secVal = KB[secKey];
+          if(typeof secVal !== 'object') continue;
+          if(secVal[ks]){
+            var d = secVal[ks];
+            var desc = typeof d === 'object'
+              ? Object.entries(d).map(function(e){ return e[0]+':'+e[1]; }).join('、')
+              : String(d);
+            found.push('['+ks+'('+secKey+')] '+desc);
+          }
         }
-      });
-      return found.join(' ');
-    }).filter(Boolean).join('\n');
+        if(found.length) results.push(found.join(' '));
+      }
+      return results.join(' / ');
+    })();
 
     userInfo = `【相談者の命式情報】
 ・生年月日: ${G.y}年${G.m}月${G.d}日 / 性別: ${G.gender}
