@@ -344,7 +344,7 @@ function makeInlineSvg(nenData,currIdx,totalW,graphH){
   let pc=null,pd='';
   for(let i=0;i<ns;i++){const v=i<ns-1?(smooth[i]+smooth[i+1])/2:smooth[i],col=getWaveColor(v);if(col!==pc){if(pd&&pc)s+=`<path d="${pd}" stroke="${pc}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;pd=`M${pxS(i)},${py(smooth[i])}`;pc=col;}else pd+=` L${pxS(i)},${py(smooth[i])}`;}
   if(pd&&pc)s+=`<path d="${pd}" stroke="${pc}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-  if(currIdx>=0&&currIdx<n){const cx=pxR(currIdx),cy=py(rawVals[currIdx]);s+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;s+=`<text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="18" fill="#f0c040" stroke="#b8860b" stroke-width="0.8" paint-order="stroke">★</text>`;}
+  if(currIdx>=0&&currIdx<n){const cx=pxR(currIdx),cy=py(rawVals[currIdx]);s+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;s+=`<text x="${cx}" y="${cy+8}" text-anchor="middle" font-size="20" dominant-baseline="middle">🌟</text>`;}
   return s+'</svg>';
 }
 
@@ -423,7 +423,7 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
     const pctY = (cy / graphH * 100).toFixed(3);
     starOverlay = `<div style="position:absolute;inset:0;pointer-events:none;z-index:2">` +
       `<div style="position:absolute;left:${pctX}%;top:0;bottom:0;width:1.2px;background:repeating-linear-gradient(to bottom,rgba(160,60,160,0.6) 0,rgba(160,60,160,0.6) 4px,transparent 4px,transparent 7px);transform:translateX(-50%)"></div>` +
-      `<div style="position:absolute;left:${pctX}%;top:${pctY}%;transform:translate(-50%,-50%);font-size:22px;line-height:1;color:#f0c040;text-shadow:0 0 3px #b8860b,0 0 1px #fff">★</div>` +
+      `<div style="position:absolute;left:${pctX}%;top:${pctY}%;transform:translate(-50%,-50%);font-size:24px;line-height:1;pointer-events:none">🌟</div>` +
       `</div>`;
   }
   svg += '</svg>';
@@ -510,7 +510,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
   </div>`;
 }
     document.getElementById('meishiki-grid').innerHTML=cH('年　柱',nenKan,nenShi,nZ,T[nenKanIdx]||'—',T[JIKKAN.indexOf(nZ)]||'—',nJus,nJu)+cH('月　柱',tsuKan,tsuShi,tZ,T[tsuKanIdx]||'—',T[JIKKAN.indexOf(tZ)]||'—',tJus,tJu)+cH('日　柱（本人）',nichiKan,nichiShi,niZ,'—',T[JIKKAN.indexOf(niZ)]||'—',niJus,niJu);
-    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">宿命大殺界</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月に要注意</div></div>`;
+    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWave=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
     const lifeCurrIdx=A2D.findIndex((_,i)=>y+i===CY);
@@ -602,9 +602,10 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.textAlign='center';
           ctx.textBaseline='middle';
           ctx.strokeStyle='#b8860b';ctx.lineWidth=1.5;
-          ctx.strokeText('★',xp,yp);
-          ctx.fillStyle='#f0c040';
-          ctx.fillText('★',xp,yp);
+          ctx.font='bold 20px sans-serif';
+          ctx.textAlign='center';
+          ctx.textBaseline='middle';
+          ctx.fillText('🌟',xp,yp);
           ctx.restore();
         }
       }
@@ -655,7 +656,7 @@ function openPrint(){
   <div class="ai-quick">
     <button onclick="quickAsk('今年の運気について教えて')">今年の運気</button>
     <button onclick="quickAsk('私の花人の特徴を教えて')">花人の特徴</button>
-    <button onclick="quickAsk('大殺界の過ごし方を教えて')">大殺界の過ごし方</button>
+    <button onclick="quickAsk('転化天蛹の過ごし方を教えて')">転化天蛹の過ごし方</button>
     <button onclick="quickAsk('今の大運について教えて')">今の大運</button>
     <button onclick="quickAsk('これからの転換期はいつ？')">転換期はいつ？</button>
   </div>
@@ -719,7 +720,7 @@ function addAiMsg(role, text){
       var reads = [
         ['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
         ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
-        ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','たいうん'],
+        ['転化天蛹','てんかてんよう'],['十二運気','じゅうにうんき'],['大運','たいうん'],
         ['＋','ぷらす'],['－','まいなす'],['+','ぷらす'],
         ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
         ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
@@ -778,7 +779,7 @@ function buildSystemPrompt(isPersonal){
       + '・年柱: ' + G.nenKan + G.nenShi + ' / 月柱: ' + G.tsuKan + G.tsuShi + ' / 日柱: ' + G.nichiKan + G.nichiShi + '\n'
       + '・今年の十二運気: ' + currJu + '\n'
       + '・今の大運の十二運気: ' + daiunJu + '\n'
-      + '・宿命大殺界: ' + (G.sats ? G.sats.join('・') : '不明') + 'の年支\n'
+      + '・転化天蛹: ' + (G.sats ? G.sats.join('・') : '不明') + 'の年支\n'
       + (kanshiKBInfo ? '・命式の干支に関する知識ベース情報:\n' + kanshiKBInfo : '');
   }
   // KBの星人キーを確認（星人または花人）
@@ -822,7 +823,7 @@ function buildSystemPrompt(isPersonal){
     + '【総合的な人物分析への対応】\n'
     + '「私はどんな人？」「深層心理は？」「本質は？」「欲求は？」「強み・弱みは？」など人物について聞かれた場合は①〜⑧の手順でデータベースをフル活用する。その人だけに当てはまる深い洞察を語り、相手が驚くような答えを出す。\n\n'
     + '【運気・時期の質問への対応】\n'
-    + '「今年の運気」「大運」「大殺界」「転換期」など運気に関する質問には命式情報をもとに具体的な時期・アドバイスを答える。\n\n'
+    + '「今年の運気」「大運」「転化天蛹」「転換期」など運気に関する質問には命式情報をもとに具体的な時期・アドバイスを答える。\n\n'
     + '【共通ルール】\n'
     + '・親しみやすい日本語で話す。花人占術の独自名称（天花人・仙花人など）を使う。六星占術という言葉は使わない。\n'
     + '・単発の概念質問は200〜300文字で答える。人物分析・深層心理など総合質問は400〜800文字で詳しく答える。記号（#や*など）は使わず普通の文章で書く。\n'
@@ -1023,7 +1024,7 @@ async function speakText(text, btn){
   var reads = [
     ['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
     ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
-    ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','たいうん'],
+    ['転化天蛹','てんかてんよう'],['十二運気','じゅうにうんき'],['大運','たいうん'],
     ['＋','ぷらす'],['－','まいなす'],['+','ぷらす'],
     ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
     ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
