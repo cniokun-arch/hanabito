@@ -64,7 +64,8 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .r-shi .u-cell{height:28px;font-family:'Zen Old Mincho',serif;font-size:0.85rem}
 .r-ju .u-cell{height:52px;writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap}
 .r-sep{border-top:2px solid rgba(184,134,11,0.35)}
-.r-dks .u-blk{height:28px}.r-th .u-blk{height:24px}.r-jos .u-blk{height:24px}.r-ku .u-blk{height:20px}
+.r-dks{height:32px}.r-th{height:28px}.r-jos{height:28px}.r-ku{height:24px}
+.r-dks .u-blk,.r-th .u-blk,.r-jos .u-blk,.r-ku .u-blk{height:100%}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:0.8rem}
 th{background:#e8dcc4;color:#4a3c28;text-align:center;padding:0.5rem 0.3rem;border:1px solid rgba(184,134,11,0.25);font-weight:500;font-size:0.7rem}
@@ -81,7 +82,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .ub-sep{border-top:2px solid rgba(184,134,11,0.35)}
 .ub-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:3px 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500}
 .ub-dl{background:#e8dcc4;color:#4a3c28}
-.ub-cells{display:flex;flex:1;overflow:hidden}
+.ub-cells{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blks{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;padding:0}
 .ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
@@ -353,7 +354,7 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   function tc(r,fb){if(r.isCurr)return'#6a0080';const cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
   function bH(fn){return BLK.map(b=>`<div class="u-blk${b.isSk?' sk':''}" style="width:${b.sp*CW}px;min-width:${b.sp*CW}px">${fn(b)}</div>`).join('');}
   let h=`<div style="width:${totalW+lblW}px">`;
-  h+=`<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}height:18px;font-size:0.54rem;color:${tc(r,'#aaa')}">${r.age}</div>`).join('')}</div></div>`;
+  h+=`<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}height:22px;font-size:0.65rem;font-weight:700;color:${tc(r,'#4a3c28')}">${r.age}</div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}height:40px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.52rem;color:${tc(r,'#4a3c28')};line-height:1.1;text-align:center">${String(r.yr).split('').join('<br>')}</span></div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}height:28px;font-family:'Zen Old Mincho',serif;font-size:0.85rem;color:${tc(r,'#1a1208')}">${r.yrShi}</div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-ju"><div class="u-lbl">十二運気</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}writing-mode:vertical-rl;height:52px;font-size:0.56rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</div>`).join('')}</div></div>`;
@@ -931,7 +932,7 @@ h2{font-family:'Zen Old Mincho',serif;font-size:9pt;color:#b8860b;border-bottom:
 .ub-graph-row{display:flex;border-bottom:1pt solid rgba(184,134,11,0.3);align-items:stretch}
 .ub-lbl{flex:0 0 55px;font-size:5.5pt;color:#7a6b52;padding:2px 4px;border-right:1pt solid rgba(184,134,11,0.35);background:#f2ead8;display:flex;align-items:center;font-weight:500}
 .ub-dl{background:#e8dcc4;color:#4a3c28}
-.ub-cells{display:flex;flex:1;overflow:hidden}
+.ub-cells{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blks{display:flex;flex:1;overflow:hidden}
 .ub-blk{display:flex;align-items:center;justify-content:center;border-right:1pt solid rgba(184,134,11,0.4);overflow:hidden;padding:0 1px;height:18pt}
 .ub-blk:last-child{border-right:none}
