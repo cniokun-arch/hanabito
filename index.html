@@ -214,7 +214,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
     <div class="info-row" id="info-row"></div>
     <div class="section" id="monthly-fortune-section" style="display:none">
       <div class="section-title">◆ 月別運気（固定・毎年同じ）</div>
-      <div id="monthly-fortune-table"></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch" id="monthly-fortune-table"></div>
     </div>
     <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section" id="unsei-scroll-section">
@@ -316,35 +316,155 @@ const MONTH_SHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','
 const MONTH_LABEL = ['12月','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月'];
 
 function buildMonthlyFortune(ht, sats) {
-  const currentMonth = new Date().getMonth() + 1;
-  const currentMonthIdx = currentMonth === 12 ? 0 : currentMonth;
-  let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
-  html += '<thead><tr>';
-  ['月','支','運気','波','判定'].forEach(h => {
-    html += `<th style="padding:6px 4px;text-align:center;background:#f2ead8;border:1px solid rgba(184,134,11,0.25);color:#4a3c28;font-weight:700;font-size:0.78rem">${h}</th>`;
-  });
-  html += '</tr></thead><tbody>';
-  MONTH_LABEL.forEach((label, i) => {
-    const shi = MONTH_SHI[i];
-    const ju = getJuniUnki(ht, shi);
+  const currentMonth = new Date().getMonth() + 1; // 1-12
+  // 12月→1月の順（左から右へ）
+  const MONTH_ORDER = [
+    {label:'12月', shi:'子', month:12},
+    {label:'11月', shi:'亥', month:11},
+    {label:'10月', shi:'戌', month:10},
+    {label:'9月',  shi:'酉', month:9},
+    {label:'8月',  shi:'申', month:8},
+    {label:'7月',  shi:'未', month:7},
+    {label:'6月',  shi:'午', month:6},
+    {label:'5月',  shi:'巳', month:5},
+    {label:'4月',  shi:'辰', month:4},
+    {label:'3月',  shi:'卯', month:3},
+    {label:'2月',  shi:'寅', month:2},
+    {label:'1月',  shi:'丑', month:1},
+  ];
+
+  const CW = 50; // セル幅px
+  const graphH = 110;
+  const totalW = CW * 12;
+  const lblW = 70;
+
+  // 各月の運気・波を計算
+  const data = MONTH_ORDER.map(mo => {
+    const ju = getJuniUnki(ht, mo.shi);
     const wave = JUNI_WAVE[ju] || 0;
-    const isSk = sats && sats.includes(shi);
-    const isCurr = i === currentMonthIdx;
-    const color = getJuniColor(ju);
-    const waveStr = wave > 0 ? '+' + wave : String(wave);
-    const judgment = wave >= 4 ? '◎' : wave >= 2 ? '○' : wave >= 0 ? '△' : wave >= -2 ? '▲' : '✕';
-    const judgmentColor = wave >= 4 ? '#1a6b3a' : wave >= 2 ? '#2a8c4a' : wave >= 0 ? '#7a6b52' : wave >= -2 ? '#cc8833' : '#882222';
-    const rowBg = isCurr ? 'rgba(124,58,237,0.08)' : isSk ? 'rgba(139,26,26,0.06)' : (i % 2 === 0 ? '#faf6ef' : '#fff');
-    html += `<tr style="background:${rowBg}">`;
-    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);font-weight:${isCurr?'700':'400'};color:${isCurr?'#6a0080':'#4a3c28'}">${label}${isCurr?' ◀':''}</td>`;
-    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);font-family:'Zen Old Mincho',serif;font-size:1rem">${shi}</td>`;
-    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${color};font-weight:600">${ju}${isSk?' ⚠':''}</td>`;
-    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${judgmentColor};font-weight:600">${waveStr}</td>`;
-    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${judgmentColor};font-weight:700;font-size:1rem">${judgment}</td>`;
-    html += '</tr>';
+    const isSk = sats && sats.includes(mo.shi);
+    const isCurr = mo.month === currentMonth;
+    return {...mo, ju, wave, isSk, isCurr};
   });
-  html += '</tbody></table></div>';
-  html += '<p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります。⚠は転化天蛹の月。</p>';
+
+  // SVG波グラフ生成
+  const minW = -4, maxW = 6, rangeW = maxW - minW;
+  const pad = 12;
+  function py(w) { return pad + (1 - (w - minW) / rangeW) * (graphH - pad * 2); }
+  function px(i) { return i * CW + CW / 2; }
+
+  // 滑らかな曲線
+  let pathPos = '', pathNeg = '';
+  data.forEach((d, i) => {
+    const x = px(i), y = py(d.wave);
+    if (i === 0) { pathPos = `M${x},${py(0)} L${x},${y}`; pathNeg = `M${x},${py(0)} L${x},${y}`; }
+    else {
+      const px0 = px(i-1), py0 = py(data[i-1].wave);
+      const cpx = (px0 + x) / 2;
+      pathPos += ` C${cpx},${py0} ${cpx},${y} ${x},${y}`;
+      pathNeg += ` C${cpx},${py0} ${cpx},${y} ${x},${y}`;
+    }
+  });
+  // 閉じる
+  const lastX = px(11);
+  pathPos += ` L${lastX},${py(0)} Z`;
+  pathNeg += ` L${lastX},${py(0)} Z`;
+
+  // 正領域（波>0）と負領域（波<0）を分けて描画
+  let svgPath = '';
+  // 簡略化：全体のエリアをグラデーションで
+  let fullPath = `M${px(0)},${py(data[0].wave)}`;
+  data.forEach((d, i) => {
+    if (i === 0) return;
+    const x0 = px(i-1), y0 = py(data[i-1].wave);
+    const x1 = px(i), y1 = py(d.wave);
+    const cpx = (x0 + x1) / 2;
+    fullPath += ` C${cpx},${y0} ${cpx},${y1} ${x1},${y1}`;
+  });
+  const closePath = fullPath + ` L${px(11)},${py(0)} L${px(0)},${py(0)} Z`;
+
+  // ゼロライン
+  const zeroY = py(0);
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${graphH}" viewBox="0 0 ${totalW} ${graphH}" style="display:block;overflow:visible">`;
+  svg += `<defs>
+    <linearGradient id="mgPos" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(30,120,60,0.5)"/><stop offset="100%" stop-color="rgba(30,120,60,0.05)"/></linearGradient>
+    <linearGradient id="mgNeg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(180,40,40,0.05)"/><stop offset="100%" stop-color="rgba(180,40,40,0.4)"/></linearGradient>
+    <clipPath id="mcPos"><rect x="0" y="0" width="${totalW}" height="${zeroY}"/></clipPath>
+    <clipPath id="mcNeg"><rect x="0" y="${zeroY}" width="${totalW}" height="${graphH - zeroY}"/></clipPath>
+  </defs>`;
+  // ゼロライン
+  svg += `<line x1="0" y1="${zeroY}" x2="${totalW}" y2="${zeroY}" stroke="rgba(0,0,0,0.1)" stroke-width="1"/>`;
+  // 正領域塗り
+  svg += `<path d="${closePath}" fill="url(#mgPos)" clip-path="url(#mcPos)"/>`;
+  // 負領域塗り
+  svg += `<path d="${closePath}" fill="url(#mgNeg)" clip-path="url(#mcNeg)"/>`;
+  // 波線（正）
+  svg += `<path d="${fullPath}" stroke="rgba(30,120,60,0.85)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#mcPos)"/>`;
+  // 波線（負）
+  svg += `<path d="${fullPath}" stroke="rgba(180,40,40,0.85)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#mcNeg)"/>`;
+
+  // 現在月の縦線と星
+  data.forEach((d, i) => {
+    if (d.isCurr) {
+      const cx = px(i), cy = py(d.wave);
+      svg += `<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;
+    }
+  });
+
+  svg += '</svg>';
+
+  // スターオーバーレイ（現在月）
+  let starOverlay = '';
+  data.forEach((d, i) => {
+    if (d.isCurr) {
+      const pctX = (px(i) / totalW * 100).toFixed(2);
+      const pctY = (py(d.wave) / graphH * 100).toFixed(2);
+      starOverlay = `<div style="position:absolute;left:${pctX}%;top:${pctY}%;transform:translate(-50%,-50%);font-size:20px;line-height:1;pointer-events:none;z-index:2">🌟</div>`;
+    }
+  });
+
+  // テーブル行を組み立て
+  const wrapDiv = `<div style="width:${totalW + lblW}px">`;
+
+  // 月ラベル行
+  let monthRow = `<div style="display:flex;border-bottom:1px solid rgba(184,134,11,0.12)">`;
+  monthRow += `<div style="flex:0 0 ${lblW}px;font-size:0.63rem;color:#7a6b52;padding:0 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;display:flex;align-items:center;font-weight:500">月</div>`;
+  monthRow += `<div style="display:flex">`;
+  data.forEach(d => {
+    const bg = d.isCurr ? 'rgba(124,58,237,0.12)' : d.isSk ? 'rgba(139,26,26,0.06)' : '';
+    monthRow += `<div style="width:${CW}px;min-width:${CW}px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);font-size:0.62rem;font-weight:${d.isCurr?'700':'400'};color:${d.isCurr?'#6a0080':'#7a6b52'};padding:3px 0;background:${bg}">${d.label}</div>`;
+  });
+  monthRow += '</div></div>';
+
+  // 支行
+  let shiRow = `<div style="display:flex;border-bottom:1px solid rgba(184,134,11,0.12)">`;
+  shiRow += `<div style="flex:0 0 ${lblW}px;font-size:0.63rem;color:#7a6b52;padding:0 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;display:flex;align-items:center;font-weight:500">支</div>`;
+  shiRow += `<div style="display:flex">`;
+  data.forEach(d => {
+    const bg = d.isCurr ? 'rgba(124,58,237,0.12)' : d.isSk ? 'rgba(139,26,26,0.06)' : '';
+    shiRow += `<div style="width:${CW}px;min-width:${CW}px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);font-family:'Zen Old Mincho',serif;font-size:0.9rem;padding:4px 0;background:${bg}">${d.shi}</div>`;
+  });
+  shiRow += '</div></div>';
+
+  // 運気行
+  let juRow = `<div style="display:flex;border-bottom:1px solid rgba(184,134,11,0.12)">`;
+  juRow += `<div style="flex:0 0 ${lblW}px;font-size:0.63rem;color:#7a6b52;padding:0 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;display:flex;align-items:center;font-weight:500">十二運気</div>`;
+  juRow += `<div style="display:flex">`;
+  data.forEach(d => {
+    const bg = d.isCurr ? 'rgba(124,58,237,0.12)' : d.isSk ? 'rgba(139,26,26,0.06)' : '';
+    juRow += `<div style="width:${CW}px;min-width:${CW}px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);writing-mode:vertical-rl;font-size:0.58rem;font-weight:600;color:${getJuniColor(d.ju)};padding:6px 0;background:${bg}">${d.ju}${d.isSk?'⚠':''}</div>`;
+  });
+  juRow += '</div></div>';
+
+  // グラフ行
+  let graphRow = `<div style="display:flex;border-bottom:2px solid rgba(184,134,11,0.3)">`;
+  graphRow += `<div style="flex:0 0 ${lblW}px;font-size:0.58rem;color:#7a6b52;padding:0 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f8f4ec;display:flex;align-items:center">月別<br>運気波</div>`;
+  graphRow += `<div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;position:relative">${svg}${starOverlay}</div>`;
+  graphRow += '</div>';
+
+  let html = wrapDiv + monthRow + shiRow + juRow + graphRow + '</div>';
+  html += '<p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります。右→左の流れ。⚠は転化天蛹の月。🌟は現在月。</p>';
   return html;
 }
 
