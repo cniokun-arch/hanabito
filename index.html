@@ -214,7 +214,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
     <div class="info-row" id="info-row"></div>
     <div class="section" id="monthly-fortune-section" style="display:none">
       <div class="section-title">◆ 月別運気（固定・毎年同じ）</div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch" id="monthly-fortune-table"></div>
+      <div id="monthly-fortune-table"></div>
     </div>
     <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section" id="unsei-scroll-section">
@@ -412,7 +412,7 @@ function buildMonthlyFortune(ht, sats) {
   graphRow += `<div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;position:relative">${svg}${starOverlay}</div>`;
   graphRow += '</div>';
 
-  return `<div style="width:${totalW+lblW}px">${monthRow}${shiRow}${juRow}${graphRow}</div>
+  return `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="width:${totalW+lblW}px">${monthRow}${shiRow}${juRow}${graphRow}</div></div>
 <p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります（右→左の流れ）。🌟は現在月。</p>`;
 }
 function buildMonthlyFortuneText(ht, sats) {
