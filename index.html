@@ -84,7 +84,6 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .ub-cells{display:flex;flex:1;overflow:hidden}
 .ub-blks{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;padding:0}
-.ub-blk>span{width:100%;display:flex;align-items:center;justify-content:center}
 .ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
 .db-b{border-left:2px solid rgba(184,134,11,0.5)!important}
 
@@ -519,7 +518,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     window._tpPlugin = {
       id:'turningPoints',
       afterDraw(chart){
-        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y:y_scale}}=chart;
+        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y}}=chart;
         const n=lifeWave.length;
         ctx.save();
         // 成天期間を帯で表示
@@ -574,33 +573,26 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.font='8px sans-serif';
           ctx.fillText(label,xp,lTop);
         }
+        ctx.restore();
         // 現在地マーカー（紫の縦線）
         const currAgeIdx = CY - y;
         if(currAgeIdx >= 0 && currAgeIdx < n) {
           const xp = x.getPixelForValue(currAgeIdx);
+          const ysc = chart.scales.y;
           ctx.save();
-          ctx.strokeStyle = 'rgba(160,60,160,0.7)';
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4,3]);
-          ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
+          ctx.strokeStyle='rgba(160,60,160,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+          ctx.beginPath();ctx.moveTo(xp,top);ctx.lineTo(xp,bottom);ctx.stroke();
           ctx.setLineDash([]);
-          ctx.font = 'bold 9px sans-serif';
-          ctx.fillStyle = 'rgba(160,60,160,0.9)';
-          ctx.textAlign = 'center';
-          ctx.fillText('▼現在', xp, top + 10);
-          const yp = y_scale.getPixelForValue(lifeWave[currAgeIdx]);
-          ctx.beginPath();
-          ctx.arc(xp, yp, 4, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(180,80,180,0.9)';
-          ctx.fill();
-          ctx.strokeStyle = '#faf6ef';
-          ctx.lineWidth = 1;
-          ctx.stroke();
+          ctx.font='bold 9px sans-serif';ctx.fillStyle='rgba(160,60,160,0.9)';ctx.textAlign='center';
+          ctx.fillText('▼現在',xp,top+10);
+          const yp=ysc.getPixelForValue(lifeWave[currAgeIdx]);
+          ctx.beginPath();ctx.arc(xp,yp,4,0,Math.PI*2);
+          ctx.fillStyle='rgba(180,80,180,0.9)';ctx.fill();
+          ctx.strokeStyle='#faf6ef';ctx.lineWidth=1;ctx.stroke();
           ctx.restore();
         }
-        ctx.restore();
-      }  // afterDraw終了
-    };   // _tpPlugin終了
+      }
+    };
     Chart.register(window._tpPlugin);
     myChart.update();
 
@@ -941,7 +933,7 @@ h2{font-family:'Zen Old Mincho',serif;font-size:9pt;color:#b8860b;border-bottom:
 .ub-sep{border-top:1pt solid rgba(184,134,11,0.35)}
 </style></head><body>
 <h1>花 人 占 術　命運グラフ</h1><div class="sub">${G_info}</div>
-<h2>◆ 命運グラフ（30年ブロック）</h2>
+<h2>◆ 命運グラフ（20年ブロック）</h2>
 ${blocksHtml}
 <h2>◆ 大運グラフ（一生分）</h2>
 ${chartImg}
@@ -1001,7 +993,7 @@ function stopMic(){
 let currentAudio = null;
 
 async function speakText(text, btn){
-  // 再生中なら休眠
+  // 再生中なら停止
   if(currentAudio && !currentAudio.paused){
     currentAudio.pause();
     currentAudio = null;
@@ -1040,7 +1032,7 @@ async function speakText(text, btn){
     // Base64のMP3を再生
     const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
     currentAudio = audio;
-    audio.onplay = () => { if(btn){ btn.textContent = "⏹ 停止"; btn.dataset.playing = 'true'; btn.disabled = false; } };
+    audio.onplay = () => { if(btn){ btn.textContent = '⏹ 停止'; btn.dataset.playing = 'true'; btn.disabled = false; } };
     audio.onended = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } currentAudio = null; };
     audio.onerror = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; btn.disabled = false; } currentAudio = null; };
     await audio.play();
