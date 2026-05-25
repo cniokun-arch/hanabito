@@ -212,6 +212,10 @@ tr:hover td{background:rgba(184,134,11,0.05)}
         <button class="print-btn" onclick="printSection1()">🖨 命式・大運表を印刷</button>
       </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
+    <div class="section" id="monthly-fortune-section" style="display:none">
+      <div class="section-title">◆ 月別運気（固定・毎年同じ）</div>
+      <div id="monthly-fortune-table"></div>
+    </div>
     <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section" id="unsei-scroll-section">
       <div class="section-title">◆ 命運グラフ（横型）― 0〜119歳</div>
@@ -306,6 +310,55 @@ function getHoshiType(y,m,d,g){const dayKS=getDayKS(y,m,d),name=HOSHI_BY_IDX[ROK
 function getHoshiName(y,m,d){return HOSHI_BY_IDX[ROKUJU.indexOf(getDayKS(y,m,d))];}
 function getDaiunStartAge(y,m,d,isFwd){const bd=new Date(y,m-1,d);let days=0;try{if(isFwd){const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{let nm=m+1,ny=y;if(nm>12){nm=1;ny++;}const ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd>=stD)days=Math.round((bd-stD)/86400000);else{let pm=m-1,py=y;if(pm<1){pm=12;py--;}const ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
 function getJuniColor(j){return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
+
+// 月別運気（月の支は固定）
+const MONTH_SHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const MONTH_LABEL = ['12月','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月'];
+
+function buildMonthlyFortune(ht, sats) {
+  const currentMonth = new Date().getMonth() + 1;
+  const currentMonthIdx = currentMonth === 12 ? 0 : currentMonth;
+  let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">';
+  html += '<thead><tr>';
+  ['月','支','運気','波','判定'].forEach(h => {
+    html += `<th style="padding:6px 4px;text-align:center;background:#f2ead8;border:1px solid rgba(184,134,11,0.25);color:#4a3c28;font-weight:700;font-size:0.78rem">${h}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  MONTH_LABEL.forEach((label, i) => {
+    const shi = MONTH_SHI[i];
+    const ju = getJuniUnki(ht, shi);
+    const wave = JUNI_WAVE[ju] || 0;
+    const isSk = sats && sats.includes(shi);
+    const isCurr = i === currentMonthIdx;
+    const color = getJuniColor(ju);
+    const waveStr = wave > 0 ? '+' + wave : String(wave);
+    const judgment = wave >= 4 ? '◎' : wave >= 2 ? '○' : wave >= 0 ? '△' : wave >= -2 ? '▲' : '✕';
+    const judgmentColor = wave >= 4 ? '#1a6b3a' : wave >= 2 ? '#2a8c4a' : wave >= 0 ? '#7a6b52' : wave >= -2 ? '#cc8833' : '#882222';
+    const rowBg = isCurr ? 'rgba(124,58,237,0.08)' : isSk ? 'rgba(139,26,26,0.06)' : (i % 2 === 0 ? '#faf6ef' : '#fff');
+    html += `<tr style="background:${rowBg}">`;
+    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);font-weight:${isCurr?'700':'400'};color:${isCurr?'#6a0080':'#4a3c28'}">${label}${isCurr?' ◀':''}</td>`;
+    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);font-family:'Zen Old Mincho',serif;font-size:1rem">${shi}</td>`;
+    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${color};font-weight:600">${ju}${isSk?' ⚠':''}</td>`;
+    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${judgmentColor};font-weight:600">${waveStr}</td>`;
+    html += `<td style="padding:6px 4px;text-align:center;border:1px solid rgba(184,134,11,0.15);color:${judgmentColor};font-weight:700;font-size:1rem">${judgment}</td>`;
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります。⚠は転化天蛹の月。</p>';
+  return html;
+}
+
+function buildMonthlyFortuneText(ht, sats) {
+  let text = '【月別運気（毎年固定）】\n';
+  MONTH_LABEL.forEach((label, i) => {
+    const shi = MONTH_SHI[i];
+    const ju = getJuniUnki(ht, shi);
+    const wave = JUNI_WAVE[ju] || 0;
+    const isSk = sats && sats.includes(shi);
+    text += label + '(' + shi + ')：' + ju + ' 波:' + (wave>0?'+':'')+wave + (isSk?' 【転化天蛹の月・注意】':'') + '\n';
+  });
+  return text;
+}
 function getWaveColor(w){return w>=4.5?'#1a6b3a':w>=3?'#3a9a5a':w>=1?'#5aaa7a':w>=-1?'#cc8833':w>=-2.5?'#bb4422':'#660000';}
 function getJuniCellStyle(ju,isCurr){
   if(isCurr)return{bg:'rgba(180,80,180,0.25)',ol:'1px solid rgba(160,60,160,0.45)',col:'#6a0080'};
@@ -631,7 +684,11 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     let ap2=0;
     for(let di=0;di<DL.length&&ap2<MAX_AGE;di++){const sp=Math.min(di===0?sa:10,MAX_AGE-ap2);const dk=DL[di],dj=getJuniUnki(ht,dk.shi),djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—',dzo=getZokan(dk.shi,dfs),w=JUNI_WAVE[dj]||0,isSk=sats.includes(dk.shi);const syr=y+ap2,isCurr=syr<=CY&&CY<syr+sp;dtbl+=`<tr class="${isSk?'sk-row':isCurr?'td-cu':''}"><td class="td-age">${ap2}〜${ap2+sp-1}歳</td><td>${syr}</td><td class="td-ks">${dk.ks}${isSk?' ⚠':''}</td><td>${dzo}</td><td class="td-th">${dth}</td><td class="td-jos">${djos}</td><td style="color:${getJuniColor(dj)}">${dj}</td><td><span style="color:${getWaveColor(w)};font-weight:600">${w>0?'+':''}${w}</span></td></tr>`;ap2+=sp;}
     document.getElementById('daiunTable').innerHTML=dtbl+'</tbody>';
-    G={y,m,d,gender,ht,sats,nenKS,tsuKS,nichiKS,nenKan,nenShi,nZ,nJus,nJu,tsuKan,tsuShi,tZ,tJus,tJu,nichiKan,nichiShi,niZ,niJus,niJu,T,nichiKanIdx,DL,A2D,BLK,ND,dfs,CY,meishikiHTML:document.getElementById('meishiki-grid').innerHTML,infoHTML:document.getElementById('info-row').innerHTML,daiunHTML:document.getElementById('daiunTable').innerHTML};
+    // 月別運気表を表示
+    document.getElementById('monthly-fortune-table').innerHTML = buildMonthlyFortune(ht, sats);
+    document.getElementById('monthly-fortune-section').style.display = 'block';
+
+    G={y,m,d,gender,ht,sats,nenKS,tsuKS,nichiKS,nenKan,nenShi,nZ,nJus,nJu,tsuKan,tsuShi,tZ,tJus,tJu,nichiKan,nichiShi,niZ,niJus,niJu,T,nichiKanIdx,DL,A2D,BLK,ND,dfs,CY,monthlyText:buildMonthlyFortuneText(ht,sats),meishikiHTML:document.getElementById('meishiki-grid').innerHTML,infoHTML:document.getElementById('info-row').innerHTML,daiunHTML:document.getElementById('daiunTable').innerHTML};
     // 新しい命式を計算したらチャット履歴をリセット
     aiHistory = [];
     const aiMsg = document.getElementById('aiMessages');
@@ -784,13 +841,38 @@ function buildSystemPrompt(isPersonal){
       return results.join(' / ');
     })();
 
+    // 大運表をテキスト化してAIに渡す
+    let daiunTableText = '【大運表（全期間）】\n';
+    if(G.BLK && G.y) {
+      let ap = 0;
+      const sa = G.DL && G.DL[0] ? (function(){
+        let s=G.y%10; return s<=5?5-s:15-s;
+      })() : 0;
+      G.BLK.forEach(function(b){
+        const startAge = b.sa;
+        const endAge = b.sa + b.sp - 1;
+        const startYr = G.y + startAge;
+        const endYr = G.y + endAge;
+        const ju = getJuniUnki(G.ht, b.shi);
+        const isCurr = (CY >= startYr && CY <= endYr);
+        const isSk = G.sats && G.sats.includes(b.shi);
+        daiunTableText += (isCurr ? '★現在▶' : '　　　　') +
+          startAge + '〜' + endAge + '歳（' + startYr + '〜' + endYr + '年）' +
+          ' 大運:' + b.ks + ' 通変星:' + b.th + ' 十二従星:' + b.jos +
+          ' 十二運気:' + ju + ' 波:' + (JUNI_WAVE[ju]||0) +
+          (isSk ? '【転化天蛹の時期】' : '') + '\n';
+      });
+    }
+
     userInfo = '【相談者の命式情報】\n'
       + '・生年月日: ' + G.y + '年' + G.m + '月' + G.d + '日 / 性別: ' + G.gender + '\n'
-      + '・花人: ' + G.ht + ' / 年齢: ' + age + '歳\n'
+      + '・花人: ' + G.ht + ' / 現在年齢: ' + age + '歳（' + CY + '年）\n'
       + '・年柱: ' + G.nenKan + G.nenShi + ' / 月柱: ' + G.tsuKan + G.tsuShi + ' / 日柱: ' + G.nichiKan + G.nichiShi + '\n'
       + '・今年の十二運気: ' + currJu + '\n'
       + '・今の大運の十二運気: ' + daiunJu + '\n'
       + '・転化天蛹の対象支: ' + (G.sats ? G.sats.join('・') : '不明') + '（※大運干支がこの支にあたる10年間のみ転化天蛹の時期。命式の年柱・月柱・日柱の干支とは無関係）\n'
+      + daiunTableText + '\n'
+      + (G.monthlyText ? G.monthlyText + '\n' : '')
       + (kanshiKBInfo ? '・命式の干支に関する知識ベース情報:\n' + kanshiKBInfo : '');
   }
   // KBの星人キーを確認（星人または花人）
