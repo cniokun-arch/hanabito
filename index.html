@@ -598,6 +598,10 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.stroke();
           ctx.restore();
         }
+        ctx.restore();
+      }  // afterDraw終了
+    };   // _tpPlugin終了
+    Chart.register(window._tpPlugin);
     myChart.update();
 
     document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(180,120,220,0.2);border:1px dashed rgba(150,80,200,0.4);margin-right:3px;vertical-align:middle"></span>人生が反転するとき（成天）</span>`;
