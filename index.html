@@ -418,11 +418,13 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   let starOverlay = '';
   if (ci >= 0 && ci < blockCount) {
     const cx = pxR(ci), cy = py(rawVals[ci]);
-    svg += `<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;
-    // 星はHTML overlayとして表示（SVGのpreserveAspectRatio:noneで潰れるのを防ぐ）
-    const pctX = (cx / totalW * 100).toFixed(2);
-    const pctY = (cy / graphH * 100).toFixed(2);
-    starOverlay = `<div style="position:absolute;left:${pctX}%;top:${pctY}%;transform:translate(-50%,-50%);font-size:20px;line-height:1;pointer-events:none;filter:drop-shadow(0 0 2px #b8860b);z-index:2">★</div>`;
+    // 縦線と星は両方HTMLオーバーレイに（SVGのpreserveAspectRatio:noneで歪むのを防ぐ）
+    const pctX = (cx / totalW * 100).toFixed(3);
+    const pctY = (cy / graphH * 100).toFixed(3);
+    starOverlay = `<div style="position:absolute;inset:0;pointer-events:none;z-index:2">` +
+      `<div style="position:absolute;left:${pctX}%;top:0;bottom:0;width:1.2px;background:repeating-linear-gradient(to bottom,rgba(160,60,160,0.6) 0,rgba(160,60,160,0.6) 4px,transparent 4px,transparent 7px);transform:translateX(-50%)"></div>` +
+      `<div style="position:absolute;left:${pctX}%;top:${pctY}%;transform:translate(-50%,-50%);font-size:22px;line-height:1;color:#f0c040;text-shadow:0 0 3px #b8860b,0 0 1px #fff">★</div>` +
+      `</div>`;
   }
   svg += '</svg>';
 
