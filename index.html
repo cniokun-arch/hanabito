@@ -83,7 +83,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .ub-dl{background:#e8dcc4;color:#4a3c28}
 .ub-cells{display:flex;flex:1;overflow:hidden}
 .ub-blks{display:flex;flex:1;overflow:hidden}
-.ub-blk{display:flex;align-items:center;justify-content:center;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;padding:0 2px;height:24px}
+.ub-blk{display:flex;align-items:center;justify-content:center;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;padding:0 2px;align-self:stretch}
 .ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
 .db-b{border-left:2px solid rgba(184,134,11,0.5)!important}
 
@@ -438,10 +438,10 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
   <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px">${svg}</div></div>
-  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${isCurr?`<span style="font-size:0.45rem;color:rgba(160,60,160,0.9);font-weight:700;margin-bottom:1px">▼現在</span>`:''  }${b.ks}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</span>`;})}</div></div>
+  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</span>`;})}</div></div>
 </div>`;
 }
 
@@ -518,7 +518,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     window._tpPlugin = {
       id:'turningPoints',
       afterDraw(chart){
-        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y}}=chart;
+        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y:y_scale}}=chart;
         const n=lifeWave.length;
         ctx.save();
         // 成天期間を帯で表示
@@ -573,10 +573,30 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.font='8px sans-serif';
           ctx.fillText(label,xp,lTop);
         }
-        ctx.restore();
-      }
-    };
-    Chart.register(window._tpPlugin);
+        // 現在地マーカー（紫の縦線）
+        const currAgeIdx = CY - y;
+        if(currAgeIdx >= 0 && currAgeIdx < n) {
+          const xp = x.getPixelForValue(currAgeIdx);
+          ctx.save();
+          ctx.strokeStyle = 'rgba(160,60,160,0.7)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4,3]);
+          ctx.beginPath(); ctx.moveTo(xp, top); ctx.lineTo(xp, bottom); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillStyle = 'rgba(160,60,160,0.9)';
+          ctx.textAlign = 'center';
+          ctx.fillText('▼現在', xp, top + 10);
+          const yp = y_scale.getPixelForValue(lifeWave[currAgeIdx]);
+          ctx.beginPath();
+          ctx.arc(xp, yp, 4, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(180,80,180,0.9)';
+          ctx.fill();
+          ctx.strokeStyle = '#faf6ef';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        }
     myChart.update();
 
     document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(180,120,220,0.2);border:1px dashed rgba(150,80,200,0.4);margin-right:3px;vertical-align:middle"></span>人生が反転するとき（成天）</span>`;
