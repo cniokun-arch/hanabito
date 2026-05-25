@@ -48,8 +48,8 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 /* 横スクロール表: 二層構造でstickyを正常動作させる */
 .unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:2px}
 .unsei-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
-.u-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch}
-.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch}
+.u-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch;width:max-content;min-width:100%}
+.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%}
 .u-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:3px 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500;position:sticky;left:0;z-index:3;box-shadow:2px 0 5px rgba(0,0,0,0.08)}
 .u-lbl.dl{background:#e8dcc4;color:#4a3c28;border-top:2px solid rgba(184,134,11,0.4)}
 .u-lbl.graph-lbl{background:#f8f4ec;color:#7a6b52;border-top:1px solid rgba(184,134,11,0.2);font-size:0.58rem}
@@ -172,9 +172,9 @@ tr:hover td{background:rgba(184,134,11,0.05)}
       <div class="section-title">◆ 命運グラフ（横型）― 0〜119歳</div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>健弱　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>乱気　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>陰影・停止・減退　← 横スクロールで全120年確認
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪　← 横スクロールで全120年確認
       </p>
       <div class="chart-wrap" style="padding:0.5rem">
         <div class="unsei-outer"><div class="unsei-inner" id="unsei-outer"></div></div>
@@ -188,9 +188,9 @@ tr:hover td{background:rgba(184,134,11,0.05)}
       </div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>健弱　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>乱気　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>陰影・停止・減退
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
+        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪
       </p>
       <div id="unsei-blocks"></div>
     </div>
@@ -241,8 +241,8 @@ const HOSHI_BY_IDX=['天花人','天花人','天花人','天花人','天花人',
 const SATSKAI={'天花人':['戌','亥'],'白花人':['申','酉'],'離花人':['午','未'],'風花人':['辰','巳'],'仙花人':['寅','卯'],'水花人':['子','丑']};
 const TSUHEN=[['比肩','劫財','食神','傷官','偏財','正財','偏官','正官','偏印','印綬'],['劫財','比肩','傷官','食神','正財','偏財','正官','偏官','印綬','偏印'],['偏印','印綬','比肩','劫財','食神','傷官','偏財','正財','偏官','正官'],['印綬','偏印','劫財','比肩','傷官','食神','正財','偏財','正官','偏官'],['偏官','正官','偏印','印綬','比肩','劫財','食神','傷官','偏財','正財'],['正官','偏官','印綬','偏印','劫財','比肩','傷官','食神','正財','偏財'],['偏財','正財','偏官','正官','偏印','印綬','比肩','劫財','食神','傷官'],['正財','偏財','正官','偏官','印綬','偏印','劫財','比肩','傷官','食神'],['食神','傷官','偏財','正財','偏官','正官','偏印','印綬','比肩','劫財'],['傷官','食神','正財','偏財','正官','偏官','印綬','偏印','劫財','比肩']];
 const JUSEI=[['天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星'],['天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星'],['天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星'],['天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星'],['天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星']];
-const JUNI_NAMES=['停止','減退','種子','緑生','立花','健弱','達成','乱気','再会','財成','安定','陰影'];
-const JUNI_WAVE={'立花':5.0,'再会':5.0,'緑生':4.5,'種子':4.0,'財成':3.5,'安定':3.0,'達成':2.0,'健弱':-2.0,'乱気':-2.5,'陰影':-2.0,'停止':-3.5,'減退':-2.0};
+const JUNI_NAMES=['休眠','残雪','発芽','青葉','開花','内省','成天','狂咲','豊穣','穂分','平凪','引寒'];
+const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
 const TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
 const ZOKAN_SHI=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子'];
 const ZOKAN_DATA=[[0,['戊','辛','庚','戊','丁','丙','戊','乙','甲','戊','癸','壬']],[9,['甲','辛','庚','壬','丁','丙','庚','乙','甲','丙','癸','壬']],[11,['甲','丁','庚','壬','乙','丙','庚','癸','甲','丙','辛','壬']],[12,['甲','丁','辛','壬','乙','己','庚','癸','乙','丙','辛','癸']],[14,['甲','戊','辛','壬','己','己','庚','戊','乙','丙','己','癸']],[16,['壬','戊','辛','庚','己','己','丙','戊','乙','甲','己','癸']]];
@@ -260,14 +260,14 @@ function getJuniUnki(ht,shi){const s=TEISHI[ht];if(s===undefined)return '—';co
 function getHoshiType(y,m,d,g){const dayKS=getDayKS(y,m,d),name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)],nenKS=getYearKS(y,m,d),num=ROKUJU.indexOf(nenKS)+1;return name+(num%2===1?'＋':'－');}
 function getHoshiName(y,m,d){return HOSHI_BY_IDX[ROKUJU.indexOf(getDayKS(y,m,d))];}
 function getDaiunStartAge(y,m,d,isFwd){const bd=new Date(y,m-1,d);let days=0;try{if(isFwd){const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{let nm=m+1,ny=y;if(nm>12){nm=1;ny++;}const ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd>=stD)days=Math.round((bd-stD)/86400000);else{let pm=m-1,py=y;if(pm<1){pm=12;py--;}const ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
-function getJuniColor(j){return({'立花':'#1a6b3a','再会':'#1a6b3a','緑生':'#2a8c4a','種子':'#3a9a5a','財成':'#4aaa6a','安定':'#5a9c7a','達成':'#6aaa8a','健弱':'#cc8833','乱気':'#bb4422','陰影':'#882222','停止':'#550000','減退':'#882222'})[j]||'#4a3c28';}
+function getJuniColor(j){return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
 function getWaveColor(w){return w>=4.5?'#1a6b3a':w>=3?'#3a9a5a':w>=1?'#5aaa7a':w>=-1?'#cc8833':w>=-2.5?'#bb4422':'#660000';}
 function getJuniCellStyle(ju,isCurr){
   if(isCurr)return{bg:'rgba(180,80,180,0.25)',ol:'1px solid rgba(160,60,160,0.45)',col:'#6a0080'};
   switch(ju){
-    case '健弱':return{bg:'rgba(100,149,237,0.18)',ol:'',col:'#1a3a7a'};
-    case '乱気':return{bg:'rgba(210,120,30,0.2)',ol:'',col:'#7a3800'};
-    case '陰影':case '停止':case '減退':return{bg:'rgba(40,30,20,0.2)',ol:'',col:'#8a7a6a'};
+    case '内省':return{bg:'rgba(100,149,237,0.18)',ol:'',col:'#1a3a7a'};
+    case '狂咲':return{bg:'rgba(210,120,30,0.2)',ol:'',col:'#7a3800'};
+    case '引寒':case '休眠':case '残雪':return{bg:'rgba(40,30,20,0.2)',ol:'',col:'#8a7a6a'};
     default:return{bg:'',ol:'',col:''};
   }
 }
@@ -276,11 +276,11 @@ function getJuniCellStyle(ju,isCurr){
 function getDaiunBlkStyle(ju, isSatsk) {
   if (isSatsk) return {bg:'rgba(120,40,140,0.18)', ol:'1px solid rgba(120,40,140,0.4)', col:'#5a0080', textCol:'#5a0080'};
   switch(ju) {
-    case '健弱': return {bg:'rgba(100,149,237,0.15)', ol:'', col:'#1a3a7a', textCol:'#1a3a7a'};
-    case '乱気': return {bg:'rgba(210,120,30,0.17)',  ol:'', col:'#7a3800', textCol:'#7a3800'};
-    case '陰影':
-    case '停止':
-    case '減退': return {bg:'rgba(40,30,20,0.18)',    ol:'', col:'#8a7a6a', textCol:'#8a7a6a'};
+    case '内省': return {bg:'rgba(100,149,237,0.15)', ol:'', col:'#1a3a7a', textCol:'#1a3a7a'};
+    case '狂咲': return {bg:'rgba(210,120,30,0.17)',  ol:'', col:'#7a3800', textCol:'#7a3800'};
+    case '引寒':
+    case '休眠':
+    case '残雪': return {bg:'rgba(40,30,20,0.18)',    ol:'', col:'#8a7a6a', textCol:'#8a7a6a'};
     default:     return {bg:'', ol:'', col:'', textCol:''};
   }
 }
@@ -471,7 +471,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>`${i[0].label}（${y+i[0].dataIndex}年）`,label:i=>{const dk=A2D[i.dataIndex];const dj=getJuniUnki(ht,dk.shi);return[`大運：${dk.ks}`,`運気：${dj}${sats.includes(dk.shi)?' ⚠':''}`,`波：${i.raw>0?'+':''}${i.raw}`];}}}},
         scales:{x:{ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:20,color:'#7a6b52'},grid:{display:false}},y:{min:-5,max:6,ticks:{font:{size:9},color:'#7a6b52',callback:v=>v>0?'+'+v:v},grid:{color:'rgba(0,0,0,0.04)'},border:{dash:[2,2]}}}}
     });
-    // ★ 転換期・達成マーカープラグイン
+    // ★ 転換期・成天マーカープラグイン
     if(window._tpPlugin) Chart.unregister(window._tpPlugin);
     window._tpPlugin = {
       id:'turningPoints',
@@ -479,13 +479,13 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
         const{ctx,chartArea:{top,bottom,left,right},scales:{x,y}}=chart;
         const n=lifeWave.length;
         ctx.save();
-        // 達成期間を帯で表示
+        // 成天期間を帯で表示
         for(let i=0;i<n;i++){
           const dj=getJuniUnki(ht,A2D[i].shi);
-          if(dj==='達成'){
-            // 連続する達成期間をひとまとめに
+          if(dj==='成天'){
+            // 連続する成天期間をひとまとめに
             let j=i;
-            while(j<n && getJuniUnki(ht,A2D[j].shi)==='達成') j++;
+            while(j<n && getJuniUnki(ht,A2D[j].shi)==='成天') j++;
             const x1=x.getPixelForValue(i), x2=x.getPixelForValue(j-1);
             // 帯背景
             ctx.fillStyle='rgba(180,120,220,0.10)';
@@ -537,7 +537,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     Chart.register(window._tpPlugin);
     myChart.update();
 
-    document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(180,120,220,0.2);border:1px dashed rgba(150,80,200,0.4);margin-right:3px;vertical-align:middle"></span>人生が反転するとき（達成）</span>`;
+    document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(180,120,220,0.2);border:1px dashed rgba(150,80,200,0.4);margin-right:3px;vertical-align:middle"></span>人生が反転するとき（成天）</span>`;
     const ND=Array.from({length:MAX_AGE},(_,a)=>{const yr=y+a,yrShi=getYearShi(yr),ju=getJuniUnki(ht,yrShi);return{yr,age:a,yrShi,ju,w:JUNI_WAVE[ju]||0,isSk:sats.includes(yrShi),isCurr:yr===CY};});
     const nenCurrIdx=ND.findIndex(r=>r.isCurr);
     document.getElementById('unsei-outer').innerHTML=buildUnseiRows(ND,A2D,BLK,nenCurrIdx,ht);
