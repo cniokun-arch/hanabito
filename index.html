@@ -49,7 +49,7 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:2px}
 .unsei-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
 .u-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch;width:max-content;min-width:100%}
-.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%}
+.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%;overflow:visible}
 .u-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:3px 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500;position:sticky;left:0;z-index:3;box-shadow:2px 0 5px rgba(0,0,0,0.08)}
 .u-lbl.dl{background:#e8dcc4;color:#4a3c28;border-top:2px solid rgba(184,134,11,0.4)}
 .u-lbl.graph-lbl{background:#f8f4ec;color:#7a6b52;border-top:1px solid rgba(184,134,11,0.2);font-size:0.58rem}
@@ -126,7 +126,40 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .speak-btn{display:block;margin-top:4px;font-size:0.68rem;padding:2px 10px;background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:10px;cursor:pointer;color:#7a6b52;font-family:'Noto Serif JP',serif}
 .speak-btn:hover{background:#e8dcc4}
-
+@media(max-width:700px){
+  body{font-size:16px}
+  .header p{font-size:1rem}
+  .input-panel h2{font-size:1.1rem}
+  .field label{font-size:0.95rem}
+  .field input,.field select{font-size:1.05rem;padding:0.65rem 0.8rem}
+  .errmsg{font-size:1rem}
+  .btn{font-size:1.1rem;padding:0.75rem 2rem}
+  .section-title{font-size:1.1rem}
+  .col-label{font-size:0.88rem}
+  .kanshi-big{font-size:2rem}
+  .zokan{font-size:0.92rem}
+  .tsuhen{font-size:1rem}
+  .jusei{font-size:0.95rem}
+  .juni{font-size:0.95rem}
+  .ic-label{font-size:0.88rem}
+  .ic-val{font-size:1.1rem}
+  .ic-sub{font-size:0.88rem}
+  table{font-size:0.95rem}
+  th{font-size:0.88rem;padding:0.6rem 0.4rem}
+  .td-age{font-size:0.9rem}
+  .td-ks{font-size:1.1rem}
+  .legend{font-size:0.85rem}
+  .u-lbl{font-size:0.8rem}
+  .u-lbl.graph-lbl{font-size:0.75rem}
+  .ub-header{font-size:1rem}
+  .ub-lbl{font-size:0.8rem}
+  .ai-header{font-size:1rem}
+  .ai-msg{font-size:0.95rem;line-height:1.7}
+  .ai-quick button{font-size:0.85rem;padding:5px 12px}
+  .ai-input-row textarea{font-size:1rem}
+  .voice-btn{font-size:0.9rem}
+  .speak-btn{font-size:0.85rem}
+}
 @media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
 </head>
@@ -934,7 +967,7 @@ function stopMic(){
 let currentAudio = null;
 
 async function speakText(text, btn){
-  // 再生中なら停止
+  // 再生中なら休眠
   if(currentAudio && !currentAudio.paused){
     currentAudio.pause();
     currentAudio = null;
@@ -973,7 +1006,7 @@ async function speakText(text, btn){
     // Base64のMP3を再生
     const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
     currentAudio = audio;
-    audio.onplay = () => { if(btn){ btn.textContent = '⏹ 停止'; btn.dataset.playing = 'true'; btn.disabled = false; } };
+    audio.onplay = () => { if(btn){ btn.textContent = "⏹ 停止"; btn.dataset.playing = 'true'; btn.disabled = false; } };
     audio.onended = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; } currentAudio = null; };
     audio.onerror = () => { if(btn){ btn.textContent = '🔊 読み上げ'; btn.dataset.playing = 'false'; btn.disabled = false; } currentAudio = null; };
     await audio.play();
