@@ -57,8 +57,8 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .u-cell{flex:0 0 30px;width:30px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.6rem;align-self:stretch}
 .u-cell.db{border-left:2px solid rgba(184,134,11,0.5)!important}
 .u-blks{display:flex;align-items:stretch}
-.u-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.45);background:transparent;overflow:hidden;padding:0;align-self:stretch}
-.u-blk>div{width:100%;display:flex;align-items:center;justify-content:center}
+.u-blk{position:relative;border-right:2px solid rgba(184,134,11,0.45);overflow:hidden;align-self:stretch;min-height:0}
+.u-blk>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
 .u-blk.sk{background:rgba(139,26,26,0.06)}.u-blk:last-child{border-right:none}
 .r-age{min-height:22px}.r-age .u-cell{font-size:0.65rem;font-weight:700}
 .r-yr{min-height:44px}.r-yr .u-cell{font-size:0.52rem}
@@ -80,11 +80,12 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .ub-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.1);align-items:stretch}
 .ub-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch}
 .ub-sep{border-top:2px solid rgba(184,134,11,0.35)}
-.ub-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:3px 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500}
+.ub-lbl{flex:0 0 70px;font-size:0.63rem;color:#7a6b52;padding:0 6px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;align-items:center;font-weight:500;align-self:stretch}
 .ub-dl{background:#e8dcc4;color:#4a3c28}
 .ub-cells{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blks{display:flex;flex:1;overflow:hidden;align-items:stretch}
-.ub-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;padding:0}
+.ub-blk{position:relative;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;align-self:stretch;min-height:0}
+.ub-blk>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
 .ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
 .db-b{border-left:2px solid rgba(184,134,11,0.5)!important}
 
@@ -343,7 +344,7 @@ function makeInlineSvg(nenData,currIdx,totalW,graphH){
   let pc=null,pd='';
   for(let i=0;i<ns;i++){const v=i<ns-1?(smooth[i]+smooth[i+1])/2:smooth[i],col=getWaveColor(v);if(col!==pc){if(pd&&pc)s+=`<path d="${pd}" stroke="${pc}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;pd=`M${pxS(i)},${py(smooth[i])}`;pc=col;}else pd+=` L${pxS(i)},${py(smooth[i])}`;}
   if(pd&&pc)s+=`<path d="${pd}" stroke="${pc}" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-  if(currIdx>=0&&currIdx<n){const cx=pxR(currIdx),cy=py(rawVals[currIdx]);s+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.5)" stroke-width="0.8" stroke-dasharray="3,2"/>`;s+=`<circle cx="${cx}" cy="${cy}" r="3" fill="rgba(180,80,180,0.9)" stroke="#faf6ef" stroke-width="0.8"/>`;}
+  if(currIdx>=0&&currIdx<n){const cx=pxR(currIdx),cy=py(rawVals[currIdx]);s+=`<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;const sr=10,sp=5,sa=Math.PI/5;const sp2=Array.from({length:10},(_,k)=>{const r=k%2===0?sr:sp,a=k*sa-Math.PI/2;return`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;}).join(' ');s+=`<polygon points="${sp2}" fill="#f0c040" stroke="#b8860b" stroke-width="1.2"/>`; }
   return s+'</svg>';
 }
 
@@ -416,8 +417,10 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   const ci = currIdx - startAge;
   if (ci >= 0 && ci < blockCount) {
     const cx = pxR(ci), cy = py(rawVals[ci]);
-    svg += `<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.5)" stroke-width="0.8" stroke-dasharray="3,2"/>`;
-    svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="rgba(180,80,180,0.9)" stroke="#faf6ef" stroke-width="0.8"/>`;
+    svg += `<line x1="${cx}" y1="0" x2="${cx}" y2="${graphH}" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>`;
+    const sr=10,sp=5,sa=Math.PI/5;
+    const pts=Array.from({length:10},(_,k)=>{const r=k%2===0?sr:sp,a=k*sa-Math.PI/2;return`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`;}).join(' ');
+    svg += `<polygon points="${pts}" fill="#f0c040" stroke="#b8860b" stroke-width="1.2"/>`;
   }
   svg += '</svg>';
 
@@ -439,10 +442,10 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
   <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px">${svg}</div></div>
-  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<div style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<div style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<div style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.8);':'';return`<div style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</div>`;})}</div></div>
+  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</div>`;})}</div></div>
 </div>`;
 }
 
@@ -591,9 +594,12 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.font='bold 9px sans-serif';ctx.fillStyle='rgba(160,60,160,0.9)';ctx.textAlign='center';
           ctx.fillText('現在▼',xp,bottom-4);
           const yp=ysc.getPixelForValue(lifeWave[currAgeIdx]);
-          ctx.beginPath();ctx.arc(xp,yp,4,0,Math.PI*2);
-          ctx.fillStyle='rgba(180,80,180,0.9)';ctx.fill();
-          ctx.strokeStyle='#faf6ef';ctx.lineWidth=1;ctx.stroke();
+          const sr=8,sp=4,ang=Math.PI/5;
+          ctx.beginPath();
+          for(let k=0;k<10;k++){const r=k%2===0?sr:sp,a=k*ang-Math.PI/2;k===0?ctx.moveTo(xp+r*Math.cos(a),yp+r*Math.sin(a)):ctx.lineTo(xp+r*Math.cos(a),yp+r*Math.sin(a));}
+          ctx.closePath();
+          ctx.fillStyle='#f0c040';ctx.fill();
+          ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
           ctx.restore();
         }
       }
