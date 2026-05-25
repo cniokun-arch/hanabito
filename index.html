@@ -632,6 +632,10 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     for(let di=0;di<DL.length&&ap2<MAX_AGE;di++){const sp=Math.min(di===0?sa:10,MAX_AGE-ap2);const dk=DL[di],dj=getJuniUnki(ht,dk.shi),djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—',dzo=getZokan(dk.shi,dfs),w=JUNI_WAVE[dj]||0,isSk=sats.includes(dk.shi);const syr=y+ap2,isCurr=syr<=CY&&CY<syr+sp;dtbl+=`<tr class="${isSk?'sk-row':isCurr?'td-cu':''}"><td class="td-age">${ap2}〜${ap2+sp-1}歳</td><td>${syr}</td><td class="td-ks">${dk.ks}${isSk?' ⚠':''}</td><td>${dzo}</td><td class="td-th">${dth}</td><td class="td-jos">${djos}</td><td style="color:${getJuniColor(dj)}">${dj}</td><td><span style="color:${getWaveColor(w)};font-weight:600">${w>0?'+':''}${w}</span></td></tr>`;ap2+=sp;}
     document.getElementById('daiunTable').innerHTML=dtbl+'</tbody>';
     G={y,m,d,gender,ht,sats,nenKS,tsuKS,nichiKS,nenKan,nenShi,nZ,nJus,nJu,tsuKan,tsuShi,tZ,tJus,tJu,nichiKan,nichiShi,niZ,niJus,niJu,T,nichiKanIdx,DL,A2D,BLK,ND,dfs,CY,meishikiHTML:document.getElementById('meishiki-grid').innerHTML,infoHTML:document.getElementById('info-row').innerHTML,daiunHTML:document.getElementById('daiunTable').innerHTML};
+    // 新しい命式を計算したらチャット履歴をリセット
+    aiHistory = [];
+    const aiMsg = document.getElementById('aiMessages');
+    if(aiMsg) aiMsg.innerHTML = '<div class="ai-msg ai-msg-bot">新しい命式を読み込みました。ご質問をどうぞ🌸</div>';
     document.getElementById('result').style.display='block';
     document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(err){document.getElementById('errmsg').textContent=`⚠ ${err.message}`;document.getElementById('errmsg').style.display='block';console.error(err);}
