@@ -54,18 +54,18 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .u-lbl.dl{background:#e8dcc4;color:#4a3c28;border-top:2px solid rgba(184,134,11,0.4)}
 .u-lbl.graph-lbl{background:#f8f4ec;color:#7a6b52;border-top:1px solid rgba(184,134,11,0.2);font-size:0.58rem}
 .u-cells{display:flex;align-items:stretch}
-.u-cell{flex:0 0 30px;width:30px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.6rem}
+.u-cell{flex:0 0 30px;width:30px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.6rem;align-self:stretch}
 .u-cell.db{border-left:2px solid rgba(184,134,11,0.5)!important}
 .u-blks{display:flex;align-items:stretch}
-.u-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.45);background:transparent;overflow:hidden;padding:0}
+.u-blk{display:flex;align-items:stretch;justify-content:center;border-right:2px solid rgba(184,134,11,0.45);background:transparent;overflow:hidden;padding:0;align-self:stretch}
 .u-blk>div{width:100%;display:flex;align-items:center;justify-content:center}
 .u-blk.sk{background:rgba(139,26,26,0.06)}.u-blk:last-child{border-right:none}
-.r-age{height:22px}.r-age .u-cell{font-size:0.65rem;font-weight:700}
-.r-yr{height:44px}.r-yr .u-cell{font-size:0.52rem}
-.r-shi{height:30px}.r-shi .u-cell{font-family:'Zen Old Mincho',serif;font-size:0.85rem}
-.r-ju{height:54px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap}
+.r-age{min-height:22px}.r-age .u-cell{font-size:0.65rem;font-weight:700}
+.r-yr{min-height:44px}.r-yr .u-cell{font-size:0.52rem}
+.r-shi{min-height:30px}.r-shi .u-cell{font-family:'Zen Old Mincho',serif;font-size:0.85rem}
+.r-ju{min-height:54px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap}
 .r-sep{border-top:2px solid rgba(184,134,11,0.35)}
-.r-dks{height:32px}.r-th{height:28px}.r-jos{height:28px}.r-ku{height:24px}
+.r-dks{min-height:32px}.r-th{min-height:28px}.r-jos{min-height:28px}.r-ku{min-height:24px}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:0.8rem}
 th{background:#e8dcc4;color:#4a3c28;text-align:center;padding:0.5rem 0.3rem;border:1px solid rgba(184,134,11,0.25);font-weight:500;font-size:0.7rem}
@@ -519,7 +519,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     window._tpPlugin = {
       id:'turningPoints',
       afterDraw(chart){
-        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y}}=chart;
+        const{ctx,chartArea:{top,bottom,left,right},scales:{x,y:ysc}}=chart;
         const n=lifeWave.length;
         ctx.save();
         // 成天期間を帯で表示
@@ -584,7 +584,6 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
         const currAgeIdx = CY - y;
         if(currAgeIdx >= 0 && currAgeIdx < n) {
           const xp = x.getPixelForValue(currAgeIdx);
-          const ysc = chart.scales.y;
           ctx.save();
           ctx.strokeStyle='rgba(160,60,160,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
           ctx.beginPath();ctx.moveTo(xp,top);ctx.lineTo(xp,bottom);ctx.stroke();
