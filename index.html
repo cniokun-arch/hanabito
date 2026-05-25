@@ -219,7 +219,7 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 
     <div class="section" id="print-section-2">
       <div class="print-section-header">
-        <div class="section-title">◆ 命運グラフ（30年ブロック）― 0〜119歳</div>
+        <div class="section-title">◆ 命運グラフ（20年ブロック）― 0〜119歳</div>
         <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
       </div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
@@ -347,7 +347,7 @@ function makeInlineSvg(nenData,currIdx,totalW,graphH){
 }
 
 function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
-  const totalW=MAX_AGE*CW,graphH=80,lblW=70;
+  const totalW=MAX_AGE*CW,graphH=120,lblW=70;
   function cst(r){const cs=getJuniCellStyle(r.ju,r.isCurr);let st=cs.bg?`background:${cs.bg};`:'';if(cs.ol)st+=`outline:${cs.ol};`;return st;}
   function ccls(r){let c='u-cell';if(r.age>0&&A2D[r.age]&&A2D[r.age-1]&&A2D[r.age].ks!==A2D[r.age-1].ks)c+=' db';return c;}
   function tc(r,fb){if(r.isCurr)return'#6a0080';const cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
@@ -367,7 +367,7 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
 }
 
 
-// 30年ブロック版（スクロールなし・4ブロック）
+// 20年ブロック版（スクロールなし・6ブロック）
 function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   const blockND = ND.slice(startAge, endAge + 1);
   const blockA2D = A2D.slice(startAge, endAge + 1);
@@ -383,13 +383,13 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
 
   // セル幅: 全体幅をブロック数で均等割り
   const cellW = Math.floor(10000 / blockCount) / 100; // %単位
-  const graphH = 72;
+  const graphH = 110;
   const totalW = blockCount * 32; // SVG用px（1年=32px）
 
   function cst(r){const cs=getJuniCellStyle(r.ju,r.isCurr);let st=cs.bg?`background:${cs.bg};`:'';if(cs.ol)st+=`outline:${cs.ol};`;return st;}
   function ccls(r,i){let c='u-cell-b';if(i>0&&blockA2D[i]&&blockA2D[i-1]&&blockA2D[i].ks!==blockA2D[i-1].ks)c+=' db-b';return c;}
   function tc(r,fb){if(r.isCurr)return'#6a0080';const cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
-  function bHb(fn){return blockBLK.map(b=>`<div class="ub-blk${b.isSk?' sk':''}" style="flex:${b.sp} 0 0">${fn(b)}</div>`).join('');}
+  function bHb(fn){return blockBLK.map((b,bi)=>`<div class="ub-blk${b.isSk?' sk':''}" style="flex:${b.sp} 0 0">${fn(b,bi)}</div>`).join('');}
 
   // インラインSVG（ブロック版）
   const rawVals = blockND.map(r => r.w);
@@ -424,6 +424,12 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
     `<div class="${ccls(r,i)}" style="${cst(r)}flex:1 0 0;height:${hpx}px;min-width:0;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);overflow:hidden;">${fn(r)}</div>`
   ).join('');
 
+  // 現在の大運ブロックを特定
+  const currDaiunIdx = blockBLK.findIndex(b => {
+    const bs = b.sa + startAge, be = bs + b.sp - 1;
+    return currIdx >= bs && currIdx <= be;
+  });
+
   return `
 <div class="ub-wrap">
   <div class="ub-header">${startAge}〜${endAge}歳</div>
@@ -432,10 +438,10 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
   <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px">${svg}</div></div>
-  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</span>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<span style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</span>`;})}</div></div>
+  <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${isCurr?`<span style="font-size:0.45rem;color:rgba(160,60,160,0.9);font-weight:700;margin-bottom:1px">▼現在</span>`:''  }${b.ks}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</span>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';const isCurr=bi===currDaiunIdx;const currStyle=isCurr?'box-shadow:inset 0 0 0 2px rgba(160,60,160,0.7);':'';return`<span style="${bg}${ol}${currStyle}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</span>`;})}</div></div>
 </div>`;
 }
 
@@ -578,7 +584,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     const nenCurrIdx=ND.findIndex(r=>r.isCurr);
     document.getElementById('unsei-outer').innerHTML=buildUnseiRows(ND,A2D,BLK,nenCurrIdx,ht);
     // 30年ブロック版
-    const blocks=[[0,29],[30,59],[60,89],[90,119]];
+    const blocks=[[0,19],[20,39],[40,59],[60,79],[80,99],[100,119]];
     document.getElementById('unsei-blocks').innerHTML=blocks.map(([s,e])=>buildBlockRows(ND,A2D,BLK,nenCurrIdx,s,e,ht)).join('');
     let dtbl='<thead><tr><th>年齢帯</th><th>開始年</th><th>大運干支</th><th>蔵干</th><th>通変星</th><th>十二従星</th><th>十二運気</th><th>波</th></tr></thead><tbody>';
     let ap2=0;
@@ -680,7 +686,7 @@ function addAiMsg(role, text){
       var reads = [
         ['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
         ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
-        ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','だいうん'],
+        ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','たいうん'],
         ['＋','ぷらす'],['－','まいなす'],['+','ぷらす'],
         ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
         ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
@@ -984,7 +990,7 @@ async function speakText(text, btn){
   var reads = [
     ['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
     ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
-    ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','だいうん'],
+    ['大殺界','だいさっかい'],['十二運気','じゅうにうんき'],['大運','たいうん'],
     ['＋','ぷらす'],['－','まいなす'],['+','ぷらす'],
     ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
     ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
