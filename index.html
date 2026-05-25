@@ -637,7 +637,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
   </div>`;
 }
     document.getElementById('meishiki-grid').innerHTML=cH('年　柱',nenKan,nenShi,nZ,T[nenKanIdx]||'—',T[JIKKAN.indexOf(nZ)]||'—',nJus,nJu)+cH('月　柱',tsuKan,tsuShi,tZ,T[tsuKanIdx]||'—',T[JIKKAN.indexOf(tZ)]||'—',tJus,tJu)+cH('日　柱（本人）',nichiKan,nichiShi,niZ,'—',T[JIKKAN.indexOf(niZ)]||'—',niJus,niJu);
-    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の年月が転化天蛹</div></div>`;
+    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWave=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
     const lifeCurrIdx=A2D.findIndex((_,i)=>y+i===CY);
