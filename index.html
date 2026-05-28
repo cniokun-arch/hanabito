@@ -831,74 +831,87 @@ document.addEventListener('click', function(e) {
 
 // ===== AI吹き出し =====
 const MESSAGES = ['✨ AIに相談する','🌸 何か気になることは？','💬 占術AIに聞いてみよう','🔮 今月の運気、気になる？','🌿 アドバイスをもらおう'];
-let idleTimer = null, seqTimer = null, bubbleActive = false, seqRunning = false;
+let bubbleActive = false;
+let bubbleState = 'idle'; // idle | waiting | showing
+let bubbleTimer = null;
+let bubbleMsgIndex = 0;
+let bubbleMsgs = [];
 const bubble = document.getElementById('aiBubble');
+const SHOW_MS = 7000;   // 1つ表示時間
+const WAIT_MS = 8000;   // 休憩時間
 
-function shuffleMessages() {
+function shuffleMsgs() {
   const arr = [...MESSAGES];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
   return arr;
 }
 
-function hideBubble() {
-  bubble.classList.remove('show');
-}
-
-function startSequence() {
-  if (!bubbleActive || seqRunning) return;
-  if (document.getElementById('aiPanel').style.display === 'flex') return;
-  if (document.getElementById('result').style.display === 'none') return;
-  seqRunning = true;
-  const msgs = shuffleMessages();
-  let i = 0;
-  function showOne() {
-    if (!bubbleActive) { seqRunning = false; hideBubble(); return; }
-    if (i >= msgs.length) {
-      // 5種類終了→消えて8秒後にまた繰り返す
-      hideBubble();
-      seqRunning = false;
-      seqTimer = setTimeout(startSequence, 8000);
-      return;
-    }
-    bubble.textContent = msgs[i++];
-    bubble.classList.add('show');
-    // 7秒表示→次へ
-    seqTimer = setTimeout(showOne, 7000);
-  }
-  showOne();
-}
-
-function resetIdleTimer() {
+function bubbleTick() {
   if (!bubbleActive) return;
-  // 操作したら全部止める
-  clearTimeout(idleTimer);
-  clearTimeout(seqTimer);
-  seqRunning = false;
-  hideBubble();
-  idleTimer = setTimeout(startSequence, 8000);
+  if (document.getElementById('aiPanel').style.display==='flex') {
+    bubbleTimer = setTimeout(bubbleTick, 1000);
+    return;
+  }
+  if (document.getElementById('result').style.display==='none') {
+    bubbleTimer = setTimeout(bubbleTick, 1000);
+    return;
+  }
+
+  if (bubbleState === 'waiting') {
+    // 待機終わり→シーケンス開始
+    bubbleMsgs = shuffleMsgs();
+    bubbleMsgIndex = 0;
+    bubbleState = 'showing';
+    bubble.textContent = bubbleMsgs[bubbleMsgIndex++];
+    bubble.classList.add('show');
+    bubbleTimer = setTimeout(bubbleTick, SHOW_MS);
+    return;
+  }
+
+  if (bubbleState === 'showing') {
+    if (bubbleMsgIndex < bubbleMsgs.length) {
+      // 次のメッセージへ（消えずに切り替え）
+      bubble.textContent = bubbleMsgs[bubbleMsgIndex++];
+      bubbleTimer = setTimeout(bubbleTick, SHOW_MS);
+    } else {
+      // 5種類終了→隠して待機へ
+      bubble.classList.remove('show');
+      bubbleState = 'waiting';
+      bubbleTimer = setTimeout(bubbleTick, WAIT_MS);
+    }
+    return;
+  }
+}
+
+function onUserAction() {
+  if (!bubbleActive) return;
+  clearTimeout(bubbleTimer);
+  bubble.classList.remove('show');
+  bubbleState = 'waiting';
+  bubbleTimer = setTimeout(bubbleTick, WAIT_MS);
 }
 
 function startBubbleTimer() {
   bubbleActive = true;
-  clearTimeout(idleTimer);
-  clearTimeout(seqTimer);
-  seqRunning = false;
-  idleTimer = setTimeout(startSequence, 8000);
+  clearTimeout(bubbleTimer);
+  bubble.classList.remove('show');
+  bubbleState = 'waiting';
+  bubbleTimer = setTimeout(bubbleTick, WAIT_MS);
 }
 
 function stopBubbleTimer() {
   bubbleActive = false;
-  clearTimeout(idleTimer);
-  clearTimeout(seqTimer);
-  seqRunning = false;
-  hideBubble();
+  clearTimeout(bubbleTimer);
+  bubble.classList.remove('show');
+  bubbleState = 'idle';
 }
 
-['touchstart','touchmove','mousedown','mousemove','scroll','keydown'].forEach(e => {
-  document.addEventListener(e, resetIdleTimer, {passive:true});
+// touchstartとclickのみ（mousemoveは除外）
+['touchstart','click','keydown'].forEach(e => {
+  document.addEventListener(e, onUserAction, {passive:true});
 });
 
 // ===== 花びら =====
@@ -938,21 +951,11 @@ function drawPetal(p) {
   ctx.translate(p.x, p.y);
   ctx.rotate(p.rotation);
   ctx.globalAlpha = p.opacity;
-  ctx.fillStyle = p.color;
-  // 桜の花びら形（卵形ベジェ）
-  const s = p.size;
-  ctx.beginPath();
-  ctx.moveTo(0, -s);
-  ctx.bezierCurveTo(s * 0.8, -s * 0.8, s * 1.0, s * 0.2, 0, s * 0.6);
-  ctx.bezierCurveTo(-s * 1.0, s * 0.2, -s * 0.8, -s * 0.8, 0, -s);
-  ctx.fill();
-  // 中央の筋
-  ctx.strokeStyle = p.color.replace('0.', '0.2').replace(',0.', ',0.2');
-  ctx.lineWidth = 0.5;
-  ctx.beginPath();
-  ctx.moveTo(0, -s * 0.8);
-  ctx.lineTo(0, s * 0.4);
-  ctx.stroke();
+  // 🌸絵文字で描画（確実に桜に見える）
+  ctx.font = p.size * 2 + 'px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🌸', 0, 0);
   ctx.restore();
 }
 
