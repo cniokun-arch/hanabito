@@ -831,7 +831,7 @@ document.addEventListener('click', function(e) {
 
 // ===== AI吹き出し =====
 const MESSAGES = ['✨ AIに相談する','🌸 何か気になることは？','💬 占術AIに聞いてみよう','🔮 今月の運気、気になる？','🌿 アドバイスをもらおう'];
-let idleTimer, bubbleActive = false;
+let idleTimer = null, seqTimer = null, bubbleActive = false, seqRunning = false;
 const bubble = document.getElementById('aiBubble');
 
 function shuffleMessages() {
@@ -843,48 +843,60 @@ function shuffleMessages() {
   return arr;
 }
 
-function showBubbleSequence() {
-  if (!bubbleActive) return;
+function hideBubble() {
+  bubble.classList.remove('show');
+}
+
+function startSequence() {
+  if (!bubbleActive || seqRunning) return;
   if (document.getElementById('aiPanel').style.display === 'flex') return;
   if (document.getElementById('result').style.display === 'none') return;
+  seqRunning = true;
   const msgs = shuffleMessages();
   let i = 0;
-  function showNext() {
-    if (!bubbleActive || i >= msgs.length) {
+  function showOne() {
+    if (!bubbleActive) { seqRunning = false; hideBubble(); return; }
+    if (i >= msgs.length) {
+      // 5種類終了→休憩→また繰り返し
       hideBubble();
-      // 全部表示し終えたら休憩してまた繰り返す
-      if (bubbleActive) idleTimer = setTimeout(showBubbleSequence, 10000);
+      seqRunning = false;
+      seqTimer = setTimeout(startSequence, 12000);
       return;
     }
     bubble.textContent = msgs[i++];
     bubble.classList.add('show');
-    setTimeout(() => {
-      hideBubble();
-      setTimeout(showNext, 600); // 消えてすぐ次へ
-    }, 3500);
+    // 3秒表示→即次へ（消えずに切り替え）
+    seqTimer = setTimeout(showOne, 3000);
   }
-  showNext();
+  showOne();
 }
 
-function hideBubble() {
-  bubble.classList.remove('show');
-}
 function resetIdleTimer() {
   if (!bubbleActive) return;
+  // 操作したら全部止める
   clearTimeout(idleTimer);
+  clearTimeout(seqTimer);
+  seqRunning = false;
   hideBubble();
-  idleTimer = setTimeout(showBubbleSequence, 8000);
+  idleTimer = setTimeout(startSequence, 8000);
 }
+
 function startBubbleTimer() {
   bubbleActive = true;
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(showBubbleSequence, 8000);
+  clearTimeout(seqTimer);
+  seqRunning = false;
+  idleTimer = setTimeout(startSequence, 8000);
 }
+
 function stopBubbleTimer() {
   bubbleActive = false;
   clearTimeout(idleTimer);
+  clearTimeout(seqTimer);
+  seqRunning = false;
   hideBubble();
 }
+
 ['touchstart','touchmove','mousedown','mousemove','scroll','keydown'].forEach(e => {
   document.addEventListener(e, resetIdleTimer, {passive:true});
 });
@@ -908,16 +920,16 @@ function createPetal() {
   return {
     x: Math.random() * canvas.width,
     y: -20,
-    size: 6 + Math.random() * 10,
-    speedY: 0.6 + Math.random() * 1.2,
-    speedX: (Math.random() - 0.5) * 0.8,
+    size: 8 + Math.random() * 10,
+    speedY: 0.5 + Math.random() * 1.0,
+    speedX: (Math.random() - 0.5) * 0.6,
     rotation: Math.random() * Math.PI * 2,
-    rotSpeed: (Math.random() - 0.5) * 0.04,
+    rotSpeed: (Math.random() - 0.5) * 0.03,
     sway: Math.random() * Math.PI * 2,
-    swaySpeed: 0.01 + Math.random() * 0.02,
-    swayAmt: 0.5 + Math.random() * 1.5,
+    swaySpeed: 0.008 + Math.random() * 0.015,
+    swayAmt: 0.8 + Math.random() * 2.0,
     color: PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)],
-    opacity: 0.4 + Math.random() * 0.5,
+    opacity: 0.5 + Math.random() * 0.4,
   };
 }
 
@@ -927,9 +939,20 @@ function drawPetal(p) {
   ctx.rotate(p.rotation);
   ctx.globalAlpha = p.opacity;
   ctx.fillStyle = p.color;
+  // 桜の花びら形（卵形ベジェ）
+  const s = p.size;
   ctx.beginPath();
-  ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+  ctx.moveTo(0, -s);
+  ctx.bezierCurveTo(s * 0.8, -s * 0.8, s * 1.0, s * 0.2, 0, s * 0.6);
+  ctx.bezierCurveTo(-s * 1.0, s * 0.2, -s * 0.8, -s * 0.8, 0, -s);
   ctx.fill();
+  // 中央の筋
+  ctx.strokeStyle = p.color.replace('0.', '0.2').replace(',0.', ',0.2');
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.8);
+  ctx.lineTo(0, s * 0.4);
+  ctx.stroke();
   ctx.restore();
 }
 
