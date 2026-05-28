@@ -794,7 +794,7 @@ function openPrint(){
 </div>
 
 <!-- 花びらキャンバス -->
-<canvas id="petalCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6"></canvas>
+<canvas id="petalCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.7;display:none"></canvas>
 
 <script>
 // ===== 設定管理 =====
@@ -831,33 +831,54 @@ document.addEventListener('click', function(e) {
 
 // ===== AI吹き出し =====
 const MESSAGES = ['✨ AIに相談する','🌸 何か気になることは？','💬 占術AIに聞いてみよう','🔮 今月の運気、気になる？','🌿 アドバイスをもらおう'];
-let idleTimer, msgIdx = 0, bubbleVisible = false, bubbleActive = false;
+let idleTimer, bubbleActive = false;
 const bubble = document.getElementById('aiBubble');
 
-function showBubble() {
+function shuffleMessages() {
+  const arr = [...MESSAGES];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showBubbleSequence() {
   if (!bubbleActive) return;
   if (document.getElementById('aiPanel').style.display === 'flex') return;
   if (document.getElementById('result').style.display === 'none') return;
-  bubble.textContent = MESSAGES[msgIdx % MESSAGES.length];
-  msgIdx++;
-  bubble.classList.add('show');
-  bubbleVisible = true;
-  setTimeout(hideBubble, 4000);
+  const msgs = shuffleMessages();
+  let i = 0;
+  function showNext() {
+    if (!bubbleActive || i >= msgs.length) {
+      hideBubble();
+      // 全部表示し終えたら休憩してまた繰り返す
+      if (bubbleActive) idleTimer = setTimeout(showBubbleSequence, 10000);
+      return;
+    }
+    bubble.textContent = msgs[i++];
+    bubble.classList.add('show');
+    setTimeout(() => {
+      hideBubble();
+      setTimeout(showNext, 600); // 消えてすぐ次へ
+    }, 3500);
+  }
+  showNext();
 }
+
 function hideBubble() {
   bubble.classList.remove('show');
-  bubbleVisible = false;
 }
 function resetIdleTimer() {
   if (!bubbleActive) return;
   clearTimeout(idleTimer);
-  if (bubbleVisible) hideBubble();
-  idleTimer = setTimeout(showBubble, 8000);
+  hideBubble();
+  idleTimer = setTimeout(showBubbleSequence, 8000);
 }
 function startBubbleTimer() {
   bubbleActive = true;
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(showBubble, 8000);
+  idleTimer = setTimeout(showBubbleSequence, 8000);
 }
 function stopBubbleTimer() {
   bubbleActive = false;
