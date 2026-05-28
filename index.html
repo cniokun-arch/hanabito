@@ -967,6 +967,8 @@ function createPetal() {
     color: colorPair[0],
     colorDark: colorPair[1],
     opacity: 0.5 + Math.random() * 0.4,
+    flip: Math.random() * Math.PI * 2,        // Y軸回転の初期位相
+    flipSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.01 + Math.random() * 0.025), // 回転速度
   };
 }
 
@@ -974,6 +976,9 @@ function drawPetal(p) {
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.rotation);
+  // Y軸回転（scaleXで表裏を表現）
+  const flipScale = Math.cos(p.flip);
+  ctx.scale(flipScale, 1);
   const s = p.size;
 
   // 花びらのパス（ハート型に近い丸みのある形）
@@ -1014,6 +1019,7 @@ function animatePetals() {
     p.x += p.speedX + Math.sin(p.sway) * p.swayAmt;
     p.y += p.speedY;
     p.rotation += p.rotSpeed;
+    p.flip += p.flipSpeed;
     drawPetal(p);
   });
   petalAnim = requestAnimationFrame(animatePetals);
@@ -1038,11 +1044,11 @@ function stopPetals() {
   const s = loadSettings();
   document.getElementById('settingBubble').checked = s.bubble !== false ? true : false;
   document.getElementById('settingPetals').checked = s.petals || false;
-  // デフォルトは吹き出しON・花びらOFF
-  if (s.bubble === undefined) {
-    s.bubble = true;
-    document.getElementById('settingBubble').checked = true;
-  }
+  // デフォルトは両方ON
+  if (s.bubble === undefined) s.bubble = true;
+  if (s.petals === undefined) s.petals = true;
+  document.getElementById('settingBubble').checked = s.bubble;
+  document.getElementById('settingPetals').checked = s.petals;
   applySettings(s);
 })();
 </script>
