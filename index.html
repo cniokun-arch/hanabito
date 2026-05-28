@@ -857,16 +857,16 @@ function startSequence() {
   function showOne() {
     if (!bubbleActive) { seqRunning = false; hideBubble(); return; }
     if (i >= msgs.length) {
-      // 5種類終了→休憩→また繰り返し
+      // 5種類終了→消えて8秒後にまた繰り返す
       hideBubble();
       seqRunning = false;
-      seqTimer = setTimeout(startSequence, 12000);
+      seqTimer = setTimeout(startSequence, 8000);
       return;
     }
     bubble.textContent = msgs[i++];
     bubble.classList.add('show');
-    // 3秒表示→即次へ（消えずに切り替え）
-    seqTimer = setTimeout(showOne, 3000);
+    // 7秒表示→次へ
+    seqTimer = setTimeout(showOne, 7000);
   }
   showOne();
 }
