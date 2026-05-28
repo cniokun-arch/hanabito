@@ -776,44 +776,182 @@ function openPrint(){
 <!-- AI相談チャット -->
 <button class="ai-fab" onclick="toggleAiPanel()" title="花人占術AIに相談する">🌸</button>
 <div class="ai-fab-bubble" id="aiBubble">✨ AIに相談する</div>
+
+<!-- 設定ボタン -->
+<button id="settingBtn" onclick="toggleSettings()" style="position:fixed;bottom:88px;right:24px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);border:1px solid rgba(184,134,11,0.3);font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1);z-index:998;display:flex;align-items:center;justify-content:center">⚙️</button>
+
+<!-- 設定パネル -->
+<div id="settingPanel" style="display:none;position:fixed;bottom:134px;right:16px;background:#fff;border:1px solid rgba(184,134,11,0.3);border-radius:12px;padding:1rem 1.2rem;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:999;min-width:200px;font-size:0.85rem;color:#4a3c28">
+  <div style="font-weight:700;margin-bottom:0.8rem;color:#b8860b;font-size:0.9rem">⚙️ 演出設定</div>
+  <label style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;cursor:pointer">
+    <input type="checkbox" id="settingBubble" onchange="saveSetting()" style="width:18px;height:18px;cursor:pointer">
+    <span>🌸 AI吹き出しを表示</span>
+  </label>
+  <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer">
+    <input type="checkbox" id="settingPetals" onchange="saveSetting()" style="width:18px;height:18px;cursor:pointer">
+    <span>🌸 花びらを舞わせる</span>
+  </label>
+</div>
+
+<!-- 花びらキャンバス -->
+<canvas id="petalCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6"></canvas>
+
 <script>
-(function(){
-  const MESSAGES = [
-    '✨ AIに相談する',
-    '🌸 何か気になることは？',
-    '💬 占術AIに聞いてみよう',
-    '🔮 今月の運気、気になる？',
-    '🌿 アドバイスをもらおう',
-  ];
-  let idleTimer, msgIdx = 0, bubbleVisible = false;
-  const bubble = document.getElementById('aiBubble');
-
-  function showBubble() {
-    if (document.getElementById('aiPanel').style.display === 'flex') return;
-    bubble.textContent = MESSAGES[msgIdx % MESSAGES.length];
-    msgIdx++;
-    bubble.classList.add('show');
-    bubbleVisible = true;
-    setTimeout(hideBubble, 4000);
+// ===== 設定管理 =====
+const SETTINGS_KEY = 'hanabito_settings';
+function loadSettings() {
+  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveSetting() {
+  const s = {
+    bubble: document.getElementById('settingBubble').checked,
+    petals: document.getElementById('settingPetals').checked,
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  applySettings(s);
+}
+function applySettings(s) {
+  // 花びら
+  if (s.petals) startPetals(); else stopPetals();
+  // 吹き出しタイマー再設定
+  if (s.bubble) startBubbleTimer(); else stopBubbleTimer();
+}
+function toggleSettings() {
+  const p = document.getElementById('settingPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+// パネル外クリックで閉じる
+document.addEventListener('click', function(e) {
+  const p = document.getElementById('settingPanel');
+  const b = document.getElementById('settingBtn');
+  if (p.style.display !== 'none' && !p.contains(e.target) && !b.contains(e.target)) {
+    p.style.display = 'none';
   }
+});
 
-  function hideBubble() {
-    bubble.classList.remove('show');
-    bubbleVisible = false;
-  }
+// ===== AI吹き出し =====
+const MESSAGES = ['✨ AIに相談する','🌸 何か気になることは？','💬 占術AIに聞いてみよう','🔮 今月の運気、気になる？','🌿 アドバイスをもらおう'];
+let idleTimer, msgIdx = 0, bubbleVisible = false, bubbleActive = false;
+const bubble = document.getElementById('aiBubble');
 
-  function resetTimer() {
-    clearTimeout(idleTimer);
-    if (bubbleVisible) hideBubble();
-    idleTimer = setTimeout(showBubble, 8000);
-  }
+function showBubble() {
+  if (!bubbleActive) return;
+  if (document.getElementById('aiPanel').style.display === 'flex') return;
+  if (document.getElementById('result').style.display === 'none') return;
+  bubble.textContent = MESSAGES[msgIdx % MESSAGES.length];
+  msgIdx++;
+  bubble.classList.add('show');
+  bubbleVisible = true;
+  setTimeout(hideBubble, 4000);
+}
+function hideBubble() {
+  bubble.classList.remove('show');
+  bubbleVisible = false;
+}
+function resetIdleTimer() {
+  if (!bubbleActive) return;
+  clearTimeout(idleTimer);
+  if (bubbleVisible) hideBubble();
+  idleTimer = setTimeout(showBubble, 8000);
+}
+function startBubbleTimer() {
+  bubbleActive = true;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(showBubble, 8000);
+}
+function stopBubbleTimer() {
+  bubbleActive = false;
+  clearTimeout(idleTimer);
+  hideBubble();
+}
+['touchstart','touchmove','mousedown','mousemove','scroll','keydown'].forEach(e => {
+  document.addEventListener(e, resetIdleTimer, {passive:true});
+});
 
-  ['mousemove','mousedown','touchstart','keydown','scroll'].forEach(e => {
-    document.addEventListener(e, resetTimer, {passive:true});
+// ===== 花びら =====
+let petalAnim = null, petalActive = false;
+const canvas = document.getElementById('petalCanvas');
+const ctx = canvas.getContext('2d');
+let petals = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+const PETAL_COLORS = ['rgba(255,182,193,0.7)','rgba(255,160,180,0.6)','rgba(255,200,210,0.65)','rgba(255,218,225,0.5)','rgba(240,150,170,0.55)'];
+
+function createPetal() {
+  return {
+    x: Math.random() * canvas.width,
+    y: -20,
+    size: 6 + Math.random() * 10,
+    speedY: 0.6 + Math.random() * 1.2,
+    speedX: (Math.random() - 0.5) * 0.8,
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.04,
+    sway: Math.random() * Math.PI * 2,
+    swaySpeed: 0.01 + Math.random() * 0.02,
+    swayAmt: 0.5 + Math.random() * 1.5,
+    color: PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)],
+    opacity: 0.4 + Math.random() * 0.5,
+  };
+}
+
+function drawPetal(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rotation);
+  ctx.globalAlpha = p.opacity;
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function animatePetals() {
+  if (!petalActive) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (Math.random() < 0.04 && petals.length < 25) petals.push(createPetal());
+  petals = petals.filter(p => p.y < canvas.height + 30);
+  petals.forEach(p => {
+    p.sway += p.swaySpeed;
+    p.x += p.speedX + Math.sin(p.sway) * p.swayAmt;
+    p.y += p.speedY;
+    p.rotation += p.rotSpeed;
+    drawPetal(p);
   });
+  petalAnim = requestAnimationFrame(animatePetals);
+}
 
-  // 最初は少し長めに待つ
-  idleTimer = setTimeout(showBubble, 12000);
+function startPetals() {
+  if (petalActive) return;
+  petalActive = true;
+  canvas.style.display = 'block';
+  animatePetals();
+}
+function stopPetals() {
+  petalActive = false;
+  cancelAnimationFrame(petalAnim);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = 'none';
+  petals = [];
+}
+
+// ===== 初期化 =====
+(function init() {
+  const s = loadSettings();
+  document.getElementById('settingBubble').checked = s.bubble !== false ? true : false;
+  document.getElementById('settingPetals').checked = s.petals || false;
+  // デフォルトは吹き出しON・花びらOFF
+  if (s.bubble === undefined) {
+    s.bubble = true;
+    document.getElementById('settingBubble').checked = true;
+  }
+  applySettings(s);
 })();
 </script>
 <div class="ai-panel" id="aiPanel">
