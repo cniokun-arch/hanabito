@@ -191,6 +191,24 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 </script>
+<script>
+window.onerror = function(msg, src, line, col) {
+  const box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ ' + msg + ' [行' + line + ':' + col + ']';
+    box.style.display = 'block';
+    box.style.wordBreak = 'break-all';
+  }
+  return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+  const box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ 非同期エラー: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
+    box.style.display = 'block';
+  }
+});
+</script>
 </head>
 <body>
 <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">花人占術 命式・大運・一生運命グラフ自動計算アプリ</h2>
@@ -299,14 +317,14 @@ const GOGYO = {
   '申':{'行':'金','陰陽':'＋'},'酉':{'行':'金','陰陽':'－'},
   '戌':{'行':'土','陰陽':'＋'},'亥':{'行':'水','陰陽':'－'}
 };
-const GOGYO_COLOR = {'木':'#2d7a3a','火':'#c0392b','土':'#b8860b','金':'#7a6b52','水':'#1a5a8a'};
 function getGogyo(char) { return GOGYO[char] || null; }
 function gogyoBadge(char) {
   const g = getGogyo(char);
   if (!g) return '';
-  const col = GOGYO_COLOR[g['行']] || '#666';
+  const gogyoName = g['行'];
+  const col = gogyoName === '木' ? '#2d7a3a' : gogyoName === '火' ? '#c0392b' : gogyoName === '土' ? '#b8860b' : gogyoName === '金' ? '#7a6b52' : '#1a5a8a';
   return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-left:4px;line-height:1.2">'
-    + '<span style="font-size:0.6rem;color:' + col + ';font-weight:700;border:1px solid ' + col + ';border-radius:2px;padding:0 3px">' + g['行'] + '</span>'
+    + '<span style="font-size:0.6rem;color:' + col + ';font-weight:700;border:1px solid ' + col + ';border-radius:2px;padding:0 3px">' + gogyoName + '</span>'
     + '<span style="font-size:0.58rem;color:' + col + ';margin-top:1px">' + g['陰陽'] + '</span>'
     + '</div>';
 }
@@ -753,9 +771,10 @@ function calculate(){
     function gogyoTag(char){
   const g=getGogyo(char);
   if(!g)return '';
-  const col=GOGYO_COLOR[g['行']]||'#666';
+  const gn=g['行'];
+  const col=gn==='木'?'#2d7a3a':gn==='火'?'#c0392b':gn==='土'?'#b8860b':gn==='金'?'#7a6b52':'#1a5a8a';
   return '<div style="display:flex;flex-direction:column;align-items:center;line-height:1.2;margin-left:3px">'
-    +'<span style="font-size:0.55rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px;white-space:nowrap">'+g['行']+'</span>'
+    +'<span style="font-size:0.55rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px;white-space:nowrap">'+gn+'</span>'
     +'<span style="font-size:0.55rem;color:'+col+';margin-top:1px">'+g['陰陽']+'</span>'
     +'</div>';
 }
