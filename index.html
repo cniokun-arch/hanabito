@@ -171,6 +171,26 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 }
 @media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
+<script>
+// グローバルエラーハンドラー
+window.onerror = function(msg, src, line, col, err) {
+  const box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ エラー: ' + msg + ' [' + (src||'').split('/').pop() + ':' + line + ':' + col + ']';
+    box.style.display = 'block';
+    box.style.whiteSpace = 'pre-wrap';
+    box.style.wordBreak = 'break-all';
+  }
+  return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+  const box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ 非同期エラー: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
+    box.style.display = 'block';
+  }
+});
+</script>
 </head>
 <body>
 <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">花人占術 命式・大運・一生運命グラフ自動計算アプリ</h2>
@@ -888,7 +908,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     if(aiMsg) aiMsg.innerHTML = '<div class="ai-msg ai-msg-bot">新しい命式を読み込みました。ご質問をどうぞ🌸</div>';
     document.getElementById('result').style.display='block';
     document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(err){document.getElementById('errmsg').textContent=`⚠ ${err.message}`;document.getElementById('errmsg').style.display='block';console.error(err);}
+  }catch(err){document.getElementById('errmsg').textContent='⚠ '+err.message+' | '+err.stack;document.getElementById('errmsg').style.display='block';console.error(err);}
 }
 function openPrint(){
   if(!G.y){alert('先に「命式を出す」を押してください');return;}
