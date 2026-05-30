@@ -12,21 +12,21 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .app{max-width:960px;margin:0 auto;padding:2rem 1rem 4rem}
 .header{text-align:center;padding:2rem 0 1.5rem;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:2rem}
 .header h1{font-family:'Zen Old Mincho',serif;font-size:2rem;letter-spacing:0.3em;color:#b8860b;font-weight:700}@media(max-width:480px){.header h1{font-size:1.4rem;letter-spacing:0.15em}}
-.header p{font-size:0.82rem;color:#7a6b52;margin-top:0.5rem}
+.header p{font-size:0.95rem;color:#7a6b52;margin-top:0.5rem}
 .input-panel{background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:4px;padding:1.5rem 2rem;margin-bottom:2rem}
-.input-panel h2{font-size:0.88rem;letter-spacing:0.2em;color:#b8860b;margin-bottom:1.2rem;text-align:center}
+.input-panel h2{font-size:1rem;letter-spacing:0.2em;color:#b8860b;margin-bottom:1.2rem;text-align:center}
 .input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;align-items:end}
-.field label{display:block;font-size:0.73rem;color:#7a6b52;margin-bottom:0.4rem}
+.field label{display:block;font-size:0.85rem;color:#7a6b52;margin-bottom:0.4rem}
 .field input,.field select{width:100%;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.7rem;font-family:'Noto Serif JP',serif;font-size:1rem;color:#1a1208;outline:none}
 .field input:focus,.field select:focus{border-color:#b8860b}
 .btn{background:#b8860b;color:#fff;border:none;padding:0.6rem 2rem;font-family:'Noto Serif JP',serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;border-radius:2px;width:100%;margin-top:1rem}
 .btn:hover{background:#d4a017}
 .btn-print{background:#4a3c28;color:#fff;border:none;padding:0.55rem 1.4rem;font-family:'Noto Serif JP',serif;font-size:0.85rem;cursor:pointer;border-radius:2px;display:inline-flex;align-items:center;gap:0.4rem}
 .btn-print:hover{background:#2a1c08}
-.errmsg{background:#fff0f0;border:1px solid #c00;color:#900;border-radius:3px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.85rem;display:none}
+.errmsg{background:#fff0f0;border:1px solid #c00;color:#900;border-radius:3px;padding:0.8rem 1rem;margin-bottom:1rem;font-size:0.95rem;display:none}
 .result{display:none}
 .section{margin-bottom:2rem}
-.section-title{font-family:'Zen Old Mincho',serif;font-size:0.95rem;letter-spacing:0.25em;color:#b8860b;border-bottom:1px solid rgba(184,134,11,0.3);padding-bottom:0.4rem;margin-bottom:1rem}
+.section-title{font-family:'Zen Old Mincho',serif;font-size:1.05rem;letter-spacing:0.25em;color:#b8860b;border-bottom:1px solid rgba(184,134,11,0.3);padding-bottom:0.4rem;margin-bottom:1rem}
 .meishiki-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(184,134,11,0.25);border:1px solid rgba(184,134,11,0.25)}
 .meishiki-col{background:#faf6ef;text-align:center;padding:0.8rem 0.5rem}
 .col-label{font-size:0.68rem;color:#7a6b52;margin-bottom:0.5rem}
@@ -38,11 +38,11 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .juni{font-size:0.8rem;margin-top:0.15rem}
 .info-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem}
 .info-card{background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:2px;padding:0.8rem 1rem;text-align:center}
-.ic-label{font-size:0.68rem;color:#7a6b52;margin-bottom:0.3rem}
-.ic-val{font-size:1rem;color:#1a1208;font-weight:500}
-.ic-sub{font-size:0.7rem;color:#b8860b;margin-top:0.2rem}
+.ic-label{font-size:0.8rem;color:#7a6b52;margin-bottom:0.3rem}
+.ic-val{font-size:1.1rem;color:#1a1208;font-weight:500}
+.ic-sub{font-size:0.82rem;color:#b8860b;margin-top:0.2rem}
 .chart-wrap{background:#faf6ef;border:1px solid rgba(184,134,11,0.25);border-radius:2px;padding:1rem;overflow:visible}
-.legend{display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;font-size:0.68rem;color:#7a6b52}
+.legend{display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;font-size:0.78rem;color:#7a6b52}
 .ld{display:flex;align-items:center;gap:0.3rem}
 .ldot{width:16px;height:3px;border-radius:2px;flex-shrink:0}
 /* 横スクロール表: 二層構造でstickyを正常動作させる */
@@ -213,7 +213,7 @@ window.addEventListener('unhandledrejection', function(e) {
 <body>
 <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">花人占術 命式・大運・一生運命グラフ自動計算アプリ</h2>
 <div class="app">
-  <div class="header"><h1>花 人 占 術</h1><p>生年月日と性別を入力すると、花人と運命の推移を自動計算します</p>
+  <div class="header"><h1>花 人 占 術</h1><p>生年月日と性別を入力すると、①その人の人間性と与えられた運命（六花人）、②過去・現在・未来の運気の流れと落とし穴や人生の転換期（大運）を鑑定します。</p>
   <p style="font-size:0.82rem;margin-top:0.5rem;color:#7a6b52;line-height:1.7">
     🌸 画面右下の花マークから、占術AIに質問・アドバイスを受けられます<br>
     <span style="font-size:0.78rem">（無料・1日10回まで）</span>
@@ -221,7 +221,7 @@ window.addEventListener('unhandledrejection', function(e) {
   <p style="font-size:0.72rem;margin-top:0.3rem;color:#b8860b;opacity:0.8">※ 有料プランは今後実装予定です</p>
   </div>
   <div class="input-panel">
-    <h2>◆ 命式入力</h2>
+    <h2>◆ 知りたい人の誕生日を入力してください</h2>
     <div class="input-row">
       <div class="field"><label>生年月日</label>
 <div style="display:flex;gap:0.5rem;align-items:center">
@@ -241,15 +241,17 @@ window.addEventListener('unhandledrejection', function(e) {
 </div>
 </div>
       <div class="field"><label>性別</label><select id="gender"><option value="男">男（陽）</option><option value="女">女（陰）</option></select></div>
-      <div class="field"><label>　</label><button class="btn" onclick="calculate()">命 式 を 出 す</button></div>
+      <div class="field"><label>　</label><button class="btn" onclick="calculate()">占 っ て み る</button></div>
     </div>
   </div>
   <div class="errmsg" id="errmsg"></div>
   <div class="result" id="result">
 
+    <div id="hoshi-banner" style="display:none"></div>
+
     <div class="section" id="print-section-1">
       <div class="print-section-header">
-        <div class="section-title">◆ 命式（四柱）</div>
+        <div class="section-title">◆ 命式（運命の型）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※与えられた魂魄の形を表します。</span></div>
         <button class="print-btn" onclick="printSection1()">🖨 命式・大運表を印刷</button>
       </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
@@ -258,12 +260,12 @@ window.addEventListener('unhandledrejection', function(e) {
       <div id="lucky-color-content"></div>
     </div>
     <div class="section" id="monthly-fortune-section" style="display:none">
-      <div class="section-title">◆ 月別運気（固定・毎年同じ）</div>
+      <div class="section-title">◆ 1年間の運気の流れ（1月から12月まで）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※スマートフォンではグラフを左右にスクロールできます</span></div>
       <div id="monthly-fortune-table"></div>
     </div>
-    <div class="section"><div class="section-title">◆ 大運表（0〜119歳）</div><div class="table-wrap"><table id="daiunTable"></table></div></div>
+    <div class="section"><div class="section-title">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span></div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section" id="unsei-scroll-section">
-      <div class="section-title">◆ 命運グラフ（横型）― 0〜119歳</div>
+      <div class="section-title">◆ 命運グラフ（横スクロール）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※スマートフォンではグラフを左右にスクロールできます</span><br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの120年間、毎年切り替わる運命の流れと運気の波、10年毎の大運の変化を見やすくひとつにまとめたものです。</span></div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
         <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
@@ -277,7 +279,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
     <div class="section" id="print-section-2">
       <div class="print-section-header">
-        <div class="section-title">◆ 命運グラフ（20年ブロック）― 0〜119歳</div>
+        <div class="section-title">◆ 命運グラフ（20年毎の区切り）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※一生分の変化を20年毎に区切ってまとめたものです。</span></div>
         <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
       </div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
@@ -450,15 +452,23 @@ function buildLuckyColorHTML(nenKan, nenShi, nZ, tsuKan, tsuShi, tZ, nichiKan, n
   let html = '<div style="background:linear-gradient(135deg,#faf6ef,#f2ead8);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1rem 1.2rem">';
   html += '<div style="font-family:serif;font-size:1rem;color:#b8860b;font-weight:700;margin-bottom:0.8rem">五行バランス ＆ ラッキーカラー</div>';
   html += '<div style="font-size:0.8rem;font-weight:700;color:#4a3c28;margin-bottom:4px">命式の五行分布（蔵干含む9要素）</div>';
+  const sortedG = Object.entries(meishikiCount).sort((a,b)=>b[1]-a[1]);
+  const maxG = sortedG[0], minG = sortedG[sortedG.length-1];
+  const maxGs = sortedG.filter(e=>e[1]===maxG[1]).map(e=>e[0]);
+  const minGs = sortedG.filter(e=>e[1]===minG[1]).map(e=>e[0]);
+  html += '<div style="font-size:0.75rem;color:#4a3c28;margin-bottom:8px;line-height:1.8">'
+    +'<span style="background:rgba(184,134,11,0.1);padding:2px 8px;border-radius:3px;margin-right:6px">多い：<strong>'+maxGs.join('・')+'</strong>（'+maxG[1]+'個）</span>'
+    +'<span style="background:rgba(100,140,220,0.1);padding:2px 8px;border-radius:3px">少ない：<strong>'+minGs.join('・')+'</strong>（'+minG[1]+'個）</span>'
+    +'</div>';
   html += makeBarHTML(meishikiCount);
   html += '<div style="margin-top:1rem;padding:0.8rem;background:rgba(255,255,255,0.7);border-radius:6px;border:1px solid rgba(184,134,11,0.2)">';
-  html += '<div style="font-size:0.8rem;font-weight:700;color:#b8860b;margin-bottom:6px">🎨 お守りカラー（命式ベース）</div>';
-  html += '<div style="font-size:0.72rem;color:#7a6b52;margin-bottom:8px">最も少ない五行「'+baseColors.join('・')+'」を補う色</div>';
+  html += '<div style="font-size:0.8rem;font-weight:700;color:#b8860b;margin-bottom:6px">🎨 お守りカラー</div>';
+  html += '<div style="font-size:0.72rem;color:#7a6b52;margin-bottom:8px">普段から自分を守ってくれるカラーを表します</div>';
   html += '<div style="display:flex;gap:10px;flex-wrap:wrap">'+makeSwatchHTML(baseColors)+'</div>';
   html += '</div>';
   html += '<div style="margin-top:0.8rem;padding:0.8rem;background:rgba(255,245,220,0.8);border-radius:6px;border:1px solid rgba(184,134,11,0.3)">';
   html += '<div style="font-size:0.8rem;font-weight:700;color:#b8860b;margin-bottom:6px">⭐ 今日のラッキーカラー（'+dateStr+'）</div>';
-  html += '<div style="font-size:0.72rem;color:#7a6b52;margin-bottom:4px">今日の干支：年'+todayData.nenKS+' 月'+todayData.tsuKS+' 日'+todayData.nichiKS+'</div>';
+  html += '<div style="font-size:0.72rem;color:#7a6b52;margin-bottom:4px"><span style="display:none">今日の干支：年'+todayData.nenKS+' 月'+todayData.tsuKS+' 日'+todayData.nichiKS+'</div>';
   html += '<div style="font-size:0.72rem;color:#7a6b52;margin-bottom:8px">命式＋今日で最も少ない「'+todayColors.join('・')+'」を補う色</div>';
   html += '<div style="display:flex;gap:10px;flex-wrap:wrap">'+makeSwatchHTML(todayColors)+'</div>';
   html += '</div></div>';
@@ -568,7 +578,7 @@ function buildMonthlyFortune(ht, sats) {
 
   // グラフ行
   let graphRow = `<div style="display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch">`;
-  graphRow += lbl('月別<br>運気波');
+  graphRow += lbl('運気波<br><span style="font-size:0.5rem;color:#1a6b3a">好調↑</span><br><span style="font-size:0.5rem;color:#882222">↓不調</span>');
   graphRow += `<div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;position:relative">${svg}${starOverlay}</div>`;
   graphRow += '</div>';
 
@@ -646,7 +656,7 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   h+=`<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.52rem;color:${tc(r,'#4a3c28')};line-height:1.1;text-align:center">${String(r.yr).split('').join('<br>')}</span></div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;font-family:'Zen Old Mincho',serif;font-size:0.85rem;color:${tc(r,'#1a1208')}">${r.yrShi}</div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-ju"><div class="u-lbl">十二運気</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</div>`).join('')}</div></div>`;
-  h+=`<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:${graphH}px">年支<br>運気波</div><div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;flex-shrink:0;overflow:hidden">${makeInlineSvg(ND,currIdx,totalW,graphH)}</div></div>`;
+  h+=`<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:${graphH}px">運気波<br><span style="font-size:0.5rem;color:#1a6b3a">好調↑</span><br><span style="font-size:0.5rem;color:#882222">↓不調</span></div><div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;flex-shrink:0;overflow:hidden">${makeInlineSvg(ND,currIdx,totalW,graphH)}</div></div>`;
   h+=`<div class="u-row r-dks r-sep"><div class="u-lbl dl">大運干支</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=2?'0.6rem':'0.82rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>`;
   h+=`<div class="u-row r-th"><div class="u-lbl dl">通変星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.5rem':b.sp<=4?'0.6rem':'0.68rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>`;
   h+=`<div class="u-row r-jos"><div class="u-lbl dl">十二従星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.45rem':b.sp<=4?'0.55rem':'0.62rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>`;
@@ -732,7 +742,7 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">${cells('',44,r=>`<span style="font-size:0.48rem;color:${tc(r,'#4a3c28')};line-height:1.15;text-align:center">${String(r.yr).split('').join('<br>')}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
-  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">年支<br>運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px;position:relative">${svg}${starOverlay}</div></div>
+  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">運気波<br><span style="font-size:0.5rem;color:#1a6b3a">好調↑</span><br><span style="font-size:0.5rem;color:#882222">↓不調</span></div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px;position:relative">${svg}${starOverlay}</div></div>
   <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
@@ -798,6 +808,26 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
   </div>`;
 }
     document.getElementById('meishiki-grid').innerHTML=cH('年　柱',nenKan,nenShi,nZ,T[nenKanIdx]||'—',T[JIKKAN.indexOf(nZ)]||'—',nJus,nJu)+cH('月　柱',tsuKan,tsuShi,tZ,T[tsuKanIdx]||'—',T[JIKKAN.indexOf(tZ)]||'—',tJus,tJu)+cH('日　柱（本人）',nichiKan,nichiShi,niZ,'—',T[JIKKAN.indexOf(niZ)]||'—',niJus,niJu);
+    // 六花人バナーHTML生成
+    const HT_COLORS = {
+      '天花人':{bg:'linear-gradient(135deg,#6a4c93,#9b72cf)',text:'#fff',sub:'#e0d0ff'},
+      '白花人':{bg:'linear-gradient(135deg,#888,#bbb)',text:'#fff',sub:'#f0f0f0'},
+      '離花人':{bg:'linear-gradient(135deg,#c0392b,#e74c3c)',text:'#fff',sub:'#ffd0cc'},
+      '風花人':{bg:'linear-gradient(135deg,#1a7a4a,#27ae60)',text:'#fff',sub:'#c0f0d0'},
+      '仙花人':{bg:'linear-gradient(135deg,#1a5a8a,#2980b9)',text:'#fff',sub:'#c0d8f0'},
+      '水花人':{bg:'linear-gradient(135deg,#16a085,#1abc9c)',text:'#fff',sub:'#c0f0e8'},
+    };
+    const htBase = ht.replace(/[＋－]/g,'');
+    const htCol = HT_COLORS[htBase] || {bg:'linear-gradient(135deg,#b8860b,#d4a520)',text:'#fff',sub:'#fff'};
+    const htSign = ht.includes('＋') ? '＋（陽）' : '－（陰）';
+    document.getElementById('hoshi-banner').innerHTML =
+      '<div style="background:'+htCol.bg+';border-radius:12px;padding:1.4rem 1.2rem;text-align:center;margin-bottom:1.2rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
+      +'<div style="font-size:0.85rem;color:'+htCol.sub+';letter-spacing:0.2em;margin-bottom:0.4rem">あなたの六花人</div>'
+      +'<div style="font-family:'Zen Old Mincho',serif;font-size:2.6rem;font-weight:700;color:'+htCol.text+';letter-spacing:0.15em;line-height:1.2">'+htBase+'</div>'
+      +'<div style="font-size:1rem;color:'+htCol.sub+';margin-top:0.4rem">'+htSign+'</div>'
+      +'</div>';
+    document.getElementById('hoshi-banner').style.display = 'block';
+
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWave=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
@@ -901,7 +931,8 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     Chart.register(window._tpPlugin);
     myChart.update();
 
-    document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(180,120,220,0.2);border:1px dashed rgba(150,80,200,0.4);margin-right:3px;vertical-align:middle"></span>人生が反転するとき（成天）</span>`;
+    document.getElementById('life-legend').innerHTML=`<span class="ld"><span class="ldot" style="background:#1a6b3a"></span>吉（強）</span><span class="ld"><span class="ldot" style="background:#3a9a5a"></span>吉</span><span class="ld"><span class="ldot" style="background:#5aaa7a"></span>小吉</span><span class="ld"><span class="ldot" style="background:#cc8833"></span>注意</span><span class="ld"><span class="ldot" style="background:#bb4422"></span>凶</span><span class="ld"><span class="ldot" style="background:#660000"></span>凶強</span><span class="ld" style="margin-left:0.5rem;padding-left:0.5rem;border-left:1px solid rgba(184,134,11,0.3)"><span style="color:rgba(42,140,74,0.85);font-weight:bold;margin-right:2px">▲</span><span style="color:rgba(160,50,50,0.85);font-weight:bold;margin-right:4px">▼</span>運命の転換期</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(40,120,200,0.15);border:1px dashed rgba(40,100,200,0.5);margin-right:3px;vertical-align:middle"></span>人生が反転する時</span><span class="ld"><span style="display:inline-block;width:14px;height:10px;background:rgba(150,80,200,0.15);border:1px dashed rgba(130,60,180,0.5);margin-right:3px;vertical-align:middle"></span>転化天蛹</span>`;
+    document.getElementById('life-legend').insertAdjacentHTML('afterend','<div style="font-size:0.7rem;color:#7a6b52;margin-top:0.3rem;line-height:1.6">※人生が反転する時とは、今までの抑圧から解放され、今後の人生の方向性を変えて進められるチャンスの時の事です。</div>');
     const ND=Array.from({length:MAX_AGE},(_,a)=>{const yr=y+a,yrShi=getYearShi(yr),ju=getJuniUnki(ht,yrShi);return{yr,age:a,yrShi,ju,w:JUNI_WAVE[ju]||0,isSk:sats.includes(yrShi),isCurr:yr===CY};});
     const nenCurrIdx=ND.findIndex(r=>r.isCurr);
     document.getElementById('unsei-outer').innerHTML=buildUnseiRows(ND,A2D,BLK,nenCurrIdx,ht);
@@ -1611,10 +1642,10 @@ td{padding:1.5mm 1mm;border:0.5pt solid #ddd;text-align:center}
 h2{font-family:'Zen Old Mincho',serif;font-size:10pt;color:#b8860b;border-bottom:0.5pt solid #b8860b;padding-bottom:1mm;margin-bottom:3mm}
 </style></head><body>
 <h1>花 人 占 術</h1><div class="sub">${G_info}</div>
-<h2>◆ 命式（四柱）</h2>
+<h2>◆ 命式（運命の型）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※与えられた魂魄の形を表します。</span></h2>
 ${document.getElementById('meishiki-grid').outerHTML}
 ${document.getElementById('info-row').outerHTML}
-<h2 style="margin-top:5mm">◆ 大運表（0〜119歳）</h2>
+<h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span></h2>
 <table>${document.getElementById('daiunTable').innerHTML}</table>
 <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
 </body></html>`);
