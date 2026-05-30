@@ -279,6 +279,7 @@ window.addEventListener('unhandledrejection', function(e) {
         <button class="print-btn" onclick="printSection1()">🖨 命式・大運表を印刷</button>
       </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
+    <button id="psychStartBtn" onclick="openPsych()" class="psych-btn" style="display:none">🔮 深層心理テストで、より詳しい鑑定を受ける</button>
     <div class="section" id="lucky-color-section" style="display:none">
       <div class="section-title">◆ ラッキーカラー</div>
       <div id="lucky-color-content"></div>
@@ -1698,8 +1699,6 @@ ${document.getElementById('meishiki-grid').outerHTML}
 ${document.getElementById('info-row').outerHTML}
 <h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】青背景＝内省（夏の陰り）　オレンジ背景＝狂咲（夏の嵐）　灰背景＝引寒・休眠・残雪（冬の時期）　紫背景＝転化天蛹（人生の変容期）</span></h2>
 <table>${document.getElementById('daiunTable').innerHTML}</table>
-
-<button id="psychStartBtn" onclick="openPsych()" class="psych-btn" style="display:none">🔮 深層心理テストで、より詳しい鑑定を受ける</button>
 
 <div class="psych-panel" id="psychPanel">
   <div class="psych-box">
