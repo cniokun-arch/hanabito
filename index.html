@@ -194,6 +194,18 @@ tr:hover td{background:rgba(184,134,11,0.05)}
 .psych-prev{background:#e8dcc4;color:#4a3c28}
 .psych-next{background:#b8860b;color:#fff}
 .psych-next:disabled{opacity:0.4;cursor:not-allowed}
+
+.info-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:1rem}
+.info-popup-overlay.open{display:flex}
+.info-popup-box{background:#faf6ef;border-radius:12px;width:min(480px,94vw);max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.25);border:1px solid rgba(184,134,11,0.3)}
+.info-popup-header{background:linear-gradient(135deg,#4a3c28,#b8860b);color:#fff;padding:0.9rem 1.2rem;display:flex;justify-content:space-between;align-items:center;border-radius:12px 12px 0 0}
+.info-popup-header h3{font-family:'Zen Old Mincho',serif;font-size:1rem;margin:0}
+.info-popup-header button{background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.info-popup-body{padding:1.2rem;font-size:0.88rem;color:#4a3c28;line-height:1.8}
+.info-popup-body h4{color:#b8860b;font-size:0.95rem;margin:0.8rem 0 0.4rem;font-family:'Zen Old Mincho',serif}
+.info-popup-body p{margin-bottom:0.6rem}
+.clickable-term{cursor:pointer;border-bottom:1px dashed rgba(184,134,11,0.6);color:inherit;transition:color 0.15s}
+.clickable-term:hover{color:#b8860b}
 </style>
 <script>
 // グローバルエラーハンドラー
@@ -252,7 +264,7 @@ window.addEventListener('unhandledrejection', function(e) {
   <select id="by" style="flex:2;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
     <option value="">年</option>
   </select>
-  <select id="bm" style="flex:1;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
+  <select id="bm" autocomplete="off" style="flex:1;background:#faf6ef;border:1px solid rgba(184,134,11,0.35);border-radius:2px;padding:0.5rem 0.4rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:#1a1208">
     <option value="">月</option>
     <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
     <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
@@ -288,9 +300,9 @@ window.addEventListener('unhandledrejection', function(e) {
       <div class="section-title">◆ 1年間の運気の流れ（1月から12月まで）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※スマートフォンではグラフを左右にスクロールできます</span></div>
       <div id="monthly-fortune-table"></div>
     </div>
-    <div class="section"><div class="section-title">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】青背景＝内省（夏の陰り）　オレンジ背景＝狂咲（夏の嵐）　灰背景＝引寒・休眠・残雪（冬の時期）　紫背景＝転化天蛹（人生の変容期）</span></div><div class="table-wrap"><table id="daiunTable"></table></div></div>
+    <div class="section"><div class="section-title">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】紫背景＝転化天蛹（人生の変容期）の20年間を表します。</span></div><div class="table-wrap"><table id="daiunTable"></table></div></div>
     <div class="section" id="unsei-scroll-section">
-      <div class="section-title">◆ 命運グラフ（横スクロール）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※スマートフォンではグラフを左右にスクロールできます</span><br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの120年間、毎年切り替わる運命の流れと運気の波、10年毎の大運の変化を見やすくひとつにまとめたものです。</span></div>
+      <div class="section-title">◆ 命運グラフ（横スクロール）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">グラフは左右にスクロールできます。</span><br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの120年間、毎年切り替わる運命の流れと運気の波、10年毎の大運の変化を見やすくひとつにまとめたものです。</span></div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
         <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
         <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
@@ -304,7 +316,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
     <div class="section" id="print-section-2">
       <div class="print-section-header">
-        <div class="section-title">◆ 命運グラフ（20年毎の区切り）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※一生分の変化を20年毎に区切ってまとめたものです。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">🌟現在地　紫背景＝転化天蛹（今までの自分を失い全く別の世界へ流れていく変容の時期。大運干支がその人の転化天蛹の対象支にあたる10年間）</span></div>
+        <div class="section-title">◆ 命運グラフ（20年毎の区切り）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※一生分の変化を20年毎に区切ってまとめたものです。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">🌟現在地　紫背景＝転化天蛹（サナギから蝶になるように、今までの自分を失い全く別の世界へ移行していく変容の時期。大運干支がその人の転化天蛹の対象支にあたる10年間×2＝20年間）。</span></div>
         <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
       </div>
       <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
@@ -680,11 +692,11 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   h+=`<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;font-size:0.65rem;font-weight:700;color:${tc(r,'#4a3c28')}">${r.age}</div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.52rem;color:${tc(r,'#4a3c28')};line-height:1.1;text-align:center">${String(r.yr).split('').join('<br>')}</span></div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;font-family:'Zen Old Mincho',serif;font-size:0.85rem;color:${tc(r,'#1a1208')}">${r.yrShi}</div>`).join('')}</div></div>`;
-  h+=`<div class="u-row r-ju"><div class="u-lbl">十二運気</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</div>`).join('')}</div></div>`;
+  h+=`<div class="u-row r-ju"><div class="u-lbl clickable-term" onclick="showTermInfo('十二運気')" title="タップで説明を表示">十二運気 ℹ</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</div>`).join('')}</div></div>`;
   h+=`<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:${graphH}px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.58rem;color:#7a6b52;font-weight:600;writing-mode:vertical-rl;letter-spacing:0.05em">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.58rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.58rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;flex-shrink:0;overflow:hidden">${makeInlineSvg(ND,currIdx,totalW,graphH)}</div></div>`;
   h+=`<div class="u-row r-dks r-sep"><div class="u-lbl dl">大運干支</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=2?'0.6rem':'0.82rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>`;
-  h+=`<div class="u-row r-th"><div class="u-lbl dl">通変星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.5rem':b.sp<=4?'0.6rem':'0.68rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>`;
-  h+=`<div class="u-row r-jos"><div class="u-lbl dl">十二従星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.45rem':b.sp<=4?'0.55rem':'0.62rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>`;
+  h+=`<div class="u-row r-th"><div class="u-lbl dl clickable-term" onclick="showTermInfo('通変星')" title="タップで説明を表示">通変星 ℹ</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.5rem':b.sp<=4?'0.6rem':'0.68rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>`;
+  h+=`<div class="u-row r-jos"><div class="u-lbl dl clickable-term" onclick="showTermInfo('十二従星')" title="タップで説明を表示">十二従星 ℹ</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.45rem':b.sp<=4?'0.55rem':'0.62rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>`;
   h+=`<div class="u-row r-ku"><div class="u-lbl dl">句</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.5rem':'0.62rem'};color:${ds.col||'#7a6b52'}">${b.ku}</div>`;})}</div></div>`;
   h+='</div>';
   return h;
@@ -766,11 +778,11 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">年齢</div><div class="ub-cells">${cells('',20,r=>`<span style="font-size:0.62rem;font-weight:700;color:${tc(r,'#4a3c28')}">${r.age}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">${cells('',44,r=>`<span style="font-size:0.48rem;color:${tc(r,'#4a3c28')};line-height:1.15;text-align:center">${String(r.yr).split('').join('<br>')}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
-  <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
+  <div class="ub-row"><div class="ub-lbl clickable-term" onclick="showTermInfo('十二運気')" title="タップで説明を表示">十二運気 ℹ</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
   <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.55rem;color:#7a6b52;font-weight:600;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.55rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.55rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px;position:relative">${svg}${starOverlay}</div></div>
   <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
-  <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl clickable-term" onclick="showTermInfo('通変星')" title="タップで説明を表示">通変星 ℹ</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
+  <div class="ub-row"><div class="ub-lbl ub-dl clickable-term" onclick="showTermInfo('十二従星')" title="タップで説明を表示">十二従星 ℹ</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">句</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':'0.6rem'};color:${ds.col||'#7a6b52'}">${b.ku}</div>`;})}</div></div>
 </div>`;
 }
@@ -855,7 +867,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     const psychBtnEl = document.getElementById('psychStartBtn');
     if(psychBtnEl) psychBtnEl.style.display = 'block';
 
-    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
+    document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label clickable-term" onclick="showTermInfo('転化天蛹')" title="タップで説明">転化天蛹 ℹ</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWave=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
     const lifeCurrIdx=A2D.findIndex((_,i)=>y+i===CY);
@@ -990,7 +1002,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     // 30年ブロック版
     const blocks=[[0,19],[20,39],[40,59],[60,79],[80,99],[100,119]];
     document.getElementById('unsei-blocks').innerHTML=blocks.map(([s,e])=>buildBlockRows(ND,A2D,BLK,nenCurrIdx,s,e,ht)).join('');
-    let dtbl='<thead><tr><th>年齢帯</th><th>開始年</th><th>大運干支</th><th>蔵干</th><th>通変星</th><th>十二従星</th><th>十二運気</th><th>波</th></tr></thead><tbody>';
+    let dtbl='<thead><tr><th>年齢帯</th><th>開始年</th><th>大運干支</th><th>蔵干</th><th class="clickable-term" onclick="showTermInfo('通変星')" title="タップで説明">通変星 ℹ</th><th class="clickable-term" onclick="showTermInfo('十二従星')" title="タップで説明">十二従星 ℹ</th><th class="clickable-term" onclick="showTermInfo('十二運気')" title="タップで説明">十二運気 ℹ</th><th>波</th></tr></thead><tbody>';
     let ap2=0;
     for(let di=0;di<DL.length&&ap2<MAX_AGE;di++){const sp=Math.min(di===0?sa:10,MAX_AGE-ap2);const dk=DL[di],dj=getJuniUnki(ht,dk.shi),djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—',dzo=getZokan(dk.shi,dfs),w=JUNI_WAVE[dj]||0,isSk=sats.includes(dk.shi);const syr=y+ap2,isCurr=syr<=CY&&CY<syr+sp;dtbl+=`<tr class="${isSk?'sk-row':isCurr?'td-cu':''}"><td class="td-age">${ap2}〜${ap2+sp-1}歳</td><td>${syr}</td><td class="td-ks">${dk.ks}${isSk?' ⚠':''}</td><td>${dzo}</td><td class="td-th">${dth}</td><td class="td-jos">${djos}</td><td style="color:${getJuniColor(dj)}">${dj}</td><td><span style="color:${getWaveColor(w)};font-weight:600">${w>0?'+':''}${w}</span></td></tr>`;ap2+=sp;}
     document.getElementById('daiunTable').innerHTML=dtbl+'</tbody>';
@@ -1441,10 +1453,12 @@ let aiHistory = [];
 function toggleAiPanel(){
   const panel = document.getElementById('aiPanel');
   const fab = document.querySelector('.ai-fab');
-  const isOpen = panel.classList.toggle('open');
-  if (fab) {
-    fab.style.display = isOpen ? 'none' : 'flex';
-    fab.style.visibility = isOpen ? 'hidden' : 'visible';
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    if (fab) { fab.style.display = 'flex'; fab.style.visibility = 'visible'; }
+  } else {
+    panel.classList.add('open');
+    if (fab) { fab.style.display = 'none'; fab.style.visibility = 'hidden'; }
   }
 }
 
@@ -1698,7 +1712,7 @@ h2{font-family:'Zen Old Mincho',serif;font-size:10pt;color:#b8860b;border-bottom
 <h2>◆ 命式（運命の型）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※与えられた魂魄の形を表します。</span></h2>
 ${document.getElementById('meishiki-grid').outerHTML}
 ${document.getElementById('info-row').outerHTML}
-<h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】青背景＝内省（夏の陰り）　オレンジ背景＝狂咲（夏の嵐）　灰背景＝引寒・休眠・残雪（冬の時期）　紫背景＝転化天蛹（人生の変容期）</span></h2>
+<h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】紫背景＝転化天蛹（人生の変容期）の20年間を表します。</span></h2>
 <table>${document.getElementById('daiunTable').innerHTML}</table>
 </div>
 </body></html>`);
@@ -1875,6 +1889,62 @@ document.addEventListener('DOMContentLoaded', function(){
   byEl.addEventListener('change', updateDays);
 });
 
+
+// ===== 用語説明ポップアップ =====
+const TERM_INFO = {
+  '十二運気': {
+    title: '十二運気とは',
+    body: `<p>その年・月の運気の状態を12段階で表したものです。植物の一生（発芽→開花→枯れ→冬眠）に例えて、人生の運気の流れを表します。</p>
+<h4>🌿 好調な運気</h4>
+<p><b>発芽</b>：新しいことを始めるのに最適な時期<br><b>青葉</b>：成長・拡大の時期。良い影響も悪い影響も2倍<br><b>開花</b>：最高潮。才能が開花する<br><b>成天</b>：達成・完成の時期<br><b>豊穣</b>：努力が実を結ぶ収穫の時期<br><b>穂分</b>：整理・安定の時期<br><b>平凪</b>：穏やかで安定した時期</p>
+<h4>⚠️ 注意が必要な運気</h4>
+<p><b>内省</b>：疲れが出やすい。休息が必要な時期<br><b>狂咲</b>：感情が乱れやすい。自分を見失いやすい<br><b>引寒</b>：冬の始まり。大きな行動は控える<br><b>休眠</b>：冬の中心。静かに力を蓄える時期<br><b>残雪</b>：冬の終わり。春の準備をする時期</p>`
+  },
+  '通変星': {
+    title: '通変星とは',
+    body: `<p>日干（生まれた日の十干）と他の干との関係から導き出される、その人の社会的な役割・才能・行動パターンを表す星です。</p>
+<h4>各通変星の意味</h4>
+<p><b>比肩</b>：独立心・自分の道を行く<br><b>劫財</b>：競争心・負けず嫌い<br><b>食神</b>：創造力・表現力・楽天的<br><b>傷官</b>：鋭い感性・芸術的才能<br><b>偏財</b>：行動力・社交性・ビジネス<br><b>正財</b>：堅実・計画的・安定志向<br><b>偏官</b>：決断力・実行力・リスクを恐れない<br><b>正官</b>：責任感・真面目・社会的地位<br><b>偏印</b>：直感力・独特な知恵<br><b>印綬</b>：学問・慈愛・人に教える力</p>`
+  },
+  '十二従星': {
+    title: '十二従星とは',
+    body: `<p>命式の干支から導き出される、その人の人生における役割・体質・運命のパターンを表す12種類の星です。十二運気とは異なり、生まれ持った固定の性質を表します。</p>
+<h4>主な十二従星</h4>
+<p><b>天印星</b>：純粋・依存心・芸術<br><b>天貫星</b>：継続力・地道な努力<br><b>天禄星</b>：実務能力・安定志向<br><b>天将星</b>：指導力・カリスマ性（最強の星）<br><b>天堂星</b>：温かさ・包容力<br><b>天胡星</b>：創造力・芸術・天才肌<br><b>天南星</b>：行動力・変化を好む<br><b>天報星</b>：社交性・人気運<br><b>天極星</b>：精神性・信仰心<br><b>天庫星</b>：蓄積・先祖との縁<br><b>天馳星</b>：自由・放浪・スピード<br><b>天印星</b>：純粋無垢・守られる星</p>`
+  },
+  '転化天蛹': {
+    title: '転化天蛹（てんかてんよう）とは',
+    body: `<p>サナギが蝶になるように、今までの自分を失い、全く別の世界へ移行していく変容の時期です。</p>
+<p>大運干支（10年ごとに変わる運気の柱）がその人の転化天蛹の対象支にあたる<b>10年間×2＝20年間</b>だけ訪れます。</p>
+<h4>具体的にどんな時期？</h4>
+<p>貧乏だった人が大金持ちになったり、逆に大金持ちが貧乏になったりするような、<b>生き方そのものが180度変わる</b>時期です。</p>
+<h4>どう過ごせばいい？</h4>
+<p>抗わずに流れに従うことが大切。功徳を積んでいれば悪い方向には転じません。新しい自分への羽化の準備期間と考えましょう。</p>
+<p style="color:#882222;font-size:0.82rem">※年運・月運・日運には転化天蛹は適用されません。大運（10年ごと）の話です。</p>`
+  },
+};
+
+// 六花人の説明
+const HANAJIN_INFO = {
+  '天花人': {title:'天花人とは', body:'<p>土星人系。大脳・花の頭の象徴。俯瞰的な視点を持ち、独自の世界観と方向転換する柔軟性がある。摺れ方で大きく変わる。</p>'},
+  '白花人': {title:'白花人とは', body:'<p>金星人系。直感と美意識の象徴。繊細で完璧主義な面がある。美しいものや洗練されたものへの感受性が高い。</p>'},
+  '離花人': {title:'離花人とは', body:'<p>火星人系。情熱と行動力の象徴。感情が豊かで社交的。直感的に動き、周囲を巻き込む力がある。</p>'},
+  '風花人': {title:'風花人とは', body:'<p>木星人系。成長と変化の象徴。自由を愛し、様々な可能性を探求する。風のように軽やかで適応力がある。</p>'},
+  '仙花人': {title:'仙花人とは', body:'<p>水星人系。知恵と洞察の象徴。冷静で分析力が高い。深く考え、本質を見抜く力がある。</p>'},
+  '水花人': {title:'水花人とは', body:'<p>水星人系。流れと柔軟性の象徴。状況に応じて形を変える適応力がある。感受性が豊かで共感力が高い。</p>'},
+};
+
+function showTermInfo(term) {
+  const info = TERM_INFO[term] || HANAJIN_INFO[term];
+  if (!info) return;
+  document.getElementById('infoPopupTitle').textContent = info.title;
+  document.getElementById('infoPopupBody').innerHTML = info.body;
+  document.getElementById('infoPopup').classList.add('open');
+}
+
+function closeInfoPopup() {
+  document.getElementById('infoPopup').classList.remove('open');
+}
 // ===== 心理テストシステム =====
 const PSYCH_Q1_Q8 = [
   { id:'q1', layer:1, text:'今のあなたが一番求めているものに、最も近いものを選んでください。',
@@ -2064,5 +2134,14 @@ function submitPsychToAI() {
   </div>
 </div>
 
+<div class="info-popup-overlay" id="infoPopup" onclick="if(event.target===this)closeInfoPopup()">
+  <div class="info-popup-box">
+    <div class="info-popup-header">
+      <h3 id="infoPopupTitle">説明</h3>
+      <button onclick="closeInfoPopup()">✕</button>
+    </div>
+    <div class="info-popup-body" id="infoPopupBody"></div>
+  </div>
+</div>
 </body>
 </html>
