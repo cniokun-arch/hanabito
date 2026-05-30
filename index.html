@@ -578,8 +578,8 @@ function buildMonthlyFortune(ht, sats) {
 
   // グラフ行
   let graphRow = `<div style="display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch">`;
-  graphRow += lbl('運気波');
-  graphRow += `<div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;position:relative">${svg}${starOverlay}<div style="position:absolute;right:2px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;z-index:2"><span style="font-size:0.58rem;color:#1a6b3a;font-weight:700;writing-mode:vertical-rl;text-align:center">好調↑</span><span style="font-size:0.58rem;color:#882222;font-weight:700;writing-mode:vertical-rl;text-align:center">↓不調</span></div></div>`;
+  graphRow += `<div style="flex:0 0 ${lblW}px;font-size:0.6rem;color:#7a6b52;padding:0 4px;border-right:2px solid rgba(184,134,11,0.35);background:#f2ead8;white-space:nowrap;display:flex;flex-direction:column;justify-content:space-between;align-items:center;font-weight:600;position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,0.06);padding:4px 2px"><span>運気波</span><span style="color:#1a6b3a;font-weight:700;text-align:center;line-height:1.2">好調<br>↑</span><span style="color:#882222;font-weight:700;text-align:center;line-height:1.2">↓<br>不調</span></div>`;
+  graphRow += `<div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;position:relative">${svg}${starOverlay}</div>`;
   graphRow += '</div>';
 
   return `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="width:${totalW+lblW}px">${monthRow}${shiRow}${juRow}${graphRow}</div></div>
@@ -656,7 +656,7 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   h+=`<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.52rem;color:${tc(r,'#4a3c28')};line-height:1.1;text-align:center">${String(r.yr).split('').join('<br>')}</span></div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;font-family:'Zen Old Mincho',serif;font-size:0.85rem;color:${tc(r,'#1a1208')}">${r.yrShi}</div>`).join('')}</div></div>`;
   h+=`<div class="u-row r-ju"><div class="u-lbl">十二運気</div><div class="u-cells">${ND.map(r=>`<div class="${ccls(r)}" style="${cst(r)}width:30px;writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</div>`).join('')}</div></div>`;
-  h+=`<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:${graphH}px">運気波</div><div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;flex-shrink:0;overflow:hidden;position:relative">${makeInlineSvg(ND,currIdx,totalW,graphH)}<div style="position:absolute;right:2px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;z-index:2"><span style="font-size:0.58rem;color:#1a6b3a;font-weight:700;writing-mode:vertical-rl;text-align:center">好調↑</span><span style="font-size:0.58rem;color:#882222;font-weight:700;writing-mode:vertical-rl;text-align:center">↓不調</span></div></div></div>`;
+  h+=`<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:${graphH}px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:4px 2px"><span style="font-size:0.6rem;color:#7a6b52;font-weight:600">運気波</span><span style="font-size:0.6rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.2">好調<br>↑</span><span style="font-size:0.6rem;color:#882222;font-weight:700;text-align:center;line-height:1.2">↓<br>不調</span></div><div style="width:${totalW}px;min-width:${totalW}px;height:${graphH}px;flex-shrink:0;overflow:hidden">${makeInlineSvg(ND,currIdx,totalW,graphH)}</div></div>`;
   h+=`<div class="u-row r-dks r-sep"><div class="u-lbl dl">大運干支</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=2?'0.6rem':'0.82rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>`;
   h+=`<div class="u-row r-th"><div class="u-lbl dl">通変星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.5rem':b.sp<=4?'0.6rem':'0.68rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>`;
   h+=`<div class="u-row r-jos"><div class="u-lbl dl">十二従星</div><div class="u-blks">${bH(b=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=2?'0.45rem':b.sp<=4?'0.55rem':'0.62rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>`;
@@ -742,7 +742,7 @@ function buildBlockRows(ND, A2D, BLK, currIdx, startAge, endAge, ht) {
   <div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">${cells('',44,r=>`<span style="font-size:0.48rem;color:${tc(r,'#4a3c28')};line-height:1.15;text-align:center">${String(r.yr).split('').join('<br>')}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">${cells('',26,r=>`<span style="font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:${tc(r,'#1a1208')}">${r.yrShi}</span>`)}</div></div>
   <div class="ub-row"><div class="ub-lbl">十二運気</div><div class="ub-cells">${cells('',48,r=>`<span style="writing-mode:vertical-rl;font-size:0.52rem;font-weight:500;white-space:nowrap;color:${r.isCurr?'#6a0080':getJuniColor(r.ju)}">${r.ju}</span>`)}</div></div>
-  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem">運気波</div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px;position:relative">${svg}${starOverlay}<div style="position:absolute;right:2px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;z-index:2"><span style="font-size:0.58rem;color:#1a6b3a;font-weight:700;writing-mode:vertical-rl;text-align:center">好調↑</span><span style="font-size:0.58rem;color:#882222;font-weight:700;writing-mode:vertical-rl;text-align:center">↓不調</span></div></div></div>
+  <div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.52rem;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:4px 2px"><span style="font-size:0.55rem;color:#7a6b52;font-weight:600">運気波</span><span style="font-size:0.58rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.2">好調<br>↑</span><span style="font-size:0.58rem;color:#882222;font-weight:700;text-align:center;line-height:1.2">↓<br>不調</span></div><div style="flex:1;overflow:visible;height:${graphH}px;min-height:${graphH}px;position:relative">${svg}${starOverlay}</div></div>
   <div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Zen Old Mincho',serif;font-size:${b.sp<=3?'0.55rem':'0.78rem'};color:${ds.col||'#1a1208'}">${b.ks}</div>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.45rem':b.sp<=6?'0.55rem':'0.65rem'};color:${ds.col||'#7a1a1a'};white-space:nowrap">${b.th}</div>`;})}</div></div>
   <div class="ub-row"><div class="ub-lbl ub-dl">十二従星</div><div class="ub-blks">${bHb((b,bi)=>{const ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);const bg=ds.bg?`background:${ds.bg};`:'';const ol=ds.ol?`outline:${ds.ol};`:'';return`<div style="${bg}${ol}display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:${b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.58rem'};color:${ds.col||'#8a6800'};white-space:nowrap">${b.jos}</div>`;})}</div></div>
@@ -872,6 +872,30 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
             ctx.fillText('↩ 反転',mx,bottom-4);
             i=j-1;
           }
+        }
+        // 転化天蛹期間を帯で表示（大運の支が転化天蛹の対象支の期間）
+        const satsSet = new Set(sats);
+        for(let i=0;i<n;i++){
+          if(!satsSet.has(A2D[i].shi)) continue;
+          let j=i;
+          while(j<n && satsSet.has(A2D[j].shi)) j++;
+          const x1=x.getPixelForValue(i), x2=x.getPixelForValue(j-1);
+          // 帯背景（紫系）
+          ctx.fillStyle='rgba(130,60,180,0.10)';
+          ctx.fillRect(x1,top,x2-x1,bottom-top);
+          // 帯の境界線
+          ctx.strokeStyle='rgba(110,40,160,0.35)';
+          ctx.lineWidth=1;
+          ctx.setLineDash([3,3]);
+          ctx.strokeRect(x1,top,x2-x1,bottom-top);
+          ctx.setLineDash([]);
+          // ラベル「転化天蛹」- グラフ上部に表示
+          const mx=(x1+x2)/2;
+          ctx.font='8px sans-serif';
+          ctx.fillStyle='rgba(100,40,150,0.7)';
+          ctx.textAlign='center';
+          ctx.fillText('転化天蛹',mx,top+10);
+          i=j-1;
         }
         // 転換期マーカー: 隣接する大運ブロック間の波の変化が大きい点
         const THRESHOLD=2.5; // 閾値: この値以上変化したら転換期
