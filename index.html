@@ -1699,21 +1699,6 @@ ${document.getElementById('meishiki-grid').outerHTML}
 ${document.getElementById('info-row').outerHTML}
 <h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】青背景＝内省（夏の陰り）　オレンジ背景＝狂咲（夏の嵐）　灰背景＝引寒・休眠・残雪（冬の時期）　紫背景＝転化天蛹（人生の変容期）</span></h2>
 <table>${document.getElementById('daiunTable').innerHTML}</table>
-
-<div class="psych-panel" id="psychPanel">
-  <div class="psych-box">
-    <div class="psych-header">
-      <h3>🔮 深層心理テスト</h3>
-      <button onclick="closePsych()">✕</button>
-    </div>
-    <div class="psych-progress"><div class="psych-progress-bar" id="psychBar" style="width:0%"></div></div>
-    <div class="psych-body" id="psychBody"></div>
-    <div class="psych-footer">
-      <button class="psych-prev" id="psychPrev" onclick="psychNav(-1)">◀ 前へ</button>
-      <span id="psychStepLabel" style="font-size:0.8rem;color:#7a6b52"></span>
-      <button class="psych-next" id="psychNext" onclick="psychNav(1)">次へ ▶</button>
-    </div>
-  </div>
 </div>
 </body></html>`);
   w.onload = function(){ setTimeout(function(){ w.print(); }, 300); };
@@ -2061,6 +2046,22 @@ function submitPsychToAI() {
   }
 }
 </script>
+
+<div class="psych-panel" id="psychPanel">
+  <div class="psych-box">
+    <div class="psych-header">
+      <h3>🔮 深層心理テスト</h3>
+      <button onclick="closePsych()">✕</button>
+    </div>
+    <div class="psych-progress"><div class="psych-progress-bar" id="psychBar" style="width:0%"></div></div>
+    <div class="psych-body" id="psychBody"></div>
+    <div class="psych-footer">
+      <button class="psych-prev" id="psychPrev" onclick="psychNav(-1)">◀ 前へ</button>
+      <span id="psychStepLabel" style="font-size:0.8rem;color:#7a6b52"></span>
+      <button class="psych-next" id="psychNext" onclick="psychNav(1)">次へ ▶</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
