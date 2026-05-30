@@ -169,6 +169,32 @@ tr:hover td{background:rgba(184,134,11,0.05)}
   .speak-btn{font-size:0.85rem}
   p{font-size:0.95rem;line-height:1.8}
 }
+
+/* ===== 心理テスト ===== */
+.psych-btn{display:block;width:100%;margin:0.8rem 0 0;padding:0.9rem;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:8px;font-family:'Zen Old Mincho',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em;box-shadow:0 3px 12px rgba(124,58,237,0.3)}
+.psych-btn:hover{opacity:0.9}
+.psych-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1100;align-items:center;justify-content:center;padding:1rem}
+.psych-panel.open{display:flex}
+.psych-box{background:#faf6ef;border-radius:12px;width:min(520px,96vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.psych-header{background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center}
+.psych-header h3{font-family:'Zen Old Mincho',serif;font-size:1rem;margin:0}
+.psych-header button{background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.4rem;cursor:pointer;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.psych-progress{height:6px;background:#e8dcc4}
+.psych-progress-bar{height:100%;background:linear-gradient(90deg,#7c3aed,#b8860b);transition:width 0.3s}
+.psych-body{padding:1.2rem;overflow-y:auto;flex:1}
+.psych-q-num{font-size:0.75rem;color:#b8860b;font-weight:700;margin-bottom:0.4rem}
+.psych-q-text{font-size:1rem;color:#4a3c28;font-weight:700;margin-bottom:1rem;line-height:1.6}
+.psych-choices{display:flex;flex-direction:column;gap:0.5rem}
+.psych-choice{background:#fff;border:1.5px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.8rem 1rem;cursor:pointer;text-align:left;font-size:0.88rem;color:#4a3c28;transition:all 0.15s;display:flex;gap:0.6rem;align-items:flex-start}
+.psych-choice:hover{border-color:#b8860b;background:#fff9ee}
+.psych-choice.selected{border-color:#7c3aed;background:rgba(124,58,237,0.06);color:#4a0080}
+.psych-choice .badge{font-weight:700;color:#b8860b;flex-shrink:0}
+.psych-footer{padding:0.8rem 1.2rem;border-top:1px solid rgba(184,134,11,0.2);display:flex;justify-content:space-between;align-items:center;background:#f5f0e8}
+.psych-footer button{padding:0.6rem 1.4rem;border-radius:6px;border:none;cursor:pointer;font-size:0.9rem;font-weight:700}
+.psych-prev{background:#e8dcc4;color:#4a3c28}
+.psych-next{background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff}
+.psych-next:disabled{opacity:0.4;cursor:not-allowed}
+
 @media print{.ai-fab,.ai-panel,.print-btn,.no-print{display:none!important}}
 </style>
 <script>
@@ -248,7 +274,7 @@ window.addEventListener('unhandledrejection', function(e) {
   <div class="result" id="result">
 
     <div id="hoshi-banner" style="display:none"></div>
-
+    <button id="psychStartBtn" onclick="openPsych()" class="psych-btn" style="display:none">🔮 深層心理テストで、より詳しい鑑定を受ける</button>
     <div class="section" id="print-section-1">
       <div class="print-section-header">
         <div class="section-title">◆ 命式（運命の型）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※与えられた魂魄の形を表します。</span></div>
@@ -827,6 +853,9 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
       +'<div style="font-size:1rem;color:'+htCol.sub+';margin-top:0.4rem">'+htSign+'</div>'
       +'</div>';
     document.getElementById('hoshi-banner').style.display = 'block';
+    // 心理テストボタンを表示
+    const psychBtnEl = document.getElementById('psychStartBtn');
+    if(psychBtnEl) psychBtnEl.style.display = 'block';
 
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
@@ -993,6 +1022,24 @@ function openPrint(){
 <!-- AI相談チャット -->
 <button class="ai-fab" onclick="toggleAiPanel()" title="花人占術AIに相談する">🌸</button>
 <div class="ai-fab-bubble" id="aiBubble">✨ AIに相談する</div>
+
+
+<!-- 心理テストパネル -->
+<div class="psych-panel" id="psychPanel">
+  <div class="psych-box">
+    <div class="psych-header">
+      <h3>🔮 深層心理テスト</h3>
+      <button onclick="closePsych()">×</button>
+    </div>
+    <div class="psych-progress"><div class="psych-progress-bar" id="psychProgress" style="width:0%"></div></div>
+    <div class="psych-body" id="psychBody"></div>
+    <div class="psych-footer">
+      <button class="psych-prev" id="psychPrev" onclick="psychStep(-1)">◀ 前へ</button>
+      <span id="psychStepLabel" style="font-size:0.8rem;color:#7a6b52"></span>
+      <button class="psych-next" id="psychNext" onclick="psychStep(1)">次へ ▶</button>
+    </div>
+  </div>
+</div>
 
 <!-- 設定ボタン -->
 <button id="settingBtn" onclick="toggleSettings()" style="position:fixed;bottom:88px;right:24px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);border:1px solid rgba(184,134,11,0.3);font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1);z-index:998;display:flex;align-items:center;justify-content:center">⚙️</button>
@@ -1584,7 +1631,8 @@ function buildSystemPrompt(isPersonal){
     + '・単発の概念質問は200〜300文字で答える。人物分析・深層心理など総合質問は400〜800文字で詳しく答える。\n'
     + '・**絶対にMarkdown記法を使わない**（**太字**・#見出し・*斜体*など一切禁止）。普通の文章のみ。\n'
     + '・データベースの内容は忠実に反映する。配慮でデータを変えたり正反対に変換したりしない。\n'
-    + '・データをそのままコピーせず会話として自然な言葉で伝える。';
+    + '・データをそのままコピーせず会話として自然な言葉で伝える。'
+    + (typeof window !== 'undefined' && window.psychResult ? window.psychResult : '');
 }
 
 async function sendAiMsg(){
@@ -1672,6 +1720,194 @@ ${document.getElementById('info-row').outerHTML}
 <h2 style="margin-top:5mm">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】青背景＝内省（夏の陰り）　オレンジ背景＝狂咲（夏の嵐）　灰背景＝引寒・休眠・残雪（冬の時期）　紫背景＝転化天蛹（人生の変容期）</span></h2>
 <table>${document.getElementById('daiunTable').innerHTML}</table>
 <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
+
+<script>
+// ===== 心理テストシステム =====
+const PSYCH_Q1_Q8 = [
+  { id:'q1', layer:1, text:'今のあなたが一番求めているものに、最も近いものを選んでください。',
+    choices:[
+      {badge:'安定', text:'毎日安心して過ごしたい。今の生活を守りたい。'},
+      {badge:'繋がり', text:'もっと人と深く繋がりたい。孤独を感じている。'},
+      {badge:'承認', text:'自分の努力や存在を、誰かにちゃんと認めてほしい。'},
+      {badge:'成長', text:'新しいことに挑戦したい。もっと成長・変化したい。'},
+      {badge:'使命', text:'本当にやりたいことで、誰かの役に立ちたい。'},
+      {badge:'変容', text:'今の自分を手放して、全く別の自分になりたい。'},
+    ]},
+  { id:'q2', layer:1, text:'最近、心に浮かびやすいテーマはどれですか？（直感で選んでください）',
+    choices:[
+      {badge:'お金・生活', text:'収入、節約、将来の貯蓄や資産のこと'},
+      {badge:'人間関係', text:'誰かとの関係、摩擦、距離感のこと'},
+      {badge:'仕事・評価', text:'職場での立場、成果、キャリアのこと'},
+      {badge:'夢・目標', text:'やりたいこと、将来のビジョン、理想の姿'},
+      {badge:'喪失・終わり', text:'別れ、手放すこと、何かが終わる感覚'},
+      {badge:'始まり・縁', text:'新しい出会い、新しい場所、新しい自分'},
+    ]},
+  { id:'q3', layer:1, text:'今の自分のエネルギー状態に近い「色」はどれですか？',
+    choices:[
+      {badge:'赤・橙', text:'燃えている。行動したくてたまらない。'},
+      {badge:'青・紺', text:'冷静に考えたい。一人の時間が必要。'},
+      {badge:'黄・金', text:'ワクワクしている。楽しいことに向かいたい。'},
+      {badge:'緑', text:'穏やかでいたい。争いを避けたい。'},
+      {badge:'灰・白', text:'疲れた。何もしたくない。空っぽな感じ。'},
+      {badge:'紫', text:'ざわざわしている。変化の予感がある。'},
+    ]},
+  { id:'q4', layer:1, text:'今の生活で「変えたい」と思っているものはありますか？',
+    choices:[
+      {badge:'A', text:'大きく変えたいことがある（仕事・住む場所・人間関係など）'},
+      {badge:'B', text:'少し変えたいことはあるが、今すぐでなくてもいい'},
+      {badge:'C', text:'特に変えたいことはなく、今のままでいい'},
+      {badge:'D', text:'むしろ変化が怖く、現状を守りたい'},
+    ]},
+  { id:'q5', layer:1, text:'今、自分の「役割」や「立ち位置」について最も近い感覚は？',
+    choices:[
+      {badge:'A', text:'果たすべき役割がはっきり見えている'},
+      {badge:'B', text:'なんとなく分かるが、確信が持てない'},
+      {badge:'C', text:'まだよく分からず、探している最中'},
+      {badge:'D', text:'今まであった役割が終わった感じがしている'},
+    ]},
+  { id:'q6', layer:2, text:'次の言葉の中で、今の自分に一番「刺さる」と感じる言葉はどれですか？',
+    choices:[
+      {badge:'', text:'戦う'},{badge:'', text:'守る'},{badge:'', text:'逃げる'},
+      {badge:'', text:'待つ'},{badge:'', text:'捨てる'},{badge:'', text:'創る'},
+      {badge:'', text:'繋がる'},{badge:'', text:'一人になる'},
+    ]},
+  { id:'q7', layer:2, text:'今の自分の状態を「季節」に例えると？',
+    choices:[
+      {badge:'春', text:'始まりの気配がある。種を蒔いている感じ。'},
+      {badge:'夏', text:'エネルギーが満ちている。今が全力期。'},
+      {badge:'秋', text:'成果が出ている。または収める・まとめる時期。'},
+      {badge:'冬', text:'静かに待っている。または何かが終わった感じ。'},
+    ]},
+  { id:'q8', layer:2, text:'あなたの「今」を動物に例えると、どのイメージに近いですか？',
+    choices:[
+      {badge:'鷹', text:'高い視点から全体を見渡している。機を待っている。'},
+      {badge:'猫', text:'マイペースに自分のペースで動いている。自由を大切にしている。'},
+      {badge:'犬', text:'誰かのそばにいたい。忠実でいたい。'},
+      {badge:'龍', text:'何かに向かって突き進んでいる。壮大なビジョンがある。'},
+      {badge:'蝶', text:'変わりたい、または変わりつつある。脱皮の最中。'},
+      {badge:'熊', text:'今は静かに力を蓄えている。冬眠中。'},
+    ]},
+];
+
+// 第3層：十二支別カスタム質問
+const PSYCH_Q3_LAYER = {
+  '子': {text:'今、誰かを深く理解しようとしていますか？それとも警戒して距離を置きたい人がいますか？', choices:[{badge:'A',text:'深く理解しようとしている'},{badge:'B',text:'警戒して距離を置きたい人がいる'},{badge:'C',text:'どちらでもない'}]},
+  '丑': {text:'お金や生活の安定への不安がありますか？それとも積み上げてきた実感がありますか？', choices:[{badge:'A',text:'不安がある'},{badge:'B',text:'積み上げの実感がある'},{badge:'C',text:'どちらでもない'}]},
+  '寅': {text:'今、自分の信念に従って動けていますか？それとも誰かに合わせて自分を抑えていますか？', choices:[{badge:'A',text:'信念に従って動けている'},{badge:'B',text:'自分を抑えていることが多い'},{badge:'C',text:'どちらでもない'}]},
+  '卯': {text:'自分の感性や美意識を表現できていますか？「普通でいなければ」という抑圧はありますか？', choices:[{badge:'A',text:'表現できている'},{badge:'B',text:'抑圧を感じることがある'},{badge:'C',text:'どちらでもない'}]},
+  '辰': {text:'今、大きな夢やビジョンはありますか？そのロマンが現実とぶつかっている感覚はありますか？', choices:[{badge:'A',text:'夢はあり、うまくいっている'},{badge:'B',text:'夢と現実がぶつかっている'},{badge:'C',text:'今は夢より現実を優先している'}]},
+  '巳': {text:'誰かに安らぎを与えられていますか？それとも自分が疲弊してケアされたい気持ちがありますか？', choices:[{badge:'A',text:'安らぎを与えられている'},{badge:'B',text:'自分が疲弊していてケアされたい'},{badge:'C',text:'どちらでもない'}]},
+  '午': {text:'今、燃えているものがありますか？それとも情熱の持っていき場がなくてくすぶっていますか？', choices:[{badge:'A',text:'燃えているものがある'},{badge:'B',text:'情熱がくすぶっている'},{badge:'C',text:'今は穏やかに過ごしたい'}]},
+  '未': {text:'誰かのために動いていますか？その献身は自分が選んでやっていると感じていますか？', choices:[{badge:'A',text:'選んでやっている'},{badge:'B',text:'強いられている感がある'},{badge:'C',text:'今は自分のために動いている'}]},
+  '申': {text:'今、本当の自分を出せていますか？それとも場に合わせて演じていることが多いですか？', choices:[{badge:'A',text:'本当の自分を出せている'},{badge:'B',text:'演じていることが多い'},{badge:'C',text:'どちらでもない'}]},
+  '酉': {text:'自分の美意識や基準が周りと合わずストレスになっていますか？それとも評価されていますか？', choices:[{badge:'A',text:'評価されていると感じる'},{badge:'B',text:'ストレスになっている'},{badge:'C',text:'気にしていない'}]},
+  '戌': {text:'信頼している人・大切な関係はありますか？その一途さは報われていると感じますか？', choices:[{badge:'A',text:'報われていると感じる'},{badge:'B',text:'報われていない感がある'},{badge:'C',text:'今は一人でいたい'}]},
+  '亥': {text:'今、曲がったことや理不尽に怒りを感じることがありますか？その正義感はうまく活かせていますか？', choices:[{badge:'A',text:'うまく活かせている'},{badge:'B',text:'活かせず怒りが強い'},{badge:'C',text:'今は正義感より穏やかさを優先している'}]},
+};
+
+let psychQuestions = [];
+let psychStep = 0;
+let psychAnswers = {};
+
+function openPsych() {
+  if(!G || !G.nichiShi) return;
+  // 問題リストを組み立て（Q1〜Q8 + 日支カスタム）
+  psychQuestions = [...PSYCH_Q1_Q8];
+  const q3 = PSYCH_Q3_LAYER[G.nichiShi];
+  if(q3) psychQuestions.push({id:'q9', layer:3, text:q3.text, choices:q3.choices});
+  psychStep = 0;
+  psychAnswers = {};
+  renderPsychStep();
+  document.getElementById('psychPanel').classList.add('open');
+}
+
+function closePsych() {
+  document.getElementById('psychPanel').classList.remove('open');
+}
+
+function renderPsychStep() {
+  const q = psychQuestions[psychStep];
+  const total = psychQuestions.length;
+  const pct = Math.round((psychStep / total) * 100);
+  document.getElementById('psychProgress').style.width = pct + '%';
+  document.getElementById('psychStepLabel').textContent = (psychStep + 1) + ' / ' + total;
+  document.getElementById('psychPrev').style.visibility = psychStep === 0 ? 'hidden' : 'visible';
+
+  const layerLabel = q.layer === 1 ? '第1層：欲求レベル' : q.layer === 2 ? '第2層：感情・直感' : '第3層：あなたへの質問';
+  const layerColor = q.layer === 1 ? '#b8860b' : q.layer === 2 ? '#7c3aed' : '#1a7a4a';
+
+  let html = '<div class="psych-q-num" style="color:'+layerColor+'">'+layerLabel+' — Q'+(psychStep+1)+'</div>';
+  html += '<div class="psych-q-text">'+q.text+'</div>';
+  html += '<div class="psych-choices">';
+  q.choices.forEach((c, i) => {
+    const sel = psychAnswers[q.id] === i ? ' selected' : '';
+    html += '<button class="psych-choice'+sel+'" onclick="selectPsych('+i+')">';
+    if(c.badge) html += '<span class="badge">【'+c.badge+'】</span>';
+    html += '<span>'+c.text+'</span></button>';
+  });
+  html += '</div>';
+  document.getElementById('psychBody').innerHTML = html;
+
+  const isLast = psychStep === total - 1;
+  const nextBtn = document.getElementById('psychNext');
+  nextBtn.textContent = isLast ? '鑑定を始める ✨' : '次へ ▶';
+  nextBtn.disabled = psychAnswers[q.id] === undefined;
+}
+
+function selectPsych(idx) {
+  const q = psychQuestions[psychStep];
+  psychAnswers[q.id] = idx;
+  renderPsychStep();
+}
+
+function psychStep(dir) {
+  if(dir === 1) {
+    const q = psychQuestions[psychStep];
+    if(psychAnswers[q.id] === undefined) return;
+    if(psychStep === psychQuestions.length - 1) {
+      // 完了→AIパネルを開いて鑑定
+      closePsych();
+      submitPsychToAI();
+      return;
+    }
+    psychStep++;
+  } else {
+    if(psychStep > 0) psychStep--;
+  }
+  renderPsychStep();
+}
+
+function buildPsychText() {
+  let txt = '\n\n【深層心理テスト回答】\n';
+  psychQuestions.forEach(q => {
+    const idx = psychAnswers[q.id];
+    if(idx !== undefined) {
+      const c = q.choices[idx];
+      const ans = (c.badge ? '【'+c.badge+'】' : '') + c.text;
+      txt += 'Q'+q.id.replace('q','')+': '+ans+'\n';
+    }
+  });
+  txt += '\n上記の心理テスト結果と命式を照合し、今この人がどのフェーズにいるかを判定した上で、命式の本質と今の状態を統合したパーソナルな鑑定をしてください。';
+  return txt;
+}
+
+function submitPsychToAI() {
+  // AIパネルを開く
+  const panel = document.getElementById('aiPanel');
+  if(panel) panel.style.display = 'flex';
+  // 心理テスト結果をシステムプロンプトに追加してAIに送信
+  const psychText = buildPsychText();
+  // psychTextをaiHistoryのシステム情報として保持（次のAI呼び出しで使われる）
+  window.psychResult = psychText;
+  // チャット入力に質問をセットして送信
+  const inp = document.getElementById('aiInput');
+  if(inp) {
+    inp.value = '深層心理テストが完了しました。テスト結果と私の命式を組み合わせて、今の私に必要な鑑定をしてください。';
+    if(typeof sendAiMsg === 'function') sendAiMsg();
+  }
+}
+</script>
+
 </body></html>`);
   w.document.close();
 }
