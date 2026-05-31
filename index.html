@@ -858,8 +858,8 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     const htCol = HT_COLORS[htBase] || {bg:'linear-gradient(135deg,#b8860b,#d4a520)',text:'#fff',sub:'#fff'};
     const htSign = ht.includes('＋') ? '＋（陽）' : '－（陰）';
     document.getElementById('hoshi-banner').innerHTML =
-      '<div style="background:'+htCol.bg+';border-radius:12px;padding:1.4rem 1.2rem;text-align:center;margin-bottom:1.2rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
-      +'<div style="font-size:0.85rem;color:'+htCol.sub+';letter-spacing:0.2em;margin-bottom:0.4rem">あなたの六花人</div>'
+      '<div style="background:'+htCol.bg+';border-radius:12px;padding:1.4rem 1.2rem;text-align:center;margin-bottom:1.2rem;box-shadow:0 4px 16px rgba(0,0,0,0.15);cursor:pointer" onclick="showTermInfo(\''+htBase+'\')" title="タップで詳しい説明を見る">'
+      +'<div style="font-size:0.85rem;color:'+htCol.sub+';letter-spacing:0.2em;margin-bottom:0.4rem">あなたの六花人　<span style="font-size:0.72rem;opacity:0.8">（タップで詳細）</span></div>'
       +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2.6rem;font-weight:700;color:'+htCol.text+';letter-spacing:0.15em;line-height:1.2">'+htBase+'</div>'
       +'<div style="font-size:1rem;color:'+htCol.sub+';margin-top:0.4rem">'+htSign+'</div>'
       +'</div>';
@@ -1939,12 +1939,30 @@ const TERM_INFO = {
 
 // 六花人の説明
 const HANAJIN_INFO = {
-  '天花人': {title:'天花人とは', body:'<p>土星人系。大脳・花の頭の象徴。俯瞰的な視点を持ち、独自の世界観と方向転換する柔軟性がある。摺れ方で大きく変わる。</p>'},
-  '白花人': {title:'白花人とは', body:'<p>金星人系。直感と美意識の象徴。繊細で完璧主義な面がある。美しいものや洗練されたものへの感受性が高い。</p>'},
-  '離花人': {title:'離花人とは', body:'<p>火星人系。情熱と行動力の象徴。感情が豊かで社交的。直感的に動き、周囲を巻き込む力がある。</p>'},
-  '風花人': {title:'風花人とは', body:'<p>木星人系。成長と変化の象徴。自由を愛し、様々な可能性を探求する。風のように軽やかで適応力がある。</p>'},
-  '仙花人': {title:'仙花人とは', body:'<p>水星人系。知恵と洞察の象徴。冷静で分析力が高い。深く考え、本質を見抜く力がある。</p>'},
-  '水花人': {title:'水花人とは', body:'<p>水星人系。流れと柔軟性の象徴。状況に応じて形を変える適応力がある。感受性が豊かで共感力が高い。</p>'},
+  '天花人': {
+    title: '天花人（てんかじん）とは',
+    body: '<p>土星人系。大地・安定・母性の象徴。どっしりとした包容力と、物事を俯瞰する広い視野を持ちます。</p><h4>特徴</h4><p>安定志向で責任感が強く、人の面倒を見るのが得意。地道な努力を惜しまない反面、変化に慎重になりすぎることも。縁の下の力持ちとして信頼される存在です。</p><h4>転化天蛹の対象支</h4><p>辰・戌（土の過剰による変容）</p>'
+  },
+  '白花人': {
+    title: '白花人（はくかじん）とは',
+    body: '<p>金星人系。洗練・美・直感の象徴。鋭い感受性と美意識を持ち、物事の本質を直感的に見抜く力があります。</p><h4>特徴</h4><p>完璧主義で美的センスが高い。人間関係では繊細で気を遣いすぎる面も。独自のこだわりと品格を持ち、信頼される鑑定眼を発揮します。</p><h4>転化天蛹の対象支</h4><p>子・午（水火の衝突による変容）</p>'
+  },
+  '離花人': {
+    title: '離花人（りかじん）とは',
+    body: '<p>火星人系。情熱・輝き・表現の象徴。明るく社交的で、周囲を照らす太陽のような存在感があります。</p><h4>特徴</h4><p>行動力と発信力が強く、人を引き付けるカリスマ性がある。感情が豊かで熱しやすく冷めやすい面も。表現することで才能を開花させます。</p><h4>転化天蛹の対象支</h4><p>丑・未（土による火の消化）</p>'
+  },
+  '風花人': {
+    title: '風花人（かぜかじん）とは',
+    body: '<p>木星人系。成長・変化・自由の象徴。風のように軽やかで、どんな環境にも適応できる柔軟性を持ちます。</p><h4>特徴</h4><p>好奇心旺盛で新しいことへの挑戦を好む。人との縁を大切にし、広いネットワークを築く。自由を愛するがゆえに、枠に縛られることを嫌います。情報収集と発信が得意な探究者です。</p><h4>転化天蛹の対象支</h4><p>辰・巳（金による木の剋）</p>'
+  },
+  '仙花人': {
+    title: '仙花人（せんかじん）とは',
+    body: '<p>水星人系。知恵・洞察・深さの象徴。深く考え、物事の本質を見抜く洞察力を持ちます。</p><h4>特徴</h4><p>冷静で分析力が高く、知的探求心が旺盛。感情より論理を優先しがちだが、内面には深い感受性がある。一人で深く考える時間を必要とします。</p><h4>転化天蛹の対象支</h4><p>申・酉（金による水の増幅）</p>'
+  },
+  '水花人': {
+    title: '水花人（みずかじん）とは',
+    body: '<p>水星人系。流れ・共感・柔軟性の象徴。水のように状況に応じて形を変え、人の心に深く寄り添います。</p><h4>特徴</h4><p>感受性が豊かで共感力が高く、相手の気持ちを自然に理解できる。柔軟性がある反面、流されやすい面も。癒しと調和をもたらす存在です。</p><h4>転化天蛹の対象支</h4><p>寅・卯（木による水の消費）</p>'
+  },
 };
 
 function showTermInfo(term) {
