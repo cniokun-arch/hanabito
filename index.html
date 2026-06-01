@@ -1343,30 +1343,31 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label clickable-term" onclick="showTermInfo('転化天蛹')" title="タップで説明">空亡</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
     const lifeWaveRaw=A2D.map(dk=>JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0);
-    // 引寒・休眠・残雪の期間だけ前後をなだらかにする（cosine補間）
+    // 引寒・休眠・残雪を連続グループとして1本のなだらかな弧に補間
     const SOFT_JUNI=new Set(['引寒','休眠','残雪']);
-    const lifeWave=lifeWaveRaw.map((w,i)=>{
-      const ju=getJuniUnki(ht,A2D[i].shi);
-      if(!SOFT_JUNI.has(ju))return w;
-      // ブロック内の位置（0=開始、1=終了）
-      const blockStart=A2D.findIndex((_,j)=>j<=i&&getJuniUnki(ht,A2D[j].shi)===ju&&(j===0||getJuniUnki(ht,A2D[j-1].shi)!==ju));
-      let bs=i,be=i;
-      while(bs>0&&getJuniUnki(ht,A2D[bs-1].shi)===ju)bs--;
-      while(be<A2D.length-1&&getJuniUnki(ht,A2D[be+1].shi)===ju)be++;
-      const len=be-bs+1;
-      const pos=(i-bs)/Math.max(len-1,1); // 0〜1
-      const prevW=bs>0?(JUNI_WAVE[getJuniUnki(ht,A2D[bs-1].shi)]||0):w;
-      const nextW=be<A2D.length-1?(JUNI_WAVE[getJuniUnki(ht,A2D[be+1].shi)]||0):w;
-      const fade=0.25; // 前後25%をなだらかにする割合
-      if(pos<fade){
-        const t=(1-Math.cos(pos/fade*Math.PI))/2;
-        return prevW+(w-prevW)*t;
-      } else if(pos>1-fade){
-        const t=(1-Math.cos((1-pos)/fade*Math.PI))/2;
-        return nextW+(w-nextW)*t;
+    const lifeWave=lifeWaveRaw.slice();
+    let i=0;
+    while(i<lifeWave.length){
+      if(SOFT_JUNI.has(getJuniUnki(ht,A2D[i].shi))){
+        // グループの開始・終了インデックスを探す
+        let gs=i,ge=i;
+        while(ge+1<A2D.length&&SOFT_JUNI.has(getJuniUnki(ht,A2D[ge+1].shi)))ge++;
+        const wStart=gs>0?lifeWaveRaw[gs-1]:lifeWaveRaw[gs];
+        const wEnd=ge+1<A2D.length?lifeWaveRaw[ge+1]:lifeWaveRaw[ge];
+        const wBottom=Math.min(...lifeWaveRaw.slice(gs,ge+1));
+        const span=ge-gs+1;
+        for(let j=gs;j<=ge;j++){
+          const t=(j-gs)/(Math.max(span-1,1)); // 0〜1
+          // cosineで入口→底→出口のなめらかな弧
+          const arc=Math.sin(t*Math.PI); // 0→1→0
+          const base=wStart+(wEnd-wStart)*t; // 線形補間のベースライン
+          lifeWave[j]=base+(wBottom-Math.max(wStart,wEnd))*arc;
+        }
+        i=ge+1;
+      } else {
+        i++;
       }
-      return w;
-    });
+    }
     const lifeCurrIdx=A2D.findIndex((_,i)=>y+i===CY);
     if(myChart)myChart.destroy();
     myChart=new Chart(document.getElementById('lifeChart').getContext('2d'),{
