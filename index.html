@@ -2319,12 +2319,16 @@ function openPsych() {
   if(q3) psychQuestions.push({id:'q9', layer:3, text:q3.text, choices:q3.choices});
   psychStep = 0;
   psychAnswers = {};
-  document.getElementById('psychPanel').classList.add('open');
+  const p = document.getElementById('psychPanel');
+  p.style.display = 'flex';
+  p.classList.add('open');
   renderPsych();
 }
 
 function closePsych() {
-  document.getElementById('psychPanel').classList.remove('open');
+  const p = document.getElementById('psychPanel');
+  p.classList.remove('open');
+  p.style.display = 'none';
 }
 
 function renderPsych() {
