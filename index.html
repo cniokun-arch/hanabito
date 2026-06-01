@@ -1695,11 +1695,11 @@ let aiHistory = [];
 function toggleAiPanel(){
   const panel = document.getElementById('aiPanel');
   const fab = document.querySelector('.ai-fab');
-  if (panel.classList.contains('open')) {
-    panel.classList.remove('open');
+  if (panel.style.display === 'flex') {
+    panel.style.display = 'none';
     if (fab) { fab.style.display = 'flex'; fab.style.visibility = 'visible'; }
   } else {
-    panel.classList.add('open');
+    panel.style.display = 'flex';
     if (fab) { fab.style.display = 'none'; fab.style.visibility = 'hidden'; }
   }
 }
@@ -2319,16 +2319,12 @@ function openPsych() {
   if(q3) psychQuestions.push({id:'q9', layer:3, text:q3.text, choices:q3.choices});
   psychStep = 0;
   psychAnswers = {};
-  const p = document.getElementById('psychPanel');
-  p.style.display = 'flex';
-  p.classList.add('open');
+  document.getElementById('psychPanel').classList.add('open');
   renderPsych();
 }
 
 function closePsych() {
-  const p = document.getElementById('psychPanel');
-  p.classList.remove('open');
-  p.style.display = 'none';
+  document.getElementById('psychPanel').classList.remove('open');
 }
 
 function renderPsych() {
@@ -2394,6 +2390,8 @@ function buildPsychText() {
 function submitPsychToAI() {
   const panel = document.getElementById('aiPanel');
   if(panel) panel.style.display = 'flex';
+  const fab = document.querySelector('.ai-fab');
+  if(fab) { fab.style.display = 'none'; fab.style.visibility = 'hidden'; }
   window.psychResult = buildPsychText();
   const inp = document.getElementById('aiInput');
   if(inp) {
