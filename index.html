@@ -303,7 +303,8 @@ window.addEventListener('unhandledrejection', function(e) {
 
       <hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0;">
 
-      <p style="text-align:center;font-size:0.82rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem;">自分や大切な人を深く知り、<br><strong style="color:#b8860b;">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>
+      <p style="text-align:center;font-size:0.82rem;color:#7a6b52;line-height:1.9;margin-bottom:0.8rem;">自分や大切な人を深く知り、<br><strong style="color:#b8860b;">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>
+        <p style="text-align:center;font-size:0.75rem;color:#7a6b52;line-height:1.8;margin-bottom:1.5rem;">※本サービスはあくまで占いです。重要な決定は必ずご自身の責任で行ってください。<br><a href="terms.html" style="color:#b8860b;text-decoration:underline;">利用規約・免責事項はこちら →</a></p>
 
       <div style="text-align:center;">
         <button onclick="document.getElementById('about-overlay').style.display='none'" style="background:#4a3c28;color:#fff;border:none;border-radius:6px;padding:0.65rem 2rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;cursor:pointer;letter-spacing:0.1em;">← 占いに戻る</button>
@@ -352,6 +353,17 @@ window.addEventListener('unhandledrejection', function(e) {
         </div>
       </div>
 
+      <!-- 深層心理テストボタン＋説明バナー -->
+      <div id="psych-guide-block" style="display:none;margin-bottom:0.8rem;">
+        <button id="psychStartBtn" onclick="openPsych()" class="psych-btn" style="margin-bottom:0.6rem;">🔮 深層心理テストで、より詳しい鑑定を受ける</button>
+        <div style="background:#fff;border:1px solid rgba(124,58,237,0.22);border-radius:8px;overflow:hidden;">
+          <button onclick="document.getElementById('psych-about-overlay').style.display='block'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:transparent;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;">
+            <span style="font-size:0.83rem;color:#7c3aed;font-weight:700;letter-spacing:0.08em;">🔮 深層心理テストとは？</span>
+            <span style="font-size:0.8rem;color:#7c3aed;">▶</span>
+          </button>
+        </div>
+      </div>
+
       <!-- 今日の運気ウィジェット -->
       <div style="background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:8px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;">
@@ -365,6 +377,42 @@ window.addEventListener('unhandledrejection', function(e) {
         <div id="unqi-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
       </div>
 
+    </div>
+
+    <!-- 深層心理テストとは？ オーバーレイ -->
+    <div id="psych-about-overlay" style="display:none;position:fixed;inset:0;background:#faf6ef;z-index:2000;overflow-y:auto;">
+      <div style="background:linear-gradient(135deg,#2a0060,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0;">深層心理テストとは</h2>
+        <button onclick="document.getElementById('psych-about-overlay').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;">✕</button>
+      </div>
+      <div style="padding:1.4rem 1.2rem 2.5rem;">
+
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem;">
+          <p style="font-size:0.88rem;color:#1a1208;line-height:1.9;margin:0;">深層心理テストは、<strong style="color:#7c3aed;">8つの質問</strong>に答えることで、命式だけでは見えにくい<strong style="color:#b8860b;">あなたの内面・本音・深層の欲求</strong>をAIが読み取り、より深い鑑定を行うための機能です。</p>
+        </div>
+
+        <div style="background:#fff;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">✨ テストを受けるメリット</h3>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            <div style="font-size:0.82rem;color:#3a2a00;display:flex;gap:0.5rem;line-height:1.7;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✦</span><span>命式＋深層心理の<strong style="color:#b8860b;">二段構えの鑑定</strong>が受けられる</span></div>
+            <div style="font-size:0.82rem;color:#3a2a00;display:flex;gap:0.5rem;line-height:1.7;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✦</span><span>AIが<strong style="color:#b8860b;">あなただけの深い洞察</strong>を語ってくれる</span></div>
+            <div style="font-size:0.82rem;color:#3a2a00;display:flex;gap:0.5rem;line-height:1.7;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✦</span><span>自分でも気づいていない<strong style="color:#b8860b;">本音や強み・弱み</strong>が分かる</span></div>
+            <div style="font-size:0.82rem;color:#3a2a00;display:flex;gap:0.5rem;line-height:1.7;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✦</span><span>所要時間は<strong style="color:#b8860b;">約3〜5分</strong>ほどです</span></div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">📝 テストを受けなくても大丈夫？</h3>
+          <p style="font-size:0.82rem;color:#3a2a00;line-height:1.9;margin:0;">はい、<strong style="color:#b8860b;">テストなしでも鑑定は受けられます。</strong><br>命式・大運・運気の情報だけでも、AIは十分に詳しいアドバイスができます。テストはあくまで「より深く知りたい方」のためのオプションです。</p>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0;">
+        <p style="text-align:center;font-size:0.82rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem;">自分の<strong style="color:#7c3aed;">深層心理</strong>を知ることで、<br>占いの精度がさらに上がります。</p>
+
+        <div style="text-align:center;">
+          <button onclick="document.getElementById('psych-about-overlay').style.display='none'" style="background:#4a3c28;color:#fff;border:none;border-radius:6px;padding:0.65rem 2rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;cursor:pointer;letter-spacing:0.1em;">← 占いに戻る</button>
+        </div>
+      </div>
     </div>
 
     <!-- AIアドバイスとは？ オーバーレイ -->
@@ -414,7 +462,6 @@ window.addEventListener('unhandledrejection', function(e) {
         <button class="print-btn" onclick="printSection1()">🖨 命式・大運表を印刷</button>
       </div><div class="meishiki-grid" id="meishiki-grid"></div></div>
     <div class="info-row" id="info-row"></div>
-    <button id="psychStartBtn" onclick="openPsych()" class="psych-btn" style="display:none">🔮 深層心理テストで、より詳しい鑑定を受ける</button>
     <div class="section" id="lucky-color-section" style="display:none">
       <div class="section-title">◆ ラッキーカラー</div>
       <div id="lucky-color-content"></div>
@@ -1055,8 +1102,8 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
       +'<div style="font-size:1rem;color:'+htCol.sub+';margin-top:0.4rem">'+htSign+'</div>'
       +'</div>';
     document.getElementById('hoshi-banner').style.display = 'block';
-    const psychBtnEl = document.getElementById('psychStartBtn');
-    if(psychBtnEl) psychBtnEl.style.display = 'block';
+    const psychGuideBlock = document.getElementById('psych-guide-block');
+    if(psychGuideBlock) psychGuideBlock.style.display = 'block';
 
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label clickable-term" onclick="showTermInfo(&apos;転化天蛹&apos;)" title="タップで説明">転化天蛹</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
