@@ -1463,7 +1463,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
             ctx.beginPath();ctx.arc(3*s,-12*s,1.2*s,0,Math.PI*2);
             ctx.fillStyle='rgba(212,168,0,0.95)';ctx.fill();
             ctx.restore();
-          })(x1, top+26);
+          })(x1, ysc.getPixelForValue(lifeWave[i]));
           // 蝶（終了）SVG Bパターン モンシロ風
           (function drawCho(cx,cy){
             const s=0.7;
@@ -1512,7 +1512,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
             ctx.beginPath();ctx.arc(9*s,-14*s,1.5*s,0,Math.PI*2);
             ctx.fillStyle='#1a1a1a';ctx.fill();
             ctx.restore();
-          })(x2, top+26);
+          })(x2, ysc.getPixelForValue(lifeWave[j-1]));
           i=j-1;
         }
         // 転換期マーカー: 隣接する大運ブロック間の波の変化が大きい点
