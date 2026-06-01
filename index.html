@@ -2226,7 +2226,15 @@ function buildSystemPrompt(isPersonal){
       + '・年柱: ' + G.nenKan + G.nenShi + ' / 月柱: ' + G.tsuKan + G.tsuShi + ' / 日柱: ' + G.nichiKan + G.nichiShi + '\n'
       + '・今年の十二運気: ' + currJu + '\n'
       + '・今の大運の十二運気: ' + daiunJu + '\n'
-      + '・転化天蛹の対象支: ' + (G.sats ? G.sats.join('・') : '不明') + '（※大運干支がこの支にあたる10年間のみ転化天蛹の時期。命式の年柱・月柱・日柱の干支とは無関係）\n'
+      + (function(){
+          if(!G.sats || !G.BLK) return '・転化天蛹の対象支: 不明\n';
+          const skBlks = G.BLK.filter(function(b){ return G.sats.includes(b.shi); });
+          if(skBlks.length === 0) return '・転化天蛹の対象支: ' + G.sats.join('・') + '（該当大運なし）\n';
+          const ages = skBlks.map(function(b){ return (G.y+b.sa)+'年（'+b.sa+'歳）〜'+(G.y+b.sa+b.sp-1)+'年（'+(b.sa+b.sp-1)+'歳）'+b.ks; });
+          return '・転化天蛹の対象支: ' + G.sats.join('・') + '\n'
+               + '・転化天蛹の期間（大運表より）: ' + ages.join(' / ') + '（合計' + skBlks.reduce(function(s,b){return s+b.sp;},0) + '年間）\n'
+               + '・※転化天蛹は上記の大運期間のみ。年運・月運・日運・命式の干支には絶対に適用しない\n';
+        })()
       + daiunTableText + '\n'
       + (G.monthlyText ? G.monthlyText + '\n' : '')
       + (kanshiKBInfo ? '・命式の干支に関する知識ベース情報:\n' + kanshiKBInfo : '');
