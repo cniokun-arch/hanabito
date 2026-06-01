@@ -1432,6 +1432,87 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
           ctx.fillStyle='rgba(100,40,150,0.7)';
           ctx.textAlign='center';
           ctx.fillText('転化天蛹',mx,top+10);
+          // サナギ（開始）SVG Bパターン
+          (function drawSanagi(cx,cy){
+            const s=0.62;
+            ctx.save();
+            ctx.translate(cx,cy);
+            // 胴体
+            ctx.beginPath();ctx.ellipse(0,4*s,9*s,18*s,0,0,Math.PI*2);
+            ctx.fillStyle='rgba(90,110,42,0.92)';ctx.fill();
+            // 頭部
+            ctx.beginPath();ctx.ellipse(0,-10*s,6*s,6*s,0,0,Math.PI*2);
+            ctx.fillStyle='rgba(122,142,58,0.95)';ctx.fill();
+            // 頭部のアーチ
+            ctx.beginPath();ctx.moveTo(-4*s,-14*s);ctx.quadraticCurveTo(0,-18*s,4*s,-14*s);
+            ctx.strokeStyle='rgba(61,78,24,0.9)';ctx.lineWidth=1.2*s;ctx.stroke();
+            // 節の線
+            [[-7,-3],[-8,2],[-8,7],[-7,12]].forEach(function(p,i){
+              ctx.beginPath();ctx.moveTo(p[0]*s,p[1]*s);ctx.lineTo(-p[0]*s,p[1]*s);
+              ctx.strokeStyle='rgba(200,216,112,'+(0.4-i*0.07)+')';ctx.lineWidth=0.8*s;ctx.stroke();
+            });
+            // 光沢
+            ctx.beginPath();ctx.ellipse(-5*s,-5*s,2*s,3*s,0,0,Math.PI*2);
+            ctx.fillStyle='rgba(160,184,74,0.5)';ctx.fill();
+            // 底のアーチ
+            ctx.beginPath();ctx.moveTo(-9*s,18*s);ctx.quadraticCurveTo(0,24*s,9*s,18*s);
+            ctx.strokeStyle='rgba(61,78,24,0.9)';ctx.lineWidth=1.2*s;ctx.stroke();
+            // 金の点
+            ctx.beginPath();ctx.arc(-3*s,-12*s,1.2*s,0,Math.PI*2);
+            ctx.fillStyle='rgba(212,168,0,0.95)';ctx.fill();
+            ctx.beginPath();ctx.arc(3*s,-12*s,1.2*s,0,Math.PI*2);
+            ctx.fillStyle='rgba(212,168,0,0.95)';ctx.fill();
+            ctx.restore();
+          })(x1, top+26);
+          // 蝶（終了）SVG Bパターン モンシロ風
+          (function drawCho(cx,cy){
+            const s=0.7;
+            ctx.save();
+            ctx.translate(cx,cy);
+            // 上羽根左
+            ctx.beginPath();ctx.moveTo(0,2*s);
+            ctx.bezierCurveTo(-6*s,-16*s,-26*s,-20*s,-22*s,-5*s);
+            ctx.bezierCurveTo(-18*s,5*s,-5*s,4*s,0,2*s);
+            ctx.fillStyle='rgba(240,240,224,0.95)';ctx.fill();
+            ctx.strokeStyle='rgba(180,180,160,0.6)';ctx.lineWidth=0.5;ctx.stroke();
+            // 上羽根右
+            ctx.beginPath();ctx.moveTo(0,2*s);
+            ctx.bezierCurveTo(6*s,-16*s,26*s,-20*s,22*s,-5*s);
+            ctx.bezierCurveTo(18*s,5*s,5*s,4*s,0,2*s);
+            ctx.fillStyle='rgba(240,240,224,0.95)';ctx.fill();
+            ctx.strokeStyle='rgba(180,180,160,0.6)';ctx.lineWidth=0.5;ctx.stroke();
+            // 下羽根左
+            ctx.beginPath();ctx.moveTo(0,2*s);
+            ctx.bezierCurveTo(-5*s,6*s,-18*s,16*s,-12*s,20*s);
+            ctx.bezierCurveTo(-7*s,23*s,-1*s,12*s,0,2*s);
+            ctx.fillStyle='rgba(232,232,216,0.9)';ctx.fill();
+            ctx.strokeStyle='rgba(180,180,160,0.6)';ctx.lineWidth=0.5;ctx.stroke();
+            // 下羽根右
+            ctx.beginPath();ctx.moveTo(0,2*s);
+            ctx.bezierCurveTo(5*s,6*s,18*s,16*s,12*s,20*s);
+            ctx.bezierCurveTo(7*s,23*s,1*s,12*s,0,2*s);
+            ctx.fillStyle='rgba(232,232,216,0.9)';ctx.fill();
+            ctx.strokeStyle='rgba(180,180,160,0.6)';ctx.lineWidth=0.5;ctx.stroke();
+            // 羽の模様（黒点）
+            ctx.beginPath();ctx.arc(-14*s,-2*s,3*s,0,Math.PI*2);
+            ctx.fillStyle='rgba(40,40,40,0.22)';ctx.fill();
+            ctx.beginPath();ctx.arc(14*s,-2*s,3*s,0,Math.PI*2);
+            ctx.fillStyle='rgba(40,40,40,0.22)';ctx.fill();
+            // 胴体
+            ctx.beginPath();ctx.ellipse(0,8*s,2*s,10*s,0,0,Math.PI*2);
+            ctx.fillStyle='#1a1a1a';ctx.fill();
+            // 触角左
+            ctx.beginPath();ctx.moveTo(-1*s,-1*s);ctx.lineTo(-9*s,-14*s);
+            ctx.strokeStyle='#1a1a1a';ctx.lineWidth=1;ctx.stroke();
+            ctx.beginPath();ctx.arc(-9*s,-14*s,1.5*s,0,Math.PI*2);
+            ctx.fillStyle='#1a1a1a';ctx.fill();
+            // 触角右
+            ctx.beginPath();ctx.moveTo(1*s,-1*s);ctx.lineTo(9*s,-14*s);
+            ctx.strokeStyle='#1a1a1a';ctx.lineWidth=1;ctx.stroke();
+            ctx.beginPath();ctx.arc(9*s,-14*s,1.5*s,0,Math.PI*2);
+            ctx.fillStyle='#1a1a1a';ctx.fill();
+            ctx.restore();
+          })(x2, top+26);
           i=j-1;
         }
         // 転換期マーカー: 隣接する大運ブロック間の波の変化が大きい点
