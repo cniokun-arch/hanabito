@@ -340,6 +340,74 @@ window.addEventListener('unhandledrejection', function(e) {
 
     <div id="hoshi-banner" style="display:none"></div>
 
+    <!-- 誕生日入力後ガイド＋今日の運気 -->
+    <div id="guide-section" style="margin-bottom:1.5rem;">
+
+      <!-- ガイド文 -->
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(184,134,11,0.08));border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1rem 1.2rem;margin-bottom:0.8rem;">
+        <p style="font-size:0.88rem;font-weight:700;color:#4a3c28;margin:0 0 0.5rem;letter-spacing:0.05em;">📖 誕生日を入力したあとは？</p>
+        <p style="font-size:0.83rem;color:#4a3c28;line-height:1.9;margin:0;">まずは画面右下の <strong style="color:#7c3aed;">🌸 マーク</strong> をタップ（パソコンならクリック）して、<strong style="color:#b8860b;">AIに質問してみよう！</strong><br>あなたの命式を読み込んだAIが、いつでも丁寧にアドバイスします。</p>
+        <div style="margin-top:0.8rem;">
+          <button onclick="document.getElementById('ai-about-overlay').style.display='block'" style="background:transparent;border:1px solid rgba(124,58,237,0.5);border-radius:20px;padding:0.4rem 1.2rem;font-family:'Noto Serif JP',serif;font-size:0.8rem;color:#7c3aed;cursor:pointer;letter-spacing:0.08em;">🤖 AIを使ったアドバイスとは？</button>
+        </div>
+      </div>
+
+      <!-- 今日の運気ウィジェット -->
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:8px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:0.9rem;letter-spacing:0.15em;">◆ あなたの運気</span>
+          <div style="display:flex;gap:0;">
+            <button id="unqi-tab-day" onclick="switchUnqiTab('day')" style="font-family:'Noto Serif JP',serif;font-size:0.72rem;padding:4px 10px;border:1px solid rgba(255,255,255,0.6);border-radius:12px 0 0 12px;cursor:pointer;background:rgba(255,255,255,0.9);color:#4a3c28;font-weight:700;">今日</button>
+            <button id="unqi-tab-month" onclick="switchUnqiTab('month')" style="font-family:'Noto Serif JP',serif;font-size:0.72rem;padding:4px 10px;border:1px solid rgba(255,255,255,0.6);border-left:none;border-right:none;cursor:pointer;background:rgba(255,255,255,0.25);color:#fff;">今月</button>
+            <button id="unqi-tab-year" onclick="switchUnqiTab('year')" style="font-family:'Noto Serif JP',serif;font-size:0.72rem;padding:4px 10px;border:1px solid rgba(255,255,255,0.6);border-radius:0 12px 12px 0;cursor:pointer;background:rgba(255,255,255,0.25);color:#fff;">今年</button>
+          </div>
+        </div>
+        <div id="unqi-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
+      </div>
+
+    </div>
+
+    <!-- AIアドバイスとは？ オーバーレイ -->
+    <div id="ai-about-overlay" style="display:none;position:fixed;inset:0;background:#faf6ef;z-index:2000;overflow-y:auto;">
+      <div style="background:linear-gradient(135deg,#1a0050,#7c3aed 60%,#4a3c28);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0;">AI アドバイスとは</h2>
+        <button onclick="document.getElementById('ai-about-overlay').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;">✕</button>
+      </div>
+      <div style="padding:1.4rem 1.2rem 2.5rem;">
+
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem;">
+          <p style="font-size:0.88rem;color:#1a1208;line-height:1.9;margin:0;">花人占術アプリでは、<strong style="color:#7c3aed;">最新のAI（人工知能）</strong>が、あなたの命式・大運・月別運気をすべて読み込んだうえで、あなた専用のアドバイスをしてくれます。</p>
+        </div>
+
+        <div style="background:#fff;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">🌸 どうやって使うの？</h3>
+          <p style="font-size:0.83rem;color:#3a2a00;line-height:2;">① 誕生日を入力して命式を表示する<br>② 画面右下の <strong style="color:#7c3aed;">🌸 マーク</strong> をタップ（クリック）<br>③ チャット画面が開くので、聞きたいことを入力する</p>
+        </div>
+
+        <div style="background:#fff;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">💬 こんなことが聞けます</h3>
+          <div style="display:flex;flex-direction:column;gap:0.4rem;">
+            <div style="font-size:0.8rem;color:#3a2a00;background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「私はどんな性格ですか？」</div>
+            <div style="font-size:0.8rem;color:#3a2a00;background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「今年の運気はどうですか？」</div>
+            <div style="font-size:0.8rem;color:#3a2a00;background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「仕事や恋愛で気をつけることは？」</div>
+            <div style="font-size:0.8rem;color:#3a2a00;background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「人生の転換期はいつですか？」</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+          <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">⚠ ご利用について</h3>
+          <p style="font-size:0.8rem;color:#3a2a00;line-height:1.9;margin:0;"><strong style="color:#b8860b;">無料：1日10回まで</strong>ご利用いただけます。<br>有料プランは今後実装予定です。</p>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0;">
+        <p style="text-align:center;font-size:0.82rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem;">あなただけの命式を読み込んだAIが、<br><strong style="color:#7c3aed;">いつでもどこでも</strong>そばにいます。</p>
+
+        <div style="text-align:center;">
+          <button onclick="document.getElementById('ai-about-overlay').style.display='none'" style="background:#4a3c28;color:#fff;border:none;border-radius:6px;padding:0.65rem 2rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;cursor:pointer;letter-spacing:0.1em;">← 占いに戻る</button>
+        </div>
+      </div>
+    </div>
+
     <div class="section" id="print-section-1">
       <div class="print-section-header">
         <div class="section-title">◆ 命式（運命の型）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※与えられた魂魄の形を表します。</span></div>
@@ -568,6 +636,74 @@ function buildLuckyColorHTML(nenKan, nenShi, nZ, tsuKan, tsuShi, tZ, nichiKan, n
 }
 
 function getJuniUnki(ht,shi){const s=TEISHI[ht];if(s===undefined)return '—';const si=JUNISHI.indexOf(shi);if(si<0)return '—';return JUNI_NAMES[(si-s+12)%12]||'—';}
+
+// ===== 今日の運気ウィジェット =====
+const JUNI_DESC={
+  '休眠':'エネルギーが内側に向かう時期。無理に動かず、静かに充電するタイミング。焦らず自分を整えることが大切です。',
+  '残雪':'まだ動き出す時期ではありません。冬の終わりのように、もう少しだけ待つことが吉。準備を整えておきましょう。',
+  '発芽':'新しい芽吹きの始まり。小さな行動が大きな実りへとつながる種まきの時。チャレンジに向いています。',
+  '青葉':'エネルギーが伸びていく成長期。積極的に動くと良い結果につながりやすい。人との縁も広がります。',
+  '開花':'運気が満開を迎える最良の時期。何事も積極的に。チャンスをつかむ力が最も高まっています。',
+  '内省':'外向きの活動よりも、内側を見つめる時期。無理な拡大は避け、学びや準備に集中しましょう。',
+  '成天':'努力が実を結ぶ安定した時期。着実に積み重ねることで、確かな成果が生まれます。',
+  '狂咲':'エネルギーが過剰になりやすい不安定な時期。勢いで動かず、落ち着いて判断することが大切です。',
+  '豊穣':'努力の成果が実る収穫の時期。これまでの積み重ねが形となって現れます。感謝を忘れずに。',
+  '穂分':'実りを分かち合う時期。人とのつながりを大切にすることで、さらなる豊かさが生まれます。',
+  '平凪':'波風のない穏やかな時期。大きな動きより、日常を丁寧に積み上げることが吉。',
+  '引寒':'寒さが引いていく移行期。手放すことで次のステージへの準備が整います。執着を手放して。'
+};
+const JUNI_EMOJI={'休眠':'🌑','残雪':'❄️','発芽':'🌱','青葉':'🍃','開花':'🌸','内省':'🔮','成天':'⭐','狂咲':'🌪️','豊穣':'🌾','穂分':'🍂','平凪':'🌿','引寒':'🌬️'};
+
+function buildUnqiHTML(tab){
+  if(!G.ht)return '';
+  const now=new Date();
+  const y=now.getFullYear(),m=now.getMonth()+1,d=now.getDate();
+  let shi,label,dateLabel;
+  if(tab==='day'){
+    const ks=getDayKS(y,m,d); shi=ks[1];
+    label='今日の運気'; dateLabel=y+'年'+(m)+'月'+d+'日（日干支：'+ks+'）';
+  } else if(tab==='month'){
+    const ks=getMonthKS(y,m,d); shi=ks[1];
+    label='今月の運気'; dateLabel=y+'年'+(m)+'月（月干支：'+ks+'）';
+  } else {
+    const ks=getYearKS(y,m,d); shi=ks[1];
+    label='今年の運気'; dateLabel=y+'年（年干支：'+ks+'）';
+  }
+  const juni=getJuniUnki(G.ht,shi);
+  const wave=JUNI_WAVE[juni]||0;
+  const color=getJuniColor(juni);
+  const bars=Math.round((wave+4)/9*10);
+  const barHTML='<div style="display:flex;gap:2px;align-items:center;margin-top:4px;">'
+    +Array.from({length:10},(_,i)=>'<div style="width:16px;height:8px;border-radius:2px;background:'+(i<bars?color:'rgba(184,134,11,0.15)')+'"></div>').join('')
+    +'<span style="font-size:0.7rem;color:'+color+';margin-left:4px;font-weight:700;">'+(wave>=3?'好調':wave>=0?'普通':wave>=-2?'注意':'要注意')+'</span></div>';
+  return '<div style="display:flex;align-items:flex-start;gap:0.8rem;">'
+    +'<div style="font-size:2.2rem;line-height:1;flex-shrink:0;">'+(JUNI_EMOJI[juni]||'🌸')+'</div>'
+    +'<div style="flex:1;">'
+    +'<div style="font-size:0.7rem;color:#7a6b52;margin-bottom:2px;">'+dateLabel+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:0.5rem;">'
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;color:'+color+';">'+juni+'</span>'
+    +'<span style="font-size:0.75rem;color:#7a6b52;">（'+G.ht+'）</span>'
+    +'</div>'
+    +barHTML
+    +'<p style="font-size:0.78rem;color:#3a2a00;line-height:1.8;margin-top:0.5rem;">'+(JUNI_DESC[juni]||'')+'</p>'
+    +'</div></div>';
+}
+
+let currentUnqiTab='day';
+function switchUnqiTab(tab){
+  currentUnqiTab=tab;
+  ['day','month','year'].forEach(function(t){
+    const btn=document.getElementById('unqi-tab-'+t);
+    if(t===tab){btn.style.background='rgba(255,255,255,0.9)';btn.style.color='#4a3c28';btn.style.fontWeight='700';}
+    else{btn.style.background='rgba(255,255,255,0.25)';btn.style.color='#fff';btn.style.fontWeight='400';}
+  });
+  document.getElementById('unqi-body').innerHTML=buildUnqiHTML(tab);
+}
+
+function updateUnqiWidget(){
+  switchUnqiTab(currentUnqiTab);
+}
+
 function getHoshiType(y,m,d,g){const dayKS=getDayKS(y,m,d),name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)],nenKS=getYearKS(y,m,d),num=ROKUJU.indexOf(nenKS)+1;return name+(num%2===1?'＋':'－');}
 function getHoshiName(y,m,d){return HOSHI_BY_IDX[ROKUJU.indexOf(getDayKS(y,m,d))];}
 function getDaiunStartAge(y,m,d,isFwd){const bd=new Date(y,m-1,d);let days=0;try{if(isFwd){const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{let nm=m+1,ny=y;if(nm>12){nm=1;ny++;}const ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{const st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd>=stD)days=Math.round((bd-stD)/86400000);else{let pm=m-1,py=y;if(pm<1){pm=12;py--;}const ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
@@ -1074,6 +1210,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     aiHistory = [];
     const aiMsg = document.getElementById('aiMessages');
     if(aiMsg) aiMsg.innerHTML = '<div class="ai-msg ai-msg-bot">新しい命式を読み込みました。ご質問をどうぞ🌸</div>';
+    updateUnqiWidget();
     document.getElementById('result').style.display='block';
     document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(err){document.getElementById('errmsg').textContent='⚠ '+err.message+' | '+err.stack;document.getElementById('errmsg').style.display='block';console.error(err);}
