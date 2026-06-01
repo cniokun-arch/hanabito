@@ -674,6 +674,8 @@ const TSUHEN=[['比肩','劫財','食神','傷官','偏財','正財','偏官','�
 const JUSEI=[['天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星'],['天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星'],['天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星'],['天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星'],['天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星']];
 const JUNI_NAMES=['休眠','残雪','発芽','青葉','開花','内省','成天','狂咲','豊穣','穂分','平凪','引寒'];
 const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
+const JUNI_RUBY={'休眠':'きゅうみん','残雪':'ざんせつ','発芽':'はつが','青葉':'あおば','開花':'かいか','内省':'ないせい','成天':'せいてん','狂咲':'くるいざき','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん'};
+function juniRuby(n){const r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
 const TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
 const ZOKAN_SHI=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子'];
 const ZOKAN_DATA=[[0,['戊','辛','庚','戊','丁','丙','戊','乙','甲','戊','癸','壬']],[9,['甲','辛','庚','壬','丁','丙','庚','乙','甲','丙','癸','壬']],[11,['甲','丁','庚','壬','乙','丙','庚','癸','甲','丙','辛','壬']],[12,['甲','丁','辛','壬','乙','己','庚','癸','乙','丙','辛','癸']],[14,['甲','戊','辛','壬','己','己','庚','戊','乙','丙','己','癸']],[16,['壬','戊','辛','庚','己','己','丙','戊','乙','甲','己','癸']]];
@@ -964,7 +966,7 @@ function buildUnqiHTML(tab){
     +'<div style="flex:1;">'
     +'<div style="font-size:0.7rem;color:#7a6b52;margin-bottom:2px;">'+dateLabel+'</div>'
     +'<div style="display:flex;align-items:baseline;gap:0.5rem;">'
-    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;color:'+color+';">'+juni+'</span>'
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;color:'+color+';">'+juniRuby(juni)+'</span>'
     +'<span style="font-size:0.75rem;color:#7a6b52;">（'+G.ht+'）</span>'
     +'</div>'
     +barHTML
@@ -1084,7 +1086,7 @@ function buildMonthlyFortune(ht, sats) {
   let juRow = `<div style="display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch">`;
   juRow += lbl('十二<br>運気');
   juRow += `<div style="display:flex">` + data.map(d =>
-    `<div style="width:${CW}px;min-width:${CW}px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);height:52px;${d.bg?'background:'+d.bg:''}"><span style="writing-mode:vertical-rl;font-size:0.6rem;font-weight:600;color:${d.col||getJuniColor(d.ju)}">${d.ju}</span></div>`
+    `<div style="width:${CW}px;min-width:${CW}px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);height:52px;${d.bg?'background:'+d.bg:''}"><span style="writing-mode:vertical-rl;font-size:0.6rem;font-weight:600;color:${d.col||getJuniColor(d.ju)}">${juniRuby(d.ju)}</span></div>`
   ).join('') + '</div></div>';
 
   // グラフ行
@@ -1584,7 +1586,7 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     document.getElementById('unsei-blocks').innerHTML=blocks.map(([s,e])=>buildBlockRows(ND,A2D,BLK,nenCurrIdx,s,e,ht)).join('');
     let dtbl='<thead><tr><th>年齢帯</th><th>開始年</th><th>大運干支</th><th>蔵干</th><th class="clickable-term" onclick="showTermInfo(&apos;通変星&apos;)" title="タップで説明">通変星</th><th class="clickable-term" onclick="showTermInfo(&apos;十二従星&apos;)" title="タップで説明">十二従星</th><th class="clickable-term" onclick="showTermInfo(&apos;十二運気&apos;)" title="タップで説明">十二運気</th><th>波</th></tr></thead><tbody>';
     let ap2=0;
-    for(let di=0;di<DL.length&&ap2<MAX_AGE;di++){const sp=Math.min(di===0?sa:10,MAX_AGE-ap2);const dk=DL[di],dj=getJuniUnki(ht,dk.shi),djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—',dzo=getZokan(dk.shi,dfs),w=JUNI_WAVE[dj]||0,isSk=sats.includes(dk.shi);const syr=y+ap2,isCurr=syr<=CY&&CY<syr+sp;dtbl+=`<tr class="${isSk?'sk-row':isCurr?'td-cu':''}"><td class="td-age">${ap2}〜${ap2+sp-1}歳</td><td>${syr}</td><td class="td-ks">${dk.ks}${isSk?' ⚠':''}</td><td>${dzo}</td><td class="td-th">${dth}</td><td class="td-jos">${djos}</td><td style="color:${getJuniColor(dj)}">${dj}</td><td><span style="color:${getWaveColor(w)};font-weight:600">${w>0?'+':''}${w}</span></td></tr>`;ap2+=sp;}
+    for(let di=0;di<DL.length&&ap2<MAX_AGE;di++){const sp=Math.min(di===0?sa:10,MAX_AGE-ap2);const dk=DL[di],dj=getJuniUnki(ht,dk.shi),djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—',dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—',dzo=getZokan(dk.shi,dfs),w=JUNI_WAVE[dj]||0,isSk=sats.includes(dk.shi);const syr=y+ap2,isCurr=syr<=CY&&CY<syr+sp;dtbl+=`<tr class="${isSk?'sk-row':isCurr?'td-cu':''}"><td class="td-age">${ap2}〜${ap2+sp-1}歳</td><td>${syr}</td><td class="td-ks">${dk.ks}${isSk?' ⚠':''}</td><td>${dzo}</td><td class="td-th">${dth}</td><td class="td-jos">${djos}</td><td style="color:${getJuniColor(dj)}">${juniRuby(dj)}</td><td><span style="color:${getWaveColor(w)};font-weight:600">${w>0?'+':''}${w}</span></td></tr>`;ap2+=sp;}
     document.getElementById('daiunTable').innerHTML=dtbl+'</tbody>';
     // 月別運気表を表示
     document.getElementById('monthly-fortune-table').innerHTML = buildMonthlyFortune(ht, sats);
