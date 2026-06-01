@@ -255,6 +255,61 @@ window.addEventListener('unhandledrejection', function(e) {
     <span style="font-size:0.78rem">（無料・1日10回まで）</span>
   </p>
   <p style="font-size:0.72rem;margin-top:0.3rem;color:#b8860b;opacity:0.8">※ 有料プランは今後実装予定です</p>
+  <button onclick="document.getElementById('about-overlay').style.display='block'" style="margin-top:1rem;background:transparent;border:1px solid rgba(184,134,11,0.5);border-radius:20px;padding:0.45rem 1.3rem;font-family:'Noto Serif JP',serif;font-size:0.82rem;color:#b8860b;cursor:pointer;letter-spacing:0.1em;">🌸 花人占術とは？</button>
+  </div>
+
+  <!-- 花人占術とは？ オーバーレイ -->
+  <div id="about-overlay" style="display:none;position:fixed;inset:0;background:#faf6ef;z-index:2000;overflow-y:auto;">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0;">花 人 占 術 と は</h2>
+      <button onclick="document.getElementById('about-overlay').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 2.5rem;">
+
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.1));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.5rem;">
+        <p style="font-size:0.88rem;color:#1a1208;line-height:1.9;margin:0;">花人占術とは、占術の祖である<strong style="color:#b8860b;">易卦・易経</strong>の分析・研究・新解釈と、今まで明確でなかった<strong style="color:#b8860b;">十干の性質</strong>の個人統計・研究により<strong style="color:#b8860b;">完全オリジナルの体系化</strong>を行い、それに四柱推命、算命学、心理学など、現状のあらゆる統計・学問・占術のエッセンスを加えて<strong style="color:#7c3aed;">総合的に融合させた新しい占い</strong>です。</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.7rem;">
+          <span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4);">易卦・易経</span>
+          <span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4);">四柱推命</span>
+          <span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4);">算命学</span>
+          <span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4);">心理学</span>
+          <span style="font-size:0.7rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(124,58,237,0.1);color:#4a1a99;border:1px solid rgba(124,58,237,0.35);">完全オリジナル</span>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem;">🔮 何が分かるの？</h3>
+        <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0 0 0.5rem;">人間の<strong style="color:#b8860b;">深層心理</strong>や魂の<strong style="color:#b8860b;">コア（核心）</strong>にまで言及することができ、</p>
+        <div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:6px;">
+          <p style="margin:0;font-size:0.82rem;color:#3a2a00;line-height:2.1;">
+            ✦ &nbsp;その人が<strong style="color:#b8860b;">求めるもの・性格</strong><br>
+            ✦ &nbsp;<strong style="color:#b8860b;">幸運と不運のタイミング</strong><br>
+            ✦ &nbsp;<strong style="color:#b8860b;">人生の転換期</strong>（大きな変化が来る時期）<br>
+            ✦ &nbsp;人生を豊かにする<strong style="color:#b8860b;">ヒント</strong>
+          </p>
+        </div>
+        <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0.5rem 0 0;">…を知ることができます。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem;">🌱 進化し続ける占術</h3>
+        <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0;">常に新しい<strong style="color:#b8860b;">統計・研究・技術</strong>を取り込んで進化を目指しており、発展を続ける<strong style="color:#7c3aed;">将来性の高い占術</strong>でもあります。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem;">🤖 最新AIによるアドバイス</h3>
+        <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0;">最新の<strong style="color:#b8860b;">AI（人工知能）</strong>による解説を導入し、聞きたいこと・分からないことが聞ける、<strong style="color:#7c3aed;">いつでもどこでも誰でも</strong>アドバイスが受けられる体制を実現しています。</p>
+      </div>
+
+      <hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0;">
+
+      <p style="text-align:center;font-size:0.82rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem;">自分や大切な人を深く知り、<br><strong style="color:#b8860b;">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>
+
+      <div style="text-align:center;">
+        <button onclick="document.getElementById('about-overlay').style.display='none'" style="background:#4a3c28;color:#fff;border:none;border-radius:6px;padding:0.65rem 2rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;cursor:pointer;letter-spacing:0.1em;">← 占いに戻る</button>
+      </div>
+
+    </div>
   </div>
   <div class="input-panel">
     <h2>◆ 知りたい人の誕生日を入力してください</h2>
