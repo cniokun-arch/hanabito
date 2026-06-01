@@ -1075,18 +1075,18 @@ const MONTH_LABEL = ['12月','1月','2月','3月','4月','5月','6月','7月','8
 function buildMonthlyFortune(ht, sats) {
   const currentMonth = new Date().getMonth() + 1; // 1-12
   const MONTH_ORDER = [
-    {label:'12月', shi:'子', month:12},
-    {label:'11月', shi:'亥', month:11},
-    {label:'10月', shi:'戌', month:10},
-    {label:'9月',  shi:'酉', month:9},
-    {label:'8月',  shi:'申', month:8},
-    {label:'7月',  shi:'未', month:7},
-    {label:'6月',  shi:'午', month:6},
-    {label:'5月',  shi:'巳', month:5},
-    {label:'4月',  shi:'辰', month:4},
-    {label:'3月',  shi:'卯', month:3},
-    {label:'2月',  shi:'寅', month:2},
     {label:'1月',  shi:'丑', month:1},
+    {label:'2月',  shi:'寅', month:2},
+    {label:'3月',  shi:'卯', month:3},
+    {label:'4月',  shi:'辰', month:4},
+    {label:'5月',  shi:'巳', month:5},
+    {label:'6月',  shi:'午', month:6},
+    {label:'7月',  shi:'未', month:7},
+    {label:'8月',  shi:'申', month:8},
+    {label:'9月',  shi:'酉', month:9},
+    {label:'10月', shi:'戌', month:10},
+    {label:'11月', shi:'亥', month:11},
+    {label:'12月', shi:'子', month:12},
   ];
 
   const CW = 56, graphH = 110, lblW = 70, totalW = CW * 12;
@@ -1170,7 +1170,7 @@ function buildMonthlyFortune(ht, sats) {
   graphRow += '</div>';
 
   return `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="width:${totalW+lblW}px">${monthRow}${shiRow}${juRow}${graphRow}</div></div>
-<p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります（右→左の流れ）。🌟は現在月。</p>`;
+<p style="font-size:0.72rem;color:#7a6b52;margin-top:0.5rem">※ 月別運気は花人のタイプによって固定。毎年同じリズムで巡ります（左→右の流れ）。🌟は現在月。</p>`;
 }
 function buildMonthlyFortuneText(ht, sats) {
   let text = '【月別運気（毎年固定）】\n';
