@@ -382,6 +382,58 @@ window.addEventListener('unhandledrejection', function(e) {
             <span style="font-size:0.75rem;color:#7c3aed;">▶</span>
           </button>
         </div>
+        <div style="border-top:1px solid rgba(184,134,11,0.15);">
+          <button onclick="document.getElementById('setsu-about-overlay').style.display='block'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1.1rem;background:transparent;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;">
+            <span style="font-size:0.78rem;color:#b8860b;font-weight:700;">📅 運気の切り替わりタイミングについて</span>
+            <span style="font-size:0.75rem;color:#b8860b;">▶</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 運気の切り替わりタイミング オーバーレイ -->
+      <div id="setsu-about-overlay" style="display:none;position:fixed;inset:0;background:#faf6ef;z-index:2000;overflow-y:auto;">
+        <div style="background:linear-gradient(135deg,#3a2a00,#b8860b 60%,#7c3aed);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;">
+          <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.15em;margin:0;">運気の切り替わりタイミング</h2>
+          <button onclick="document.getElementById('setsu-about-overlay').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;">✕</button>
+        </div>
+        <div style="padding:1.4rem 1.2rem 2.5rem;">
+
+          <div style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(124,58,237,0.06));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem;">
+            <p style="font-size:0.88rem;color:#1a1208;line-height:1.9;margin:0;">花人占術では、運気の切り替わりは<strong style="color:#b8860b;">カレンダーの月初め・元旦ではなく</strong>、古来から使われてきた<strong style="color:#b8860b;">節気（せっき）の日</strong>を基準にしています。「月が変わったのに運気が変わらない」と感じたときは、まだ節気を迎えていないサインです。</p>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+            <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">📅 年の運気の切り替わり</h3>
+            <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0;">年の運気は<strong style="color:#b8860b;">立春（りっしゅん）</strong>の日から切り替わります。毎年2月4日頃です。</p>
+            <p style="font-size:0.82rem;color:#7a6b52;line-height:1.8;margin:0.5rem 0 0;">例：2026年の運気は <strong>2026年2月4日（立春）〜2027年2月3日</strong> まで続きます。<br>1月中はまだ前年（2025年）の運気です。</p>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+            <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">🗓️ 月の運気の切り替わり</h3>
+            <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem;">月の運気は以下の<strong style="color:#b8860b;">12の節気</strong>の当日から切り替わります。</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem 1rem;">
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立春</span>（2月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">啓蟄</span>（3月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">清明</span>（4月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立夏</span>（5月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">芒種</span>（6月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">小暑</span>（7月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立秋</span>（8月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">白露</span>（9月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">寒露</span>（10月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立冬</span>（11月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">大雪</span>（12月初旬）</div>
+              <div style="font-size:0.8rem;color:#3a2a00;line-height:1.8;"><span style="color:#b8860b;font-weight:700;">小寒</span>（1月初旬）</div>
+            </div>
+            <p style="font-size:0.78rem;color:#7a6b52;line-height:1.8;margin:0.6rem 0 0;">例：6月1日はまだ前月の運気。<strong>6月6日（芒種）</strong>から新しい月の運気に切り替わります。</p>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;">
+            <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">💡 アプリでの確認方法</h3>
+            <p style="font-size:0.83rem;color:#3a2a00;line-height:1.9;margin:0;">「今月の運気」「今年の運気」タブには、その運気が続く<strong style="color:#7c3aed;">正確な期間（節気名と日付）</strong>を表示しています。切り替わりのタイミングの目安としてご活用ください。</p>
+          </div>
+
+        </div>
       </div>
 
       <!-- 12運気とは？ オーバーレイ -->
@@ -681,8 +733,30 @@ const ZOKAN_SHI=['亥','戌','酉','申','未','午','巳','辰','卯','寅','�
 const ZOKAN_DATA=[[0,['戊','辛','庚','戊','丁','丙','戊','乙','甲','戊','癸','壬']],[9,['甲','辛','庚','壬','丁','丙','庚','乙','甲','丙','癸','壬']],[11,['甲','丁','庚','壬','乙','丙','庚','癸','甲','丙','辛','壬']],[12,['甲','丁','辛','壬','乙','己','庚','癸','乙','丙','辛','癸']],[14,['甲','戊','辛','壬','己','己','庚','戊','乙','丙','己','癸']],[16,['壬','戊','辛','庚','己','己','丙','戊','乙','甲','己','癸']]];
 const MAX_AGE=120,CW=30;
 const SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,957505740000,960198120000,962913780000,965636460000,968326020000,970974540000,973578000000,976134780000];
+const SETSU_NAMES=['小寒','立春','啓蟄','清明','立夏','芒種','小暑','立秋','白露','寒露','立冬','大雪'];
 const TROPICAL_YEAR_MS=365.24219879*86400000;
 function getSetsuDate(y,m){const b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
+function fmtMD(dt){return (dt.getMonth()+1)+'/'+dt.getDate();}
+function getMonthPeriodLabel(y,m,d){
+  const bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  let mo=m,yo=y;
+  if(bd<sD){mo--;if(mo<1){mo=12;yo--;}}
+  const startS=getSetsuDate(yo,mo),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  let nm=mo+1,ny=yo;if(nm>12){nm=1;ny++;}
+  const endS=getSetsuDate(ny,nm),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  const endBefore=new Date(endD-86400000);
+  const startName=SETSU_NAMES[mo-1]||'';
+  const endName=SETSU_NAMES[nm-1]||'';
+  return fmtMD(startD)+'('+startName+')〜'+fmtMD(endBefore)+'('+endName+'前日)';
+}
+function getYearPeriodLabel(y,m,d){
+  const bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());
+  const refY=bd>=rsD?y:y-1;
+  const startS=getSetsuDate(refY,2),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  const endS=getSetsuDate(refY+1,2),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  const endBefore=new Date(endD-86400000);
+  return startD.getFullYear()+'/'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'/'+fmtMD(endBefore)+'(立春前日)';
+}
 function getDaysFromSetsu(y,m,d){const bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());if(bd>=sD)return Math.round((bd-sD)/86400000);let pm=m-1,py=y;if(pm<1){pm=12;py--;}const ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());return Math.max(0,Math.round((bd-psD)/86400000));}
 function getDayKS(y,m,d){const diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
 function getYearKS(y,m,d){const bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
@@ -949,10 +1023,10 @@ function buildUnqiHTML(tab){
     label='今日の運気'; dateLabel=y+'年'+(m)+'月'+d+'日（日干支：'+ks+'）';
   } else if(tab==='month'){
     const ks=getMonthKS(y,m,d); shi=ks[1];
-    label='今月の運気'; dateLabel=y+'年'+(m)+'月（月干支：'+ks+'）';
+    label='今月の運気'; dateLabel=y+'年'+(m)+'月（月干支：'+ks+'）　'+getMonthPeriodLabel(y,m,d);
   } else {
     const ks=getYearKS(y,m,d); shi=ks[1];
-    label='今年の運気'; dateLabel=y+'年（年干支：'+ks+'）';
+    label='今年の運気'; dateLabel=y+'年（年干支：'+ks+'）　'+getYearPeriodLabel(y,m,d);
   }
   const juni=getJuniUnki(G.ht,shi);
   const wave=JUNI_WAVE[juni]||0;
