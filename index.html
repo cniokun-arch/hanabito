@@ -66,6 +66,18 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .r-ju{min-height:54px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:0.56rem;font-weight:500;white-space:nowrap}
 .r-sep{border-top:2px solid rgba(184,134,11,0.35)}
 .r-dks{min-height:32px}.r-th{min-height:28px}.r-jos{min-height:28px}.r-ku{min-height:24px}
+/* 大運タブ */
+.daiun-tab-wrap{margin-bottom:2rem}
+.daiun-tab-header{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid #b8860b}
+.daiun-tab-btn{flex:1;padding:0.75rem 0.3rem;background:#f2ead8;border:1px solid rgba(184,134,11,0.35);border-bottom:none;font-family:'Noto Serif JP',serif;font-size:0.78rem;color:#7a6b52;cursor:pointer;letter-spacing:0.05em;text-align:center;line-height:1.4;transition:background 0.15s,color 0.15s;border-right:none}
+.daiun-tab-btn:first-child{border-radius:6px 0 0 0}
+.daiun-tab-btn:last-child{border-right:1px solid rgba(184,134,11,0.35);border-radius:0 6px 0 0}
+.daiun-tab-btn:hover{background:#e8dcc4;color:#4a3c28}
+.daiun-tab-btn.active{background:#b8860b;color:#fff;font-weight:700}
+.daiun-tab-btn .tab-icon{display:block;font-size:1.2rem;margin-bottom:0.2rem}
+.daiun-tab-btn .tab-label{display:block}
+.daiun-tab-pane{display:none;border:1px solid rgba(184,134,11,0.3);border-top:none;background:#faf6ef;padding:1rem;border-radius:0 0 6px 6px}
+.daiun-tab-pane.active{display:block}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:0.8rem}
 th{background:#e8dcc4;color:#4a3c28;text-align:center;padding:0.5rem 0.3rem;border:1px solid rgba(184,134,11,0.25);font-weight:500;font-size:0.7rem}
@@ -606,47 +618,74 @@ window.addEventListener('unhandledrejection', function(e) {
       <div class="section-title">◆ 1年間の運気の流れ（1月から12月まで）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※スマートフォンではグラフを左右にスクロールできます</span></div>
       <div id="monthly-fortune-table"></div>
     </div>
-    <div class="section"><div class="section-title">◆ 大運表<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの10年毎の大きな運命の変化を表します。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">【色の見方】紫背景＝<ruby>転化天蛹<rt>てんかてんよう</rt></ruby>（人生の変容期）の20年間を表します。</span></div><div class="table-wrap"><table id="daiunTable"></table></div></div>
-    <div class="section" id="unsei-scroll-section">
-      <div class="section-title">◆ 命運グラフ（横スクロール）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">グラフは左右にスクロールできます。</span><br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※0〜119歳までの120年間、毎年切り替わる運命の流れと運気の波、10年毎の大運の変化を見やすくひとつにまとめたものです。</span></div>
-      <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪　← 横スクロールで全120年確認
-      </p>
-      <div class="chart-wrap" style="padding:0.5rem">
-        <div class="unsei-outer"><div class="unsei-inner" id="unsei-outer"></div></div>
+    <!-- 大運の流れ タブ -->
+    <div class="section daiun-tab-wrap" id="daiun-tab-section">
+      <div class="section-title">◆ 大運の流れ（0〜119歳）<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※下のタブで表・グラフを切り替えて見ることができます。すべて同じデータを異なる視点で表示しています。</span></div>
+      <div class="daiun-tab-header" role="tablist">
+        <button class="daiun-tab-btn active" role="tab" aria-selected="true" aria-controls="dtab-table" onclick="switchDaiunTab('table',this)">
+          <span class="tab-icon">📋</span><span class="tab-label">大運表</span>
+        </button>
+        <button class="daiun-tab-btn" role="tab" aria-selected="false" aria-controls="dtab-scroll" onclick="switchDaiunTab('scroll',this)">
+          <span class="tab-icon">↔️</span><span class="tab-label">横スクロール</span>
+        </button>
+        <button class="daiun-tab-btn" role="tab" aria-selected="false" aria-controls="dtab-block" onclick="switchDaiunTab('block',this)">
+          <span class="tab-icon">🔲</span><span class="tab-label">20年ブロック</span>
+        </button>
+        <button class="daiun-tab-btn" role="tab" aria-selected="false" aria-controls="dtab-graph" onclick="switchDaiunTab('graph',this)">
+          <span class="tab-icon">📈</span><span class="tab-label">大運グラフ</span>
+        </button>
       </div>
-    </div>
 
-    <div class="section" id="print-section-2">
-      <div class="print-section-header">
-        <div class="section-title">◆ 命運グラフ（20年毎の区切り）― 0〜119歳<br><span style="font-size:0.75rem;font-weight:400;color:#7a6b52">※一生分の変化を20年毎に区切ってまとめたものです。</span><br><span style="font-size:0.72rem;font-weight:400;color:#7a6b52">🌟現在地　紫背景＝<ruby>転化天蛹<rt>てんかてんよう</rt></ruby>（サナギから蝶になるように、今までの自分を失い全く別の世界へ移行していく変容の時期。大運干支がその人の<ruby>転化天蛹<rt>てんかてんよう</rt></ruby>の対象支にあたる10年間×2＝20年間）。</span></div>
-        <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
+      <!-- タブ1: 大運表 -->
+      <div class="daiun-tab-pane active" id="dtab-table" role="tabpanel">
+        <p style="font-size:0.72rem;color:#7a6b52;margin-bottom:0.7rem">※0〜119歳までの10年毎の大きな運命の変化を表します。<br>【色の見方】紫背景＝<ruby>転化天蛹<rt>てんかてんよう</rt></ruby>（人生の変容期）の20年間</p>
+        <div class="table-wrap"><table id="daiunTable"></table></div>
       </div>
-      <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
-        <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪
-      </p>
-      <div id="unsei-blocks"></div>
-    </div>
-    <div class="section">
-      <div class="section-title">◆ 大運グラフ（一生分・0〜119歳）</div>
-      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(184,134,11,0.08));border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1rem 1.2rem;margin-bottom:0.8rem;">
-        <p style="font-size:0.85rem;font-weight:700;color:#4a3c28;margin:0 0 0.45rem;letter-spacing:0.04em;">📈 このグラフの見方</p>
-        <p style="font-size:0.8rem;color:#4a3c28;line-height:1.9;margin:0 0 0.5rem;">あなたの人生120年分の<strong style="color:#b8860b;">運気の流れ</strong>を一覧で表示しています。グラフが<strong style="color:#1a6b3a;">上に高いほど好調</strong>な時期、<strong style="color:#8b1a1a;">下に深いほど注意</strong>が必要な時期です。<br>スマートフォンなら指でなぞると、その時の年齢・運気が表示されます。</p>
-        <p style="font-size:0.78rem;color:#7a6b52;margin:0;">紫の帯は<strong style="color:#7c3aed;"><ruby>転化天蛹<rt>てんかてんよう</rt></ruby></strong>の時期（大運のみ）。人生が大きく変容する特別な20年間です。</p>
-        <div style="margin-top:0.8rem;">
-          <button onclick="document.getElementById('tensho-about-overlay').style.display='block'" style="background:transparent;border:1px solid rgba(124,58,237,0.5);border-radius:20px;padding:0.4rem 1.2rem;font-family:'Noto Serif JP',serif;font-size:0.8rem;color:#7c3aed;cursor:pointer;letter-spacing:0.08em;">🦋 転化天蛹とは？</button>
+
+      <!-- タブ2: 横スクロール -->
+      <div class="daiun-tab-pane" id="dtab-scroll" role="tabpanel">
+        <p style="font-size:0.72rem;color:#7a6b52;margin-bottom:0.7rem">※0〜119歳・毎年の運命の流れと運気の波・10年毎の大運を一覧表示。左右にスクロールできます。</p>
+        <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪
+        </p>
+        <div class="chart-wrap" style="padding:0.5rem">
+          <div class="unsei-outer"><div class="unsei-inner" id="unsei-outer"></div></div>
         </div>
       </div>
-      <div class="chart-wrap">
-        <div class="legend" id="life-legend"></div>
-        <div style="position:relative;width:100%;height:240px">
+
+      <!-- タブ3: 20年ブロック -->
+      <div class="daiun-tab-pane" id="dtab-block" role="tabpanel">
+        <div style="margin-bottom:0.5rem">
+          <button class="print-btn" onclick="printSection2()">🖨 グラフを印刷</button>
+        </div>
+        <p style="font-size:0.72rem;color:#7a6b52;margin-bottom:0.7rem">※一生分の変化を20年毎に区切ってまとめたものです。🌟現在地　紫背景＝<ruby>転化天蛹<rt>てんかてんよう</rt></ruby></p>
+        <p style="font-size:0.71rem;color:#7a6b52;margin-bottom:0.8rem">
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(180,80,180,0.28);border-radius:1px;vertical-align:middle;margin-right:3px;outline:1px solid rgba(160,60,160,0.4)"></span>現在年　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(100,149,237,0.25);border-radius:1px;vertical-align:middle;margin-right:2px"></span>内省　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(210,120,30,0.22);border-radius:1px;vertical-align:middle;margin-right:2px"></span>狂咲　
+          <span style="display:inline-block;width:10px;height:10px;background:rgba(40,30,20,0.2);border-radius:1px;vertical-align:middle;margin-right:2px"></span>引寒・休眠・残雪
+        </p>
+        <div id="unsei-blocks"></div>
+      </div>
+
+      <!-- タブ4: 大運グラフ -->
+      <div class="daiun-tab-pane" id="dtab-graph" role="tabpanel">
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(184,134,11,0.08));border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1rem 1.2rem;margin-bottom:0.8rem;">
+          <p style="font-size:0.85rem;font-weight:700;color:#4a3c28;margin:0 0 0.45rem;letter-spacing:0.04em;">📈 このグラフの見方</p>
+          <p style="font-size:0.8rem;color:#4a3c28;line-height:1.9;margin:0 0 0.5rem;">あなたの人生120年分の<strong style="color:#b8860b;">運気の流れ</strong>を一覧で表示しています。グラフが<strong style="color:#1a6b3a;">上に高いほど好調</strong>な時期、<strong style="color:#8b1a1a;">下に深いほど注意</strong>が必要な時期です。<br>スマートフォンなら指でなぞると、その時の年齢・運気が表示されます。</p>
+          <p style="font-size:0.78rem;color:#7a6b52;margin:0;">紫の帯は<strong style="color:#7c3aed;"><ruby>転化天蛹<rt>てんかてんよう</rt></ruby></strong>の時期（大運のみ）。人生が大きく変容する特別な20年間です。</p>
+          <div style="margin-top:0.8rem;">
+            <button onclick="document.getElementById('tensho-about-overlay').style.display='block'" style="background:transparent;border:1px solid rgba(124,58,237,0.5);border-radius:20px;padding:0.4rem 1.2rem;font-family:'Noto Serif JP',serif;font-size:0.8rem;color:#7c3aed;cursor:pointer;letter-spacing:0.08em;">🦋 転化天蛹とは？</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="legend" id="life-legend"></div>
+          <div style="position:relative;width:100%;height:240px">
 <canvas id="lifeChart" role="img" aria-label="大運グラフ"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -2356,6 +2395,14 @@ async function sendAiMsg(){
   花人占術 &copy; 2026
 </div>
 <script>
+// ===== 大運タブ切り替え =====
+function switchDaiunTab(name, btn) {
+  document.querySelectorAll('.daiun-tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.daiun-tab-btn').forEach(function(b){ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.getElementById('dtab-' + name).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+}
 // ===== 印刷機能 =====
 function printSection1(){
   // 命式・大運表のみ印刷
