@@ -377,6 +377,11 @@ window.addEventListener('unhandledrejection', function(e) {
         </div>
       </div>
 
+      <!-- 相性診断ボタン -->
+      <div id="compat-guide-block" style="display:none;margin-bottom:0.8rem;">
+        <a href="compat.html" style="display:block;width:100%;margin:0.8rem 0 0;padding:0.9rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;font-family:'Zen Old Mincho',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em;box-shadow:0 3px 12px rgba(184,134,11,0.3);text-align:center;text-decoration:none;">🌸 相性診断で、相手との関係を知る</a>
+      </div>
+
       <!-- 今日の運気ウィジェット -->
       <div style="background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:8px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;">
@@ -1461,6 +1466,8 @@ function cH(lbl,kan,shi,zo,th,zth,js,jn){
     document.getElementById('hoshi-banner').style.display = 'block';
     const psychGuideBlock = document.getElementById('psych-guide-block');
     if(psychGuideBlock) psychGuideBlock.style.display = 'block';
+    const compatGuideBlock = document.getElementById('compat-guide-block');
+    if(compatGuideBlock) compatGuideBlock.style.display = 'block';
 
     document.getElementById('info-row').innerHTML=`<div class="info-card"><div class="ic-label">花　人</div><div class="ic-val">${ht}</div><div class="ic-sub">日干支：${nichiKS} / 年干支：${nenKS}</div></div><div class="info-card"><div class="ic-label">大運の流れ</div><div class="ic-val">${isFwd?'順行 ▶':'◀ 逆行'}</div><div class="ic-sub">${sa}歳から10年ごと切替</div></div><div class="info-card"><div class="ic-label clickable-term" onclick="showTermInfo('転化天蛹')" title="タップで説明">空亡</div><div class="ic-val" style="color:#8b1a1a">${sats.join('・')}</div><div class="ic-sub">この支の大運期間が転化天蛹</div></div>`;
     const CY=new Date().getFullYear();
