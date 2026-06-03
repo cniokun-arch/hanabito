@@ -348,10 +348,15 @@ function getCompatScore(p1,p2){
   // 年柱の運気（最重要）
   var nenJu1=getJuniUnki(p1.ht,p2.nenShi);
   var nenJu2=getJuniUnki(p2.ht,p1.nenShi);
-  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
+  var goodJuni=['発芽','青葉','成天','豊穣','穂分','平凪'];
   var badJuni=['内省','狂咲','引寒','休眠','残雪'];
-  var g1=goodJuni.indexOf(nenJu1)>=0?1:badJuni.indexOf(nenJu1)>=0?-1:0;
-  var g2=goodJuni.indexOf(nenJu2)>=0?1:badJuni.indexOf(nenJu2)>=0?-1:0;
+  // 開花は増幅特性：他が良ければ+1、他が悪ければ-1
+  function scoreJuni(j,otherJ){
+    if(j==='開花') return badJuni.indexOf(otherJ)>=0?-1:1;
+    return goodJuni.indexOf(j)>=0?1:badJuni.indexOf(j)>=0?-1:0;
+  }
+  var g1=scoreJuni(nenJu1,nenJu2);
+  var g2=scoreJuni(nenJu2,nenJu1);
   var score=g1+g2;
   // 感性の相性も加味
   var nc=getNayinCompat(p1.nichiN,p2.nichiN);
@@ -731,6 +736,39 @@ function drawList(result){
 // ===== モーダル =====
 // ===== AI一言コメント =====
 var AI_COMMENT_CACHE={};
+
+// ===== KB読み込み（相性十二運気をKVから取得） =====
+var JUNI_PLAIN={"発芽":"新たな挑戦や実りをもたらしてくれる","青葉":"自分を成長させてくれる","開花":"良いものも悪いものも増幅する","成天":"最も求めていた縁の相手","狂咲":"ついつい従ってしまい心が乱れやすい","豊穣":"できなかったことのチャンスをくれる","穂分":"安定と恵みをもたらしてくれる","平凪":"一緒にいると安心できる","内省":"疲れを感じやすいが気づきをくれる","引寒":"小さなトラブルを持ち込みやすい","休眠":"やりたいことを先取りされやすい","残雪":"最初は良さそうに見えるが結果になりにくい"};
+var WORKER_BASE='https://polished-flower-2524.cniokun.workers.dev';
+
+async function loadCompatKB(){
+  try{
+    var res=await fetch(WORKER_BASE+'/api/kb');
+    if(!res.ok) return;
+    var kb=await res.json();
+    // 相性十二運気セクションを取得
+    var compatJuni=kb['相性十二運気'];
+    if(compatJuni&&typeof compatJuni==='object'){
+      // 各運気の「説明」フィールドをJUNI_PLAINに反映
+      Object.keys(compatJuni).forEach(function(juniName){
+        var entry=compatJuni[juniName];
+        var desc='';
+        if(typeof entry==='string') desc=entry;
+        else if(entry&&entry['説明']) desc=entry['説明'];
+        else if(entry&&typeof entry==='object'){
+          // 最初のフィールド値を使う
+          var vals=Object.values(entry);
+          if(vals.length>0) desc=vals[0];
+        }
+        if(desc) JUNI_PLAIN[juniName]=desc;
+      });
+    }
+  }catch(e){
+    console.log('KB読み込みスキップ:', e);
+  }
+}
+loadCompatKB();
+
 var WORKER_URL='https://polished-flower-2524.cniokun.workers.dev/api/chat';
 
 function getCompatKey(pair){
@@ -743,12 +781,15 @@ async function fetchAIComment(pair,p1,p2){
   var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
   var badJuni=['内省','狂咲','引寒','休眠','残雪'];
   function jr(j){return goodJuni.indexOf(j)>=0?'良':badJuni.indexOf(j)>=0?'要注意':'普通';}
+  var overallJudge=pair.label.text;
   var parts=[
-    '相性データ：'+p1.name+'（'+p1.role+'）と'+p2.name+'（'+p2.role+'）',
-    '根源運気：'+p1.name+'→'+pair.nenJu1+'('+jr(pair.nenJu1)+') '+p2.name+'→'+pair.nenJu2+'('+jr(pair.nenJu2)+')',
-    '日常運気：'+p1.name+'→'+pair.tsuJu1+'('+jr(pair.tsuJu1)+') '+p2.name+'→'+pair.tsuJu2+'('+jr(pair.tsuJu2)+')',
-    '感性の相性：'+pair.comment,
-    '上記を元に2〜3文で総合評価。根源が要注意なら正直に伝え、感性が合っても近くで悪影響が出る場合はそれも伝える。Markdown不可。絵文字1〜2個。'
+    '二人：'+p1.name+'（'+p1.role+'）と'+p2.name+'（'+p2.role+'）総合判定：'+overallJudge,
+    p1.name+'から見た'+p2.name+'の長期的影響：'+pair.nenJu1+'（'+jr(pair.nenJu1)+'）',
+    p2.name+'から見た'+p1.name+'の長期的影響：'+pair.nenJu2+'（'+jr(pair.nenJu2)+'）',
+    p1.name+'から見た'+p2.name+'の日常的影響：'+pair.tsuJu1+'（'+jr(pair.tsuJu1)+'）',
+    p2.name+'から見た'+p1.name+'の日常的影響：'+pair.tsuJu2+'（'+jr(pair.tsuJu2)+'）',
+    '感性の相性（参考）：'+pair.comment,
+    '総合判定が要注意・注意必要の場合は正直にそう伝えること。感性が合っていても長期的に悪影響が出る場合はそれを優先して伝えること。2〜3文で。Markdown不可。絵文字1〜2個。'
   ];
   var prompt=parts.join(' / ');
   var sysPrompt='あなたは花人占術の鑑定師です。相性を2〜3文で端的に正直に温かく伝えてください。';
@@ -775,24 +816,41 @@ async function fetchAIComment(pair,p1,p2){
 async function showCompatDetail(pair){
   if(!RESULT_DATA) return;
   var p1=RESULT_DATA.persons[pair.i],p2=RESULT_DATA.persons[pair.j];
-  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
-  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
-  function rating(j){return goodJuni.indexOf(j)>=0?'◎ '+j:badJuni.indexOf(j)>=0?'▲ '+j:'○ '+j;}
+  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
+  var badJ=['内省','狂咲','引寒','休眠','残雪'];
+  var JUNI_PLAIN={
+    '発芽':'新たな挑戦や実りをもたらしてくれる',
+    '青葉':'自分を成長させてくれる',
+    '開花':'良いものも悪いものも増幅する',
+    '成天':'最も求めていた縁の相手',
+    '狂咲':'ついつい従ってしまい心が乱れやすい',
+    '豊穣':'できなかったことのチャンスをくれる',
+    '穂分':'安定と恵みをもたらしてくれる',
+    '平凪':'一緒にいると安心できる',
+    '内省':'疲れを感じやすいが気づきをくれる',
+    '引寒':'小さなトラブルを持ち込みやすい',
+    '休眠':'やりたいことを先取りされやすい',
+    '残雪':'最初は良さそうに見えるが結果になりにくい'
+  };
+  function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'◎':'○';}
+  function rl(n1,n2,j){return ri(j)+' '+n2+'にとって'+n1+'は「'+(JUNI_PLAIN[j]||j)+'」相手';}
 
-  // まずモーダルを即座に開く（ローディング状態）
   document.getElementById('modalMark').textContent=pair.label.mark;
   document.getElementById('modalMark').style.color=pair.label.color;
   document.getElementById('modalTitle').textContent=p1.name+' と '+p2.name+'の相性';
   document.getElementById('modalComment').innerHTML=
     '<span id="aiCommentText" style="color:#7a6b52;font-style:normal;font-size:0.85rem">🌸 鑑定中...</span>';
   document.getElementById('modalDetails').innerHTML=
-    '<div class="modal-detail-row"><span class="modal-detail-label">'+p1.name+'から見た'+p2.name+'（根源）</span><span>'+rating(pair.nenJu1)+'</span></div>'
-    +'<div class="modal-detail-row"><span class="modal-detail-label">'+p2.name+'から見た'+p1.name+'（根源）</span><span>'+rating(pair.nenJu2)+'</span></div>'
-    +'<div class="modal-detail-row"><span class="modal-detail-label">'+p1.name+'から見た'+p2.name+'（日常）</span><span>'+rating(pair.tsuJu1)+'</span></div>'
-    +'<div class="modal-detail-row"><span class="modal-detail-label">'+p2.name+'から見た'+p1.name+'（日常）</span><span>'+rating(pair.tsuJu2)+'</span></div>'
-    +'<div class="modal-detail-row"><span class="modal-detail-label">'+p1.name+'の六花人</span><span>'+p1.ht.replace(/[＋－]/g,'')+'</span></div>'
-    +'<div class="modal-detail-row"><span class="modal-detail-label">'+p2.name+'の六花人</span><span>'+p2.ht.replace(/[＋－]/g,'')+'</span></div>';
-  document.getElementById('modalOverlay').classList.remove('hidden');
+    '<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
+    +'<span class="modal-detail-label">長期的に見ると（根本の相性）</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p1.name,p2.name,pair.nenJu2)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p2.name,p1.name,pair.nenJu1)+'</span>'
+    +'</div>'
+    +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
+    +'<span class="modal-detail-label">普段の付き合いでは</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p1.name,p2.name,pair.tsuJu2)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p2.name,p1.name,pair.tsuJu1)+'</span>'
+    +'</div>';
 
   // AIコメントを非同期取得（キャッシュあれば即反映）
   var comment=await fetchAIComment(pair,p1,p2);

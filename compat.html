@@ -819,6 +819,39 @@ async function speakAI(btn){
 }
 
 // ===== 生年月日セレクト動的生成（index.htmlと同仕様） =====
+
+// ===== KB読み込み（相性十二運気をKVから取得） =====
+var JUNI_PLAIN={"発芽":"新たな挑戦や実りをもたらしてくれる","青葉":"自分を成長させてくれる","開花":"良いものも悪いものも増幅する","成天":"最も求めていた縁の相手","狂咲":"ついつい従ってしまい心が乱れやすい","豊穣":"できなかったことのチャンスをくれる","穂分":"安定と恵みをもたらしてくれる","平凪":"一緒にいると安心できる","内省":"疲れを感じやすいが気づきをくれる","引寒":"小さなトラブルを持ち込みやすい","休眠":"やりたいことを先取りされやすい","残雪":"最初は良さそうに見えるが結果になりにくい"};
+var WORKER_BASE='https://polished-flower-2524.cniokun.workers.dev';
+
+async function loadCompatKB(){
+  try{
+    var res=await fetch(WORKER_BASE+'/api/kb');
+    if(!res.ok) return;
+    var kb=await res.json();
+    // 相性十二運気セクションを取得
+    var compatJuni=kb['相性十二運気'];
+    if(compatJuni&&typeof compatJuni==='object'){
+      // 各運気の「説明」フィールドをJUNI_PLAINに反映
+      Object.keys(compatJuni).forEach(function(juniName){
+        var entry=compatJuni[juniName];
+        var desc='';
+        if(typeof entry==='string') desc=entry;
+        else if(entry&&entry['説明']) desc=entry['説明'];
+        else if(entry&&typeof entry==='object'){
+          // 最初のフィールド値を使う
+          var vals=Object.values(entry);
+          if(vals.length>0) desc=vals[0];
+        }
+        if(desc) JUNI_PLAIN[juniName]=desc;
+      });
+    }
+  }catch(e){
+    console.log('KB読み込みスキップ:', e);
+  }
+}
+loadCompatKB();
+
 document.addEventListener('DOMContentLoaded',function(){
   var cy=new Date().getFullYear();
   ['myY','theirY'].forEach(function(id){
