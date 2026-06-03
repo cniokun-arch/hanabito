@@ -452,33 +452,33 @@ function addPersonForm(preset){
   var idx=personCount;
   var g=GROUPS.find(function(x){return x.id===CURRENT_GROUP;});
   var isFirst=(idx===1);
-  var preset=preset||{};
+  var p=preset||{};
   var card=document.createElement('div');
   card.className='person-form-card';
   card.dataset.idx=idx;
   // 年セレクト生成
   var yearOpts='<option value="">年</option>';
   var cy=new Date().getFullYear();
-  for(var y=cy;y>=1900;y--) yearOpts+='<option value="'+y+'"'+(preset.y==y?' selected':'')+'>'+y+'年</option>';
+  for(var y=cy;y>=1900;y--) yearOpts+='<option value="'+y+'"'+(p.y==y?' selected':'')+'>'+y+'年</option>';
   // 月セレクト
   var monOpts='<option value="">月</option>';
-  for(var mo=1;mo<=12;mo++) monOpts+='<option value="'+mo+'"'+(preset.m==mo?' selected':'')+'>'+mo+'月</option>';
+  for(var mo=1;mo<=12;mo++) monOpts+='<option value="'+mo+'"'+(p.m==mo?' selected':'')+'>'+mo+'月</option>';
   // 日セレクト
   var dayOpts='<option value="">日</option>';
-  for(var dd=1;dd<=31;dd++) dayOpts+='<option value="'+dd+'"'+(preset.d==dd?' selected':'')+'>'+dd+'日</option>';
+  for(var dd=1;dd<=31;dd++) dayOpts+='<option value="'+dd+'"'+(p.d==dd?' selected':'')+'>'+dd+'日</option>';
   // 続柄
   var roles=['あなた（本人）','恋人・パートナー','配偶者','父','母','子','きょうだい','友人','職場の同僚','上司・先輩','部下・後輩'];
-  var roleOpts=roles.map(function(r){return '<option value="'+r+'"'+(preset.role===r?' selected':'')+'>'+r+'</option>';}).join('');
+  var roleOpts=roles.map(function(r){return '<option value="'+r+'"'+(p.role===r?' selected':'')+'>'+r+'</option>';}).join('');
   card.innerHTML='<div class="pfc-label"><span>人物 '+idx+'</span>'
     +(isFirst?'':'<span class="remove-btn" onclick="removePersonForm(this)">削除</span>')
     +'</div>'
-    +'<input class="pfc-input pfc-name" type="text" placeholder="名前（任意）" maxlength="10" value="'+(preset.name||'')+'">'
+    +'<input class="pfc-input pfc-name" type="text" placeholder="名前（任意）" maxlength="10" value="'+(p.name||'')+'">'
     +'<div class="pfc-date-row">'
     +'<select class="pfc-y">'+yearOpts+'</select>'
     +'<select class="pfc-m">'+monOpts+'</select>'
     +'<select class="pfc-d">'+dayOpts+'</select>'
     +'</div>'
-    +'<select class="pfc-select pfc-gender"><option value="男">男（陽）</option><option value="女"'+(preset.gender==='女'?' selected':'')+'>女（陰）</option></select>'
+    +'<select class="pfc-select pfc-gender"><option value="男">男（陽）</option><option value="女"'+(p.gender==='女'?' selected':'')+'>女（陰）</option></select>'
     +'<select class="pfc-select pfc-role" style="margin-top:0.4rem">'+roleOpts+'</select>';
   document.getElementById('personForms').appendChild(card);
   updateAddBtn();
@@ -502,28 +502,75 @@ function updateAddBtn(){
 }
 
 // ===== 計算・描画 =====
+function showError(msg){
+  var el=document.getElementById('inputError');
+  el.textContent=msg;
+  el.classList.remove('hidden');
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  // 3秒後に自動消去
+  setTimeout(function(){el.classList.add('hidden');},4000);
+}
+
 var RESULT_DATA=null;
 
 function calcGraph(){
   var errEl=document.getElementById('inputError');
   errEl.classList.add('hidden');
   var cards=document.querySelectorAll('.person-form-card');
-  if(cards.length<2){errEl.textContent='2人以上登録してください。';errEl.classList.remove('hidden');return;}
+  if(cards.length<2){
+    showError('2人以上登録してください。');
+    return;
+  }
   var persons=[];
   var valid=true;
-  cards.forEach(function(card){
+  var errName='';
+  cards.forEach(function(card,ci){
     var y=+card.querySelector('.pfc-y').value;
     var m=+card.querySelector('.pfc-m').value;
     var d=+card.querySelector('.pfc-d').value;
-    var name=card.querySelector('.pfc-name').value||('人物'+(persons.length+1));
+    var name=card.querySelector('.pfc-name').value||('人物'+(ci+1));
+    var gender=card.querySelector('.pfc-gender').value;
+    var role=card.querySelector('.pfc-role').value;
+    if(!y||!m||!d){
+      valid=false;
+      errName=name;
+      // カードをハイライト
+      card.style.border='1.5px solid #c0392b';
+      card.style.background='#fff5f5';
+    } else {
+      card.style.border='';
+      card.style.background='';
+    }
+    if(!valid&&y&&m&&d) return;
+    if(valid||y&&m&&d){
+      try{
+        var pp=calcPerson(y,m,d,gender);
+        pp.name=name;pp.role=role;
+        persons.push(pp);
+      }catch(e){
+        valid=false;errName=name;
+      }
+    }
+  });
+  // 再チェック
+  persons=[];
+  valid=true;
+  cards.forEach(function(card,ci){
+    var y=+card.querySelector('.pfc-y').value;
+    var m=+card.querySelector('.pfc-m').value;
+    var d=+card.querySelector('.pfc-d').value;
+    var name=card.querySelector('.pfc-name').value||('人物'+(ci+1));
     var gender=card.querySelector('.pfc-gender').value;
     var role=card.querySelector('.pfc-role').value;
     if(!y||!m||!d){valid=false;return;}
-    var p=calcPerson(y,m,d,gender);
-    p.name=name;p.role=role;
-    persons.push(p);
+    var pp=calcPerson(y,m,d,gender);
+    pp.name=name;pp.role=role;
+    persons.push(pp);
   });
-  if(!valid){errEl.textContent='すべての人物の生年月日を入力してください。';errEl.classList.remove('hidden');return;}
+  if(!valid){
+    showError('すべての人物の生年月日を入力してください。');
+    return;
+  }
   // 全ペアの相性を計算
   var pairs=[];
   for(var i=0;i<persons.length;i++){
@@ -639,7 +686,12 @@ function drawDiagram(result){
     svg.appendChild(fo);
   });
   // wrapのheightを調整
-  document.getElementById('diagramWrap').style.height=(H*(document.getElementById('diagramWrap').offsetWidth/W))+'px';
+  var wrapEl=document.getElementById('diagramWrap');
+  function updateDiagramHeight(){
+    wrapEl.style.height=(H*(wrapEl.offsetWidth/W))+'px';
+  }
+  updateDiagramHeight();
+  window.addEventListener('resize',updateDiagramHeight);
 }
 
 // n人のレイアウト位置（ドラマ相関図風）
