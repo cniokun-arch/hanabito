@@ -11,58 +11,63 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .app{max-width:760px;margin:0 auto;padding:2rem 1rem 4rem}
 .header{text-align:center;padding:2rem 0 1.5rem;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:2rem}
 .header h1{font-family:'Zen Old Mincho',serif;font-size:1.7rem;letter-spacing:0.25em;color:#b8860b;font-weight:700}
-.header p{font-size:0.88rem;color:#7a6b52;margin-top:0.5rem;line-height:1.8}
-.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#b8860b;font-size:0.82rem;text-decoration:none;margin-bottom:1.5rem;padding:0.35rem 0.8rem;border:1px solid rgba(184,134,11,0.4);border-radius:20px;transition:background 0.15s}
+.header p{font-size:0.9rem;color:#7a6b52;margin-top:0.5rem;line-height:1.9}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:#b8860b;font-size:0.85rem;text-decoration:none;margin-bottom:1.5rem;padding:0.4rem 0.9rem;border:1px solid rgba(184,134,11,0.4);border-radius:20px;transition:background 0.15s}
 .back-link:hover{background:rgba(184,134,11,0.08)}
-.section{background:#fff;border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:1.4rem;margin-bottom:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,0.04)}
-.section-title{font-family:'Zen Old Mincho',serif;font-size:0.98rem;letter-spacing:0.2em;color:#b8860b;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.5rem;margin-bottom:1rem}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
-@media(max-width:480px){.form-grid{grid-template-columns:1fr}}
-.form-group{display:flex;flex-direction:column;gap:0.3rem}
-.form-group label{font-size:0.8rem;color:#7a6b52;letter-spacing:0.05em}
-.form-group input,.form-group select{font-family:'Noto Serif JP',serif;font-size:0.9rem;padding:0.55rem 0.75rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;background:#faf6ef;color:#1a1208;outline:none;transition:border-color 0.15s}
-.form-group input:focus,.form-group select:focus{border-color:#b8860b}
-.form-group.full{grid-column:1/-1}
-.btn-calc{width:100%;margin-top:1rem;padding:0.9rem;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.2em;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:opacity 0.15s,transform 0.1s}
-.btn-calc:hover{opacity:0.9;transform:translateY(-1px)}
+.section{background:#fff;border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,0.04)}
+.section-title{font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.2em;color:#b8860b;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.55rem;margin-bottom:1.1rem}
+/* 入力フォーム */
+.form-person{margin-bottom:1.2rem}
+.form-person:last-of-type{margin-bottom:0}
+.person-head{font-size:0.88rem;font-weight:700;color:#4a3c28;margin-bottom:0.7rem;padding-bottom:0.4rem;border-bottom:1px dotted rgba(184,134,11,0.3)}
+.field-row{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.7rem;flex-wrap:wrap}
+.field-row label{font-size:0.83rem;color:#7a6b52;min-width:4em;flex-shrink:0}
+.field-row input[type=text]{flex:1;font-family:'Noto Serif JP',serif;font-size:0.92rem;padding:0.52rem 0.7rem;border:1px solid rgba(184,134,11,0.4);border-radius:4px;background:#faf6ef;color:#1a1208;outline:none;min-width:0}
+.field-row input[type=text]:focus{border-color:#b8860b}
+.date-selects{display:flex;gap:0.4rem;flex:1;min-width:0}
+.date-selects select,.field-row select{font-family:'Noto Serif JP',serif;font-size:0.9rem;padding:0.52rem 0.4rem;border:1px solid rgba(184,134,11,0.35);border-radius:4px;background:#faf6ef;color:#1a1208;outline:none}
+.date-selects select:focus,.field-row select:focus{border-color:#b8860b}
+.sel-y{flex:2}
+.sel-m,.sel-d{flex:1}
+.relation-row{margin-top:0.5rem}
+.btn-calc{width:100%;margin-top:1.2rem;padding:1rem;font-family:'Zen Old Mincho',serif;font-size:1.05rem;letter-spacing:0.2em;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;box-shadow:0 3px 10px rgba(184,134,11,0.25)}
+.btn-calc:hover{opacity:0.92;transform:translateY(-1px)}
 .btn-calc:active{transform:translateY(0)}
-.person-card{background:#faf6ef;border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.9rem 1rem;margin-bottom:0.8rem}
-.person-card .person-label{font-size:0.72rem;color:#7a6b52;letter-spacing:0.1em;margin-bottom:0.4rem}
-.person-card .person-name{font-family:'Zen Old Mincho',serif;font-size:1.05rem;color:#1a1208;margin-bottom:0.5rem}
-.person-card .rokka{display:inline-block;font-size:0.85rem;font-weight:700;padding:0.2rem 0.8rem;border-radius:20px;margin-bottom:0.5rem}
-.person-card .ks-row{font-size:0.78rem;color:#4a3c28;line-height:1.9}
-.nayin-badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.6rem;border-radius:12px;margin:0.15rem 0.2rem 0.15rem 0;border:1px solid rgba(184,134,11,0.4);background:rgba(184,134,11,0.06);color:#6b4c00}
-.compat-level{text-align:center;padding:1.2rem 0.5rem;margin-bottom:1rem}
-.compat-level .level-label{font-size:0.78rem;color:#7a6b52;margin-bottom:0.4rem}
-.compat-stars{font-size:1.4rem;letter-spacing:0.1em;margin-bottom:0.5rem}
-.compat-comment{font-size:0.88rem;color:#3a2a00;line-height:1.8;padding:0.6rem 1rem;background:#fdf9f0;border-radius:6px;border-left:3px solid #b8860b}
-.layer-title{font-size:0.78rem;font-weight:700;color:#b8860b;letter-spacing:0.1em;margin:1rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px dotted rgba(184,134,11,0.3)}
-.layer-row{display:flex;gap:0.6rem;align-items:flex-start;margin-bottom:0.7rem;padding:0.6rem;background:#faf6ef;border-radius:6px}
-.layer-row .lr-icon{font-size:1.1rem;flex-shrink:0;margin-top:0.1rem}
+/* プロフィールカード */
+.profile-cards{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+@media(max-width:480px){.profile-cards{grid-template-columns:1fr}}
+.person-card{background:#faf6ef;border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:1rem}
+.person-card .pc-label{font-size:0.72rem;color:#7a6b52;letter-spacing:0.1em;margin-bottom:0.35rem}
+.person-card .pc-name{font-family:'Zen Old Mincho',serif;font-size:1.05rem;color:#1a1208;margin-bottom:0.5rem}
+.rokka-badge{display:inline-block;font-size:0.88rem;font-weight:700;padding:0.22rem 0.85rem;border-radius:20px;margin-bottom:0.5rem}
+.person-card .ks-row{font-size:0.82rem;color:#4a3c28;line-height:2}
+.inochi-badges{margin-top:0.4rem;display:flex;flex-wrap:wrap;gap:0.25rem}
+.inochi-badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.6rem;border-radius:10px;background:rgba(184,134,11,0.09);color:#6b4c00;border:1px solid rgba(184,134,11,0.3)}
+/* 相性レイヤー */
+.layer-title{font-size:0.82rem;font-weight:700;color:#b8860b;letter-spacing:0.08em;margin:1.1rem 0 0.55rem;padding:0.3rem 0.6rem;background:rgba(184,134,11,0.07);border-radius:4px;border-left:3px solid #b8860b}
+.layer-row{display:flex;gap:0.7rem;align-items:flex-start;margin-bottom:0.8rem;padding:0.85rem 1rem;background:#faf6ef;border-radius:7px;border:1px solid rgba(184,134,11,0.12)}
+.layer-row .lr-icon{font-size:1.15rem;flex-shrink:0;margin-top:0.05rem}
 .layer-row .lr-body{flex:1;min-width:0}
-.layer-row .lr-label{font-size:0.72rem;color:#7a6b52;margin-bottom:0.25rem}
-.layer-row .lr-text{font-size:0.82rem;color:#2a1e00;line-height:1.75}
-.layer-row .lr-nayin{font-size:0.8rem;font-weight:700;color:#6b4c00}
-.juni-badge{display:inline-block;font-size:0.7rem;padding:0.1rem 0.5rem;border-radius:10px;margin:0 0.15rem}
-.ai-section{margin-top:1.5rem}
-.ai-answer-box{background:#fdf9f0;border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1rem 1.2rem;font-size:0.88rem;line-height:2;color:#1a1208;white-space:pre-wrap;min-height:80px}
-.ai-loading{display:flex;align-items:center;gap:0.6rem;color:#7a6b52;font-size:0.85rem;padding:1rem 0}
+.layer-row .lr-label{font-size:0.76rem;color:#7a6b52;margin-bottom:0.3rem;letter-spacing:0.03em}
+.layer-row .lr-text{font-size:0.88rem;color:#2a1e00;line-height:1.85;font-style:italic}
+.layer-row .lr-sub{font-size:0.78rem;color:#5a4a30;line-height:1.75;margin-top:0.4rem;padding-top:0.35rem;border-top:1px dotted rgba(184,134,11,0.2)}
+.name-tag{display:inline-block;font-size:0.78rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:10px;margin-right:0.3rem;margin-bottom:0.25rem}
+.juni-badge{display:inline-block;font-size:0.82rem;font-weight:700;padding:0.18rem 0.65rem;border-radius:12px;margin:0 0.2rem}
+/* AI */
+.ai-answer-box{background:#fdf9f0;border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:1.1rem 1.2rem;font-size:0.9rem;line-height:2;color:#1a1208;white-space:pre-wrap}
+.ai-loading{display:flex;align-items:center;gap:0.6rem;color:#7a6b52;font-size:0.88rem;padding:0.8rem 0}
 .ai-loading .dots span{animation:blink 1.2s infinite;opacity:0}
 .ai-loading .dots span:nth-child(2){animation-delay:0.2s}
 .ai-loading .dots span:nth-child(3){animation-delay:0.4s}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
-.ai-count{font-size:0.72rem;color:#7a6b52;text-align:right;margin-top:0.4rem}
-.result-hidden{display:none}
-.hoshi-color-tenka{background:#e8f4e8;color:#1a5c1a}
-.hoshi-color-haku{background:#e8e8f4;color:#1a1a5c}
-.hoshi-color-ri{background:#f4e8e8;color:#5c1a1a}
-.hoshi-color-fu{background:#f0f4e8;color:#3a5c1a}
-.hoshi-color-sen{background:#e8f0f4;color:#1a3a5c}
-.hoshi-color-sui{background:#e8eef4;color:#1a2a5c}
-.divider{height:1px;background:rgba(184,134,11,0.15);margin:1rem 0}
-.ai-ask-btn{width:100%;margin-top:0.8rem;padding:0.75rem;font-family:'Zen Old Mincho',serif;font-size:0.92rem;letter-spacing:0.15em;background:#fff;color:#b8860b;border:1.5px solid #b8860b;border-radius:8px;cursor:pointer;transition:background 0.15s}
+.ai-count{font-size:0.75rem;color:#7a6b52;text-align:right;margin-top:0.4rem}
+.ai-btn-row{display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap}
+.ai-ask-btn{flex:1;padding:0.8rem;font-family:'Zen Old Mincho',serif;font-size:0.92rem;letter-spacing:0.12em;background:#fff;color:#b8860b;border:1.5px solid #b8860b;border-radius:8px;cursor:pointer;transition:background 0.15s;min-width:140px}
 .ai-ask-btn:hover{background:rgba(184,134,11,0.06)}
-.error-msg{color:#c0392b;font-size:0.82rem;padding:0.5rem;background:#fff5f5;border-radius:6px;margin-top:0.5rem}
+.speak-btn{padding:0.6rem 1rem;font-family:'Noto Serif JP',serif;font-size:0.82rem;background:#f2ead8;border:1px solid rgba(184,134,11,0.3);border-radius:20px;cursor:pointer;color:#7a6b52;white-space:nowrap}
+.speak-btn:hover{background:#e8dcc4}
+.error-msg{color:#c0392b;font-size:0.85rem;padding:0.5rem 0.8rem;background:#fff5f5;border-radius:6px;margin-top:0.6rem}
+.result-hidden{display:none}
 ruby rt{font-size:0.55em}
 </style>
 </head>
@@ -70,55 +75,77 @@ ruby rt{font-size:0.55em}
 <div class="app">
   <div class="header">
     <h1>花 人 相 性 診 断</h1>
-    <p>花人占術の命式・納音・六花人を元に<br>二人の多層的な相性を鑑定します</p>
+    <p>花人占術の命式から二人の深層的な相性を多層的に鑑定します</p>
   </div>
 
   <a href="index.html" class="back-link">← 花人占術に戻る</a>
 
-  <!-- 自分の情報 -->
   <div class="section">
-    <div class="section-title">◆ あなたの情報</div>
-    <div class="form-grid">
-      <div class="form-group full">
-        <label>お名前（任意）</label>
-        <input type="text" id="myName" placeholder="あなたのお名前" maxlength="20">
+    <div class="section-title">◆ 二人の情報を入力する</div>
+
+    <!-- あなた -->
+    <div class="form-person">
+      <div class="person-head">あなた</div>
+      <div class="field-row">
+        <label>お名前</label>
+        <input type="text" id="myName" placeholder="（任意）" maxlength="20">
       </div>
-      <div class="form-group">
+      <div class="field-row">
         <label>生年月日</label>
-        <input type="date" id="myDate" min="1900-01-01" max="2025-12-31">
+        <div class="date-selects">
+          <select id="myY" class="sel-y"><option value="">年</option></select>
+          <select id="myM" class="sel-m">
+            <option value="">月</option>
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+          <select id="myD" class="sel-d"><option value="">日</option></select>
+        </div>
       </div>
-      <div class="form-group">
+      <div class="field-row">
         <label>性別</label>
         <select id="myGender">
-          <option value="男">男性</option>
-          <option value="女">女性</option>
+          <option value="男">男（陽）</option>
+          <option value="女">女（陰）</option>
         </select>
       </div>
     </div>
-  </div>
 
-  <!-- 相手の情報 -->
-  <div class="section">
-    <div class="section-title">◆ 相手の情報</div>
-    <div class="form-grid">
-      <div class="form-group full">
-        <label>お名前（任意）</label>
-        <input type="text" id="theirName" placeholder="相手のお名前" maxlength="20">
+    <hr style="border:none;border-top:1px dashed rgba(184,134,11,0.25);margin:1rem 0">
+
+    <!-- 相手 -->
+    <div class="form-person">
+      <div class="person-head">相手</div>
+      <div class="field-row">
+        <label>お名前</label>
+        <input type="text" id="theirName" placeholder="（任意）" maxlength="20">
       </div>
-      <div class="form-group">
+      <div class="field-row">
         <label>生年月日</label>
-        <input type="date" id="theirDate" min="1900-01-01" max="2025-12-31">
+        <div class="date-selects">
+          <select id="theirY" class="sel-y"><option value="">年</option></select>
+          <select id="theirM" class="sel-m">
+            <option value="">月</option>
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+          <select id="theirD" class="sel-d"><option value="">日</option></select>
+        </div>
       </div>
-      <div class="form-group">
+      <div class="field-row">
         <label>性別</label>
         <select id="theirGender">
-          <option value="女">女性</option>
-          <option value="男">男性</option>
+          <option value="女">女（陰）</option>
+          <option value="男">男（陽）</option>
         </select>
       </div>
-      <div class="form-group full">
+      <div class="field-row relation-row">
         <label>続柄</label>
-        <select id="relation">
+        <select id="relation" style="flex:1">
           <option value="恋人・パートナー">恋人・パートナー</option>
           <option value="配偶者">配偶者</option>
           <option value="友人">友人</option>
@@ -132,6 +159,7 @@ ruby rt{font-size:0.55em}
         </select>
       </div>
     </div>
+
     <div id="inputError" class="error-msg" style="display:none"></div>
     <button class="btn-calc" onclick="calcCompat()">🌸 相性を診断する</button>
   </div>
@@ -139,38 +167,27 @@ ruby rt{font-size:0.55em}
   <!-- 結果 -->
   <div id="result" class="result-hidden">
 
-    <!-- 二人のプロフィール -->
     <div class="section">
       <div class="section-title">◆ 二人の命式</div>
-      <div id="profileCards"></div>
+      <div class="profile-cards" id="profileCards"></div>
     </div>
 
-    <!-- 相性の多層分析 -->
     <div class="section">
       <div class="section-title">◆ 相性の多層分析</div>
-
-      <div class="layer-title">🌕 日柱の納音相性（最も強く出る・本音）</div>
-      <div id="compat-nichi"></div>
-
-      <div class="layer-title">🌙 月柱の納音相性（普段の付き合い・社会的な顔）</div>
-      <div id="compat-tsuki"></div>
-
-      <div class="layer-title">☀️ 年柱の納音相性（根源的な素地）</div>
-      <div id="compat-nen"></div>
-
-      <div class="layer-title">🌸 六花人の関係（12運気から見た相性）</div>
-      <div id="compat-rokka"></div>
+      <div id="compat-layers"></div>
     </div>
 
-    <!-- AI相性アドバイス -->
-    <div class="section ai-section">
+    <div class="section">
       <div class="section-title">◆ 花人占術AIによる相性鑑定</div>
       <div id="aiAnswer" class="ai-answer-box" style="display:none"></div>
       <div id="aiLoading" class="ai-loading" style="display:none">
         <span>🌸</span>
         <span>鑑定中です<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>
       </div>
-      <button class="ai-ask-btn" id="aiAskBtn" onclick="askAI()">🔮 AIに詳しい相性鑑定を依頼する</button>
+      <div class="ai-btn-row">
+        <button class="ai-ask-btn" id="aiAskBtn" onclick="askAI()">🔮 AIに詳しい相性鑑定を依頼する</button>
+        <button class="speak-btn" id="speakBtn" onclick="speakAI(this)" style="display:none">🔊 読み上げ</button>
+      </div>
       <div id="aiCountDisp" class="ai-count"></div>
     </div>
 
@@ -178,8 +195,7 @@ ruby rt{font-size:0.55em}
 </div>
 
 <script>
-// ===== 定数・計算関数（花人占術 index.html より） =====
-
+// ===== 定数・計算関数 =====
 const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
@@ -188,7 +204,7 @@ const NAYIN_COMPAT={"海中金":{"海中金":"互いに疑い深い同士だが�
 const NAYIN_KB={"海中金":{"読み":"かいちゅうきん","干支":["甲子","乙丑"],"性格":"置かれた環境に自然と馴染んでいける、しなやかな適応力の持ち主。他にはない独自の才能を秘めており、ある日突然それが開花して注目を集めることも少なくない。内面には強い警戒心があり、傷つくことへの恐れが行動をためらわせる一方、それが他者への細やかな気遣いにもなっている。根底には社会で活躍したいという野心があり、周囲のサポートや後押しがあれば大きく伸びていく。経験を重ねるほど自信がつき、力を発揮するタイプ。","人間関係":"和を何より大切にし、義理を忘れない。目上の人との関係づくりが上手で、実力者や見識のある人からの評価が高い。一方、目下の人には横柄な面が出ることも。自分の意見をはっきり打ち出すのが苦手で、周囲に合わせすぎて実力以下に見られることがある。","恋愛":"好みははっきりしているが、自分から動くのは得意でない。愛されることを強く求め、交際前から結果を見極めようとする慎重さがある。傷つくことを恐れるが、一度深く結ばれると真剣そのもの。愛する相手の影響を強く受け、人生が大きく変わることもある。","弱点":"強い志とは裏腹に、外から見ると控えめすぎる印象を与えがち。必要なのは場数を踏むことと、自分の力への自覚。自信がつけば必ず開花する。"},"炉中火":{"読み":"ろちゅうか","干支":["丙寅","丁卯"],"性格":"その場を明るく和ませる、生まれながらのムードメーカー。良識を大切にし、人や組織の役に立ちたいという気持ちが強い。内面には激しい感情を秘めているが、それをうまくコントロールしながら場に合った振る舞いができる。新しいものへの反応は早いが、表面だけで判断すると視野が狭まる。吸収した知識をさらに深めていければ、社会で大きく活躍できる人。","人間関係":"感情を顔に出さないポーカーフェイス。場の空気を読んで、枠を外れない立ち振る舞いをする。交友関係は幅広く、様々な人と自然につながれる。奉仕精神が強く頼まれれば快く動くが、内心では感謝や見返りをひそかに期待している。おだてに乗りやすくそそっかしい面も。情報や噂を鵜呑みにしがちな点は注意が必要。","恋愛":"情熱的で嫉妬心が強いが、表向きは紳士的・淑女的に振る舞う。親しくなるにつれ感情をストレートに出すようになる。自分にないものを持つ相手に惹かれやすい。熱しやすく冷めやすく、誘惑にも弱い。マンネリを嫌い、常に新鮮さを求める。苦境になると踏ん張りが利かなくなることも。","弱点":"気持ちが萎えやすいのが最大の課題。継続する力と初心を忘れない姿勢が必要。ルーティンを地道にこなせるようになれば、本来の力が発揮される。"},"大森木":{"読み":"だいしんぼく","干支":["戊辰","己巳"],"性格":"いくつになっても若さと活気を失わない、永遠の少年少女。やんちゃで反骨心が強く、社会の理不尽さを人一倍敏感に感じ取る。どんな経験も無駄にせず自分なりに吸収して表現する力があり、劣等感さえも成長の糧に変えてしまう。大胆さと繊細さ、寛大さと小心さという相反する面を同時に持ち合わせ、優れたバランス感覚と工夫する力で時間をかけて大きく成功する大器晩成型。","人間関係":"あらゆる人から刺激を受け、幅広い交流を持つ。ストレートな物言いで場を沸かせることもあるが、逆に指摘されると深くダメージを受ける。気を張り続けるため人付き合いでのストレスは溜まりやすいが、気心の知れた相手には思い切り甘え、感情をぶつけることができる。褒められると一気にやる気が高まるタイプ。","恋愛":"寂しがり屋で甘えん坊。尽くされたりプレゼントされると無邪気に喜ぶが、理想は高い。頭の中で恋のシナリオを勝手に描いて結論を出してしまう傾向がある。同じ視点で物事を見てくれる相手を好み、基本的にアプローチを待つ側。ただし恋のライバルが現れると途端に闘争心に火がつき積極的になる。束縛は苦手で、気持ちが冷めると手のひらを返したように冷たくなることも。","弱点":"焦りが最大の敵。順を追って着実に積み上げることが大切で、急いで結果を求めると本来の力が出ない。じっくり培っていけば必ず大成する。"},"路傍土":{"読み":"ろぼうど","干支":["庚午","辛未"],"性格":"真面目で地道、意思が強く一徹。責任感と使命感が人一倍強く、引き受けたことは必ずやり遂げる。融通は利かないが、その誠実さが信頼につながる。迷い始めるととことん迷うが、その分納得のいく結論を出す。資格や表彰など公的な評価で自信を深めるタイプ。切磋琢磨しながら着実に成長する大器晩成型。","人間関係":"とっつきにくい印象を与えがちで、打ち解けるまでに時間がかかる。マイペースで臨機応変な対応は苦手だが、一度信頼関係ができると誠意を尽くして動く。お世辞は言えず誤解されることもあるが、その責任感の強さが引き立てにつながる。おだてを見抜いて安易に乗らない堅実さも持ち合わせている。","恋愛":"突然のアタックには乗りにくく、相手を好きになるまでに時間がかかる。恋の駆け引きは不得意で、身近にいる相手に自然と惹かれていくタイプ。基本は受け身だが、ここぞという場面では正攻法で告白する。記念日を大切にし、一人の相手を思い続ける一途な恋愛スタイル。","弱点":"頑固になりすぎることが最大の課題。状況に応じて柔軟に対応する姿勢を身につけることが大切。見方を変え発想を転換できれば、大きな成功をつかめる。"},"剣鋒金":{"読み":"けんぼうきん","干支":["壬申","癸酉"],"性格":"鋭い閃きとシャープな感性に恵まれた、非凡な才能の持ち主。芸術家的な気質と強い正義感を持ち、改革者として力を発揮する。立ち振る舞いに無駄がなく鮮やかで、独自の美的哲学を内に持つ。表面はおおらかに見えるが、内心は自分の尺度で物事を判断する。発想の転換が得意で、その価値が認められて大きく成長していく人。","人間関係":"存在するだけで場の空気が変わる、静かな存在感の持ち主。普段は穏やかで無駄に攻撃しないが、必要なときはズバリと指摘し、一切ひるまない。正面から挑んでくる相手には真っ向からぶつかる。人に慕われ仰ぎ見られることが多い一方、感情に流されないクールな付き合いが得意。同志を大切にし、テンポの遅い相手にはいらつく面もある。","恋愛":"注目を集めやすくモテる存在。ドラマチックな恋愛を好み、一目惚れしやすくフィーリングを重視する。本音はなかなか見せず、察してくれる相手を求める。恋のピンチには弱く、面倒になると自分から距離を置く。自分のペースを崩さず、失恋しても立ち直りが早い。","弱点":"内に潜む短気な一面が課題。温かみのある表現と穏やかな気持ちを心がけることで、内外ともに丸くなれれば大きな成功をつかめる。"},"山頭火":{"読み":"さんとうか","干支":["甲戌","乙亥"],"性格":"ひときわ目立つ異色の存在。理想が高く、大きな目標を掲げる野心家。人と違う一面をアピールして差別化を図り、人知れず努力を重ねる。その裏には高いプライドが見え隠れする。感情の起伏が激しく怒りを爆発させることもあるが、孤独を愛するナルシストでもある。周囲からの支持を得ることで、本来の活躍の場が大きく広がっていく人。","人間関係":"カリスマ的な存在感を放ち、特別扱いされることを望む。近寄りがたい印象を与えることも多く、命令されることやこき使われるのを嫌う。相手を批判して理想論を語る一方、自分への批判はいつまでも忘れない。発言が周囲を唖然とさせることもあるが、いざという場面では頼られて担ぎ出されることが多い。","恋愛":"恋人への理想をはっきりと持っている。恋心を隠そうとするわりに周囲には気づかれやすく、自分からアプローチするのは苦手。恋が成就すると途端に冷静に相手を見始め、わがままを押しつける面も出てくる。恋が終わりに近づくと逆に情熱的になり、失恋からの立ち直りには時間がかかる。","弱点":"高すぎるプライドが壁になりやすい。時に折れる姿勢と、相手を受け入れる広い心が必要。実行力が伴えば人の上に立てる器を持っている。"},"澗下水":{"読み":"かんげすい","干支":["丙子","丁丑"],"性格":"実力本位の努力家で、自分のペースを貫きストイックに突き進む。器用さには欠けるが、ものをまとめ束ねる才能と抜群の記憶力を持つ。気性は激しくパワーにあふれるが、セルフコントロールは苦手。内面には保護されたい気持ちが潜んでいて、満たされない孤独感を抱えやすい。自分を神秘のベールで包むのが得意で、時流に乗ることで大きく伸びていく人。","人間関係":"叱咤激励が得意なボス的存在で、年下から慕われることが多い。対立を恐れずどんな相手にも向かっていく一方、同志は快く迎え入れる。年功序列より実力を重視し、自分のペースに人を巻き込みがち。強い姿勢を崩さず、親しくなるほど辛辣な態度や感情をぶつけることがある。言葉では語り尽くせない深い心の触れ合いを求めている。","恋愛":"フィーリングで恋をするミステリアスな存在。同じ方向を見つめる相手に惹かれ、自分から好きにならないと恋が始まらない。愛する人をわざと攻撃する言動をとることもあり、愛情表現の加減がつかめずうろたえることも。尽くすことで愛を示すタイプで、遊びと本気の間で揺れやすく、恋が終わってから自分の気持ちに気づくことも多い。","弱点":"何事も強く多く大きくすれば良いわけではない。相手の立場に立って行動する姿勢と、適度な加減を身につけることが課題。賛同者を増やすことが成功への近道。"},"城頭土":{"読み":"じょうとうど","干支":["戊寅","己卯"],"性格":"向上心が旺盛で負けず嫌い、権力志向が強く強さを証明したがる。特別扱いされることを望み、情に流されず物事を割り切る姿勢を持つ。メリットよりデメリットを先に考える慎重さがあり、人から影響されることを内心恐れている。人より抜きんでて脚光を浴びる可能性が高く、特技を磨くことで活躍していく人。","人間関係":"好き嫌いが激しく、敵か味方かをはっきり区別する。人に頭を下げたりお世辞を言うのは苦手で、人の上に立ちたがる。信頼できる相手には心を開くが、自尊心を傷つけられると容赦なく関係を断つ。ルールやモラルはきちんと守り、人情より理性で対応する。","恋愛":"理想が極めて高く、紹介による出会いを好む。恋のメリット・デメリットを計算しがちで、自分からアプローチするより相手から純粋に慕われる方が心を動かされる。露骨な愛情表現には拒否反応が出やすく、理性的でスマートな付き合いを望む。愛するより愛されたいタイプで、愛する相手の前では相当なわがままを発揮する。","弱点":"うぬぼれが最大の課題。能ある鷹は爪を隠すという姿勢と、腰を低くする謙虚さが必要。外見だけでなく内面も磨くことで、真の一流になれる人。"},"白鑞金":{"読み":"はくろうきん","干支":["庚辰","辛巳"],"性格":"素直で従順、心優しく気配り上手。情に厚く義理堅く、常に謙虚な姿勢を保つ。どんな環境にも自然と馴染んで場の華になれる一方、押しの強さには欠け、状況を考えすぎて行動が鈍ることも。ただし白羽の矢が立てば期待以上の力を発揮する。ふたつの才能を兼ね備えた、個性で飛躍していく人。","人間関係":"誰に対しても親切で争いを避ける平和主義者。人当たりが良く礼儀正しく、臨機応変に立ち回る。相手の良さを見抜いて助けることが多く、人に引き立てられて伸びていくタイプ。人の影響を受けやすい面もある。","恋愛":"強引なアプローチに弱く断るのが苦手で、受け身の恋愛になりがち。愛情深く尽くすタイプで、涙や傷ついた心に弱い。その場のムードに流されやすく、相手を包み込もうとする。深く結ばれることを望み、恋が終わっても長く引きずる。","弱点":"本質を見失いやすいのが課題。自分らしくあり続けること、自分の良さに気づくことが大切。持ち味を活かして個性を打ち出せれば成功をつかめる人。"},"楊柳木":{"読み":"ようりゅうぼく","干支":["壬午","癸未"],"性格":"好奇心旺盛で新しいことを常に吸収しようとする情報感度の高い人。強引さを避けて調和を大切にするが、流れに身を任せすぎて周囲の勢いに流されやすい。評価や評判を気にする過剰な自意識がある一方、それが優雅な立ち振る舞いを生み出してもいる。ストレスは溜まりやすいが、褒められ賛美されることで大きく伸びていく人。","人間関係":"物腰が柔らかく誰とでも仲良くなれる社交家。そつなく対応して上手にかわし、好印象を与えることに長けている。「柳に風」で聞き流し従うポーズを取り、年上からの受けが良い。攻撃されると身を引いて距離を置く。信頼されることを望み、パイプ役になることが多い。","恋愛":"ムードに弱く誘いに乗りやすい。会う機会や会話が減ると不安になり、自分から別れを切り出すのが苦手で曖昧な関係が続きやすい。嫌われたくない気持ちから自分を押し出せず、二つの恋の間で揺れることもある。マンネリを嫌い、常に新鮮な関係を求める。愛されたいタイプ。","弱点":"意思の弱さが最大の課題。ここぞという場面ではっきり自分の意見を伝えること、優柔不断を手放すことが大切。自分の意見を打ち出すことで大きく飛躍できる人。"},"泉中水":{"読み":"せんちゅうすい","干支":["甲申","乙酉"],"性格":"澄んだ心と豊かな感性を持ち、直感的な判断力とセンスに優れる。表裏がなく無邪気で無欲、温厚で奉仕精神が旺盛。物質への関心は低く、根底には感謝されたい気持ちがある。おだてられると調子に乗りやすい面も。人から才能を見出されることが多く、一つのことに邁進すれば貴重な存在として大きく羽ばたける人。","人間関係":"人脈づくりが上手で、人の気持ちを癒し和ませることが得意。情と絆を大切にし、本音で語ろうとするため、時に誤解を受けることも。人の言葉を真に受けて利用されやすく、泣きつかれると放っておけない。仲裁役になることが多く、根に持たない大らかさがある。","恋愛":"純愛型で相手を深く理解しようとする。社会的な条件より心の絆を重視し、愛する相手には精魂込めて尽くす。相手の心の変化を素早く見抜き、素直に謝られると何でも許す。同情から恋が生まれやすく、失恋しても立ち直りが早い。過去にこだわらないタイプ。","弱点":"人の良さが裏目に出やすい。受け入れて与えるだけが愛情ではなく、時に厳しく突き放す姿勢も必要。その瞬間に何が必要かを考え行動できれば、大きく伸びる人。"},"屋上土":{"読み":"おくじょうど","干支":["丙戌","丁亥"],"性格":"知的好奇心が強く物事を理性的に捉える理知的な人。感情を露骨に出さず、凝り性で自分の物差しで判断する。常にトップを目指し、人前では悠然と構えてあくせくした面を見せない。体裁を整えたい気持ちが内面に潜んでいるが、根は真面目で陰の努力を惜しまない。ブランドやネームバリューを大切にし、周囲に大きな影響を与え物事の流れさえ変える人。","人間関係":"ブラックユーモアに富んだ相当な皮肉屋。余裕のポーズを見せたがり、形式にこだわる。適正な距離を保ちながら広く浅く付き合い、信用するまでに時間がかかる。弱みを見せず、人に頼られると煩わしさを感じる。自分の非は認めずその場を取り繕うが、いざとなると冷淡な判断を下す合理主義者。","恋愛":"好みはうるさく遊びと本気を使い分ける。グループ交際から恋に発展させるのが得意で、知的な相手に惹かれる。相手の心を見抜くのが上手く、恋のプロセスを客観的に楽しむ。愛されたい気持ちは強いが、べたべたした付き合いは好まない。スマートな恋を望み後腐れなく付き合おうとする。","弱点":"何でも理性で片付けようとするのが課題。時には情熱を前面に出す積極的な姿勢が必要。自分の心の声に気づいて人間味を打ち出せれば成功をつかめる。"},"霹靂火":{"読み":"へきれきか","干支":["戊子","己丑"],"性格":"抜群の瞬発力と集中力を持ち、度胸があって恐れを知らず勇敢に立ち向かう。閃きに優れ一発勝負を好む自信家で、気迫に満ちた大物タイプ。目立つことへの意欲が強く、情熱的な面と冷静な面を併せ持つ。内面は感情の起伏が激しくわがままな一面も。正義感が強く曲がったことが許せない頑固さがある。圧倒的なパワーで脚光を浴びるスター性の持ち主。","人間関係":"その場を明るくする存在だが、意見が衝突すると相手の立場を気にせず食ってかかる。押しが強く簡単に妥協しない。普段は温厚でも怒ると怖い、ただし根には持たない。意表をつく発言で周囲を唖然とさせることも。無視されるのが嫌いでちやほやされたがり、親しい人の前では短気な一面が出やすい。","恋愛":"一目惚れから始まる恋が多く、情熱的になるがプライドが邪魔してアプローチできないことも。恋の駆け引きは苦手で、告白はダイレクトに相手にぶつかっていく。邪魔されるほど燃え上がり、嫉妬心が強く不安になると相手を振り回す。わがままをぶつけることで愛情を表現するが、一方的になりがちで喧嘩別れになりやすい。","弱点":"自己中心的な考え方が最大の課題。称賛や喝采に酔わず、独りよがりを慎むことが大切。冷静さを保ち続けられれば、存分に活躍できる人。"},"松柏木":{"読み":"しょうはくぼく","干支":["庚寅","辛卯"],"性格":"努力家で打たれ強く逆境を耐え抜く強さを持つ。節操を守り信じるものに一途で、一面では頑固でマイペース。リスクを避けて安全策を選びながらも、したたかさも持ち合わせる。自己成長への意欲が強く、年齢とともに風格が増していく。技や特技を時間をかけて熟成させ認められる大器晩成型。","人間関係":"打ち解けるまでに時間がかかり、立ち回りが得意でないため周囲から浮きやすい。持論を曲げずに我が道を行き、好き嫌いがはっきりしている。口うるさい面もあるが、誰に対しても同じスタンスで接する公平さがある。内面では尊敬され慕われることを望んでおり、家族や親子の絆を大切にする。","恋愛":"恋をすると一途で、時間をかけて愛を育てる。モラルを大切にし相手を包み込む度量を持つ。ドラマチックな展開を夢見るが現実はワンパターンになりがち。恋のピンチも自力で乗り越える自信があり、浮気はできないし許せないタイプ。自分に合わせてくれる相手を望む。","弱点":"強すぎる信念が視野を狭めることがある。方向性に誤りがないか常に確認する姿勢が大切。狭量さを手放して正しい信念を持てれば、根を広げて大成できる人。"},"長流水":{"読み":"ちょうりゅうすい","干支":["壬辰","癸巳"],"性格":"度量が大きく着眼点に優れ、物事を多角的に捉える。研究熱心で熟考するが、内面では相反する考えが交錯して葛藤しやすい。気性は激しく完璧を目指す深い内省力を持ち、独自の世界観と野心を持つ。慌ただしさが性に合い手を止めることを好まない。時流に乗れば多くの人に影響を与えて活躍できる人。","人間関係":"一見気難しい印象を与えがちだが、親しくなると人間的な魅力が溢れ出す。相手の長所と欠点を鋭く見抜き、人をまとめる才能に恵まれている。自分の意見を押し通す強さがある一方、うまくいかないと周囲に八つ当たりすることも。おおらかさと繊細さを両方持ち合わせている。","恋愛":"相当なロマンチストで、恋をすると相手にのめり込む。しかし恋心とは裏腹に無関心を装うことが多く、わざと捨て台詞を吐いて恋の芽を自ら摘んでしまうことも。自分からアプローチするのは苦手だが、愛する相手とは酸いも甘いも共にできる。愛情が深く絆を大切にするが、失恋からの立ち直りには時間がかかる。","弱点":"感情が激発しやすいのが最大の課題。楽観的に物事を捉える姿勢と気分転換の工夫が必要。穏やかな心を保ち続けられれば大きく羽ばたける人。"},"沙中金":{"読み":"さちゅうきん","干支":["甲午","乙未"],"性格":"何でも器用にこなすが、順応性にはやや欠ける。独創的で人と違うやり方を好み、豊かな才能を内に秘めている。冷めた目で物事を見るナイーブな一面があり、内心には競争心と猜疑心が宿る。後押しされると見事にやり遂げる力があり、人に見出されることで世界が広がり大きく伸びていく人。","人間関係":"人に頭を下げるのが苦手で、相手が自分の真意に気づくのを待つタイプ。深く理解してくれる人を求めるが、対立すると一人で思い悩む。急に内気になったり過剰な期待を寄せすぎることも。孤独感を抱きやすいが、特別扱いされると喜ぶ。人との出会いが人生を一変させることが多い。","恋愛":"恋をすると詩人になるほどのロマンチスト。華やかな恋をひそかに望むが、自分からはっきり告白しない。ただし気持ちを隠しきれず表情に出やすく、プレゼントなど態度で気持ちをアピールする。恋敵がいると情熱が燃え上がり、察しの良い相手を好む。愛する相手を束縛しがちで、失恋からの立ち直りには時間がかかる。","弱点":"猜疑心が最大の課題。禍福は表裏一体と捉えてプラス思考を大切にすること。積極的に物事に向かえば才能が見出される人。"},"山下火":{"読み":"さんげか","干支":["丙申","丁酉"],"性格":"物腰は穏やかで落ち着いているが、内に秘めたパワーは人一倍で相当な自信家。向上心と志が高く、本心を見せたがらないシャイな面がある。いったん怒り出すと止まらず、白黒はっきりつけたがる。好きなことには寝食を忘れて没頭し、活躍の場を見つければ広く影響を与える存在になれる人。","人間関係":"心優しくそつなく対応し、面倒見が良くて熱心。対立を恐れず売られた喧嘩は買う。意思のはっきりしない人にいらつき、親しい人の前では短気になりやすい。自分の気持ちを話したがらないため誤解されることも多く、思いつきで動くように見られやすい。","恋愛":"ドラマチックな恋を求め、恋をするとポーカーフェイスを保とうとするが心底では情熱に燃えている。なかなか気持ちを打ち明けないが、ある日突然熱烈なアプローチを開始する。一方的に思いをぶつける強引さがあり、恋の決着を早めにつけたがる。愛する相手にはわがままを出し、マンネリを嫌う。失恋しても立ち直りは早い。","弱点":"入り乱れる心が最大の課題。目標を一つに絞ってパワーを集中させる姿勢が大切。一点集中主義を守り精魂を込めれば大成できる人。"},"平地木":{"読み":"へいちぼく","干支":["戊戌","己亥"],"性格":"上品で気位が高く、常識的で規律を守り紳士的・淑女的に振る舞う。純粋でまっすぐな性格で快適な環境を求め、独特の美意識と完璧さへのこだわりを持つ。人目を気にして体裁を整えようとするが、内心ではワイルドさやナチュラルさへの強い憧れがある。与えられた環境の中で自分を活かしきれば、多くの人に仰ぎ見られる存在になれる人。","人間関係":"人と接する時は常に気を張って緊張するが、引き受けたことは完璧にこなして信頼される。人の欠点に目が行きやすくわざと意地を張ることもあるが、スマートな付き合いを心がける。弱みを見せず取り乱すことは少ないが、親しい人の前ではくつろいで脆さを見せる。","恋愛":"恋のムードに弱く恋に恋しやすい。絵になるカップルを目指し、理性的に順序立てて恋を進める。相手を振り回すことが多く、愛する人の前では子供のように甘えたりすねたりする。愛する以上に愛されたいタイプで、失恋すると悲劇のヒーロー・ヒロインとなり恋を美化する。","弱点":"高すぎる美意識が課題。緊張感を解いて、完璧でない部分も自分の魅力と認めることが大切。人間性を高めることでさらに成長できる人。"},"壁上土":{"読み":"へきじょうど","干支":["庚子","辛丑"],"性格":"粘り強く地道で実直、不屈の精神を持ち少々のことではへこたれない。責任感が強く守りに徹するポイントを押さえた行動をする。自分のパワーを信じて計画通りに物事を進め、時間をかけて学び取る現実主義者。自分を犠牲にしすぎることもあるが、方向さえ見誤らなければ人に尽くして社会に貢献できる人。","人間関係":"自分の役割に忠実で黙々とこなす。立場をはっきりさせたがり、情に厚く義理堅い。慕われるととことん面倒を見て守ろうとする。言葉が不足しがちで面白みに欠けることもあるが、外見より内容を重視する。人見知りしやすく自分のテリトリーを大切にする。","恋愛":"愛情深く包容力にあふれ、二人だけの時間と絆を大切にする。自分から愛したいタイプで、言葉より態度で愛情を表現する。好きになると粘り強くあきらめない。曖昧な関係は苦手で、愛する相手にはしつこくなりがち。恋の終わりはきっちりけじめをつけたがる。","弱点":"強すぎる責任感が課題。抱え込みすぎる弊害に気づき、気持ちにゆとりを持つことが大切。自分のキャパシティを知ることで伸びていける人。"},"金箔金":{"読み":"きんぱくきん","干支":["壬寅","癸卯"],"性格":"優雅でおしゃれ、美観を大切にする。人との出会いで運が開ける人で、ロマンを持ち続ける。自己主張は苦手で縁の下の力持ちに徹しがち。周囲に気を配って物事を抱え込みやすく、内面には不安な気持ちが渦巻いている。パワーを秘めているが自分の長所に気づかないことも多い。心身を鍛えることで重要な役割を担える人。","人間関係":"人付き合いが良く社交性に富み、どんなジャンルの人とも仲良くなれる。友好的な雰囲気を作るのが上手で、相手の良さを引き出して引き立てる役に回ることが多い。おだて上手でほめ上手。聞く耳を持ち人の意見に従う。どこにいても重宝がられるが、強引な相手には心を乱されて傷つきやすい。","恋愛":"恋のムードを大切にしてフィーリングで恋をする。思わせぶりな態度に出やすく恋の噂が先行しやすい。愛情表現は得意で、愛する相手を喜ばせようと一途に尽くす。相手のライフスタイルに合わせようとするが、恋のピンチになるとしだいに身を引いていく。","弱点":"度が過ぎる優しさが課題。気配りも過剰になると双方のためにならない。シビアな判断を持って対処できれば成功をつかめる人。"},"覆燈火":{"読み":"ふくとうか","干支":["甲辰","乙巳"],"性格":"周囲を明るくさせる人で、一芸に秀でている。目先のことにこだわりやすく大局を見落としがちだが、あやふやなことには手を出さず確信を持てば一直線に突き進む。得意不得意がはっきりしており、用心深さが行動の裏にある。特技を磨いてその分野でトップに上り詰める人。","人間関係":"人に安らぎを与え、面倒見が良く親切で自然と人を引き付ける。行きつけの場所を作るのが得意で家族思い。初対面では人見知りしやすく、人の気持ちを分析して把握したがる。自分の意見ははっきり言うが口論は避けたいタイプ。","恋愛":"恋には慎重で、手応えを感じてから動く。周囲に焚き付けられてその気になることもある。ひとたび行動を起こすと大胆にストレートにアタックし、一途に燃焼する。愛する相手の面倒をよく見るがやや押しつけがましい面も。恋心が冷め始めると急速に気持ちが冷え、失恋後の立ち直りは早い。","弱点":"野心のなさが課題。ハングリー精神を持ち、失敗を恐れずに羽ばたく意欲を持てば頭角を現せる人。"},"天河水":{"読み":"てんがすい","干支":["丙午","丁未"],"性格":"自分の気持ちに忠実で嘘がつけない。気まぐれで自分のペースで行動したがるが、個性を打ち出すのが上手な自信家。感情が豊かで同情深く、内面には激しい気性が潜む。器用で多才、実力に富んで疲れを見せない。周囲の期待に応えて成長すれば、多くの人に影響を与える存在になれる人。","人間関係":"人に希望を与え、信頼と期待を集める存在。親しい人にはルーズな面を見せることもあるが、多くの人に愛されるキャラクター。どこにいても目立つ。頼まれるとノーと言えずに尽力し、感謝されることを望む。状況判断に優れて人の心を見抜き、アドバイスが上手。","恋愛":"一目惚れする傾向があり深く愛したい一方で移り気な面も。情にほだされやすく、自分で思う以上にモテる。愛する相手の前ではわがままになりがちで相手を振り回しやすい。失恋すると落ち込みが激しい。","弱点":"気まぐれさとルーズさが課題。どれほど褒められても図に乗らず、真摯な姿勢を貫けば多くの人から仰ぎ見られる存在になれる人。"},"大駅土":{"読み":"たいえきど","干支":["戊申","己酉"],"性格":"知的好奇心が旺盛で上昇志向が高く、情報に敏感で先を読むのが得意。多芸多能で物怖じせず、自由を好んで合理的に物事を解釈する。ルールやモラルを大切にし、できるできないをはっきりさせたがる。内面には寂しがり屋な面もある。人を引きつける力が増すほど強いカリスマ性を発揮する人。","人間関係":"ソフトでスマートな付き合いを好み、理性的な対応を心がける。内面は意外にクールで、交友関係が広く誰とでも仲良くなれる。人を引きつけて中心的存在になることが多い一方、誘惑や悪友も近づきやすい。謙遜上手でおだても得意だが、羨望される反面、敵も多い。","恋愛":"シビアな目で恋を捉え、本気と遊びのけじめをつける。人を魅了してモテるが、相手の内面を見ようとする。純粋に愛されると弱い。恋をすると積極的にアプローチし、自分から離れていくことが多い。マンネリを嫌いフレッシュな関係を求める。","弱点":"旺盛すぎる上昇志向が課題。甘い言葉に惑わされず誘惑に負けないことが大切。方向さえ間違えなければ必ず成功できる人。"},"釵釧金":{"読み":"さいせんきん","干支":["庚戌","辛亥"],"性格":"華やかなムードを持ち場を明るくする、華やかな場所が似合う人。女性的な優しさと快楽志向があり、ステイタスを求める傾向が強い。情報収集に長けていて、表面は優しいが内面は意外にクール。物事を割り切って形式にこだわる。系統立てて学べば人の上に立てる人。","人間関係":"争いを好まず和を大切にし、場をまとめて仕切るのが得意。頂点に立つことが好きで、精神面より形式的な手順を重視しやすい。心と態度が裏腹になって片意地を張ることも多い。一流の人と交流を深めたがり、礼儀正しくて年上からの受けが良い。","恋愛":"おしゃれで楽しいムードの中から恋が生まれやすい。現実的に恋を捉え、リスクのある恋は最初からパスする。好みはうるさく相手の将来性・財力・立場を重視し、理知的な相手を求める。恋をすると自分からアプローチするが恋のピンチには弱い。恋の終わりは新たな恋の始まりになりやすい。","弱点":"形式へのこだわりが課題。例外を認めて相手を理解する姿勢を持つことが大切。心と気持ちのつながりを大切にすれば大きく活躍できる人。"},"桑柘木":{"読み":"そうしゃぼく","干支":["壬子","癸丑"],"性格":"多くの人に夢を与える存在。現実的に物事を捉えて行動に無駄がなく、しっかりとしたポリシーを持つ。内面は打たれ強く忍耐力に優れ、多くの才能をじっくりと磨いていく。スロースターターで思いつきで動くと失敗しやすいが、時間をかけるほど大物へと成長する大器晩成型。","人間関係":"人見知りしやすく打ち解けるまでに時間がかかるが、心を許した相手には面倒見が良い。説明不足で誤解されやすく、来るものは拒まず去るものは追わないスタンスを持つ。媚びず人に合わせるのは苦手だが、間接的に人を育てていく力がある。","恋愛":"恋の始まりになかなか気づかないタイプ。恋をすると自分の良さをアピールしながら、相手からのアプローチを密かに望む。深い結びつきを求めてまめに尽くすが、恋が実っても長続きしないことも。熱心に口説かれるとなびき、なかなか踏ん切りがつかずよりが戻ることもある。","弱点":"言葉不足に陥りやすいのが課題。意思の疎通は会話してこそ図れるもので、コミュニケーションを軽視すると落とし穴にはまる。誤解されずに成長し続ければ成功が約束されている人。"},"大渓水":{"読み":"たいけいすい","干支":["甲寅","乙卯"],"性格":"純粋で心優しく、自由を求めて活発に行動する。向上心が旺盛でライバル意識が強く、状況把握が得意。無理強いせず機が熟すのを待つが、内心では考えが錯綜して迷いが多い。親しい人に対しては感情の起伏が激しい。時間をかけて実力をつけ頭角を現す、大器晩成型。","人間関係":"表面上は相手に合わせながら、最終的には自分の方向に話を進めるのが得意。表立ってもめることは少なく、年下や弱者には親切。ただし親切心が競争心に変わりやすい。裏切られると激怒して仕返しを考え、突然横柄な態度に出て敵を作ることも。賛同者を増やすのが上手。","恋愛":"ダメージを恐れて恋には引っ込み思案。付き合う前に相手をよく観察してデータを集める。誠心誠意尽くされると弱く、自分に合わせてくれる相手を望む。本気で人を好きになることは少なく、束縛を嫌う。失恋しても立ち直りは意外と早い。","弱点":"波打つ感情が最大の課題。感情の落差は不信感を招きやすいため、コントロールする姿勢が必要。自分自身を鍛えていけば大成できる人。"},"沙中土":{"読み":"さちゅうど","干支":["丙辰","丁巳"],"性格":"スケールが大きく後腐れのないさっぱりした気性の持ち主。純粋な目で物事を捉え、負けん気が強くわざと強がって見せることが多い。裏側には孤独な気持ちと劣等感が潜んでいる。力強いものへの憧れを持ち、物怖じせず自分らしさをアピールする。粘りにはやや欠けるが、一つのことに打ち込んで大成できる人。","人間関係":"多面的な魅力にあふれ人の心を癒す存在。人前では弱さを見せない外剛内柔型だが、敵には容赦なく立ち向かう。自分自身がエンターテイナーで、面倒見は良いが人を育てるタイプではない。一線を画して付き合うことが多く、親しい人の前ではわがままになりやすい。","恋愛":"恋のパーフェクトさを求めて急発進はしない。相手の前で本音を切り出せず、態度で意思表示する。優しくされるとリアクションに戸惑い、情に溺れない。愛する相手には愛するがゆえに手厳しく、不安を感じると冷たい態度で反応をうかがう。恋のピンチには弱いが、失恋後の立ち直りは早い。","弱点":"劣等感が最大の課題。強さも弱さも自分の一部と受け入れ、隠さないことが大切。すべてをさらけ出すことで成功をつかめる人。"},"天上火":{"読み":"てんじょうか","干支":["戊午","己未"],"性格":"行動力と実行力を兼ね備えた熱血漢。一つのことに熱を上げ、どんな時も堂々と意見を述べて確信を持って行動する。頭の回転が速く先を見通し、ルールを守ろうとする。内面は寂しがり屋で、元気でパワフルな面を見せたがる。自分がしなければという意識が強く、おごらなければ多くの人に尊敬される人。","人間関係":"天下無敵の存在感でひときわ目立ち、中心的な役割を果たす。親分肌で親身に面倒を見るが、自分が良いと思うことを人に強制しがち。強引さが反感を買うこともある。親しい人の前では横柄になりやすく、尊敬できる人とできない人をはっきり区別する。影響力が強い。","恋愛":"華やかでドラマチックな出会いを望む。恋をすると相手の気持ちを読んでから行動し、オープンな交際を心がける。一方的なサービス精神を発揮しがちで、自分のペースで相手を振り回すことも。恋心が失せると相手を冷たくあしらい、失恋すると悲劇の主人公と化す。","弱点":"おごる心が最大の課題。自信とおごりは紙一重で、身勝手な振る舞いを慎む姿勢が必要。自分の力を信じながら謙虚でいられれば、人の上に立って活躍できる人。"},"石榴木":{"読み":"せきりゅうぼく","干支":["庚申","辛酉"],"性格":"純朴で誠実、好みがはっきりしている。思い込みが激しく決めつけることが多いが、弱音をはかない。その裏にはダメージを受けたくない気持ちが潜んでいる。自信のある分野では積極的に行動し、人知れず技を磨く努力家。実力を蓄えて花開く大器晩成型。","人間関係":"初対面ではとっつきにくい印象を与えやすく、好き嫌いが激しい。年功序列にこだわりすぎて実力のない年上を軽視しがち。馬が合う人との交流を求め、合わない人は避けようとする。人前では弱みを見せず、心安らぐ人にだけ素顔を見せてわがままになる。一人の時間を好む。","恋愛":"恋愛の先に結婚を見据えるタイプ。自分の恋心になかなか気づかず、アプローチをためらう。ポーカーフェイスを装いながら密かに情熱を燃やし、相手の気持ちを探ったうえで突然情熱的に動く。心の結びつきを求めて信頼関係を築こうとする。シークレットな交際や復活愛もあり得る人。","弱点":"警戒心が最大の課題。オープンマインドを心がけて人と協力し合うことで成長できると気づくことが大切。良き理解者と相談者に恵まれれば成功していく人。"},"大海水":{"読み":"たいかいすい","干支":["壬戌","癸亥"],"性格":"感情豊かで直観力に優れ、同情深く涙もろい。人情家で心優しくお人好し。太っ腹でたいていのことは寛大に対応するが、一面ルーズな面も。いったん怒ると一時的に意地を張る。子供っぽい面と大人らしい面を持ち合わせ、調子の良い時と悪い時の差が激しい。人や社会のために貢献することで成功をつかむ人。","人間関係":"人なつっこく多面的な魅力を持ち、どんなジャンルの人とも付き合える。縁を大切にして心のつながりを求め、相手の能力を引き出す。悩みを打ち明けられて人の心を癒す場面が多い。状況に流されやすいが、世渡り上手で人付き合いの遊泳術を心得ている。","恋愛":"恋のムードやシチュエーションにこだわる。照れ屋で最初の一歩がなかなか踏み出せず、言い寄られると弱い。相手の全てを愛して全てを許そうとし、愛する相手のために全力で行動する。愛の証と記念日を大切にするが、別れを切り出すのが苦手で失恋すると相当落ち込む。","弱点":"情に流されやすいのが最大の課題。情だけに縛られると前に進めない。割り切るべき時は割り切る姿勢と、感情と理性の両面から判断する力を身につければ大きく飛躍できる人。"}};
 const NAYIN_MAP={'甲子':'海中金','乙丑':'海中金','丙寅':'炉中火','丁卯':'炉中火','戊辰':'大森木','己巳':'大森木','庚午':'路傍土','辛未':'路傍土','壬申':'剣鋒金','癸酉':'剣鋒金','甲戌':'山頭火','乙亥':'山頭火','丙子':'澗下水','丁丑':'澗下水','戊寅':'城頭土','己卯':'城頭土','庚辰':'白鑞金','辛巳':'白鑞金','壬午':'楊柳木','癸未':'楊柳木','甲申':'泉中水','乙酉':'泉中水','丙戌':'屋上土','丁亥':'屋上土','戊子':'霹靂火','己丑':'霹靂火','庚寅':'松柏木','辛卯':'松柏木','壬辰':'長流水','癸巳':'長流水','甲午':'沙中金','乙未':'沙中金','丙申':'山下火','丁酉':'山下火','戊戌':'平地木','己亥':'平地木','庚子':'壁上土','辛丑':'壁上土','壬寅':'金箔金','癸卯':'金箔金','甲辰':'覆燈火','乙巳':'覆燈火','丙午':'天河水','丁未':'天河水','戊申':'大駅土','己酉':'大駅土','庚戌':'釵釧金','辛亥':'釵釧金','壬子':'桑柘木','癸丑':'桑柘木','甲寅':'大渓水','乙卯':'大渓水','丙辰':'沙中土','丁巳':'沙中土','戊午':'天上火','己未':'天上火','庚申':'石榴木','辛酉':'石榴木','壬戌':'大海水','癸亥':'大海水'};
 function getNayin(ks){return NAYIN_MAP[ks]||'';}
-function getNayinYinYang(ks){const yo=['甲','丙','戊','庚','壬'];return yo.includes(ks[0])?'陽（外向き）':'陰（内向き）';}
+function getNayinYinYang(ks){const yo=['甲','丙','戊','庚','壬'];return yo.includes(ks[0])?'外向き':'内向き';}
 const SATSKAI={'天花人':['戌','亥'],'白花人':['申','酉'],'離花人':['午','未'],'風花人':['辰','巳'],'仙花人':['寅','卯'],'水花人':['子','丑']};
 const JUNI_NAMES=['休眠','残雪','発芽','青葉','開花','内省','成天','狂咲','豊穣','穂分','平凪','引寒'];
 const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
@@ -207,6 +223,19 @@ function getZokan(shi,days){const col=ZOKAN_SHI.indexOf(shi);if(col<0)return '�
 function getJuniUnki(ht,shi){const s=TEISHI[ht];if(s===undefined)return '—';const si=JUNISHI.indexOf(shi);if(si<0)return '—';return JUNI_NAMES[(si-s+12)%12]||'—';}
 function getRokkaJin(y,m,d){const dayKS=getDayKS(y,m,d);const name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)];const nenKS=getYearKS(y,m,d);const num=ROKUJU.indexOf(nenKS)+1;return name+(num%2===1?'＋':'－');}
 
+// 十二運気カラー（index.htmlと同じ）
+function getJuniColor(j){
+  return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';
+}
+function getJuniBg(j){
+  const w=JUNI_WAVE[j]||0;
+  if(w>=4.0) return {bg:'rgba(30,120,60,0.12)',col:getJuniColor(j)};
+  if(w>=2.0) return {bg:'rgba(90,160,120,0.10)',col:getJuniColor(j)};
+  if(w>=-2.0) return {bg:'rgba(180,134,11,0.10)',col:getJuniColor(j)};
+  return {bg:'rgba(40,30,20,0.12)',col:getJuniColor(j)};
+}
+function juniRuby(n){const r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
+
 // 六花人カラー
 const ROKKA_COLORS={
   '天花人':{bg:'#e8f0e4',col:'#2d5a1b',border:'#5a8c3a'},
@@ -220,278 +249,193 @@ function getRokkaColor(ht){return ROKKA_COLORS[ht.replace(/[＋－]/,'')]||{bg:'
 
 // 命式計算
 function calcPerson(y,m,d,gender){
-  const nenKS=getYearKS(y,m,d),nenKan=nenKS[0],nenShi=nenKS[1];
-  const tsuKS=getMonthKS(y,m,d),tsuKan=tsuKS[0],tsuShi=tsuKS[1];
-  const nichiKS=getDayKS(y,m,d),nichiKan=nichiKS[0],nichiShi=nichiKS[1];
-  const nDays=getDaysFromSetsu(y,m,d);
-  const tDays=getDaysFromSetsu(y,m,d);
-  const nZ=getZokan(nenShi,nDays),tZ=getZokan(tsuShi,tDays),niZ=getZokan(nichiShi,0);
-  const ht=getRokkaJin(y,m,d);
-  const htBase=ht.replace(/[＋－]/,'');
-  const nenJu=getJuniUnki(ht,nenShi);
-  const tsuJu=getJuniUnki(ht,tsuShi);
-  const nichiJu=getJuniUnki(ht,nichiShi);
-  const nenN=getNayin(nenKS),tsuN=getNayin(tsuKS),nichiN=getNayin(nichiKS);
-  const nenYY=getNayinYinYang(nenKS),tsuYY=getNayinYinYang(tsuKS),nichiYY=getNayinYinYang(nichiKS);
-  return {y,m,d,gender,ht,htBase,nenKS,tsuKS,nichiKS,nenKan,nenShi,nZ,tsuKan,tsuShi,tZ,nichiKan,nichiShi,niZ,nenJu,tsuJu,nichiJu,nenN,tsuN,nichiN,nenYY,tsuYY,nichiYY};
+  var nenKS=getYearKS(y,m,d),nenShi=nenKS[1];
+  var tsuKS=getMonthKS(y,m,d),tsuShi=tsuKS[1];
+  var nichiKS=getDayKS(y,m,d),nichiShi=nichiKS[1];
+  var nDays=getDaysFromSetsu(y,m,d);
+  var nZ=getZokan(nenShi,nDays),tZ=getZokan(tsuShi,nDays),niZ=getZokan(nichiShi,0);
+  var ht=getRokkaJin(y,m,d);
+  var nenN=getNayin(nenKS),tsuN=getNayin(tsuKS),nichiN=getNayin(nichiKS);
+  var nenYY=getNayinYinYang(nenKS),tsuYY=getNayinYinYang(tsuKS),nichiYY=getNayinYinYang(nichiKS);
+  var nenJu=getJuniUnki(ht,nenShi),tsuJu=getJuniUnki(ht,tsuShi),nichiJu=getJuniUnki(ht,nichiShi);
+  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nZ,tZ,niZ,nenN,tsuN,nichiN,nenYY,tsuYY,nichiYY,nenJu,tsuJu,nichiJu};
 }
 
-// 納音相性コメント取得
 function getNayinCompat(n1,n2){
   if(NAYIN_COMPAT[n1]&&NAYIN_COMPAT[n1][n2]) return NAYIN_COMPAT[n1][n2];
   if(NAYIN_COMPAT[n2]&&NAYIN_COMPAT[n2][n1]) return NAYIN_COMPAT[n2][n1];
-  return '相性データを取得できませんでした。';
+  return '';
 }
 
-// 六花人の相性（相手の支から見た12運気）
-function getRokkaRelation(myHt,theirShi){
-  return getJuniUnki(myHt,theirShi);
-}
-
-// 12運気からスコア（星数用）
-function juniToScore(ju){
-  const w=JUNI_WAVE[ju]||0;
-  if(w>=4.5) return 5;
-  if(w>=3.0) return 4;
-  if(w>=2.0) return 3;
-  if(w>=-2.0) return 2;
-  return 1;
-}
-
-// 全体スコア算出（簡易版：日柱x3+月柱x2+年柱x1+六花人x2）
-function calcOverallScore(p1,p2){
-  const nichiScore = getNayinScore(p1.nichiN,p2.nichiN);
-  const tsuScore = getNayinScore(p1.tsuN,p2.tsuN);
-  const nenScore = getNayinScore(p1.nenN,p2.nenN);
-  const rokka1 = juniToScore(getRokkaRelation(p1.ht,p2.nichiShi));
-  const rokka2 = juniToScore(getRokkaRelation(p2.ht,p1.nichiShi));
-  const rokkaAvg = (rokka1+rokka2)/2;
-  const total = nichiScore*3 + tsuScore*2 + nenScore*1 + rokkaAvg*2;
-  const max = 5*3 + 5*2 + 5*1 + 5*2;
-  return Math.round((total/max)*5*10)/10;
-}
-
-// 納音相性スコア（コメントの先頭から判定）
-function getNayinScore(n1,n2){
-  if(n1===n2) return 4;
-  const c=getNayinCompat(n1,n2);
-  if(/相性は抜群|理解度が高く|気持ちが通じ合う|言葉がなくても|最強コンビ|名コンビ|信頼関係が抜群|絆が深まる|心強い|互いに理解|ベストコンビ/.test(c)) return 5;
-  if(/相性は良好|良好な関係|調和的|気軽に付き合える|楽しく|仲が深まる|打ち解け/.test(c)) return 4;
-  if(/普通|適度な距離|一定の距離|波風|付き合える/.test(c)) return 3;
-  if(/すれ違い|ぶつかり|不信感|気疲れ|振り回|割に合わない/.test(c)) return 2;
-  if(/水と油|手こずる|腹立|苦手|うんざり/.test(c)) return 1;
-  return 3;
-}
-
-// 星HTML
-function starsHTML(score){
-  const full=Math.round(score);
-  let h='';
-  for(let i=1;i<=5;i++) h+=i<=full?'★':'☆';
-  return h;
-}
-
-// 六花人の関係表示
-function rokkaRelHTML(p1,p2){
-  const ju1=getRokkaRelation(p1.ht,p2.nichiShi);
-  const ju2=getRokkaRelation(p2.ht,p1.nichiShi);
-  const w1=JUNI_WAVE[ju1]||0,w2=JUNI_WAVE[ju2]||0;
-  const avg=(w1+w2)/2;
-  const jc1=getJuniColor(ju1),jc2=getJuniColor(ju2);
-  const name1=p1.ht.replace(/[＋－]/,'');
-  const name2=p2.ht.replace(/[＋－]/,'');
-  return '<div class="layer-row">'
-    +'<div class="lr-icon">🌸</div>'
-    +'<div class="lr-body">'
-    +'<div class="lr-label">'+name1+'から見た'+name2+'（'+p2.nichiShi+'）の運気</div>'
-    +'<div class="lr-text"><span class="juni-badge" style="background:'+jc1.bg+';color:'+jc1.col+'">'+ju1+'</span>（波：'+(w1>=0?'+':'')+w1+'）</div>'
-    +'</div></div>'
-    +'<div class="layer-row">'
-    +'<div class="lr-icon">🌸</div>'
-    +'<div class="lr-body">'
-    +'<div class="lr-label">'+name2+'から見た'+name1+'（'+p1.nichiShi+'）の運気</div>'
-    +'<div class="lr-text"><span class="juni-badge" style="background:'+jc2.bg+';color:'+jc2.col+'">'+ju2+'</span>（波：'+(w2>=0?'+':'')+w2+'）</div>'
-    +'</div></div>'
-    +'<div style="font-size:0.78rem;color:#7a6b52;padding:0.4rem 0.5rem;line-height:1.8">'
-    +(avg>=3?'二人の六花人から見た運気の平均は良好です。':'運気の方向性に差があります。互いの状態を理解し合うことが大切です。')
+// プロフィールカード
+function profileCardHTML(p,nameDisp,isFirst){
+  var rc=getRokkaColor(p.ht);
+  var htBase=p.ht.replace(/[＋－]/,'');
+  var label=isFirst?'あなた':'相手';
+  var nb1=getJuniBg(p.nichiJu),nb2=getJuniBg(p.tsuJu),nb3=getJuniBg(p.nenJu);
+  return '<div class="person-card">'
+    +'<div class="pc-label">'+label+'</div>'
+    +'<div class="pc-name">'+nameDisp+'</div>'
+    +'<span class="rokka-badge" style="background:'+rc.bg+';color:'+rc.col+';border:1px solid '+rc.border+'">'+htBase+'</span>'
+    +'<div class="ks-row">'
+    +'年柱：'+p.nenKS+'　月柱：'+p.tsuKS+'　日柱：'+p.nichiKS
+    +'</div>'
+    +'<div class="inochi-badges">'
+    +'<span class="inochi-badge" style="background:'+nb1.bg+';color:'+nb1.col+'">日：<span style="font-weight:700">'+juniRuby(p.nichiJu)+'</span></span>'
+    +'<span class="inochi-badge" style="background:'+nb2.bg+';color:'+nb2.col+'">月：<span style="font-weight:700">'+juniRuby(p.tsuJu)+'</span></span>'
+    +'<span class="inochi-badge" style="background:'+nb3.bg+';color:'+nb3.col+'">年：<span style="font-weight:700">'+juniRuby(p.nenJu)+'</span></span>'
+    +'</div>'
     +'</div>';
 }
 
-function getJuniColor(ju){
-  const w=JUNI_WAVE[ju]||0;
-  if(w>=4.5) return {bg:'#e8f5e8',col:'#1a5c1a'};
-  if(w>=2.0) return {bg:'#e8eef5',col:'#1a3a6b'};
-  if(w>=-2.0) return {bg:'#f5f2e8',col:'#5c4a00'};
-  return {bg:'#f5e8e8',col:'#6b1a1a'};
-}
-
-// 納音表示ブロック
-function nayinCompatHTML(label,n1,n2,yy1,yy2,p1name,p2name){
-  const comment=getNayinCompat(n1,n2);
-  const score=getNayinScore(n1,n2);
-  const kb1=NAYIN_KB[n1]||{};
-  const kb2=NAYIN_KB[n2]||{};
+// 相性レイヤー（表示上は納音名・陰陽を出さない）
+function inochiCompatHTML(pillarLabel,n1,n2,p1name,p2name,icon){
+  var comment=getNayinCompat(n1,n2);
+  var kb1=NAYIN_KB[n1]||{};
+  var kb2=NAYIN_KB[n2]||{};
+  var sameSrc = (n1===n2);
+  var subText = sameSrc
+    ? p1name+'と'+p2name+'は稀な組み合わせ。共通の感性と世界観で深く共鳴し合える間柄です。'
+    : '【'+p1name+'の特性】'+kb1['性格']+'<br>【'+p2name+'の特性】'+kb2['性格'];
   return '<div class="layer-row">'
-    +'<div class="lr-icon">💫</div>'
+    +'<div class="lr-icon">'+icon+'</div>'
     +'<div class="lr-body">'
-    +'<div class="lr-label">'+label+'</div>'
-    +'<div style="margin-bottom:0.4rem">'
-    +'<span class="nayin-badge">'+p1name+'：'+n1+'（'+yy1+'）</span>'
-    +'<span class="nayin-badge">'+p2name+'：'+n2+'（'+yy2+'）</span>'
-    +'</div>'
-    +'<div class="lr-text" style="font-style:italic;color:#4a3c28;margin-bottom:0.4rem">'+comment+'</div>'
-    +(n1!==n2?'<div style="font-size:0.75rem;color:#7a6b52;margin-top:0.3rem">'
-      +'【'+n1+'の特徴】'+kb1['性格']+'</div>'
-      +'<div style="font-size:0.75rem;color:#7a6b52;margin-top:0.3rem">'
-      +'【'+n2+'の特徴】'+kb2['性格']+'</div>'
-      :'<div style="font-size:0.75rem;color:#7a6b52;margin-top:0.3rem">同じ納音同士。共通の世界観と感性を持っています。</div>')
+    +'<div class="lr-label">'+pillarLabel+'</div>'
+    +(comment?'<div class="lr-text">'+comment+'</div>':'')
+    +'<div class="lr-sub">'+subText+'</div>'
     +'</div></div>';
 }
 
-// プロフィールカードHTML
-function profileCardHTML(p,nameDisp,isFirst){
-  const rc=getRokkaColor(p.ht);
-  const htBase=p.ht.replace(/[＋－]/,'');
-  const label=isFirst?'あなた':'相手';
-  return '<div class="person-card">'
-    +'<div class="person-label">'+label+'</div>'
-    +'<div class="person-name">'+nameDisp+'</div>'
-    +'<span class="rokka" style="background:'+rc.bg+';color:'+rc.col+';border:1px solid '+rc.border+'">'+htBase+'</span>'
-    +'<div class="ks-row">'
-    +'年柱：'+p.nenKS+' ／ 月柱：'+p.tsuKS+' ／ 日柱：'+p.nichiKS+'</div>'
-    +'<div style="margin-top:0.4rem">'
-    +'<span class="nayin-badge">日柱：'+p.nichiN+'</span>'
-    +'<span class="nayin-badge">月柱：'+p.tsuN+'</span>'
-    +'<span class="nayin-badge">年柱：'+p.nenN+'</span>'
-    +'</div>'
-    +'</div>';
+// 六花人の関係（年・月・日すべて）
+function rokkaRelHTML(p1,p2,n1,n2){
+  var cols=['年柱','月柱','日柱'];
+  var shis1=[p1.nenShi,p1.tsuShi,p1.nichiShi];
+  var shis2=[p2.nenShi,p2.tsuShi,p2.nichiShi];
+  var icons=['☀️','🌙','🌕'];
+  var htBase1=p1.ht.replace(/[＋－]/,''),htBase2=p2.ht.replace(/[＋－]/,'');
+  var html='';
+  for(var i=0;i<3;i++){
+    var ju1=getJuniUnki(p1.ht,shis2[i]);
+    var ju2=getJuniUnki(p2.ht,shis1[i]);
+    var w1=JUNI_WAVE[ju1]||0,w2=JUNI_WAVE[ju2]||0;
+    var jb1=getJuniBg(ju1),jb2=getJuniBg(ju2);
+    html+='<div class="layer-row">'
+      +'<div class="lr-icon">'+icons[i]+'</div>'
+      +'<div class="lr-body">'
+      +'<div class="lr-label">'+cols[i]+'の関係性</div>'
+      +'<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">'
+      +'<span style="font-size:0.82rem;color:#4a3c28">'+n1+'から見た'+n2+'：</span>'
+      +'<span class="juni-badge" style="background:'+jb1.bg+';color:'+jb1.col+'">'+juniRuby(ju1)+'</span>'
+      +'<span style="font-size:0.78rem;color:#7a6b52">（波：'+(w1>=0?'+':'')+w1+'）</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:0.5rem;flex-wrap:wrap">'
+      +'<span style="font-size:0.82rem;color:#4a3c28">'+n2+'から見た'+n1+'：</span>'
+      +'<span class="juni-badge" style="background:'+jb2.bg+';color:'+jb2.col+'">'+juniRuby(ju2)+'</span>'
+      +'<span style="font-size:0.78rem;color:#7a6b52">（波：'+(w2>=0?'+':'')+w2+'）</span>'
+      +'</div>'
+      +'</div></div>';
+  }
+  return html;
 }
 
-// ===== メイン計算 =====
-var RESULT = null;
+// ===== メイン =====
+var RESULT=null;
+var currentAudio=null;
 
 function calcCompat(){
   var errEl=document.getElementById('inputError');
   errEl.style.display='none';
-
-  var myDateVal=document.getElementById('myDate').value;
-  var theirDateVal=document.getElementById('theirDate').value;
-  if(!myDateVal||!theirDateVal){
+  var myY=+document.getElementById('myY').value;
+  var myM=+document.getElementById('myM').value;
+  var myD=+document.getElementById('myD').value;
+  var theirY=+document.getElementById('theirY').value;
+  var theirM=+document.getElementById('theirM').value;
+  var theirD=+document.getElementById('theirD').value;
+  if(!myY||!myM||!myD||!theirY||!theirM||!theirD){
     errEl.textContent='生年月日を両方入力してください。';
     errEl.style.display='block';
     return;
   }
-
-  var myParts=myDateVal.split('-').map(Number);
-  var theirParts=theirDateVal.split('-').map(Number);
   var myName=document.getElementById('myName').value||'あなた';
   var theirName=document.getElementById('theirName').value||'相手';
   var myGender=document.getElementById('myGender').value;
   var theirGender=document.getElementById('theirGender').value;
   var relation=document.getElementById('relation').value;
-
-  var p1=calcPerson(myParts[0],myParts[1],myParts[2],myGender);
-  var p2=calcPerson(theirParts[0],theirParts[1],theirParts[2],theirGender);
-
+  var p1=calcPerson(myY,myM,myD,myGender);
+  var p2=calcPerson(theirY,theirM,theirD,theirGender);
+  var htBase1=p1.ht.replace(/[＋－]/,''),htBase2=p2.ht.replace(/[＋－]/,'');
   RESULT={p1,p2,myName,theirName,relation};
 
-  // プロフィールカード
+  // プロフィール
   document.getElementById('profileCards').innerHTML=
-    profileCardHTML(p1,myName,true)+
-    profileCardHTML(p2,theirName,false);
+    profileCardHTML(p1,myName,true)+profileCardHTML(p2,theirName,false);
 
-  // 日柱の納音相性
-  document.getElementById('compat-nichi').innerHTML=
-    nayinCompatHTML('日柱（本音・熱中や衝突の時に最も強く出る）',p1.nichiN,p2.nichiN,p1.nichiYY,p2.nichiYY,myName,theirName);
+  // 相性レイヤー
+  var layers='';
+  layers+='<div class="layer-title">🌕 二人の本質的な相性</div>';
+  layers+=inochiCompatHTML('深層で最も強く出る相性',p1.nichiN,p2.nichiN,myName,theirName,'💫');
+  layers+='<div class="layer-title">🌙 日常の相性</div>';
+  layers+=inochiCompatHTML('普段の付き合いで出る相性',p1.tsuN,p2.tsuN,myName,theirName,'🌿');
+  layers+='<div class="layer-title">☀️ 二人の根源にある相性</div>';
+  layers+=inochiCompatHTML('育ちの素地から来る相性',p1.nenN,p2.nenN,myName,theirName,'🌱');
+  layers+='<div class="layer-title">🌸 六花人から見た関係性（運気の方向）</div>';
+  layers+=rokkaRelHTML(p1,p2,htBase1,htBase2);
+  document.getElementById('compat-layers').innerHTML=layers;
 
-  // 月柱の納音相性
-  document.getElementById('compat-tsuki').innerHTML=
-    nayinCompatHTML('月柱（普段の付き合い・社会的な顔）',p1.tsuN,p2.tsuN,p1.tsuYY,p2.tsuYY,myName,theirName);
-
-  // 年柱の納音相性
-  document.getElementById('compat-nen').innerHTML=
-    nayinCompatHTML('年柱（根源的な素地・軽めに出る）',p1.nenN,p2.nenN,p1.nenYY,p2.nenYY,myName,theirName);
-
-  // 六花人の関係
-  document.getElementById('compat-rokka').innerHTML=rokkaRelHTML(p1,p2);
-
-  // AIアドバイスをリセット
-  document.getElementById('aiAnswer').style.display='none';
+  // AI欄リセット（バグ修正：再診断時に完全リセット）
   document.getElementById('aiAnswer').textContent='';
-  document.getElementById('aiAskBtn').style.display='block';
+  document.getElementById('aiAnswer').style.display='none';
   document.getElementById('aiLoading').style.display='none';
+  document.getElementById('aiAskBtn').style.display='block';
+  document.getElementById('speakBtn').style.display='none';
   document.getElementById('aiCountDisp').textContent='';
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
 
-  // 結果表示
   document.getElementById('result').classList.remove('result-hidden');
   document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ===== AI相性鑑定 =====
-var AI_CALLED=false;
-
 function buildCompatPrompt(p1,p2,myName,theirName,relation){
-  var n1=p1.nichiN,n2=p2.nichiN;
-  var kb1=NAYIN_KB[n1]||{};
-  var kb2=NAYIN_KB[n2]||{};
-  var jul1=getRokkaRelation(p1.ht,p2.nichiShi);
-  var jul2=getRokkaRelation(p2.ht,p1.nichiShi);
-  var prompt='【相性診断データ】\n'
-    +'続柄：'+relation+'\n\n'
-    +'【'+myName+'（あなた）の命式】\n'
-    +'六花人：'+p1.ht.replace(/[＋－]/,'')+'\n'
-    +'年柱：'+p1.nenKS+' 月柱：'+p1.tsuKS+' 日柱：'+p1.nichiKS+'\n'
-    +'日柱の納音：'+p1.nichiN+'（'+p1.nichiYY+'）\n'
-    +'月柱の納音：'+p1.tsuN+'（'+p1.tsuYY+'）\n'
-    +'年柱の納音：'+p1.nenN+'（'+p1.nenYY+'）\n\n'
-    +'【'+theirName+'（相手）の命式】\n'
-    +'六花人：'+p2.ht.replace(/[＋－]/,'')+'\n'
-    +'年柱：'+p2.nenKS+' 月柱：'+p2.tsuKS+' 日柱：'+p2.nichiKS+'\n'
-    +'日柱の納音：'+p2.nichiN+'（'+p2.nichiYY+'）\n'
-    +'月柱の納音：'+p2.tsuN+'（'+p2.tsuYY+'）\n'
-    +'年柱の納音：'+p2.nenN+'（'+p2.nenYY+'）\n\n'
-    +'【納音相性コメント（データベース）】\n'
-    +'日柱（最も強く出る）：'+getNayinCompat(p1.nichiN,p2.nichiN)+'\n'
-    +'月柱（普段の付き合い）：'+getNayinCompat(p1.tsuN,p2.tsuN)+'\n'
-    +'年柱（根源的）：'+getNayinCompat(p1.nenN,p2.nenN)+'\n\n'
-    +'【六花人から見た12運気の関係】\n'
-    +p1.ht.replace(/[＋－]/,'')+'から見た'+p2.ht.replace(/[＋－]/,'')+'の運気：'+jul1+'\n'
-    +p2.ht.replace(/[＋－]/,'')+'から見た'+p1.ht.replace(/[＋－]/,'')+'の運気：'+jul2+'\n\n'
-    +'【各納音の性格データ】\n'
-    +myName+'の日柱納音（'+n1+'）の性格：'+(kb1['性格']||'')+'\n'
-    +myName+'の日柱納音（'+n1+'）の弱点：'+(kb1['弱点']||'')+'\n'
-    +theirName+'の日柱納音（'+n2+'）の性格：'+(kb2['性格']||'')+'\n'
-    +theirName+'の日柱納音（'+n2+'）の弱点：'+(kb2['弱点']||'')+'\n\n'
-    +'以上のデータを元に、花人占術の専門家として、続柄「'+relation+'」を踏まえて'
-    +'この二人の相性を深く鑑定してください。'
-    +'良い部分・注意が必要な部分・長続きさせるためのアドバイスを含めて400〜600文字で回答してください。'
-    +'甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は回答に出さないでください。'
-    +'年柱・月柱・日柱・蔵干という言葉も出さず、自然な言葉で伝えてください。';
+  var kb1=NAYIN_KB[p1.nichiN]||{};
+  var kb2=NAYIN_KB[p2.nichiN]||{};
+  var htBase1=p1.ht.replace(/[\u＋\u－]/g,'').replace(/[＋－]/g,'');
+  var htBase2=p2.ht.replace(/[＋－]/g,'');
+  var c1=getNayinCompat(p1.nichiN,p2.nichiN);
+  var c2=getNayinCompat(p1.tsuN,p2.tsuN);
+  var c3=getNayinCompat(p1.nenN,p2.nenN);
+  var j1=getJuniUnki(p1.ht,p2.nichiShi);
+  var j2=getJuniUnki(p2.ht,p1.nichiShi);
+  var prompt='【相性診断データ】続柄：'+relation+'\n\n'
+    +'【'+myName+'（あなた）の命式】六花人：'+htBase1+' 年柱：'+p1.nenKS+' 月柱：'+p1.tsuKS+' 日柱：'+p1.nichiKS+'\n\n'
+    +'【'+theirName+'（相手）の命式】六花人：'+htBase2+' 年柱：'+p2.nenKS+' 月柱：'+p2.tsuKS+' 日柱：'+p2.nichiKS+'\n\n'
+    +'【深層の相性（最も強く出る）】'+c1+'\n\n'
+    +'【日常の相性（普段の付き合い）】'+c2+'\n\n'
+    +'【根源の相性（育ちの素地）】'+c3+'\n\n'
+    +'【六花人の関係性】'+htBase1+'から見た'+htBase2+'の運気：'+j1+' ／ '+htBase2+'から見た'+htBase1+'の運気：'+j2+'\n\n'
+    +'【'+myName+'の特性】'+(kb1['性格']||'')+'　弱点：'+(kb1['弱点']||'')+'\n'
+    +'【'+theirName+'の特性】'+(kb2['性格']||'')+'　弱点：'+(kb2['弱点']||'')+'\n\n'
+    +'以上のデータをもとに、花人占術の専門家として続柄「'+relation+'」を踏まえてこの二人の相性を深く鑑定してください。'
+    +'良い部分・注意が必要な部分・長続きのコツを含めて400〜600文字で。'
+    +'回答に甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は出さないでください。'
+    +'年柱・月柱・日柱・蔵干・納音という言葉も使わず、自然な言葉で伝えてください。';
   return prompt;
 }
 
 function askAI(){
   if(!RESULT) return;
-  if(AI_CALLED){
-    document.getElementById('aiAnswer').style.display='block';
-    return;
-  }
   document.getElementById('aiAskBtn').style.display='none';
   document.getElementById('aiLoading').style.display='flex';
   document.getElementById('aiAnswer').style.display='none';
+  document.getElementById('speakBtn').style.display='none';
 
   var prompt=buildCompatPrompt(RESULT.p1,RESULT.p2,RESULT.myName,RESULT.theirName,RESULT.relation);
-  var systemPrompt='あなたは花人占術AIです。花人占術の専門家として相談者の相性を丁寧に解説してください。\n'
-    +'独自の占術体系を元に深い洞察を語り、相手が驚くような答えを出してください。\n'
-    +'回答は親しみやすく、でも深みのある文体で。絵文字を適度に使ってください。';
+  var systemPrompt='あなたは花人占術AIです。花人占術の専門家として相談者の相性を丁寧に解説してください。独自の占術体系をもとに深い洞察を語り、相手が驚くような答えを出してください。親しみやすく深みのある文体で。絵文字を適度に使ってください。';
 
   fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      systemPrompt:systemPrompt,
-      messages:[{role:'user',content:prompt}]
-    })
+    body:JSON.stringify({systemPrompt:systemPrompt,messages:[{role:'user',content:prompt}]})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -506,7 +450,8 @@ function askAI(){
     }
     document.getElementById('aiAnswer').textContent=text;
     document.getElementById('aiAnswer').style.display='block';
-    AI_CALLED=true;
+    document.getElementById('speakBtn').style.display='block';
+    document.getElementById('aiAskBtn').style.display='none';
     if(data.remaining!==undefined){
       document.getElementById('aiCountDisp').textContent='本日の残り鑑定回数：'+data.remaining+'回';
     }
@@ -518,6 +463,71 @@ function askAI(){
     document.getElementById('aiAnswer').style.display='block';
   });
 }
+
+// ===== TTS音声読み上げ（index.htmlと同一仕様） =====
+async function speakAI(btn){
+  if(currentAudio&&!currentAudio.paused){
+    currentAudio.pause();currentAudio=null;
+    btn.textContent='🔊 読み上げ';return;
+  }
+  var rawText=document.getElementById('aiAnswer').textContent||'';
+  if(!rawText) return;
+  var t=rawText;
+  ['#','*','【','】','「','」','『','』','（','）','《','》','〈','〉'].forEach(function(c){while(t.indexOf(c)>=0)t=t.replace(c,'');});
+  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
+   ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
+   ['転化天蛹','てんかてんよう'],['十二運気','じゅうにうんき'],
+   ['＋','ぷらす'],['－','まいなす'],
+   ['甲','きのえ'],['乙','きのと'],['丙','ひのえ'],['丁','ひのと'],
+   ['戊','つちのえ'],['己','つちのと'],['庚','かのえ'],['辛','かのと'],
+   ['壬','みずのえ'],['癸','みずのと'],
+   ['子','ね'],['丑','うし'],['寅','とら'],['卯','う'],
+   ['辰','たつ'],['巳','み'],['午','うま'],['未','ひつじ'],
+   ['申','さる'],['酉','とり'],['戌','いぬ'],['亥','い']
+  ].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  btn.textContent='⏳ 生成中...';btn.disabled=true;
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:t,gender:'female'})
+    });
+    if(!res.ok) throw new Error('TTS失敗');
+    var data=await res.json();
+    if(data.error) throw new Error(data.error);
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){btn.textContent='⏹ 停止';btn.disabled=false;};
+    audio.onended=function(){btn.textContent='🔊 読み上げ';currentAudio=null;};
+    audio.onerror=function(){btn.textContent='🔊 読み上げ';btn.disabled=false;currentAudio=null;};
+    await audio.play();
+  }catch(e){
+    btn.textContent='🔊 読み上げ';btn.disabled=false;
+  }
+}
+
+// ===== 生年月日セレクト動的生成（index.htmlと同仕様） =====
+document.addEventListener('DOMContentLoaded',function(){
+  var cy=new Date().getFullYear();
+  ['myY','theirY'].forEach(function(id){
+    var el=document.getElementById(id);
+    for(var y=cy;y>=1900;y--){var op=document.createElement('option');op.value=y;op.textContent=y+'年';el.appendChild(op);}
+  });
+  function makeDayUpdater(yId,mId,dId){
+    var yEl=document.getElementById(yId),mEl=document.getElementById(mId),dEl=document.getElementById(dId);
+    function updateDays(){
+      var y=+yEl.value||cy,m=+mEl.value;
+      var maxD=m?new Date(y,m,0).getDate():31;
+      var cur=+dEl.value;
+      dEl.innerHTML='<option value="">日</option>';
+      for(var i=1;i<=maxD;i++){var op=document.createElement('option');op.value=i;op.textContent=i+'日';if(i===cur)op.selected=true;dEl.appendChild(op);}
+    }
+    updateDays();
+    mEl.addEventListener('change',updateDays);
+    yEl.addEventListener('change',updateDays);
+  }
+  makeDayUpdater('myY','myM','myD');
+  makeDayUpdater('theirY','theirM','theirD');
+});
 </script>
 </body>
 </html>
