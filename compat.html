@@ -360,6 +360,28 @@ function rokkaRelHTML(p1,p2,myName,theirName){
 }
 
 // ===== メイン =====
+// Markdown記法を除去してプレーンテキスト化
+function stripMarkdown(t){
+  var r=t;
+  // 見出し（# ## ###）
+  r=r.replace(/^#{1,4}\s*/gm,'');
+  // 太字・斜体（** * __ _）
+  r=r.replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1');
+  r=r.replace(/_{1,2}([^_]+)_{1,2}/g,'$1');
+  // 箇条書き（- * +）
+  r=r.replace(/^[\-\*\+]\s+/gm,'・');
+  // 番号リスト
+  r=r.replace(/^\d+\.\s+/gm,'');
+  // コードブロック
+  r=r.replace(/```[^`]*```/g,'');
+  r=r.replace(/`([^`]+)`/g,'$1');
+  // 水平線
+  r=r.replace(/^[-*_]{3,}$/gm,'');
+  // 連続改行を2つまでに
+  r=r.replace(/\n{3,}/g,'\n\n');
+  return r.trim();
+}
+
 var RESULT=null;
 var currentAudio=null;
 
@@ -481,7 +503,8 @@ function buildCompatPrompt(p1,p2,myName,theirName,relation){
     +'　　　家族→「離れて暮らすことで、会った時に良い関係が保てる」\n'
     +'\n'
     +'400〜600文字で。回答に甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は出さないでください。'
-    +'年柱・月柱・日柱・蔵干・納音という言葉も使わず、自然な言葉で伝えてください。';
+    +'年柱・月柱・日柱・蔵干・納音という言葉も使わず、自然な言葉で伝えてください。'
+    +'絶対にMarkdown記法（# ## ** * など）を使わず、普通の文章のみで書いてください。';
   return prompt;
 }
 
@@ -511,12 +534,13 @@ function askAI(){
     } else {
       text='AIからの応答を取得できませんでした。';
     }
-    document.getElementById('aiAnswer').textContent=text;
+    var cleanText=stripMarkdown(text);
+    document.getElementById('aiAnswer').textContent=cleanText;
     document.getElementById('aiAnswer').style.display='block';
     document.getElementById('speakBtn').style.display='block';
     document.getElementById('aiAskBtn').style.display='none';
     document.getElementById('aiChatArea').style.display='block';
-    AI_CHAT_HISTORY=[{role:'assistant',content:text}];
+    AI_CHAT_HISTORY=[{role:'assistant',content:cleanText}];
     if(data.remaining!==undefined){
       document.getElementById('aiCountDisp').textContent='本日の残り鑑定回数：'+data.remaining+'回';
     }
@@ -547,16 +571,9 @@ function sendChatMsg(){
   document.getElementById('aiChatLoading').style.display='flex';
   // コンテキスト：命式データ＋会話履歴
   var contextMsg='続柄：'+RESULT.relation+'　あなた：'+RESULT.myName+'　相手：'+RESULT.theirName;
-  var messages=[];
-  // 最初のAI回答を先頭に
-  if(AI_CHAT_HISTORY.length>0&&AI_CHAT_HISTORY[0].role==='assistant'){
-    messages.push({role:'assistant',content:AI_CHAT_HISTORY[0].content});
-  }
-  // その後の会話を追加（最大直近6件）
-  var recent=AI_CHAT_HISTORY.slice(1);
-  if(recent.length>6) recent=recent.slice(recent.length-6);
-  for(var i=0;i<recent.length;i++) messages.push(recent[i]);
-  var systemPrompt='あなたは花人占術AIです。続柄・命式コンテキスト：'+contextMsg+'。追加質問に答えてください。花人占術の専門家として、正直に深く答えてください。良くない相性は正直に伝え、離れることが良い場合はその提案を躊躇わず行ってください。';
+  // 会話履歴をそのまま渡す（最大直近10件）
+  var messages=AI_CHAT_HISTORY.slice(-10);
+  var systemPrompt='あなたは花人占術AIです。続柄・命式コンテキスト：'+contextMsg+'。追加質問に答えてください。花人占術の専門家として、正直に深く答えてください。良くない相性は正直に伝え、離れることが良い場合はその提案を躊躇わず行ってください。絶対にMarkdown記法（# ## ** * など）を使わず、普通の文章のみで書いてください。';
   fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -571,10 +588,11 @@ function sendChatMsg(){
     } else {
       text='応答を取得できませんでした。';
     }
-    AI_CHAT_HISTORY.push({role:'assistant',content:text});
+    var text2=stripMarkdown(text);
+    AI_CHAT_HISTORY.push({role:'assistant',content:text2});
     var aiDiv=document.createElement('div');
     aiDiv.className='chat-bubble-ai';
-    aiDiv.textContent=text;
+    aiDiv.textContent=text2;
     var speakDiv=document.createElement('button');
     speakDiv.className='chat-speak-btn';
     speakDiv.textContent='🔊 読み上げ';
