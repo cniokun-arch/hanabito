@@ -52,6 +52,8 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .layer-row .lr-text{font-size:0.88rem;color:#2a1e00;line-height:1.85;font-style:italic}
 .layer-row .lr-sub{font-size:0.78rem;color:#5a4a30;line-height:1.75;margin-top:0.4rem;padding-top:0.35rem;border-top:1px dotted rgba(184,134,11,0.2)}
 .lr-same{font-size:0.85rem;color:#3a2a00;line-height:1.85;margin-top:0.4rem;padding:0.5rem 0.7rem;background:rgba(184,134,11,0.07);border-radius:6px;border-left:2px solid rgba(184,134,11,0.4)}
+.chat-bubble-ai{background:#fdf9f0;border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.75rem 1rem;font-size:0.88rem;line-height:1.9;color:#1a1208;margin-bottom:0.6rem;white-space:pre-wrap}
+.chat-bubble-user{background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.6rem 1rem;font-size:0.85rem;color:#4a3c28;margin-bottom:0.4rem;text-align:right}
 .rokka-rel-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;padding:0.5rem 0.6rem;background:#fff;border-radius:6px;border:1px solid rgba(184,134,11,0.12)}
 .rokka-rel-row:last-child{margin-bottom:0}
 .rel-name{font-size:0.82rem;color:#4a3c28;white-space:nowrap}
@@ -192,6 +194,14 @@ ruby rt{font-size:0.55em}
       <div class="ai-btn-row">
         <button class="ai-ask-btn" id="aiAskBtn" onclick="askAI()">🔮 AIに詳しい相性鑑定を依頼する</button>
         <button class="speak-btn" id="speakBtn" onclick="speakAI(this)" style="display:none">🔊 読み上げ</button>
+      </div>
+      <div id="aiChatArea" style="display:none;margin-top:0.8rem">
+        <div id="aiChatHistory" style="margin-bottom:0.6rem"></div>
+        <div style="display:flex;gap:0.5rem;align-items:flex-end">
+          <textarea id="aiChatInput" rows="2" placeholder="さらに質問する..." style="flex:1;font-family:'Noto Serif JP',serif;font-size:0.88rem;padding:0.55rem 0.7rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;background:#faf6ef;color:#1a1208;outline:none;resize:none;line-height:1.6"></textarea>
+          <button onclick="sendChatMsg()" style="padding:0.55rem 0.9rem;font-family:'Zen Old Mincho',serif;font-size:0.85rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap">送信</button>
+        </div>
+        <div id="aiChatLoading" class="ai-loading" style="display:none"><span>🌸</span><span>鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
       </div>
       <div id="aiCountDisp" class="ai-count"></div>
     </div>
@@ -408,6 +418,10 @@ function calcCompat(){
   document.getElementById('aiAskBtn').style.display='block';
   document.getElementById('speakBtn').style.display='none';
   document.getElementById('aiCountDisp').textContent='';
+  document.getElementById('aiChatArea').style.display='none';
+  document.getElementById('aiChatHistory').innerHTML='';
+  document.getElementById('aiChatInput').value='';
+  AI_CHAT_HISTORY=[];
   if(currentAudio){currentAudio.pause();currentAudio=null;}
 
   document.getElementById('result').classList.remove('result-hidden');
@@ -418,24 +432,53 @@ function calcCompat(){
 function buildCompatPrompt(p1,p2,myName,theirName,relation){
   var kb1=NAYIN_KB[p1.nichiN]||{};
   var kb2=NAYIN_KB[p2.nichiN]||{};
-  var htBase1=p1.ht.replace(/[\u＋\u－]/g,'').replace(/[＋－]/g,'');
+  var htBase1=p1.ht.replace(/[＋－]/g,'');
   var htBase2=p2.ht.replace(/[＋－]/g,'');
   var c1=getNayinCompat(p1.nichiN,p2.nichiN);
   var c2=getNayinCompat(p1.tsuN,p2.tsuN);
   var c3=getNayinCompat(p1.nenN,p2.nenN);
-  var j1=getJuniUnki(p1.ht,p2.nichiShi);
-  var j2=getJuniUnki(p2.ht,p1.nichiShi);
+  // 年・月・日柱の運気（自分→相手、相手→自分）
+  var my_nen=getJuniUnki(p1.ht,p2.nenShi);
+  var my_tsu=getJuniUnki(p1.ht,p2.tsuShi);
+  var my_nichi=getJuniUnki(p1.ht,p2.nichiShi);
+  var their_nen=getJuniUnki(p2.ht,p1.nenShi);
+  var their_tsu=getJuniUnki(p2.ht,p1.tsuShi);
+  var their_nichi=getJuniUnki(p2.ht,p1.nichiShi);
+  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
+  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  function juniRating(j){return goodJuni.indexOf(j)>=0?'良':badJuni.indexOf(j)>=0?'要注意':'中';}
+  var myNenRating=juniRating(my_nen);
+  var theirNenRating=juniRating(their_nen);
+  // 一方通行判定
+  var myBad=(badJuni.indexOf(my_nen)>=0);
+  var theirBad=(badJuni.indexOf(their_nen)>=0);
+  var oneWay=(myBad&&!theirBad)||(!myBad&&theirBad);
   var prompt='【相性診断データ】続柄：'+relation+'\n\n'
-    +'【'+myName+'（あなた）の命式】六花人：'+htBase1+' 年柱：'+p1.nenKS+' 月柱：'+p1.tsuKS+' 日柱：'+p1.nichiKS+'\n\n'
-    +'【'+theirName+'（相手）の命式】六花人：'+htBase2+' 年柱：'+p2.nenKS+' 月柱：'+p2.tsuKS+' 日柱：'+p2.nichiKS+'\n\n'
-    +'【深層の相性（最も強く出る）】'+c1+'\n\n'
-    +'【日常の相性（普段の付き合い）】'+c2+'\n\n'
-    +'【根源の相性（育ちの素地）】'+c3+'\n\n'
-    +'【六花人の関係性】'+htBase1+'から見た'+htBase2+'の運気：'+j1+' ／ '+htBase2+'から見た'+htBase1+'の運気：'+j2+'\n\n'
+    +'【'+myName+'（あなた）の命式】六花人：'+htBase1+' 年：'+p1.nenKS+' 月：'+p1.tsuKS+' 日：'+p1.nichiKS+'\n\n'
+    +'【'+theirName+'（相手）の命式】六花人：'+htBase2+' 年：'+p2.nenKS+' 月：'+p2.tsuKS+' 日：'+p2.nichiKS+'\n\n'
+    +'【六花人の関係性（最重要：根源・長期的な影響）】\n'
+    +myName+'から見た'+theirName+'の年の運気：'+my_nen+'（'+myNenRating+'）\n'
+    +theirName+'から見た'+myName+'の年の運気：'+their_nen+'（'+theirNenRating+'）\n'
+    +(oneWay?'※一方通行の相性あり（片方にとって良く、片方にとって悪い）\n':'')
+    +'\n【六花人の関係性（月・普段の付き合い）】\n'
+    +myName+'から見た'+theirName+'：'+my_tsu+'　'+theirName+'から見た'+myName+'：'+their_tsu+'\n'
+    +'\n【六花人の関係性（日・深く関わった時）】\n'
+    +myName+'から見た'+theirName+'：'+my_nichi+'　'+theirName+'から見た'+myName+'：'+their_nichi+'\n\n'
+    +'【感性・波長の相性（深層）】'+c1+'\n'
+    +'【感性・波長の相性（日常）】'+c2+'\n'
+    +'【感性・波長の相性（根源）】'+c3+'\n\n'
     +'【'+myName+'の特性】'+(kb1['性格']||'')+'　弱点：'+(kb1['弱点']||'')+'\n'
     +'【'+theirName+'の特性】'+(kb2['性格']||'')+'　弱点：'+(kb2['弱点']||'')+'\n\n'
-    +'以上のデータをもとに、花人占術の専門家として続柄「'+relation+'」を踏まえてこの二人の相性を深く鑑定してください。'
-    +'良い部分・注意が必要な部分・長続きのコツを含めて400〜600文字で。'
+    +'【鑑定の指針】\n'
+    +'・年の運気（根源・長期的影響）を最も重視して鑑定すること\n'
+    +'・年の運気が要注意（内省・狂咲・引寒・休眠・残雪）の場合は、近くにいるほど悪い影響が出やすいとはっきり伝えること\n'
+    +'・一方通行の相性がある場合は正直に言及すること\n'
+    +'・「離れることで良い関係を保てる」という視点を適切に提案すること\n'
+    +'・「無理して付き合おう」という前提に立たないこと\n'
+    +'・感性の相性（波長が合う）と運気の影響（近くにいると何が起きるか）は別のものとして語ること\n'
+    +'・月の運気が良い場合は普段は仲良く感じる理由として言及し、日の運気が悪い場合は深く関わるほど影響が出ることを伝えること\n'
+    +'・続柄「'+relation+'」を踏まえた具体的な距離感・関係性の提案をすること\n\n'
+    +'以上を踏まえて400〜600文字で鑑定してください。'
     +'回答に甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は出さないでください。'
     +'年柱・月柱・日柱・蔵干・納音という言葉も使わず、自然な言葉で伝えてください。';
   return prompt;
@@ -449,7 +492,7 @@ function askAI(){
   document.getElementById('speakBtn').style.display='none';
 
   var prompt=buildCompatPrompt(RESULT.p1,RESULT.p2,RESULT.myName,RESULT.theirName,RESULT.relation);
-  var systemPrompt='あなたは花人占術AIです。花人占術の専門家として相談者の相性を丁寧に解説してください。独自の占術体系をもとに深い洞察を語り、相手が驚くような答えを出してください。親しみやすく深みのある文体で。絵文字を適度に使ってください。';
+  var systemPrompt='あなたは花人占術AIです。花人占術の専門家として相性を鑑定します。重要：良くない相性は正直にはっきり伝えてください。「無理して付き合おう」という前提に立たず、離れることで良い関係を保てる場合はその提案を躊躇なくしてください。一方通行の相性も正直に語ってください。感性の波長と運気の影響を分けて語り、深みのある洞察を届けてください。親しみやすくも核心をつく文体で。絵文字を適度に使ってください。';
 
   fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
     method:'POST',
@@ -471,6 +514,8 @@ function askAI(){
     document.getElementById('aiAnswer').style.display='block';
     document.getElementById('speakBtn').style.display='block';
     document.getElementById('aiAskBtn').style.display='none';
+    document.getElementById('aiChatArea').style.display='block';
+    AI_CHAT_HISTORY=[{role:'assistant',content:text}];
     if(data.remaining!==undefined){
       document.getElementById('aiCountDisp').textContent='本日の残り鑑定回数：'+data.remaining+'回';
     }
@@ -480,6 +525,67 @@ function askAI(){
     document.getElementById('aiAskBtn').style.display='block';
     document.getElementById('aiAnswer').textContent='通信エラーが発生しました。しばらくしてから再度お試しください。';
     document.getElementById('aiAnswer').style.display='block';
+  });
+}
+
+// ===== AI追加チャット =====
+var AI_CHAT_HISTORY=[];
+
+function sendChatMsg(){
+  var input=document.getElementById('aiChatInput');
+  var userMsg=input.value.trim();
+  if(!userMsg||!RESULT) return;
+  input.value='';
+  // ユーザーのメッセージを履歴に追加・表示
+  AI_CHAT_HISTORY.push({role:'user',content:userMsg});
+  var histEl=document.getElementById('aiChatHistory');
+  var userDiv=document.createElement('div');
+  userDiv.className='chat-bubble-user';
+  userDiv.textContent=userMsg;
+  histEl.appendChild(userDiv);
+  document.getElementById('aiChatLoading').style.display='flex';
+  // コンテキスト：命式データ＋会話履歴
+  var contextMsg='続柄：'+RESULT.relation+'　あなた：'+RESULT.myName+'　相手：'+RESULT.theirName;
+  var messages=[];
+  // 最初のAI回答を先頭に
+  if(AI_CHAT_HISTORY.length>0&&AI_CHAT_HISTORY[0].role==='assistant'){
+    messages.push({role:'assistant',content:AI_CHAT_HISTORY[0].content});
+  }
+  // その後の会話を追加（最大直近6件）
+  var recent=AI_CHAT_HISTORY.slice(1);
+  if(recent.length>6) recent=recent.slice(recent.length-6);
+  for(var i=0;i<recent.length;i++) messages.push(recent[i]);
+  var systemPrompt='あなたは花人占術AIです。続柄・命式コンテキスト：'+contextMsg+'。追加質問に答えてください。花人占術の専門家として、正直に深く答えてください。良くない相性は正直に伝え、離れることが良い場合はその提案を躊躇わず行ってください。';
+  fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({systemPrompt:systemPrompt,messages:messages})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    document.getElementById('aiChatLoading').style.display='none';
+    var text='';
+    if(data.content&&data.content.length>0){
+      text=data.content.map(function(b){return b.text||'';}).join('\n');
+    } else {
+      text='応答を取得できませんでした。';
+    }
+    AI_CHAT_HISTORY.push({role:'assistant',content:text});
+    var aiDiv=document.createElement('div');
+    aiDiv.className='chat-bubble-ai';
+    aiDiv.textContent=text;
+    histEl.appendChild(aiDiv);
+    aiDiv.scrollIntoView({behavior:'smooth',block:'nearest'});
+    if(data.remaining!==undefined){
+      document.getElementById('aiCountDisp').textContent='本日の残り鑑定回数：'+data.remaining+'回';
+    }
+  })
+  .catch(function(){
+    document.getElementById('aiChatLoading').style.display='none';
+    var errDiv=document.createElement('div');
+    errDiv.className='chat-bubble-ai';
+    errDiv.textContent='通信エラーが発生しました。';
+    histEl.appendChild(errDiv);
   });
 }
 
