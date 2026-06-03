@@ -51,8 +51,7 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .layer-row .lr-label{font-size:0.76rem;color:#7a6b52;margin-bottom:0.3rem;letter-spacing:0.03em}
 .layer-row .lr-text{font-size:0.88rem;color:#2a1e00;line-height:1.85;font-style:italic}
 .layer-row .lr-sub{font-size:0.78rem;color:#5a4a30;line-height:1.75;margin-top:0.4rem;padding-top:0.35rem;border-top:1px dotted rgba(184,134,11,0.2)}
-.lr-why{font-size:0.85rem;color:#3a2a00;line-height:1.85;margin-top:0.5rem;padding:0.6rem 0.75rem;background:rgba(184,134,11,0.05);border-radius:6px;border-left:2px solid rgba(184,134,11,0.3)}
-.lr-why-label{font-size:0.72rem;color:#7a6b52;letter-spacing:0.05em;margin-bottom:0.35rem;text-align:center}
+.lr-same{font-size:0.85rem;color:#3a2a00;line-height:1.85;margin-top:0.4rem;padding:0.5rem 0.7rem;background:rgba(184,134,11,0.07);border-radius:6px;border-left:2px solid rgba(184,134,11,0.4)}
 .rokka-rel-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;padding:0.5rem 0.6rem;background:#fff;border-radius:6px;border:1px solid rgba(184,134,11,0.12)}
 .rokka-rel-row:last-child{margin-bottom:0}
 .rel-name{font-size:0.82rem;color:#4a3c28;white-space:nowrap}
@@ -158,8 +157,8 @@ ruby rt{font-size:0.55em}
           <option value="職場の同僚">職場の同僚</option>
           <option value="上司・先輩">上司・先輩</option>
           <option value="部下・後輩">部下・後輩</option>
-          <option value="家族（親）">家族（親）</option>
-          <option value="家族（子）">家族（子）</option>
+          <option value="家族（私が子・相手が親）">家族（私が子・相手が親）</option>
+          <option value="家族（私が親・相手が子）">家族（私が親・相手が子）</option>
           <option value="家族（きょうだい）">家族（きょうだい）</option>
           <option value="気になる人">気になる人</option>
         </select>
@@ -295,28 +294,16 @@ function profileCardHTML(p,nameDisp,isFirst){
 }
 
 // 相性レイヤー（表示上は納音名を出さない）
-function inochiCompatHTML(pillarLabel,n1,n2,p1name,p2name,icon){
+function inochiCompatHTML(pillarLabel,n1,n2,icon){
   var comment=getNayinCompat(n1,n2);
-  var kb1=NAYIN_KB[n1]||{};
-  var kb2=NAYIN_KB[n2]||{};
   var sameSrc=(n1===n2);
-  var whyText='';
-  if(sameSrc){
-    whyText=p1name+'さんと'+p2name+'さんは同じ魂の質を持つ稀な組み合わせ。深いところで感性が共鳴しています。';
-  } else {
-    var s1=kb1['性格']||'';
-    var s2=kb2['性格']||'';
-    // 最初の文だけ抽出（。で区切り）
-    var p1short=s1.split('。')[0]+'。';
-    var p2short=s2.split('。')[0]+'。';
-    whyText=p1name+'さんは'+p1short+'<br>'+p2name+'さんは'+p2short;
-  }
+  var sameText=sameSrc?'<div class="lr-same">二人は稀な同質の組み合わせ。深いところで感性が共鳴し合える間柄です。</div>':'';
   return '<div class="layer-row">'
     +'<div class="lr-icon">'+icon+'</div>'
     +'<div class="lr-body">'
     +'<div class="lr-label">'+pillarLabel+'</div>'
     +(comment?'<div class="lr-text">'+comment+'</div>':'')
-    +'<div class="lr-why"><div class="lr-why-label">── なぜ、この相性になるのか ──</div>'+whyText+'</div>'
+    +sameText
     +'</div></div>';
 }
 
@@ -328,19 +315,20 @@ function rokkaRelHTML(p1,p2,myName,theirName){
   var icons=['☀️','🌙','🌕'];
   var myN=myName+'さん',theirN=theirName+'さん';
   // 十二運気の平易な説明
+  // 相性における十二運気の意味（花人占術独自定義）
   var JUNI_DESC={
-    '開花':'最高潮。才能や努力が花開く時',
-    '豊穣':'努力が実を結ぶ収穫の時',
-    '青葉':'成長・拡大の時。良い影響も悪い影響も2倍',
-    '発芽':'新しいことを始める芽吹きの時',
-    '穂分':'整理・安定の時',
-    '平凪':'穏やかで安定した時',
-    '成天':'達成・完成の時。人生の転換点になりやすい',
-    '内省':'疲れが出やすく、自分を見つめ直す時',
-    '狂咲':'感情が乱れやすく、自分を見失いやすい時',
-    '引寒':'大きな行動・決断は控える時',
-    '休眠':'静かに力を蓄える時',
-    '残雪':'春の準備をする時'
+    '発芽':'新しい挑戦や子宝にも縁がある相手。自分が思う以上の実りを将来もたらしてくれる',
+    '青葉':'自分を成長させてくれる相手。干渉しすぎず、適度な距離感が大切',
+    '開花':'良い面も悪い面も強め合う相手。良い時は最高、悪い時は激しくなりやすい',
+    '内省':'疲れや追い詰められ感を感じやすい相手。ただし自分の反省点に気づかせてくれる',
+    '成天':'自分が最も求めている人間性を持つ人。やりたかったことを叶えてくれる相手',
+    '狂咲':'心を乱され、本来しないことに手を出してしまう相手。無意識に従って失敗することも',
+    '豊穣':'できなかったこと、やり遂げられなかったことにチャンスをくれる相手',
+    '穂分':'金銭的・物質的な安定をもたらす相手。財産となる恵みや子宝にも縁がある',
+    '平凪':'一緒にいると安心感があり、将来成功できる気がする相手',
+    '引寒':'小さなトラブルを持ち込みがちで、将来大きなトラブルに発展することも。将来性に注意',
+    '休眠':'自分の場所を占拠されてしまう相手。やりたいことを先にやられたり、伝えても通じにくい',
+    '残雪':'希望的観測は良好に見えるが、良い結果になりにくい。トラブルに発展しやすい相手'
   };
   var html='';
   for(var i=0;i<3;i++){
@@ -404,11 +392,11 @@ function calcCompat(){
   // 相性レイヤー
   var layers='';
   layers+='<div class="layer-title">🌕 二人の本質的な相性</div>';
-  layers+=inochiCompatHTML('深層で最も強く出る相性',p1.nichiN,p2.nichiN,myName,theirName,'💫');
+  layers+=inochiCompatHTML('深層で最も強く出る相性',p1.nichiN,p2.nichiN,'💫');
   layers+='<div class="layer-title">🌙 日常の相性</div>';
-  layers+=inochiCompatHTML('普段の付き合いで出る相性',p1.tsuN,p2.tsuN,myName,theirName,'🌿');
+  layers+=inochiCompatHTML('普段の付き合いで出る相性',p1.tsuN,p2.tsuN,'🌿');
   layers+='<div class="layer-title">☀️ 二人の根源にある相性</div>';
-  layers+=inochiCompatHTML('育ちの素地から来る相性',p1.nenN,p2.nenN,myName,theirName,'🌱');
+  layers+=inochiCompatHTML('育ちの素地から来る相性',p1.nenN,p2.nenN,'🌱');
   layers+='<div class="layer-title">🌸 六花人から見た関係性（運気の方向）</div>';
   layers+=rokkaRelHTML(p1,p2,myName,theirName);
   document.getElementById('compat-layers').innerHTML=layers;
