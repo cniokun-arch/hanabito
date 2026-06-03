@@ -51,6 +51,12 @@ body{background:#faf6ef;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .layer-row .lr-label{font-size:0.76rem;color:#7a6b52;margin-bottom:0.3rem;letter-spacing:0.03em}
 .layer-row .lr-text{font-size:0.88rem;color:#2a1e00;line-height:1.85;font-style:italic}
 .layer-row .lr-sub{font-size:0.78rem;color:#5a4a30;line-height:1.75;margin-top:0.4rem;padding-top:0.35rem;border-top:1px dotted rgba(184,134,11,0.2)}
+.lr-why{font-size:0.85rem;color:#3a2a00;line-height:1.85;margin-top:0.5rem;padding:0.6rem 0.75rem;background:rgba(184,134,11,0.05);border-radius:6px;border-left:2px solid rgba(184,134,11,0.3)}
+.lr-why-label{font-size:0.72rem;color:#7a6b52;letter-spacing:0.05em;margin-bottom:0.35rem;text-align:center}
+.rokka-rel-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;padding:0.5rem 0.6rem;background:#fff;border-radius:6px;border:1px solid rgba(184,134,11,0.12)}
+.rokka-rel-row:last-child{margin-bottom:0}
+.rel-name{font-size:0.82rem;color:#4a3c28;white-space:nowrap}
+.rel-desc{font-size:0.8rem;color:#5a4a30;line-height:1.6}
 .name-tag{display:inline-block;font-size:0.78rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:10px;margin-right:0.3rem;margin-bottom:0.25rem}
 .juni-badge{display:inline-block;font-size:0.82rem;font-weight:700;padding:0.18rem 0.65rem;border-radius:12px;margin:0 0.2rem}
 /* AI */
@@ -281,57 +287,82 @@ function profileCardHTML(p,nameDisp,isFirst){
     +'年柱：'+p.nenKS+'　月柱：'+p.tsuKS+'　日柱：'+p.nichiKS
     +'</div>'
     +'<div class="inochi-badges">'
-    +'<span class="inochi-badge" style="background:'+nb1.bg+';color:'+nb1.col+'">日：<span style="font-weight:700">'+juniRuby(p.nichiJu)+'</span></span>'
-    +'<span class="inochi-badge" style="background:'+nb2.bg+';color:'+nb2.col+'">月：<span style="font-weight:700">'+juniRuby(p.tsuJu)+'</span></span>'
     +'<span class="inochi-badge" style="background:'+nb3.bg+';color:'+nb3.col+'">年：<span style="font-weight:700">'+juniRuby(p.nenJu)+'</span></span>'
+    +'<span class="inochi-badge" style="background:'+nb2.bg+';color:'+nb2.col+'">月：<span style="font-weight:700">'+juniRuby(p.tsuJu)+'</span></span>'
+    +'<span class="inochi-badge" style="background:'+nb1.bg+';color:'+nb1.col+'">日：<span style="font-weight:700">'+juniRuby(p.nichiJu)+'</span></span>'
     +'</div>'
     +'</div>';
 }
 
-// 相性レイヤー（表示上は納音名・陰陽を出さない）
+// 相性レイヤー（表示上は納音名を出さない）
 function inochiCompatHTML(pillarLabel,n1,n2,p1name,p2name,icon){
   var comment=getNayinCompat(n1,n2);
   var kb1=NAYIN_KB[n1]||{};
   var kb2=NAYIN_KB[n2]||{};
-  var sameSrc = (n1===n2);
-  var subText = sameSrc
-    ? p1name+'と'+p2name+'は稀な組み合わせ。共通の感性と世界観で深く共鳴し合える間柄です。'
-    : '【'+p1name+'の特性】'+kb1['性格']+'<br>【'+p2name+'の特性】'+kb2['性格'];
+  var sameSrc=(n1===n2);
+  var whyText='';
+  if(sameSrc){
+    whyText=p1name+'さんと'+p2name+'さんは同じ魂の質を持つ稀な組み合わせ。深いところで感性が共鳴しています。';
+  } else {
+    var s1=kb1['性格']||'';
+    var s2=kb2['性格']||'';
+    // 最初の文だけ抽出（。で区切り）
+    var p1short=s1.split('。')[0]+'。';
+    var p2short=s2.split('。')[0]+'。';
+    whyText=p1name+'さんは'+p1short+'<br>'+p2name+'さんは'+p2short;
+  }
   return '<div class="layer-row">'
     +'<div class="lr-icon">'+icon+'</div>'
     +'<div class="lr-body">'
     +'<div class="lr-label">'+pillarLabel+'</div>'
     +(comment?'<div class="lr-text">'+comment+'</div>':'')
-    +'<div class="lr-sub">'+subText+'</div>'
+    +'<div class="lr-why"><div class="lr-why-label">── なぜ、この相性になるのか ──</div>'+whyText+'</div>'
     +'</div></div>';
 }
 
-// 六花人の関係（年・月・日すべて）
-function rokkaRelHTML(p1,p2,n1,n2){
+// 六花人の関係（年・月・日 / 名前で表示・波削除）
+function rokkaRelHTML(p1,p2,myName,theirName){
   var cols=['年柱','月柱','日柱'];
   var shis1=[p1.nenShi,p1.tsuShi,p1.nichiShi];
   var shis2=[p2.nenShi,p2.tsuShi,p2.nichiShi];
   var icons=['☀️','🌙','🌕'];
-  var htBase1=p1.ht.replace(/[＋－]/,''),htBase2=p2.ht.replace(/[＋－]/,'');
+  var myN=myName+'さん',theirN=theirName+'さん';
+  // 十二運気の平易な説明
+  var JUNI_DESC={
+    '開花':'最高潮。才能や努力が花開く時',
+    '豊穣':'努力が実を結ぶ収穫の時',
+    '青葉':'成長・拡大の時。良い影響も悪い影響も2倍',
+    '発芽':'新しいことを始める芽吹きの時',
+    '穂分':'整理・安定の時',
+    '平凪':'穏やかで安定した時',
+    '成天':'達成・完成の時。人生の転換点になりやすい',
+    '内省':'疲れが出やすく、自分を見つめ直す時',
+    '狂咲':'感情が乱れやすく、自分を見失いやすい時',
+    '引寒':'大きな行動・決断は控える時',
+    '休眠':'静かに力を蓄える時',
+    '残雪':'春の準備をする時'
+  };
   var html='';
   for(var i=0;i<3;i++){
     var ju1=getJuniUnki(p1.ht,shis2[i]);
     var ju2=getJuniUnki(p2.ht,shis1[i]);
     var w1=JUNI_WAVE[ju1]||0,w2=JUNI_WAVE[ju2]||0;
     var jb1=getJuniBg(ju1),jb2=getJuniBg(ju2);
+    var desc1=JUNI_DESC[ju1]||ju1;
+    var desc2=JUNI_DESC[ju2]||ju2;
     html+='<div class="layer-row">'
       +'<div class="lr-icon">'+icons[i]+'</div>'
       +'<div class="lr-body">'
       +'<div class="lr-label">'+cols[i]+'の関係性</div>'
-      +'<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">'
-      +'<span style="font-size:0.82rem;color:#4a3c28">'+n1+'から見た'+n2+'：</span>'
+      +'<div class="rokka-rel-row">'
+      +'<span class="rel-name">'+myN+'から見た'+theirN+'</span>'
       +'<span class="juni-badge" style="background:'+jb1.bg+';color:'+jb1.col+'">'+juniRuby(ju1)+'</span>'
-      +'<span style="font-size:0.78rem;color:#7a6b52">（波：'+(w1>=0?'+':'')+w1+'）</span>'
+      +'<span class="rel-desc">'+desc1+'</span>'
       +'</div>'
-      +'<div style="display:flex;gap:0.5rem;flex-wrap:wrap">'
-      +'<span style="font-size:0.82rem;color:#4a3c28">'+n2+'から見た'+n1+'：</span>'
+      +'<div class="rokka-rel-row">'
+      +'<span class="rel-name">'+theirN+'から見た'+myN+'</span>'
       +'<span class="juni-badge" style="background:'+jb2.bg+';color:'+jb2.col+'">'+juniRuby(ju2)+'</span>'
-      +'<span style="font-size:0.78rem;color:#7a6b52">（波：'+(w2>=0?'+':'')+w2+'）</span>'
+      +'<span class="rel-desc">'+desc2+'</span>'
       +'</div>'
       +'</div></div>';
   }
@@ -379,7 +410,7 @@ function calcCompat(){
   layers+='<div class="layer-title">☀️ 二人の根源にある相性</div>';
   layers+=inochiCompatHTML('育ちの素地から来る相性',p1.nenN,p2.nenN,myName,theirName,'🌱');
   layers+='<div class="layer-title">🌸 六花人から見た関係性（運気の方向）</div>';
-  layers+=rokkaRelHTML(p1,p2,htBase1,htBase2);
+  layers+=rokkaRelHTML(p1,p2,myName,theirName);
   document.getElementById('compat-layers').innerHTML=layers;
 
   // AI欄リセット（バグ修正：再診断時に完全リセット）
