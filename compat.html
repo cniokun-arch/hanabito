@@ -268,6 +268,122 @@ function calcPerson(y,m,d,gender){
   return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nZ,tZ,niZ,nenN,tsuN,nichiN,nenYY,tsuYY,nichiYY,nenJu,tsuJu,nichiJu};
 }
 
+// ===== 現在の運気計算 =====
+// 大運リスト取得
+function getDaiunList(y,m,d,gender,tsuKS){
+  var nenKS2=getYearKS(y,m,d);
+  var nenNum=ROKUJU.indexOf(nenKS2)+1;
+  var isYo=nenNum%2===1;
+  var isFwd=(isYo&&gender==='男')||(!isYo&&gender==='女');
+  var sa=getDaiunStartAge(y,m,d,isFwd);
+  var tsuKanIdx=JIKKAN.indexOf(tsuKS[0]);
+  var tsuShiIdx=JUNISHI.indexOf(tsuKS[1]);
+  var dl=[];
+  for(var i=0;i<=14;i++){
+    var ki,si;
+    if(isFwd){ki=(tsuKanIdx+i)%10;si=(tsuShiIdx+i)%12;}
+    else{ki=((tsuKanIdx-i)%10+10)%10;si=((tsuShiIdx-i)%12+12)%12;}
+    dl.push({ks:JIKKAN[ki]+JUNISHI[si],kan:JIKKAN[ki],shi:JUNISHI[si],startAge:sa+i*10});
+  }
+  return {dl:dl,sa:sa,isFwd:isFwd};
+}
+
+// 現在の年齢（歳）
+function getAge(y,m,d){
+  var today=new Date();
+  var age=today.getFullYear()-y;
+  var mm=today.getMonth()+1;
+  var dd=today.getDate();
+  if(mm<m||(mm===m&&dd<d)) age--;
+  return age;
+}
+
+// 今年の年運（十二運気）
+function getNenUnki(ht,targetYear,birthY,birthM,birthD){
+  var nenKS=getYearKS(targetYear,2,15);
+  var shi=nenKS[1];
+  return {ju:getJuniUnki(ht,shi),ks:nenKS,shi:shi};
+}
+
+// 今月の月運（十二運気）
+function getTsuUnki(ht,targetYear,targetMonth){
+  var MONTH_SHI=['丑','寅','卯','辰','巳','午','未','申','酉','戌','亥','子'];
+  var shi=MONTH_SHI[targetMonth-1];
+  return {ju:getJuniUnki(ht,shi),shi:shi};
+}
+
+// 来年の年運
+function getNextNenUnki(ht,targetYear){
+  return getNenUnki(ht,targetYear+1,0,1,1);
+}
+
+// 現在の大運干支と次の大運
+function getCurrentDaiun(y,m,d,gender,tsuKS){
+  var res=getDaiunList(y,m,d,gender,tsuKS);
+  var age=getAge(y,m,d);
+  var currentDaiun=null,nextDaiun=null;
+  for(var i=0;i<res.dl.length-1;i++){
+    var start=res.dl[i].startAge;
+    var end=res.dl[i+1].startAge;
+    if(age>=start&&age<end){
+      currentDaiun=res.dl[i];
+      nextDaiun=res.dl[i+1];
+      break;
+    }
+  }
+  if(!currentDaiun&&res.dl.length>0){
+    currentDaiun=res.dl[0];
+    nextDaiun=res.dl[1]||null;
+  }
+  return {current:currentDaiun,next:nextDaiun};
+}
+
+// 今年・来年の各月運気（相性観点）
+function getMonthlyUnkiYear(ht, year){
+  var MONTH_SHI=['丑','寅','卯','辰','巳','午','未','申','酉','戌','亥','子'];
+  var MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  var goodJuni=['開花','豊穣','青葉','発芽','成天'];
+  var results=[];
+  for(var i=0;i<12;i++){
+    var ju=getJuniUnki(ht,MONTH_SHI[i]);
+    var tag=goodJuni.indexOf(ju)>=0?'◎':badJuni.indexOf(ju)>=0?'▲':'○';
+    results.push(MONTH_LABELS[i]+':'+ju+'('+tag+')');
+  }
+  return results;
+}
+
+// 全体の現在運気サマリーをプロンプト用に生成
+function buildCurrentUnkiSummary(p,name,birthY,birthM,birthD,gender){
+  var TODAY=new Date();
+  var CY=TODAY.getFullYear();
+  var CM=TODAY.getMonth()+1;
+  var age=getAge(birthY,birthM,birthD);
+  var nenNow=getNenUnki(p.ht,CY,birthY,birthM,birthD);
+  var nenNext=getNextNenUnki(p.ht,CY);
+  var tsuNow=getTsuUnki(p.ht,CY,CM);
+  var daiun=getCurrentDaiun(birthY,birthM,birthD,gender,p.tsuKS);
+  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
+  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  function rating(j){return goodJuni.indexOf(j)>=0?'良':badJuni.indexOf(j)>=0?'要注意':'普通';}
+  var monthlyThis=getMonthlyUnkiYear(p.ht,CY);
+  var s='【'+name+'の現在の運気】\n';
+  s+='年齢：'+age+'歳\n';
+  s+='今年('+CY+'年)の運気：'+nenNow.ju+'（'+rating(nenNow.ju)+'）\n';
+  s+='来年('+(CY+1)+'年)の運気：'+nenNext.ju+'（'+rating(nenNext.ju)+'）\n';
+  s+='今月('+CM+'月)の運気：'+tsuNow.ju+'（'+rating(tsuNow.ju)+'）\n';
+  if(daiun.current){
+    var daiunJu=getJuniUnki(p.ht,daiun.current.shi);
+    s+='現在の大運('+daiun.current.startAge+'歳〜)：'+daiun.current.ks+'（運気：'+daiunJu+'・'+rating(daiunJu)+'）\n';
+  }
+  if(daiun.next){
+    var nextJu=getJuniUnki(p.ht,daiun.next.shi);
+    s+='次の大運('+daiun.next.startAge+'歳〜)：'+daiun.next.ks+'（運気：'+nextJu+'・'+rating(nextJu)+'）\n';
+  }
+  s+='今年の月別運気：'+monthlyThis.join('、')+'\n';
+  return s;
+}
+
 function getNayinCompat(n1,n2){
   if(NAYIN_COMPAT[n1]&&NAYIN_COMPAT[n1][n2]) return NAYIN_COMPAT[n1][n2];
   if(NAYIN_COMPAT[n2]&&NAYIN_COMPAT[n2][n1]) return NAYIN_COMPAT[n2][n1];
@@ -444,6 +560,11 @@ function calcCompat(){
 
 // ===== AI相性鑑定 =====
 function buildCompatPrompt(p1,p2,myName,theirName,relation){
+  var TODAY=new Date();
+  var CY=TODAY.getFullYear();
+  var CM=TODAY.getMonth()+1;
+  var unki1=buildCurrentUnkiSummary(p1,myName,p1.y,p1.m,p1.d,p1.gender);
+  var unki2=buildCurrentUnkiSummary(p2,theirName,p2.y,p2.m,p2.d,p2.gender);
   var kb1=NAYIN_KB[p1.nichiN]||{};
   var kb2=NAYIN_KB[p2.nichiN]||{};
   var htBase1=p1.ht.replace(/[＋－]/g,'');
@@ -478,16 +599,22 @@ function buildCompatPrompt(p1,p2,myName,theirName,relation){
     +myName+'から見た'+theirName+'：'+my_tsu+'　'+theirName+'から見た'+myName+'：'+their_tsu+'\n'
     +'\n【六花人の関係性（日・深く関わった時）】\n'
     +myName+'から見た'+theirName+'：'+my_nichi+'　'+theirName+'から見た'+myName+'：'+their_nichi+'\n\n'
+    +unki1+'\n'
+    +unki2+'\n'
     +'【感性・波長の相性（深層）】'+c1+'\n'
     +'【感性・波長の相性（日常）】'+c2+'\n'
     +'【感性・波長の相性（根源）】'+c3+'\n\n'
     +'【'+myName+'の特性】'+(kb1['性格']||'')+'　弱点：'+(kb1['弱点']||'')+'\n'
     +'【'+theirName+'の特性】'+(kb2['性格']||'')+'　弱点：'+(kb2['弱点']||'')+'\n\n'
     +'【鑑定の構成と指針】\n'
+    +'現在日時：2026年6月\n'
     +'必ず以下の3段構成で語ること：\n'
     +'①まず「普段の付き合いでの良さ」を温かく肯定する（月の運気が良ければその理由を自然な言葉で）\n'
+    +'②次に「仲良くなるほど・深く関わるほど出てくる影響」を正直に伝え、さらに「今現在の二人の運気状態」を踏まえて今なぜうまくいっているか・なぜギクシャクしているかを読む\n'
+    +'③最後に「時間軸のアドバイス」：今年・来年・特定の月に何が起きやすいか、いつが良いタイミングでいつが注意か、を具体的に伝え、この二人の最善の距離感・関係の保ち方で締める\n'
     +'②次に「仲良くなるほど・深く関わるほど出てくる影響」を正直に伝える（日・年の運気をもとに）\n'
     +'③最後に「この二人にとっての最善の距離感・関係の保ち方」を具体的・温かく提案して締める\n'
+    +'\n'
     +'\n'
     +'トーンと表現の指針：\n'
     +'・占い師が相談者に語りかけるような、温かみのある一人称的な文体で書くこと\n'
@@ -502,7 +629,7 @@ function buildCompatPrompt(p1,p2,myName,theirName,relation){
     +'　　　職場→「仕事上の付き合いに留め、プライベートまで踏み込まない」\n'
     +'　　　家族→「離れて暮らすことで、会った時に良い関係が保てる」\n'
     +'\n'
-    +'400〜600文字で。回答に甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は出さないでください。'
+    +'500〜700文字で。回答に甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字は出さないでください。'
     +'年柱・月柱・日柱・蔵干・納音という言葉も使わず、自然な言葉で伝えてください。'
     +'絶対にMarkdown記法（# ## ** * など）を使わず、普通の文章のみで書いてください。';
   return prompt;
