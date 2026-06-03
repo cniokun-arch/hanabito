@@ -593,6 +593,7 @@ function calcGraph(){
 
 function showResult(result){
   RESULT_DATA=result;
+  AI_COMMENT_CACHE={};
   document.getElementById('resultSection').classList.remove('hidden');
   document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
   drawDiagram(result);
@@ -728,16 +729,62 @@ function drawList(result){
 }
 
 // ===== モーダル =====
-function showCompatDetail(pair){
+// ===== AI一言コメント =====
+var AI_COMMENT_CACHE={};
+var WORKER_URL='https://polished-flower-2524.cniokun.workers.dev/api/chat';
+
+function getCompatKey(pair){
+  return pair.i+'-'+pair.j;
+}
+
+async function fetchAIComment(pair,p1,p2){
+  var key=pair.i+'-'+pair.j;
+  if(AI_COMMENT_CACHE[key]) return AI_COMMENT_CACHE[key];
+  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
+  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  function jr(j){return goodJuni.indexOf(j)>=0?'良':badJuni.indexOf(j)>=0?'要注意':'普通';}
+  var parts=[
+    '相性データ：'+p1.name+'（'+p1.role+'）と'+p2.name+'（'+p2.role+'）',
+    '根源運気：'+p1.name+'→'+pair.nenJu1+'('+jr(pair.nenJu1)+') '+p2.name+'→'+pair.nenJu2+'('+jr(pair.nenJu2)+')',
+    '日常運気：'+p1.name+'→'+pair.tsuJu1+'('+jr(pair.tsuJu1)+') '+p2.name+'→'+pair.tsuJu2+'('+jr(pair.tsuJu2)+')',
+    '感性の相性：'+pair.comment,
+    '上記を元に2〜3文で総合評価。根源が要注意なら正直に伝え、感性が合っても近くで悪影響が出る場合はそれも伝える。Markdown不可。絵文字1〜2個。'
+  ];
+  var prompt=parts.join(' / ');
+  var sysPrompt='あなたは花人占術の鑑定師です。相性を2〜3文で端的に正直に温かく伝えてください。';
+  try{
+    var res=await fetch(WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:prompt}],max_tokens:200})
+    });
+    var data=await res.json();
+    var text='';
+    if(data.content&&data.content.length>0){
+      text=data.content.map(function(b){return b.text||'';}).join('');
+    }
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    AI_COMMENT_CACHE[key]=text||'データを取得できませんでした。';
+    return AI_COMMENT_CACHE[key];
+  }catch(e){
+    return '通信エラーが発生しました。';
+  }
+}
+
+
+async function showCompatDetail(pair){
   if(!RESULT_DATA) return;
   var p1=RESULT_DATA.persons[pair.i],p2=RESULT_DATA.persons[pair.j];
-  document.getElementById('modalMark').textContent=pair.label.mark;
-  document.getElementById('modalMark').style.color=pair.label.color;
-  document.getElementById('modalTitle').textContent=p1.name+' と '+p2.name+'の相性';
-  document.getElementById('modalComment').textContent=pair.comment||'感性の相性データを読み込んでいます。';
   var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
   var badJuni=['内省','狂咲','引寒','休眠','残雪'];
   function rating(j){return goodJuni.indexOf(j)>=0?'◎ '+j:badJuni.indexOf(j)>=0?'▲ '+j:'○ '+j;}
+
+  // まずモーダルを即座に開く（ローディング状態）
+  document.getElementById('modalMark').textContent=pair.label.mark;
+  document.getElementById('modalMark').style.color=pair.label.color;
+  document.getElementById('modalTitle').textContent=p1.name+' と '+p2.name+'の相性';
+  document.getElementById('modalComment').innerHTML=
+    '<span id="aiCommentText" style="color:#7a6b52;font-style:normal;font-size:0.85rem">🌸 鑑定中...</span>';
   document.getElementById('modalDetails').innerHTML=
     '<div class="modal-detail-row"><span class="modal-detail-label">'+p1.name+'から見た'+p2.name+'（根源）</span><span>'+rating(pair.nenJu1)+'</span></div>'
     +'<div class="modal-detail-row"><span class="modal-detail-label">'+p2.name+'から見た'+p1.name+'（根源）</span><span>'+rating(pair.nenJu2)+'</span></div>'
@@ -746,6 +793,16 @@ function showCompatDetail(pair){
     +'<div class="modal-detail-row"><span class="modal-detail-label">'+p1.name+'の六花人</span><span>'+p1.ht.replace(/[＋－]/g,'')+'</span></div>'
     +'<div class="modal-detail-row"><span class="modal-detail-label">'+p2.name+'の六花人</span><span>'+p2.ht.replace(/[＋－]/g,'')+'</span></div>';
   document.getElementById('modalOverlay').classList.remove('hidden');
+
+  // AIコメントを非同期取得（キャッシュあれば即反映）
+  var comment=await fetchAIComment(pair,p1,p2);
+  var el=document.getElementById('aiCommentText');
+  if(el){
+    el.style.color='';
+    el.style.fontStyle='italic';
+    el.style.fontSize='';
+    el.textContent=comment;
+  }
 }
 
 function showPersonDetail(idx){
