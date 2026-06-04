@@ -190,6 +190,25 @@ ruby rt{font-size:0.55em}
 </div>
 
 <script>
+// ===== グローバルエラーキャッチ（index.htmlと同仕様） =====
+window.onerror = function(msg, src, line, col, err) {
+  var box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ JS Error: ' + msg + ' [行' + line + ':' + col + ']';
+    box.style.display = 'block';
+    box.style.wordBreak = 'break-all';
+  }
+  return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+  var box = document.getElementById('errmsg');
+  if (box) {
+    box.textContent = '⚠ 非同期エラー: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
+    box.style.display = 'block';
+  }
+});
+</script>
+<script>
 const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
@@ -789,10 +808,10 @@ function drawDiagram(result){
       return function(){showDirectionalDetail(pr,'backward');};
     })(pair));
 
-    // 中央：総括マーク（2本矢印の中間点）
-    var cx=(pos1.x+pos2.x)/2;
-    var cy2=(pos1.y+pos2.y)/2;
-    var cfw=32,cfh=26;
+    // 中央：総括マーク（2本矢印の外側、垂直方向にオフセット）
+    var cx=(pos1.x+pos2.x)/2 + px*22;
+    var cy2=(pos1.y+pos2.y)/2 + py*22;
+    var cfw=40,cfh=32;
     var fo2=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
     fo2.setAttribute('x',cx-cfw/2);fo2.setAttribute('y',cy2-cfh/2);
     fo2.setAttribute('width',cfw);fo2.setAttribute('height',cfh);
@@ -1119,38 +1138,41 @@ async function sendDirChat(){
 
 
 async function showCompatDetail(pair){
+  var errmsg=document.getElementById('errmsg');
+  if(errmsg) errmsg.style.display='none';
   if(!RESULT_DATA) return;
   var p1=RESULT_DATA.persons[pair.i],p2=RESULT_DATA.persons[pair.j];
   var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
   var badJ=['内省','狂咲','引寒','休眠','残雪'];
-  function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'◎':'○';}
+  function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'○':'○';}
   function rl(n1,n2,j){return ri(j)+' '+n2+'にとって'+n1+'は「'+(JUNI_PLAIN[j]||j)+'」相手';}
 
   document.getElementById('modalMark').textContent=pair.label.mark;
   document.getElementById('modalMark').style.color=pair.label.color;
-  document.getElementById('modalTitle').textContent=p1.name+' と '+p2.name+'の相性';
-  document.getElementById('modalComment').innerHTML=
-    '<span id="aiCommentText" style="color:#7a6b52;font-style:normal;font-size:0.85rem">🌸 鑑定中...</span>';
+  document.getElementById('modalTitle').textContent=p1.name+' と '+p2.name+'の総合相性';
+  document.getElementById('modalComment').innerHTML='<span id="compatAiText" style="color:#7a6b52;font-size:0.85rem">🌸 AI鑑定中...</span>';
   document.getElementById('modalDetails').innerHTML=
     '<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
-    +'<span class="modal-detail-label">長期的に見ると（根本の相性）</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p1.name,p2.name,pair.nenJu2)+'</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p2.name,p1.name,pair.nenJu1)+'</span>'
+    +'<span class="modal-detail-label">'+p1.name+'から見た'+p2.name+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">長期：'+rl(p2.name,p1.name,pair.nenJu1)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">日常：'+rl(p2.name,p1.name,pair.tsuJu1)+'</span>'
     +'</div>'
     +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
-    +'<span class="modal-detail-label">普段の付き合いでは</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p1.name,p2.name,pair.tsuJu2)+'</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+rl(p2.name,p1.name,pair.tsuJu1)+'</span>'
+    +'<span class="modal-detail-label">'+p2.name+'から見た'+p1.name+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">長期：'+rl(p1.name,p2.name,pair.nenJu2)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">日常：'+rl(p1.name,p2.name,pair.tsuJu2)+'</span>'
     +'</div>';
+  document.getElementById('modalOverlay').classList.remove('hidden');
 
-  // AIコメントを非同期取得（キャッシュあれば即反映）
-  var comment=await fetchAIComment(pair,p1,p2);
-  var el=document.getElementById('aiCommentText');
-  if(el){
-    el.style.color='';
-    el.style.fontStyle='italic';
-    el.style.fontSize='';
-    el.textContent=comment;
+  // AI総合コメントを取得
+  try{
+    var comment=await fetchAIComment(pair,p1,p2);
+    var el=document.getElementById('compatAiText');
+    if(el){el.style.fontStyle='italic';el.style.color='';el.textContent=comment;}
+  }catch(e){
+    var el=document.getElementById('compatAiText');
+    if(el) el.textContent='AI鑑定エラー：'+e.message;
+    if(errmsg){errmsg.textContent='⚠ showCompatDetail エラー：'+e.message;errmsg.style.display='block';}
   }
 }
 
@@ -1186,7 +1208,7 @@ function buildQuestionForms(result){
   var me=persons[0];
 
   // Q1: 各ペアの同居状況
-  var pairs=result.pairs;
+  var pairs=result.pairs.filter(function(pair){return pair.i===0;});
   pairs.forEach(function(pair){
     var p=persons[pair.j];
     var pid=pair.i+'-'+pair.j;
