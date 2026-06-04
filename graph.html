@@ -145,6 +145,21 @@ ruby rt{font-size:0.55em}
         <span>🌸</span><span>鑑定中です<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>
       </div>
       <div id="adviceText" class="ai-answer-box" style="display:none"></div>
+      <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap" id="adviceBtnRow" style="display:none">
+        <button class="speak-btn" id="adviceSpeakBtn" onclick="speakAdvice(this)" style="display:none">🔊 読み上げ</button>
+        <select id="adviceVoiceGender" style="font-size:0.82rem;padding:0.4rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#faf6ef;color:#4a3c28;display:none">
+          <option value="female">女性の声</option>
+          <option value="male">男性の声</option>
+        </select>
+      </div>
+      <div id="adviceChatArea" style="display:none;margin-top:1rem">
+        <div id="adviceChatHistory" style="margin-bottom:0.6rem"></div>
+        <div style="display:flex;gap:0.5rem;align-items:flex-end">
+          <textarea id="adviceChatInput" rows="2" placeholder="さらに質問する..." style="flex:1;font-size:0.88rem;padding:0.55rem 0.7rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;background:#faf6ef;color:#1a1208;outline:none;resize:none;line-height:1.6"></textarea>
+          <button onclick="sendAdviceChat()" style="padding:0.55rem 0.9rem;font-size:0.85rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap">送信</button>
+        </div>
+        <div id="adviceChatLoading" class="ai-loading" style="display:none"><span>🌸</span><span>鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
+      </div>
       <div id="adviceCount" style="font-size:0.78rem;color:#7a6b52;text-align:right;margin-top:0.4rem"></div>
     </div>
   </div>
@@ -601,8 +616,12 @@ function calcGraph(){
     pp.name=name;pp.role=role;
     persons.push(pp);
   });
+  if(persons.length<2){
+    showError('生年月日を入力できた人物が2人未満です。すべて入力してください。');
+    return;
+  }
   if(!valid){
-    showError('すべての人物の生年月日を入力してください。');
+    showError('すべての人物の生年月日を入力してください。赤くなっているカードを確認してください。');
     return;
   }
   // 全ペアの相性を計算
@@ -644,6 +663,13 @@ function showResult(result){
   document.getElementById('questionSection').classList.remove('hidden');
   document.getElementById('adviceSection').classList.add('hidden');
   document.getElementById('adviceText').style.display='none';
+  document.getElementById('adviceSpeakBtn').style.display='none';
+  document.getElementById('adviceVoiceGender').style.display='none';
+  document.getElementById('adviceChatArea').style.display='none';
+  document.getElementById('adviceChatHistory').innerHTML='';
+  ADVICE_CHAT_HISTORY=[];
+  DIR_AI_CACHE={};
+  DIR_CHAT_HISTORY={};
 }
 
 // ===== 相関図描画 =====
@@ -651,124 +677,158 @@ function drawDiagram(result){
   var persons=result.persons;
   var pairs=result.pairs;
   var n=persons.length;
-  var W=380,H=380;
+  // 広めのviewBox
+  var W=440,H=440;
   var positions=getPositions(n,W,H);
   var svg=document.getElementById('diagramSvg');
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.innerHTML='';
 
-  // SVGにarrowheadマーカーを定義
+  // arrowheadマーカー定義
   var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-  ['green','blue','orange','red'].forEach(function(name,ci){
-    var colors=['#2a8c4a','#4a7acc','#b8a000','#e05040'];
+  var arrowColors={green:'#2a8c4a',blue:'#4a7acc',orange:'#b8a000',red:'#c0392b'};
+  Object.keys(arrowColors).forEach(function(name){
     var marker=document.createElementNS('http://www.w3.org/2000/svg','marker');
     marker.setAttribute('id','arrow-'+name);
-    marker.setAttribute('markerWidth','8');
-    marker.setAttribute('markerHeight','8');
-    marker.setAttribute('refX','6');
+    marker.setAttribute('markerWidth','9');
+    marker.setAttribute('markerHeight','9');
+    marker.setAttribute('refX','7');
     marker.setAttribute('refY','3');
     marker.setAttribute('orient','auto');
     var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 8 3, 0 6');
-    poly.setAttribute('fill',colors[ci]);
+    poly.setAttribute('points','0 0, 9 3, 0 6');
+    poly.setAttribute('fill',arrowColors[name]);
     marker.appendChild(poly);
     defs.appendChild(marker);
   });
   svg.appendChild(defs);
 
-  function getArrowMarker(label){
-    if(label.line==='#2a8c4a') return 'url(#arrow-green)';
-    if(label.line==='#4a7acc') return 'url(#arrow-blue)';
-    if(label.line==='#b8a000') return 'url(#arrow-orange)';
+  function getArrowMarker(lbl){
+    if(lbl.line==='#2a8c4a') return 'url(#arrow-green)';
+    if(lbl.line==='#4a7acc') return 'url(#arrow-blue)';
+    if(lbl.line==='#b8a000') return 'url(#arrow-orange)';
     return 'url(#arrow-red)';
   }
 
-  var nodeW=68,nodeH=74;
-  var nr=nodeW/2; // ノード半径（矢印を止める位置用）
+  var nodeW=76,nodeH=82;
+  var margin=nodeW/2+3;
+  var arrowOffset=9; // 2本線の間隔
+  var markOffset=0.35; // 矢印上のマーク位置（0=始点 0.5=中央 1=終点）
+  var fw=26,fh=22; // マークボックスサイズ
 
-  // ① 接続線（2本の矢印＋中央総括ラベル）
   pairs.forEach(function(pair){
     var pos1=positions[pair.i],pos2=positions[pair.j];
     var dx=pos2.x-pos1.x,dy=pos2.y-pos1.y;
     var dist=Math.sqrt(dx*dx+dy*dy);
     var ux=dx/dist,uy=dy/dist;
-    var px=-uy,py=ux; // 垂直方向
-    var offset=7; // 2本線のオフセット
+    var px=-uy,py=ux;
 
-    // 矢印の始点・終点（ノードの端から始まる）
-    var margin=nr+4;
+    // p1→p2 矢印の始点・終点
+    var s1x=pos1.x+ux*margin+px*arrowOffset;
+    var s1y=pos1.y+uy*margin+py*arrowOffset;
+    var e1x=pos2.x-ux*margin+px*arrowOffset;
+    var e1y=pos2.y-uy*margin+py*arrowOffset;
 
-    // 矢印1：p1→p2（pair.label1の色）
-    var s1x=pos1.x+ux*margin+px*offset;
-    var s1y=pos1.y+uy*margin+py*offset;
-    var e1x=pos2.x-ux*margin+px*offset;
-    var e1y=pos2.y-uy*margin+py*offset;
+    // p2→p1 矢印の始点・終点
+    var s2x=pos2.x-ux*margin-px*arrowOffset;
+    var s2y=pos2.y-uy*margin-py*arrowOffset;
+    var e2x=pos1.x+ux*margin-px*arrowOffset;
+    var e2y=pos1.y+uy*margin-py*arrowOffset;
 
-    // 矢印2：p2→p1（pair.label2の色）
-    var s2x=pos2.x-ux*margin-px*offset;
-    var s2y=pos2.y-uy*margin-py*offset;
-    var e2x=pos1.x+ux*margin-px*offset;
-    var e2y=pos1.y+uy*margin-py*offset;
-
-    function makeLine(sx,sy,ex,ey,lbl,clickFn){
+    function addLine(sx,sy,ex,ey,lbl,clickFn){
       var line=document.createElementNS('http://www.w3.org/2000/svg','line');
       line.setAttribute('x1',sx);line.setAttribute('y1',sy);
       line.setAttribute('x2',ex);line.setAttribute('y2',ey);
       line.setAttribute('stroke',lbl.line);
-      line.setAttribute('stroke-width','2');
-      line.setAttribute('stroke-opacity','0.75');
+      line.setAttribute('stroke-width','2.2');
+      line.setAttribute('stroke-opacity','0.8');
       line.setAttribute('marker-end',getArrowMarker(lbl));
       line.style.cursor='pointer';
       line.onclick=clickFn;
       svg.appendChild(line);
     }
 
-    // p1→p2の矢印（p1視点でp2がどういう相手か）
-    makeLine(s1x,s1y,e1x,e1y,pair.label1,(function(pr){
+    function addMarkLabel(x,y,lbl,clickFn){
+      var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
+      fo.setAttribute('x',x-fw/2);fo.setAttribute('y',y-fh/2);
+      fo.setAttribute('width',fw);fo.setAttribute('height',fh);
+      fo.style.cursor='pointer';
+      fo.onclick=clickFn;
+      var d=document.createElement('div');
+      d.style.cssText='background:'+lbl.bg+';color:'+lbl.color
+        +';border:2px solid '+lbl.color
+        +';font-size:0.82rem;font-weight:700;border-radius:6px'
+        +';text-align:center;line-height:'+fh+'px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)';
+      d.textContent=lbl.mark;
+      fo.appendChild(d);
+      svg.appendChild(fo);
+    }
+
+    // 矢印1（p1→p2）を描画
+    addLine(s1x,s1y,e1x,e1y,pair.label1,(function(pr){
       return function(){showDirectionalDetail(pr,'forward');};
     })(pair));
 
-    // p2→p1の矢印（p2視点でp1がどういう相手か）
-    makeLine(s2x,s2y,e2x,e2y,pair.label2,(function(pr){
+    // 矢印1のマーク（矢印の35%地点）
+    var m1x=s1x+(e1x-s1x)*markOffset;
+    var m1y=s1y+(e1y-s1y)*markOffset;
+    addMarkLabel(m1x,m1y,pair.label1,(function(pr){
+      return function(){showDirectionalDetail(pr,'forward');};
+    })(pair));
+
+    // 矢印2（p2→p1）を描画
+    addLine(s2x,s2y,e2x,e2y,pair.label2,(function(pr){
       return function(){showDirectionalDetail(pr,'backward');};
     })(pair));
 
-    // 中央：総括ラベル
-    var lx=(pos1.x+pos2.x)/2;
-    var ly=(pos1.y+pos2.y)/2;
-    var fw=44,fh=22;
-    var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-    fo.setAttribute('x',lx-fw/2);fo.setAttribute('y',ly-fh/2);
-    fo.setAttribute('width',fw);fo.setAttribute('height',fh);
-    fo.style.cursor='pointer';
-    fo.onclick=(function(pr){return function(){showCompatDetail(pr);};})(pair);
-    var div=document.createElement('div');
-    div.style.cssText='background:'+pair.label.bg+';color:'+pair.label.color+';border:1.5px solid '+pair.label.color+';font-size:0.72rem;font-weight:700;padding:0.12rem 0.3rem;border-radius:4px;text-align:center;line-height:1.4;white-space:nowrap;cursor:pointer';
-    div.textContent=pair.label.mark;
-    fo.appendChild(div);
-    svg.appendChild(fo);
+    // 矢印2のマーク（矢印の35%地点）
+    var m2x=s2x+(e2x-s2x)*markOffset;
+    var m2y=s2y+(e2y-s2y)*markOffset;
+    addMarkLabel(m2x,m2y,pair.label2,(function(pr){
+      return function(){showDirectionalDetail(pr,'backward');};
+    })(pair));
+
+    // 中央：総括マーク（2本矢印の中間点）
+    var cx=(pos1.x+pos2.x)/2;
+    var cy2=(pos1.y+pos2.y)/2;
+    var cfw=32,cfh=26;
+    var fo2=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
+    fo2.setAttribute('x',cx-cfw/2);fo2.setAttribute('y',cy2-cfh/2);
+    fo2.setAttribute('width',cfw);fo2.setAttribute('height',cfh);
+    fo2.style.cursor='pointer';
+    fo2.onclick=(function(pr){return function(){showCompatDetail(pr);};})(pair);
+    var d2=document.createElement('div');
+    d2.style.cssText='background:'+pair.label.bg+';color:'+pair.label.color
+      +';border:2.5px solid '+pair.label.color
+      +';font-size:0.95rem;font-weight:700;border-radius:8px'
+      +';text-align:center;line-height:'+cfh+'px;cursor:pointer'
+      +';box-shadow:0 2px 6px rgba(0,0,0,0.18)';
+    d2.textContent=pair.label.mark;
+    fo2.appendChild(d2);
+    svg.appendChild(fo2);
   });
 
-  // ② 人物カード
+  // 人物カード
+  var nodeW2=76,nodeH2=82;
   persons.forEach(function(p,i){
     var pos=positions[i];
     var rc=getRokkaColor(p.ht);
     var htBase=p.ht.replace(/[＋－]/g,'');
     var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-    fo.setAttribute('x',pos.x-nodeW/2);fo.setAttribute('y',pos.y-nodeH/2);
-    fo.setAttribute('width',nodeW);fo.setAttribute('height',nodeH);
+    fo.setAttribute('x',pos.x-nodeW2/2);fo.setAttribute('y',pos.y-nodeH2/2);
+    fo.setAttribute('width',nodeW2);fo.setAttribute('height',nodeH2);
     fo.style.cursor='pointer';
     fo.onclick=(function(idx){return function(){showPersonDetail(idx);};})(i);
     var div=document.createElement('div');
-    div.style.cssText='background:#fff;border:2px solid '+rc.border+';border-radius:8px;padding:0.25rem 0.2rem;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1)';
+    div.style.cssText='background:#fff;border:2.5px solid '+rc.border+';border-radius:10px;padding:0.3rem 0.2rem;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12)';
     var icon=document.createElement('div');
-    icon.style.cssText='width:34px;height:34px;border-radius:5px;background:'+rc.bg+';border:1.5px solid '+rc.border+';display:flex;align-items:center;justify-content:center;margin-bottom:3px;font-size:0.58rem;font-weight:700;color:'+rc.col+';line-height:1.2;text-align:center';
+    icon.style.cssText='width:36px;height:26px;border-radius:5px;background:'+rc.bg+';border:1.5px solid '+rc.border+';display:flex;align-items:center;justify-content:center;margin-bottom:3px;font-size:0.6rem;font-weight:700;color:'+rc.col+';text-align:center';
     icon.textContent=htBase;
     var nameEl=document.createElement('div');
-    nameEl.style.cssText='font-size:0.7rem;font-weight:700;color:#1a1208;line-height:1.3;max-width:62px;word-break:break-all;text-align:center';
+    nameEl.style.cssText='font-size:0.75rem;font-weight:700;color:#1a1208;line-height:1.3;max-width:70px;word-break:break-all;text-align:center';
     nameEl.textContent=p.name;
     var roleEl=document.createElement('div');
-    roleEl.style.cssText='font-size:0.56rem;color:#7a6b52;margin-top:2px;text-align:center';
+    roleEl.style.cssText='font-size:0.6rem;color:#7a6b52;margin-top:2px;text-align:center';
     roleEl.textContent=p.role.replace('あなた（本人）','本人');
     div.appendChild(icon);div.appendChild(nameEl);div.appendChild(roleEl);
     fo.appendChild(div);
@@ -786,13 +846,12 @@ function drawDiagram(result){
 // n人のレイアウト位置（ドラマ相関図風）
 function getPositions(n,W,H){
   var cx=W/2,cy=H/2;
-  var mx=W*0.12,my=H*0.12;
   var layouts={
     1:[[cx,cy]],
-    2:[[W*0.28,cy],[W*0.72,cy]],
-    3:[[cx,H*0.22],[W*0.22,H*0.72],[W*0.78,H*0.72]],
-    4:[[cx,H*0.18],[W*0.18,cy],[W*0.82,cy],[cx,H*0.82]],
-    5:[[cx,H*0.18],[W*0.15,H*0.42],[W*0.85,H*0.42],[W*0.25,H*0.78],[W*0.75,H*0.78]]
+    2:[[W*0.25,cy],[W*0.75,cy]],
+    3:[[cx,H*0.18],[W*0.18,H*0.75],[W*0.82,H*0.75]],
+    4:[[cx,H*0.15],[W*0.15,H*0.5],[W*0.85,H*0.5],[cx,H*0.85]],
+    5:[[cx,H*0.15],[W*0.12,H*0.45],[W*0.88,H*0.45],[W*0.25,H*0.82],[W*0.75,H*0.82]]
   };
   return (layouts[n]||layouts[5]).map(function(p){return {x:p[0],y:p[1]};});
 }
@@ -896,7 +955,11 @@ async function fetchAIComment(pair,p1,p2){
 }
 
 
-// 矢印タップ：一方向の詳細（forward=p1→p2視点、backward=p2→p1視点）
+// 矢印タップ：一方向の詳細 + AI診断 + チャット
+var DIR_AI_CACHE={};
+var DIR_CHAT_HISTORY={};
+var DIR_CURRENT_KEY='';
+
 function showDirectionalDetail(pair,direction){
   if(!RESULT_DATA) return;
   var isForward=(direction==='forward');
@@ -909,11 +972,6 @@ function showDirectionalDetail(pair,direction){
   var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
   var badJ=['内省','狂咲','引寒','休眠','残雪'];
   function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'○（増幅）':'○';}
-  document.getElementById('modalMark').textContent=myLabel.mark;
-  document.getElementById('modalMark').style.color=myLabel.color;
-  document.getElementById('modalTitle').textContent=me.name+'にとっての'+them.name;
-  document.getElementById('modalComment').innerHTML=
-    '<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.5rem">'+me.name+'から見た'+them.name+'の影響</div>';
   var JUNI_PLAIN_DIR={
     '発芽':'新たな挑戦や実りをもたらしてくれる。思った以上の成果が生まれやすい',
     '青葉':'自分を成長させてくれる。適度な距離感が大切',
@@ -928,21 +986,136 @@ function showDirectionalDetail(pair,direction){
     '休眠':'やりたいことを先取りされやすい。伝えても通じにくい',
     '残雪':'最初は良さそうに見えるが結果になりにくい。トラブルに発展しやすい'
   };
+
+  DIR_CURRENT_KEY=pair.i+'-'+pair.j+'-'+direction;
+  if(!DIR_CHAT_HISTORY[DIR_CURRENT_KEY]) DIR_CHAT_HISTORY[DIR_CURRENT_KEY]=[];
+
+  document.getElementById('modalMark').textContent=myLabel.mark;
+  document.getElementById('modalMark').style.color=myLabel.color;
+  document.getElementById('modalTitle').textContent=me.name+'にとっての'+them.name;
+  document.getElementById('modalComment').innerHTML=
+    '<span id="dirAiText" style="color:#7a6b52;font-size:0.85rem">🌸 鑑定中...</span>';
   document.getElementById('modalDetails').innerHTML=
     '<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
     +'<span class="modal-detail-label">長期的に見ると（根本）</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(nenJu)+' '+nenJu+'：'+(JUNI_PLAIN[nenJu]||JUNI_PLAIN_DIR[nenJu]||nenJu)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">'+ri(nenJu)+' '+nenJu+'：'+(JUNI_PLAIN[nenJu]||JUNI_PLAIN_DIR[nenJu])+'</span>'
     +'</div>'
     +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
     +'<span class="modal-detail-label">普段の付き合いでは</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(tsuJu)+' '+tsuJu+'：'+(JUNI_PLAIN[tsuJu]||JUNI_PLAIN_DIR[tsuJu]||tsuJu)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">'+ri(tsuJu)+' '+tsuJu+'：'+(JUNI_PLAIN[tsuJu]||JUNI_PLAIN_DIR[tsuJu])+'</span>'
     +'</div>'
     +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
     +'<span class="modal-detail-label">深く関わると（本音）</span>'
-    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(nichiJu)+' '+nichiJu+'：'+(JUNI_PLAIN[nichiJu]||JUNI_PLAIN_DIR[nichiJu]||nichiJu)+'</span>'
+    +'<span style="font-size:0.88rem;line-height:1.85">'+ri(nichiJu)+' '+nichiJu+'：'+(JUNI_PLAIN[nichiJu]||JUNI_PLAIN_DIR[nichiJu])+'</span>'
+    +'</div>'
+    +'<div id="dirChatHistory" style="margin-top:0.8rem"></div>'
+    +'<div id="dirChatArea" style="margin-top:0.6rem">'
+    +'<div style="display:flex;gap:0.5rem;align-items:flex-end">'
+    +'<textarea id="dirChatInput" rows="2" placeholder="さらに質問する..." style="flex:1;font-size:0.88rem;padding:0.5rem 0.7rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;background:#faf6ef;color:#1a1208;outline:none;resize:none;line-height:1.6"></textarea>'
+    +'<button onclick="sendDirChat()" style="padding:0.55rem 0.9rem;font-size:0.85rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap">送信</button>'
+    +'</div>'
+    +'<div id="dirChatLoading" class="ai-loading" style="display:none"><span>🌸</span><span>鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>'
     +'</div>';
+
   document.getElementById('modalOverlay').classList.remove('hidden');
+  // AI鑑定を非同期で取得
+  fetchDirAI(pair,direction,me,them,nenJu,tsuJu,nichiJu,myLabel);
 }
+
+async function fetchDirAI(pair,direction,me,them,nenJu,tsuJu,nichiJu,myLabel){
+  var key=pair.i+'-'+pair.j+'-'+direction;
+  if(DIR_AI_CACHE[key]){
+    var el=document.getElementById('dirAiText');
+    if(el){el.style.fontStyle='italic';el.style.color='';el.textContent=DIR_AI_CACHE[key];}
+    DIR_CHAT_HISTORY[key]=[{role:'assistant',content:DIR_AI_CACHE[key]}];
+    return;
+  }
+  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
+  var badJ=['内省','狂咲','引寒','休眠','残雪'];
+  function jr(j){return goodJ.indexOf(j)>=0?'良':badJ.indexOf(j)>=0?'要注意':'普通';}
+  var parts=[
+    me.name+'('+me.role+')にとっての'+them.name+'('+them.role+')の相性',
+    '総合判定：'+myLabel.mark+myLabel.text,
+    '長期的影響：'+nenJu+'('+jr(nenJu)+')',
+    '日常的影響：'+tsuJu+'('+jr(tsuJu)+')',
+    '深層的影響：'+nichiJu+'('+jr(nichiJu)+')',
+    me.name+'の視点で2〜3文で鑑定。距離の置き方の具体策を含める。Markdown不可。絵文字1〜2個。'
+  ];
+  var sysPrompt='あなたは花人占術の鑑定師です。一人の視点から見た相手との関係性を、正直に温かく鑑定してください。';
+  try{
+    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:parts.join(' / ')}],max_tokens:200})});
+    var data=await res.json();
+    var text='';
+    if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    DIR_AI_CACHE[key]=text;
+    DIR_CHAT_HISTORY[key]=[{role:'assistant',content:text}];
+    var el=document.getElementById('dirAiText');
+    if(el){el.style.fontStyle='italic';el.style.color='';el.textContent=text;}
+  }catch(e){
+    var el=document.getElementById('dirAiText');
+    if(el) el.textContent='通信エラーが発生しました。';
+  }
+}
+
+async function sendDirChat(){
+  var input=document.getElementById('dirChatInput');
+  if(!input) return;
+  var userMsg=input.value.trim();
+  if(!userMsg) return;
+  input.value='';
+  var key=DIR_CURRENT_KEY;
+  if(!DIR_CHAT_HISTORY[key]) DIR_CHAT_HISTORY[key]=[];
+  DIR_CHAT_HISTORY[key].push({role:'user',content:userMsg});
+  var histEl=document.getElementById('dirChatHistory');
+  if(histEl){
+    var ud=document.createElement('div');
+    ud.className='chat-bubble-user';
+    ud.textContent=userMsg;
+    histEl.appendChild(ud);
+  }
+  var loadEl=document.getElementById('dirChatLoading');
+  if(loadEl) loadEl.style.display='flex';
+  var messages=DIR_CHAT_HISTORY[key].slice(-8);
+  var sysPrompt='あなたは花人占術の鑑定師です。追加質問に正直に深く答えてください。Markdown不可。';
+  try{
+    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:messages})});
+    var data=await res.json();
+    var text='';
+    if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    DIR_CHAT_HISTORY[key].push({role:'assistant',content:text});
+    if(loadEl) loadEl.style.display='none';
+    if(histEl){
+      var ad=document.createElement('div');
+      ad.className='chat-bubble-ai';
+      ad.textContent=text;
+      var sb=document.createElement('button');
+      sb.className='chat-speak-btn';
+      sb.textContent='🔊 読み上げ';
+      sb.setAttribute('data-text',text);
+      sb.onclick=function(){speakChatBubble(this);};
+      var wrap=document.createElement('div');
+      wrap.appendChild(ad);wrap.appendChild(sb);
+      histEl.appendChild(wrap);
+      wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    if(data.remaining!==undefined){
+      document.getElementById('aiCountDisp').textContent='本日の残り回数：'+data.remaining+'回';
+    }
+  }catch(e){
+    if(loadEl) loadEl.style.display='none';
+    if(histEl){
+      var ed=document.createElement('div');
+      ed.className='chat-bubble-ai';
+      ed.textContent='通信エラーが発生しました。';
+      histEl.appendChild(ed);
+    }
+  }
+}
+
 
 async function showCompatDetail(pair){
   if(!RESULT_DATA) return;
@@ -1114,6 +1287,10 @@ async function getRelationAdvice(){
     document.getElementById('adviceLoading').style.display='none';
     document.getElementById('adviceText').textContent=text;
     document.getElementById('adviceText').style.display='block';
+    document.getElementById('adviceSpeakBtn').style.display='block';
+    document.getElementById('adviceVoiceGender').style.display='block';
+    document.getElementById('adviceChatArea').style.display='block';
+    ADVICE_CHAT_HISTORY=[{role:'assistant',content:text}];
     if(data.remaining!==undefined){
       document.getElementById('adviceCount').textContent='本日の残り鑑定回数：'+data.remaining+'回';
     }
@@ -1122,6 +1299,126 @@ async function getRelationAdvice(){
     document.getElementById('adviceLoading').style.display='none';
     document.getElementById('adviceText').textContent='通信エラーが発生しました。';
     document.getElementById('adviceText').style.display='block';
+  }
+}
+
+// ===== アドバイス音声読み上げ =====
+var currentAudio=null;
+var ADVICE_CHAT_HISTORY=[];
+
+async function speakAdvice(btn){
+  if(currentAudio&&!currentAudio.paused){
+    currentAudio.pause();currentAudio=null;
+    btn.textContent='🔊 読み上げ';return;
+  }
+  var rawText=document.getElementById('adviceText').textContent||'';
+  if(!rawText) return;
+  var gender=document.getElementById('adviceVoiceGender').value||'female';
+  var t=rawText;
+  ['#','*','【','】','「','」'].forEach(function(c){while(t.indexOf(c)>=0)t=t.replace(c,'');});
+  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
+   ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
+   ['＋','ぷらす'],['－','まいなす']
+  ].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  btn.textContent='⏳ 生成中...';btn.disabled=true;
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:t,gender:gender})
+    });
+    if(!res.ok) throw new Error('TTS失敗');
+    var data=await res.json();
+    if(data.error) throw new Error(data.error);
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){btn.textContent='⏹ 停止';btn.disabled=false;};
+    audio.onended=function(){btn.textContent='🔊 読み上げ';currentAudio=null;};
+    audio.onerror=function(){btn.textContent='🔊 読み上げ';btn.disabled=false;currentAudio=null;};
+    await audio.play();
+  }catch(e){
+    btn.textContent='🔊 読み上げ';btn.disabled=false;
+  }
+}
+
+// チャットバブル個別読み上げ
+async function speakChatBubble(btn){
+  if(currentAudio&&!currentAudio.paused){
+    currentAudio.pause();currentAudio=null;
+    btn.textContent='🔊 読み上げ';return;
+  }
+  var rawText=btn.getAttribute('data-text')||'';
+  if(!rawText) return;
+  var t=rawText;
+  ['#','*','【','】'].forEach(function(c){while(t.indexOf(c)>=0)t=t.replace(c,'');});
+  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],
+   ['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん']
+  ].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  btn.textContent='⏳ 生成中...';btn.disabled=true;
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:t,gender:'female'})
+    });
+    if(!res.ok) throw new Error('失敗');
+    var data=await res.json();
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){btn.textContent='⏹ 停止';btn.disabled=false;};
+    audio.onended=function(){btn.textContent='🔊 読み上げ';currentAudio=null;};
+    audio.onerror=function(){btn.textContent='🔊 読み上げ';btn.disabled=false;currentAudio=null;};
+    await audio.play();
+  }catch(e){
+    btn.textContent='🔊 読み上げ';btn.disabled=false;
+  }
+}
+
+// アドバイスセクションのチャット
+async function sendAdviceChat(){
+  var input=document.getElementById('adviceChatInput');
+  if(!input) return;
+  var userMsg=input.value.trim();
+  if(!userMsg) return;
+  input.value='';
+  ADVICE_CHAT_HISTORY.push({role:'user',content:userMsg});
+  var histEl=document.getElementById('adviceChatHistory');
+  if(histEl){
+    var ud=document.createElement('div');
+    ud.className='chat-bubble-user';
+    ud.textContent=userMsg;
+    histEl.appendChild(ud);
+  }
+  var loadEl=document.getElementById('adviceChatLoading');
+  if(loadEl) loadEl.style.display='flex';
+  var messages=ADVICE_CHAT_HISTORY.slice(-10);
+  var sysPrompt='あなたは花人占術の鑑定師です。相関図の鑑定に関する追加質問に答えてください。Markdown不可。';
+  try{
+    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:messages})});
+    var data=await res.json();
+    var text='';
+    if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    ADVICE_CHAT_HISTORY.push({role:'assistant',content:text});
+    if(loadEl) loadEl.style.display='none';
+    if(histEl){
+      var ad=document.createElement('div');
+      ad.className='chat-bubble-ai';
+      ad.textContent=text;
+      var sb=document.createElement('button');
+      sb.className='chat-speak-btn';
+      sb.textContent='🔊 読み上げ';
+      sb.setAttribute('data-text',text);
+      sb.onclick=function(){speakChatBubble(this);};
+      var wrap=document.createElement('div');
+      wrap.appendChild(ad);wrap.appendChild(sb);
+      histEl.appendChild(wrap);
+      wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    if(data.remaining!==undefined){
+      document.getElementById('adviceCount').textContent='本日の残り回数：'+data.remaining+'回';
+    }
+  }catch(e){
+    if(loadEl) loadEl.style.display='none';
   }
 }
 
