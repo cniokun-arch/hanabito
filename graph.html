@@ -41,6 +41,9 @@ body{background:#f5f0e8;color:#1a1208;min-height:100vh}
 
 /* 相関図エリア */
 .diagram-wrap{position:relative;background:#fefcf7;border:1px solid rgba(184,134,11,0.15);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.mark-btn,.sokatsu-btn,.card-btn{cursor:pointer}
+.mark-btn:hover circle{r:17}
+.sokatsu-btn:hover rect,.card-btn:hover rect{opacity:0.85}
 /* ノート罫線背景 */
 .diagram-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(transparent,transparent 39px,rgba(100,150,200,0.12) 39px,rgba(100,150,200,0.12) 40px);pointer-events:none;z-index:0}
 .diagram-svg{width:100%;display:block;position:relative;z-index:1}
@@ -123,7 +126,9 @@ ruby rt{font-size:0.55em}
     </div>
     <div id="diagramView">
       <div class="diagram-wrap" id="diagramWrap">
-        <svg class="diagram-svg" id="diagramSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="scroll-wrap" style="overflow-x:auto;overflow-y:auto;width:100%">
+          <svg id="svg" xmlns="http://www.w3.org/2000/svg" style="display:block;"></svg>
+        </div>
       </div>
       <p style="font-size:0.78rem;color:#7a6b52;text-align:center;margin-top:0.3rem">カードや相性マークをタップすると詳細が見られます</p>
     </div>
@@ -164,6 +169,23 @@ ruby rt{font-size:0.55em}
     </div>
   </div>
 </div>
+
+<!-- テンプレート詳細ポップアップ -->
+<div id="detail-popup" style="
+  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border-radius:12px; padding:20px 24px; max-width:340px; width:92%;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18); z-index:200; font-family:'Noto Serif JP',serif;
+">
+  <div id="detail-title" style="font-size:0.85rem; margin-bottom:8px; font-weight:700;color:#b8860b"></div>
+  <div id="detail-body" style="font-size:0.9rem; line-height:1.8; color:#333;"></div>
+  <button onclick="closeDetail()" style="
+    margin-top:16px; width:100%; padding:10px; border:none; border-radius:8px;
+    background:#f5f0e8; color:#7a6b52; font-size:0.88rem; cursor:pointer;
+  ">閉じる</button>
+</div>
+<div id="detail-overlay" onclick="closeDetail()" style="
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:199;
+"></div>
 
 <!-- 相性詳細モーダル -->
 <div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
@@ -707,218 +729,75 @@ function showResult(result){
 }
 
 // ===== 相関図描画 =====
-function drawDiagram(result){
+function generateTemplateData(result){
   var persons=result.persons;
   var pairs=result.pairs;
-  var n=persons.length;
-  // 広めのviewBox
-  var W=440,H=440;
-  var positions=getPositions(n,W,H);
-  var svg=document.getElementById('diagramSvg');
-  svg.setAttribute('viewBox','0 0 '+W+' '+H);
-  svg.innerHTML='';
+  var ids=['A','B','C','D','E'];
+  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
+  var badJ=['内省','狂咲','引寒','休眠','残雪'];
 
-  // arrowheadマーカー定義
-  var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-  var arrowColors={green:'#2a8c4a',blue:'#4a7acc',orange:'#b8a000',red:'#c0392b'};
-  Object.keys(arrowColors).forEach(function(name){
-    var marker=document.createElementNS('http://www.w3.org/2000/svg','marker');
-    marker.setAttribute('id','arrow-'+name);
-    marker.setAttribute('markerWidth','9');
-    marker.setAttribute('markerHeight','9');
-    marker.setAttribute('refX','7');
-    marker.setAttribute('refY','3');
-    marker.setAttribute('orient','auto');
-    var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 9 3, 0 6');
-    poly.setAttribute('fill',arrowColors[name]);
-    marker.appendChild(poly);
-    defs.appendChild(marker);
-  });
-  svg.appendChild(defs);
-
-  function getArrowMarker(lbl){
-    if(lbl.line==='#2a8c4a') return 'url(#arrow-green)';
-    if(lbl.line==='#4a7acc') return 'url(#arrow-blue)';
-    if(lbl.line==='#b8a000') return 'url(#arrow-orange)';
-    return 'url(#arrow-red)';
+  function juniDesc(j){return JUNI_PLAIN[j]||j;}
+  function juniMark(j){
+    if(goodJ.indexOf(j)>=0) return j==='成天'?'◎':'○';
+    if(badJ.indexOf(j)>=0) return j==='休眠'?'×':'▲';
+    return '△';
   }
+  function personalMark(lbl){return lbl.mark;}
 
-  var nodeW=76,nodeH=82;
-  var margin=nodeW/2+3;
-  var arrowOffset=13; // 2本線の間隔
-  var markOffset=0.35; // 矢印上のマーク位置（0=始点 0.5=中央 1=終点）
-  var fw=26,fh=22; // マークボックスサイズ
-
-  pairs.forEach(function(pair){
-    var pos1=positions[pair.i],pos2=positions[pair.j];
-    var dx=pos2.x-pos1.x,dy=pos2.y-pos1.y;
-    var dist=Math.sqrt(dx*dx+dy*dy);
-    var ux=dx/dist,uy=dy/dist;
-    var px=-uy,py=ux;
-
-    // p1→p2 矢印の始点・終点
-    var s1x=pos1.x+ux*margin+px*arrowOffset;
-    var s1y=pos1.y+uy*margin+py*arrowOffset;
-    var e1x=pos2.x-ux*margin+px*arrowOffset;
-    var e1y=pos2.y-uy*margin+py*arrowOffset;
-
-    // p2→p1 矢印の始点・終点
-    var s2x=pos2.x-ux*margin-px*arrowOffset;
-    var s2y=pos2.y-uy*margin-py*arrowOffset;
-    var e2x=pos1.x+ux*margin-px*arrowOffset;
-    var e2y=pos1.y+uy*margin-py*arrowOffset;
-
-    function addLine(sx,sy,ex,ey,lbl,clickFn){
-      var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',sx);line.setAttribute('y1',sy);
-      line.setAttribute('x2',ex);line.setAttribute('y2',ey);
-      line.setAttribute('stroke',lbl.line);
-      line.setAttribute('stroke-width','8');
-      line.setAttribute('stroke-opacity','0.0');
-      line.setAttribute('marker-end',getArrowMarker(lbl));
-      line.style.cursor='pointer';
-      line.onclick=clickFn;
-      line.addEventListener('touchend',function(e){e.preventDefault();clickFn();});
-      svg.appendChild(line);
-      // 見た目用の細い線（marker-endは細い線だけに付ける）
-      var vis=document.createElementNS('http://www.w3.org/2000/svg','line');
-      vis.setAttribute('x1',sx);vis.setAttribute('y1',sy);
-      vis.setAttribute('x2',ex);vis.setAttribute('y2',ey);
-      vis.setAttribute('stroke',lbl.line);
-      vis.setAttribute('stroke-width','2.2');
-      vis.setAttribute('stroke-opacity','0.8');
-      vis.setAttribute('pointer-events','none');
-      vis.setAttribute('marker-end',getArrowMarker(lbl));
-      svg.appendChild(vis);
-      // 透明ヒット領域（marker-endなし）
-      line.setAttribute('marker-end','none');
-    }
-
-    function addMarkLabel(x,y,lbl,clickFn){
-      var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-      fo.setAttribute('x',x-fw/2);fo.setAttribute('y',y-fh/2);
-      fo.setAttribute('width',fw);fo.setAttribute('height',fh);
-      var d=document.createElement('div');
-      d.style.cssText='background:'+lbl.bg+';color:'+lbl.color
-        +';border:2px solid '+lbl.color
-        +';font-size:0.82rem;font-weight:700;border-radius:6px'
-        +';text-align:center;line-height:'+fh+'px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)'
-        +';-webkit-tap-highlight-color:rgba(0,0,0,0.2);user-select:none';
-      d.textContent=lbl.mark;
-      d.onclick=clickFn;
-      d.addEventListener('touchend',function(e){e.preventDefault();clickFn();});
-      fo.appendChild(d);
-      svg.appendChild(fo);
-    }
-
-    // 矢印1（p1→p2）を描画
-    addLine(s1x,s1y,e1x,e1y,pair.label1,(function(pr){
-      return function(){showDirectionalDetail(pr,'forward');};
-    })(pair));
-
-    // 矢印1のマーク（矢印の35%地点）
-    var m1x=s1x+(e1x-s1x)*markOffset;
-    var m1y=s1y+(e1y-s1y)*markOffset;
-    addMarkLabel(m1x,m1y,pair.label1,(function(pr){
-      return function(){showDirectionalDetail(pr,'forward');};
-    })(pair));
-
-    // 矢印2（p2→p1）を描画
-    addLine(s2x,s2y,e2x,e2y,pair.label2,(function(pr){
-      return function(){showDirectionalDetail(pr,'backward');};
-    })(pair));
-
-    // 矢印2のマーク（矢印の35%地点）
-    var m2x=s2x+(e2x-s2x)*markOffset;
-    var m2y=s2y+(e2y-s2y)*markOffset;
-    addMarkLabel(m2x,m2y,pair.label2,(function(pr){
-      return function(){showDirectionalDetail(pr,'backward');};
-    })(pair));
-
-    // 総括マーク：三角形の重心から外側方向にオフセット
-    // 重心を計算して逆方向に配置
-    var n=persons.length;
-    var gx=0,gy=0;
-    for(var gi=0;gi<n;gi++){gx+=positions[gi].x;gy+=positions[gi].y;}
-    gx/=n;gy/=n;
-    // 辺の中点から重心への方向を計算して逆方向（外側）に配置
-    var midX=(pos1.x+pos2.x)/2;
-    var midY=(pos1.y+pos2.y)/2;
-    var outDirX=midX-gx;var outDirY=midY-gy;
-    var outLen=Math.sqrt(outDirX*outDirX+outDirY*outDirY)||1;
-    var outOffset=32;
-    var cx=midX+(outDirX/outLen)*outOffset;
-    var cy2=midY+(outDirY/outLen)*outOffset;
-    var cfw=40,cfh=32;
-    var fo2=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-    fo2.setAttribute('x',cx-cfw/2);fo2.setAttribute('y',cy2-cfh/2);
-    fo2.setAttribute('width',cfw);fo2.setAttribute('height',cfh);
-    var d2=document.createElement('div');
-    d2.style.cssText='background:'+pair.label.bg+';color:'+pair.label.color
-      +';border:2.5px solid '+pair.label.color
-      +';font-size:0.95rem;font-weight:700;border-radius:8px'
-      +';text-align:center;line-height:'+cfh+'px;cursor:pointer'
-      +';box-shadow:0 2px 6px rgba(0,0,0,0.18)'
-      +';-webkit-tap-highlight-color:rgba(0,0,0,0.2);user-select:none';
-    d2.textContent=pair.label.mark;
-    (function(pr){
-      d2.onclick=function(){showCompatDetail(pr);};
-      d2.addEventListener('touchend',function(e){e.preventDefault();showCompatDetail(pr);});
-    })(pair);
-    fo2.appendChild(d2);
-    svg.appendChild(fo2);
-  });
-
-  // 人物カード
-  var nodeW2=76,nodeH2=82;
-  persons.forEach(function(p,i){
-    var pos=positions[i];
+  // people
+  var people=persons.map(function(p,i){
     var rc=getRokkaColor(p.ht);
     var htBase=p.ht.replace(/[＋－]/g,'');
-    var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
-    fo.setAttribute('x',pos.x-nodeW2/2);fo.setAttribute('y',pos.y-nodeH2/2);
-    fo.setAttribute('width',nodeW2);fo.setAttribute('height',nodeH2);
-    fo.style.cursor='pointer';
-    fo.onclick=(function(idx){return function(){showPersonDetail(idx);};})(i);
-    var div=document.createElement('div');
-    div.style.cssText='background:#fff;border:2.5px solid '+rc.border+';border-radius:10px;padding:0.3rem 0.2rem;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12)';
-    var icon=document.createElement('div');
-    icon.style.cssText='width:36px;height:26px;border-radius:5px;background:'+rc.bg+';border:1.5px solid '+rc.border+';display:flex;align-items:center;justify-content:center;margin-bottom:3px;font-size:0.6rem;font-weight:700;color:'+rc.col+';text-align:center';
-    icon.textContent=htBase;
-    var nameEl=document.createElement('div');
-    nameEl.style.cssText='font-size:0.75rem;font-weight:700;color:#1a1208;line-height:1.3;max-width:70px;word-break:break-all;text-align:center';
-    nameEl.textContent=p.name;
-    var roleEl=document.createElement('div');
-    roleEl.style.cssText='font-size:0.6rem;color:#7a6b52;margin-top:2px;text-align:center';
-    roleEl.textContent=p.role.replace('あなた（本人）','本人');
-    div.appendChild(icon);div.appendChild(nameEl);div.appendChild(roleEl);
-    fo.appendChild(div);
-    svg.appendChild(fo);
+    var kb=NAYIN_KB[p.nichiN]||{};
+    var detail=htBase+'\n'+
+      '年柱：'+p.nenKS+' 月柱：'+p.tsuKS+' 日柱：'+p.nichiKS+'\n\n'+
+      (kb['性格']||'');
+    return {id:ids[i],name:p.name,role:p.role.replace('あなた（本人）','本人'),color:rc.border,detail:detail};
   });
 
-  var wrapEl=document.getElementById('diagramWrap');
-  function updateDiagramHeight(){
-    wrapEl.style.height=(H*(wrapEl.offsetWidth/W))+'px';
-  }
-  updateDiagramHeight();
-  window.addEventListener('resize',updateDiagramHeight);
+  // relations（矢印：個人視点）
+  var relations=[];
+  pairs.forEach(function(pair){
+    var pa=persons[pair.i],pb=persons[pair.j];
+    var idA=ids[pair.i],idB=ids[pair.j];
+    // A→B（AにとってのB）
+    var nenA=pair.nenJu1,tsuA=pair.tsuJu1,nichiA=pair.nichiJu1;
+    var detailAB=pa.name+'にとって'+pb.name+'は\n'+
+      '長期的に：'+nenA+'（'+juniDesc(nenA)+'）\n'+
+      '日常的に：'+tsuA+'（'+juniDesc(tsuA)+'）\n'+
+      '深層では：'+nichiA+'（'+juniDesc(nichiA)+'）';
+    relations.push({from:idA,to:idB,mark:personalMark(pair.label1),detail:detailAB});
+    // B→A（Bにとってのa）
+    var nenB=pair.nenJu2,tsuB=pair.tsuJu2,nichiB=pair.nichiJu2;
+    var detailBA=pb.name+'にとって'+pa.name+'は\n'+
+      '長期的に：'+nenB+'（'+juniDesc(nenB)+'）\n'+
+      '日常的に：'+tsuB+'（'+juniDesc(tsuB)+'）\n'+
+      '深層では：'+nichiB+'（'+juniDesc(nichiB)+'）';
+    relations.push({from:idB,to:idA,mark:personalMark(pair.label2),detail:detailBA});
+  });
+
+  // sokatsu（総括）
+  var sokatsu=pairs.map(function(pair){
+    var pa=persons[pair.i],pb=persons[pair.j];
+    var idA=ids[pair.i],idB=ids[pair.j];
+    var comment=getNayinCompat(pa.nichiN,pb.nichiN);
+    var detail=pa.name+'と'+pb.name+'の総括\n総合：'+pair.label.mark+pair.label.text+'\n\n'+comment;
+    return {pair:idA+idB,mark:pair.label.mark,detail:detail};
+  });
+
+  return {people:people,relations:relations,sokatsu:sokatsu};
 }
 
-// n人のレイアウト位置（ドラマ相関図風）
-function getPositions(n,W,H){
-  var cx=W/2,cy=H/2;
-  var layouts={
-    1:[[cx,cy]],
-    2:[[W*0.25,cy],[W*0.75,cy]],
-    3:[[cx,H*0.18],[W*0.18,H*0.75],[W*0.82,H*0.75]],
-    4:[[cx,H*0.15],[W*0.15,H*0.5],[W*0.85,H*0.5],[cx,H*0.85]],
-    5:[[cx,H*0.15],[W*0.12,H*0.45],[W*0.88,H*0.45],[W*0.25,H*0.82],[W*0.75,H*0.82]]
-  };
-  return (layouts[n]||layouts[5]).map(function(p){return {x:p[0],y:p[1]};});
+function drawDiagram(result){
+  var data=generateTemplateData(result);
+  // グローバルDATAをセット
+  window.DATA=data;
+  render();
+  // diagramWrapの高さはsvgのviewBoxに応じて自動
+  document.getElementById('diagramWrap').style.height='auto';
 }
 
-// ===== 相性一覧 =====
+
 function drawList(result){
   var el=document.getElementById('compatList');
   el.innerHTML='';
@@ -1512,6 +1391,312 @@ function confirmAddGroup(){
 }
 
 // ===== 初期化 =====
+// ペアカラー（人数に応じて自動生成）
+const PAIR_COLORS = [
+  "#7a9e7e","#7a8fbe","#b07a9e","#c49a5a","#c47a7a","#7aadad"
+];
+
+function getPairKey(a, b) { return [a,b].sort().join(""); }
+
+function buildPairColorMap(people) {
+  const map = {};
+  const ids = people.map(p => p.id);
+  let i = 0;
+  for (let a = 0; a < ids.length; a++)
+    for (let b = a+1; b < ids.length; b++)
+      map[ids[a]+ids[b]] = PAIR_COLORS[i++];
+  return map;
+}
+
+function personById(id) { return DATA.people.find(p => p.id === id); }
+function sokatsuByPair(pair) { return DATA.sokatsu.find(s => s.pair === pair || s.pair === pair.split("").reverse().join("")); }
+function relationByFromTo(from, to) { return DATA.relations.find(r => r.from === from && r.to === to); }
+
+// ---- レイアウト定義 ----
+function getLayout(n, W, H, CW, CH) {
+  // カード中心座標を返す
+  if (n === 2) return [
+    { x: W/2 - CW/2, y: 80 },
+    { x: W/2 - CW/2, y: H - 80 - CH },
+  ];
+  if (n === 3) return [
+    { x: W/2 - CW/2,       y: 70 },
+    { x: 60,               y: H - 80 - CH },
+    { x: W - 60 - CW,      y: H - 80 - CH },
+  ];
+  if (n === 4) return [
+    { x: 80,               y: 70 },
+    { x: W - 80 - CW,      y: 70 },
+    { x: 80,               y: H - 80 - CH },
+    { x: W - 80 - CW,      y: H - 80 - CH },
+  ];
+}
+
+// ---- SVG描画 ----
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(svg, x, y, str, attrs) {
+  const t = el("text", { x, y, "text-anchor":"middle", "font-family":"sans-serif", ...attrs }, svg);
+  t.textContent = str;
+  return t;
+}
+
+let activeTooltip = null;
+
+function showDetail(title, body, color) {
+  document.getElementById("detail-title").textContent = title;
+  document.getElementById("detail-title").style.color = color;
+  document.getElementById("detail-body").textContent = body;
+  document.getElementById("detail-popup").style.display = "block";
+  document.getElementById("detail-overlay").style.display = "block";
+}
+function closeDetail() {
+  document.getElementById("detail-popup").style.display = "none";
+  document.getElementById("detail-overlay").style.display = "none";
+}
+
+function makeTappable(g, onTap) {
+  g.style.cursor = "pointer";
+  g.addEventListener("click", e => { e.stopPropagation(); onTap(); });
+}
+
+function drawArrowMark(parent, cx, cy, mark, color, label, detail) {
+  const g = el("g", {}, parent);
+  const c = el("circle", { cx, cy, r:14, fill:"#fff", stroke:color, "stroke-width":"1.5" }, g);
+  const t = el("text", { x:cx, y:cy+5, "text-anchor":"middle", "font-size":"13", fill:color, "font-family":"sans-serif", "pointer-events":"none" }, g);
+  t.textContent = mark;
+  makeTappable(g, () => showDetail(label, detail, color));
+  return g;
+}
+
+function drawSokatsu(parent, x, y, mark, color, label, detail) {
+  const g = el("g", {}, parent);
+  const lbl = el("text", { x: x+16, y: y-3, "text-anchor":"middle", "font-size":"10", fill:color, "font-family":"sans-serif", "pointer-events":"none" }, g);
+  lbl.textContent = "総括をみる";
+  el("rect", { x, y, width:32, height:32, rx:6, fill:"#fff", stroke:color, "stroke-width":"2" }, g);
+  const t = el("text", { x:x+16, y:y+23, "text-anchor":"middle", "font-size":"15", "font-weight":"bold", fill:color, "font-family":"sans-serif", "pointer-events":"none" }, g);
+  t.textContent = mark;
+  makeTappable(g, () => showDetail(label, detail, color));
+  return g;
+}
+
+function addMarker(defs, id, color) {
+  const m = el("marker", { id, markerWidth:8, markerHeight:8, refX:8, refY:3, orient:"auto", markerUnits:"strokeWidth" }, defs);
+  const p = el("path", { d:"M0,0 L0,6 L8,3 Z", fill:color }, m);
+}
+
+function polyline(parent, points, color, markerId) {
+  el("polyline", { points: points.map(p=>p.join(",")).join(" "), fill:"none", stroke:color, "stroke-width":"1.8", "marker-end":"url(#"+markerId+")" }, parent);
+}
+
+function render() {
+  const people = DATA.people;
+  const n = people.length;
+  const pairColorMap = buildPairColorMap(people);
+
+  const CW = 130, CH = 90;
+  const W = n <= 3 ? 520 : 820;
+  const H = n === 2 ? 420 : n === 3 ? 500 : 660;
+
+  const svg = document.getElementById("svg");
+  svg.setAttribute("viewBox", "0 0 "+W+" "+H);
+  svg.style.width = W + "px";
+  svg.style.minWidth = W + "px";
+  svg.innerHTML = "";
+
+  // defs
+  const defs = el("defs", {}, svg);
+  const ids = people.map(p => p.id);
+  for (let a = 0; a < ids.length; a++)
+    for (let b = a+1; b < ids.length; b++) {
+      const key = ids[a]+ids[b];
+      addMarker(defs, "m"+key, pairColorMap[key]);
+    }
+
+  // 背景
+  el("rect", { width:W, height:H, rx:12, fill:"#faf6f0", stroke:"#dcd1c4", "stroke-width":"1" }, svg);
+  for (let y = 30; y < H; y += 30)
+    el("line", { x1:0, y1:y, x2:W, y2:y, stroke:"#e8dfd5", "stroke-width":"1" }, svg);
+
+  // レイアウト
+  const layout = getLayout(n, W, H, CW, CH);
+
+  // カード（先に描く）
+  people.forEach((p, i) => {
+    const { x, y } = layout[i];
+    const cx = x + CW/2;
+    const g = el("g", {}, svg);
+    el("rect", { x, y, width:CW, height:CH, rx:8, fill:"#fff", stroke:p.color, "stroke-width":"2" }, g);
+    txt(g, cx, y+30, p.role, { "font-size":"11", fill:"#888" });
+    txt(g, cx, y+57, p.name, { "font-size":"15", "font-weight":"500", fill:"#333" });
+    makeTappable(g, () => showDetail(p.name + "（" + p.role + "）", p.detail, p.color));
+  });
+
+  // 矢印線レイヤー
+  const lineLayer = el("g", {}, svg);
+  // マークレイヤー（最前面）
+  const markLayer = el("g", {}, svg);
+
+  // ペアごとに矢印を描く
+  // 2人
+  if (n === 2) {
+    const [L0, L1] = layout;
+    const cx0 = L0.x + CW/2, cy0 = L0.y + CH;
+    const cx1 = L1.x + CW/2, cy1 = L1.y;
+    const color = pairColorMap["AB"];
+    const key = "AB";
+    // A→B: 左側
+    const ax = cx0 - 20;
+    polyline(lineLayer, [[ax, cy0],[ax, cy1]], color, "m"+key);
+    // B→A: 右側
+    const bx = cx0 + 20;
+    polyline(lineLayer, [[bx, cy1],[bx, cy0]], color, "m"+key);
+    // marks
+    const rAB = relationByFromTo("A","B"), rBA = relationByFromTo("B","A");
+    const midY = (cy0 + cy1) / 2;
+    drawArrowMark(markLayer, ax, midY - 20, (rAB&&rAB.mark?rAB.mark:"?")||"?", color, people[0].name+" → "+people[1].name, (rAB&&rAB.detail?rAB.detail:"")||"");
+    drawArrowMark(markLayer, bx, midY + 20, (rBA&&rBA.mark?rBA.mark:"?")||"?", color, people[1].name+" → "+people[0].name, (rBA&&rBA.detail?rBA.detail:"")||"");
+    const s = sokatsuByPair(key);
+    drawSokatsu(markLayer, cx0 + 40, midY - 16, (s&&s.mark?s.mark:"?")||"?", color, people[0].name+" ⇔ "+people[1].name+" の総括", (s&&s.detail?s.detail:"")||"");
+  }
+
+  // 3人
+  if (n === 3) {
+    const [L0, L1, L2] = layout;
+    const pts = layout.map((l,i) => ({ x: l.x + CW/2, y: l.y + CH/2, l }));
+    // A(0)↔B(1): まこと⇔えいこ 左側
+    drawPair3(lineLayer, markLayer, pairColorMap, people, 0, 1, layout, CW, CH,
+      { outA:"left", outB:"top", offset1:55, offset2:40 });
+    // A(0)↔C(2): まこと⇔めぐみ 右側
+    drawPair3(lineLayer, markLayer, pairColorMap, people, 0, 2, layout, CW, CH,
+      { outA:"right", outB:"top", offset1:55, offset2:40 });
+    // B(1)↔C(2): えいこ⇔めぐみ 下側
+    drawPair3(lineLayer, markLayer, pairColorMap, people, 1, 2, layout, CW, CH,
+      { outA:"right", outB:"left", offset1:null, offset2:null });
+  }
+
+  // 4人
+  if (n === 4) {
+    // 四隅配置: A=左上, B=右上, C=左下, D=右下
+    const [LA, LB, LC, LD] = layout;
+    const pairs4 = [
+      { ai:0, bi:1, key:"AB", routeType:"top" },
+      { ai:0, bi:2, key:"AC", routeType:"left" },
+      { ai:0, bi:3, key:"AD", routeType:"diag1" },
+      { ai:1, bi:2, key:"BC", routeType:"diag2" },
+      { ai:1, bi:3, key:"BD", routeType:"right" },
+      { ai:2, bi:3, key:"CD", routeType:"bottom" },
+    ];
+    pairs4.forEach(({ ai, bi, key, routeType }) => {
+      const color = pairColorMap[key];
+      const pa = people[ai], pb = people[bi];
+      const la = layout[ai], lb = layout[bi];
+      const cax = la.x + CW/2, cay = la.y + CH/2;
+      const cbx = lb.x + CW/2, cby = lb.y + CH/2;
+      const rAB = relationByFromTo(pa.id, pb.id);
+      const rBA = relationByFromTo(pb.id, pa.id);
+      const s = sokatsuByPair(key);
+      let m1x, m1y, m2x, m2y, sx, sy;
+
+      if (routeType === "top") {
+        const y1 = la.y - 22, y2 = la.y - 37;
+        polyline(lineLayer, [[la.x+CW*0.4, la.y],[la.x+CW*0.4, y1],[lb.x+CW*0.4, y1],[lb.x+CW*0.4, lb.y]], color, "m"+key);
+        polyline(lineLayer, [[lb.x+CW*0.6, lb.y],[lb.x+CW*0.6, y2],[la.x+CW*0.6, y2],[la.x+CW*0.6, la.y]], color, "m"+key);
+        m1x = (la.x+lb.x)/2+CW/2; m1y = y1;
+        m2x = m1x; m2y = y2;
+        sx = la.x+CW*0.7+60; sy = y1-20;
+      } else if (routeType === "left") {
+        const x1 = la.x - 22, x2 = la.x - 37;
+        polyline(lineLayer, [[la.x, la.y+CH*0.4],[x1, la.y+CH*0.4],[x1, lb.y+CH*0.4],[la.x, lb.y+CH*0.4]], color, "m"+key);
+        polyline(lineLayer, [[la.x, lb.y+CH*0.6],[x2, lb.y+CH*0.6],[x2, la.y+CH*0.6],[la.x, la.y+CH*0.6]], color, "m"+key);
+        m1x = x1; m1y = (la.y+lb.y)/2+CH/2 - 20;
+        m2x = x2; m2y = m1y + 40;
+        sx = x1 - 36; sy = la.y + CH + 30;
+      } else if (routeType === "right") {
+        const x1 = lb.x + CW + 22, x2 = lb.x + CW + 37;
+        polyline(lineLayer, [[lb.x+CW, la.y+CH*0.4],[x1, la.y+CH*0.4],[x1, lb.y+CH*0.4],[lb.x+CW, lb.y+CH*0.4]], color, "m"+key);
+        polyline(lineLayer, [[lb.x+CW, lb.y+CH*0.6],[x2, lb.y+CH*0.6],[x2, la.y+CH*0.6],[lb.x+CW, la.y+CH*0.6]], color, "m"+key);
+        m1x = x1; m1y = (la.y+lb.y)/2+CH/2 - 20;
+        m2x = x2; m2y = m1y + 40;
+        sx = x1 + 6; sy = la.y + CH + 30;
+      } else if (routeType === "bottom") {
+        const y1 = lb.y + CH + 22, y2 = lb.y + CH + 37;
+        polyline(lineLayer, [[la.x+CW*0.4, lb.y+CH],[la.x+CW*0.4, y1],[lb.x+CW*0.4, y1],[lb.x+CW*0.4, lb.y+CH]], color, "m"+key);
+        polyline(lineLayer, [[lb.x+CW*0.6, lb.y+CH],[lb.x+CW*0.6, y2],[la.x+CW*0.6, y2],[la.x+CW*0.6, lb.y+CH]], color, "m"+key);
+        m1x = (la.x+lb.x)/2+CW/2; m1y = y1;
+        m2x = m1x; m2y = y2;
+        sx = la.x+CW*0.7+60; sy = y1+6;
+      } else if (routeType === "diag1") {
+        // A左下→D: 内側 y=320,300
+        const iy1 = 320, iy2 = 300;
+        polyline(lineLayer, [[la.x+CW*0.55, la.y+CH],[la.x+CW*0.55, iy1],[lb.x+CW*0.45, iy1],[lb.x+CW*0.45, lb.y]], color, "m"+key);
+        polyline(lineLayer, [[lb.x+CW*0.55, lb.y],[lb.x+CW*0.55, iy2],[la.x+CW*0.45, iy2],[la.x+CW*0.45, la.y+CH]], color, "m"+key);
+        m1x = (la.x+lb.x)/2+CW/2+5; m1y = iy1;
+        m2x = m1x; m2y = iy2;
+        sx = la.x + CW + 20; sy = iy1 - 18;
+      } else if (routeType === "diag2") {
+        const iy1 = 340, iy2 = 280;
+        polyline(lineLayer, [[la.x+CW*0.45, la.y+CH],[la.x+CW*0.45, iy1],[lb.x+CW*0.55, iy1],[lb.x+CW*0.55, lb.y]], color, "m"+key);
+        polyline(lineLayer, [[lb.x+CW*0.45, lb.y],[lb.x+CW*0.45, iy2],[la.x+CW*0.55, iy2],[la.x+CW*0.55, la.y+CH]], color, "m"+key);
+        m1x = (la.x+lb.x)/2+CW/2-5; m1y = iy1;
+        m2x = m1x + 35; m2y = iy2;
+        sx = la.x + CW + 20; sy = iy2 - 18;
+      }
+
+      drawArrowMark(markLayer, m1x, m1y, (rAB&&rAB.mark?rAB.mark:"?")||"?", color, pa.name+" → "+pb.name, (rAB&&rAB.detail?rAB.detail:"")||"");
+      drawArrowMark(markLayer, m2x, m2y, (rBA&&rBA.mark?rBA.mark:"?")||"?", color, pb.name+" → "+pa.name, (rBA&&rBA.detail?rBA.detail:"")||"");
+      drawSokatsu(markLayer, sx, sy, (s&&s.mark?s.mark:"?")||"?", color, pa.name+" ⇔ "+pb.name+" の総括", (s&&s.detail?s.detail:"")||"");
+    });
+  }
+}
+
+// 3人用ペア描画ヘルパー
+function drawPair3(lineLayer, markLayer, pairColorMap, people, ai, bi, layout, CW, CH, opts) {
+  const pa = people[ai], pb = people[bi];
+  const key = getPairKey(pa.id, pb.id);
+  const color = pairColorMap[key];
+  const la = layout[ai], lb = layout[bi];
+  const rAB = relationByFromTo(pa.id, pb.id);
+  const rBA = relationByFromTo(pb.id, pa.id);
+  const s = sokatsuByPair(key);
+
+  if (ai===0 && bi===1) {
+    // まこと(上中央)⇔えいこ(左下): 左外
+    const x1=48, x2=33;
+    polyline(lineLayer, [[la.x, la.y+CH*0.4],[x1, la.y+CH*0.4],[x1, lb.y+CH*0.4],[lb.x, lb.y+CH*0.4]], color, "m"+key);
+    polyline(lineLayer, [[lb.x, lb.y+CH*0.6],[x2, lb.y+CH*0.6],[x2, la.y+CH*0.6],[la.x, la.y+CH*0.6]], color, "m"+key);
+    const midY = (la.y+lb.y)/2+CH/2;
+    drawArrowMark(markLayer, x1, midY-20, (rAB&&rAB.mark?rAB.mark:"?")||"?", color, pa.name+" → "+pb.name, (rAB&&rAB.detail?rAB.detail:"")||"");
+    drawArrowMark(markLayer, x2, midY+20, (rBA&&rBA.mark?rBA.mark:"?")||"?", color, pb.name+" → "+pa.name, (rBA&&rBA.detail?rBA.detail:"")||"");
+    drawSokatsu(markLayer, x2-36, midY-80, (s&&s.mark?s.mark:"?")||"?", color, pa.name+" ⇔ "+pb.name+" の総括", (s&&s.detail?s.detail:"")||"");
+  } else if (ai===0 && bi===2) {
+    // まこと(上中央)⇔めぐみ(右下): 右外
+    const W = la.x + CW + (520 - la.x - CW - layout[2].x) + layout[2].x + CW;
+    const x1 = layout[2].x+CW+22, x2 = layout[2].x+CW+37;
+    polyline(lineLayer, [[la.x+CW, la.y+CH*0.4],[x1, la.y+CH*0.4],[x1, lb.y+CH*0.4],[lb.x+CW, lb.y+CH*0.4]], color, "m"+key);
+    polyline(lineLayer, [[lb.x+CW, lb.y+CH*0.6],[x2, lb.y+CH*0.6],[x2, la.y+CH*0.6],[la.x+CW, la.y+CH*0.6]], color, "m"+key);
+    const midY = (la.y+lb.y)/2+CH/2;
+    drawArrowMark(markLayer, x1, midY-20, (rAB&&rAB.mark?rAB.mark:"?")||"?", color, pa.name+" → "+pb.name, (rAB&&rAB.detail?rAB.detail:"")||"");
+    drawArrowMark(markLayer, x2, midY+20, (rBA&&rBA.mark?rBA.mark:"?")||"?", color, pb.name+" → "+pa.name, (rBA&&rBA.detail?rBA.detail:"")||"");
+    drawSokatsu(markLayer, x1+6, midY-80, (s&&s.mark?s.mark:"?")||"?", color, pa.name+" ⇔ "+pb.name+" の総括", (s&&s.detail?s.detail:"")||"");
+  } else if (ai===1 && bi===2) {
+    // えいこ(左下)⇔めぐみ(右下): 下側水平
+    const y1 = lb.y+CH+18, y2 = lb.y+CH+33;
+    polyline(lineLayer, [[la.x+CW, la.y+CH*0.4],[lb.x, la.y+CH*0.4]], color, "m"+key);
+    polyline(lineLayer, [[lb.x, lb.y+CH*0.6],[la.x+CW, lb.y+CH*0.6]], color, "m"+key);
+    const midX = (la.x+CW + lb.x)/2;
+    drawArrowMark(markLayer, midX, la.y+CH*0.4, (rAB&&rAB.mark?rAB.mark:"?")||"?", color, pa.name+" → "+pb.name, (rAB&&rAB.detail?rAB.detail:"")||"");
+    drawArrowMark(markLayer, midX, lb.y+CH*0.6, (rBA&&rBA.mark?rBA.mark:"?")||"?", color, pb.name+" → "+pa.name, (rBA&&rBA.detail?rBA.detail:"")||"");
+    drawSokatsu(markLayer, midX+30, lb.y+CH+10, (s&&s.mark?s.mark:"?")||"?", color, pa.name+" ⇔ "+pb.name+" の総括", (s&&s.detail?s.detail:"")||"");
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded',function(){
   renderGroupTabs();
   loadGroupForms();
