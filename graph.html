@@ -760,26 +760,38 @@ function drawDiagram(result){
       line.setAttribute('x1',sx);line.setAttribute('y1',sy);
       line.setAttribute('x2',ex);line.setAttribute('y2',ey);
       line.setAttribute('stroke',lbl.line);
-      line.setAttribute('stroke-width','2.2');
-      line.setAttribute('stroke-opacity','0.8');
+      line.setAttribute('stroke-width','8');
+      line.setAttribute('stroke-opacity','0.0');
       line.setAttribute('marker-end',getArrowMarker(lbl));
       line.style.cursor='pointer';
       line.onclick=clickFn;
+      line.addEventListener('touchend',function(e){e.preventDefault();clickFn();});
       svg.appendChild(line);
+      // 見た目用の細い線
+      var vis=document.createElementNS('http://www.w3.org/2000/svg','line');
+      vis.setAttribute('x1',sx);vis.setAttribute('y1',sy);
+      vis.setAttribute('x2',ex);vis.setAttribute('y2',ey);
+      vis.setAttribute('stroke',lbl.line);
+      vis.setAttribute('stroke-width','2.2');
+      vis.setAttribute('stroke-opacity','0.8');
+      vis.setAttribute('pointer-events','none');
+      vis.setAttribute('marker-end',getArrowMarker(lbl));
+      svg.appendChild(vis);
     }
 
     function addMarkLabel(x,y,lbl,clickFn){
       var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
       fo.setAttribute('x',x-fw/2);fo.setAttribute('y',y-fh/2);
       fo.setAttribute('width',fw);fo.setAttribute('height',fh);
-      fo.style.cursor='pointer';
-      fo.onclick=clickFn;
       var d=document.createElement('div');
       d.style.cssText='background:'+lbl.bg+';color:'+lbl.color
         +';border:2px solid '+lbl.color
         +';font-size:0.82rem;font-weight:700;border-radius:6px'
-        +';text-align:center;line-height:'+fh+'px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)';
+        +';text-align:center;line-height:'+fh+'px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)'
+        +';-webkit-tap-highlight-color:rgba(0,0,0,0.2);user-select:none';
       d.textContent=lbl.mark;
+      d.onclick=clickFn;
+      d.addEventListener('touchend',function(e){e.preventDefault();clickFn();});
       fo.appendChild(d);
       svg.appendChild(fo);
     }
@@ -815,15 +827,18 @@ function drawDiagram(result){
     var fo2=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
     fo2.setAttribute('x',cx-cfw/2);fo2.setAttribute('y',cy2-cfh/2);
     fo2.setAttribute('width',cfw);fo2.setAttribute('height',cfh);
-    fo2.style.cursor='pointer';
-    fo2.onclick=(function(pr){return function(){showCompatDetail(pr);};})(pair);
     var d2=document.createElement('div');
     d2.style.cssText='background:'+pair.label.bg+';color:'+pair.label.color
       +';border:2.5px solid '+pair.label.color
       +';font-size:0.95rem;font-weight:700;border-radius:8px'
       +';text-align:center;line-height:'+cfh+'px;cursor:pointer'
-      +';box-shadow:0 2px 6px rgba(0,0,0,0.18)';
+      +';box-shadow:0 2px 6px rgba(0,0,0,0.18)'
+      +';-webkit-tap-highlight-color:rgba(0,0,0,0.2);user-select:none';
     d2.textContent=pair.label.mark;
+    (function(pr){
+      d2.onclick=function(){showCompatDetail(pr);};
+      d2.addEventListener('touchend',function(e){e.preventDefault();showCompatDetail(pr);});
+    })(pair);
     fo2.appendChild(d2);
     svg.appendChild(fo2);
   });
@@ -959,18 +974,26 @@ async function fetchAIComment(pair,p1,p2){
     var res=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:prompt}],max_tokens:200})
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:prompt}]})
     });
     var data=await res.json();
     var text='';
     if(data.content&&data.content.length>0){
       text=data.content.map(function(b){return b.text||'';}).join('');
+    } else if(data.error){
+      text='（'+data.error+'）';
+    } else {
+      // デバッグ: レスポンス構造をerrmsgに表示
+      var box=document.getElementById('errmsg');
+      if(box){box.textContent='⚠ APIレスポンス形式: '+JSON.stringify(Object.keys(data));box.style.display='block';}
     }
     text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
-    AI_COMMENT_CACHE[key]=text||'データを取得できませんでした。';
+    AI_COMMENT_CACHE[key]=text||'（AI鑑定を取得できませんでした）';
     return AI_COMMENT_CACHE[key];
   }catch(e){
-    return '通信エラーが発生しました。';
+    var box=document.getElementById('errmsg');
+    if(box){box.textContent='⚠ fetchAIComment catch: '+e.message;box.style.display='block';}
+    return '通信エラー: '+e.message;
   }
 }
 
@@ -1064,7 +1087,7 @@ async function fetchDirAI(pair,direction,me,them,nenJu,tsuJu,nichiJu,myLabel){
   var sysPrompt='あなたは花人占術の鑑定師です。一人の視点から見た相手との関係性を、正直に温かく鑑定してください。';
   try{
     var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:parts.join(' / ')}],max_tokens:200})});
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:parts.join(' / ')}]})});
     var data=await res.json();
     var text='';
     if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
