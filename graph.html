@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:17px}
-body{background:#f5f0e8;font-family:'Noto Serif JP',serif;color:#1a1208;min-height:100vh}
+body{background:#f5f0e8;color:#1a1208;min-height:100vh}
 .app{max-width:780px;margin:0 auto;padding:1.2rem 0.8rem 5rem}
 .header{text-align:center;padding:1.5rem 0 1.2rem;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:1.4rem}
 .header h1{font-family:'Zen Old Mincho',serif;font-size:1.5rem;letter-spacing:0.25em;color:#b8860b}
@@ -32,10 +32,10 @@ body{background:#f5f0e8;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 .person-form-card{background:#faf6ef;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:0.9rem}
 .person-form-card .pfc-label{font-size:0.72rem;color:#7a6b52;letter-spacing:0.1em;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center}
 .person-form-card .pfc-label .remove-btn{font-size:0.7rem;color:#c0392b;cursor:pointer;padding:0.1rem 0.4rem;border:1px solid #c0392b;border-radius:10px;background:transparent}
-.pfc-input{width:100%;font-family:'Noto Serif JP',serif;font-size:0.9rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none;margin-bottom:0.4rem}
+.pfc-input{width:100%;font-size:0.9rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none;margin-bottom:0.4rem}
 .pfc-date-row{display:flex;gap:0.3rem;margin-bottom:0.4rem}
-.pfc-date-row select{flex:1;font-family:'Noto Serif JP',serif;font-size:0.82rem;padding:0.5rem 0.25rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none}
-.pfc-select{width:100%;font-family:'Noto Serif JP',serif;font-size:0.88rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none}
+.pfc-date-row select{flex:1;font-size:0.82rem;padding:0.5rem 0.25rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none}
+.pfc-select{width:100%;font-size:0.88rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;color:#1a1208;outline:none}
 .add-person-btn{width:100%;padding:0.65rem;font-family:'Zen Old Mincho',serif;font-size:0.88rem;border:1.5px dashed rgba(184,134,11,0.5);border-radius:10px;background:transparent;color:#b8860b;cursor:pointer;margin-top:0.5rem}
 .calc-btn{width:100%;padding:1rem;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.2em;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;cursor:pointer;box-shadow:0 3px 12px rgba(184,134,11,0.3);margin-top:0.8rem}
 
@@ -83,7 +83,7 @@ body{background:#f5f0e8;font-family:'Noto Serif JP',serif;color:#1a1208;min-heig
 
 /* グループ追加モーダル */
 .group-modal{background:#fff;border-radius:16px;padding:1.5rem;width:90%;max-width:380px}
-.group-modal input{width:100%;font-family:'Noto Serif JP',serif;font-size:0.95rem;padding:0.65rem 0.8rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;outline:none;margin-bottom:0.8rem}
+.group-modal input{width:100%;font-size:0.95rem;padding:0.65rem 0.8rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;outline:none;margin-bottom:0.8rem}
 .group-modal-btns{display:flex;gap:0.6rem}
 .group-modal-btns button{flex:1;padding:0.75rem;font-family:'Zen Old Mincho',serif;font-size:0.9rem;border-radius:8px;cursor:pointer}
 .group-modal-btns .confirm-btn{background:#b8860b;color:#fff;border:none}
@@ -129,6 +129,23 @@ ruby rt{font-size:0.55em}
     </div>
     <div id="listView" class="hidden">
       <div class="compat-list" id="compatList"></div>
+    </div>
+    <!-- 質問フェーズ -->
+    <div class="section hidden" id="questionSection">
+      <div class="section-title">◆ 関係性について教えてください</div>
+      <p style="font-size:0.85rem;color:#7a6b52;margin-bottom:1rem;line-height:1.8">より精細なアドバイスのために、今の状況を教えてください。</p>
+      <div id="questionForms"></div>
+      <button class="calc-btn" style="margin-top:0.8rem" onclick="getRelationAdvice()">🔮 AIに関係性のアドバイスを聞く</button>
+    </div>
+
+    <!-- AIアドバイスセクション -->
+    <div class="section hidden" id="adviceSection">
+      <div class="section-title">◆ 花人占術AIによる関係性アドバイス</div>
+      <div id="adviceLoading" class="ai-loading" style="display:none">
+        <span>🌸</span><span>鑑定中です<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>
+      </div>
+      <div id="adviceText" class="ai-answer-box" style="display:none"></div>
+      <div id="adviceCount" style="font-size:0.78rem;color:#7a6b52;text-align:right;margin-top:0.4rem"></div>
     </div>
   </div>
 </div>
@@ -344,25 +361,37 @@ function getNayinCompat(n1,n2){
   return '';
 }
 
-function getCompatScore(p1,p2){
-  // 年柱の運気（最重要）
-  var nenJu1=getJuniUnki(p1.ht,p2.nenShi);
-  var nenJu2=getJuniUnki(p2.ht,p1.nenShi);
+// 個人視点のスコア（自分→相手）
+function getPersonalScore(myHt,theirNenShi,theirTsuShi,theirNichiShi,theirHt,myNenShi){
   var goodJuni=['発芽','青葉','成天','豊穣','穂分','平凪'];
   var badJuni=['内省','狂咲','引寒','休眠','残雪'];
-  // 開花は増幅特性：他が良ければ+1、他が悪ければ-1
-  function scoreJuni(j,otherJ){
+  function sj(j,otherJ){
     if(j==='開花') return badJuni.indexOf(otherJ)>=0?-1:1;
     return goodJuni.indexOf(j)>=0?1:badJuni.indexOf(j)>=0?-1:0;
   }
-  var g1=scoreJuni(nenJu1,nenJu2);
-  var g2=scoreJuni(nenJu2,nenJu1);
-  var score=g1+g2;
-  // 感性の相性も加味
+  var nenJu=getJuniUnki(myHt,theirNenShi);
+  var tsuJu=getJuniUnki(myHt,theirTsuShi);
+  var nichiJu=getJuniUnki(myHt,theirNichiShi);
+  var otherNen=getJuniUnki(theirHt,myNenShi);
+  // 年柱x2+月柱x1（日柱は深層なので相性スコアには含めない）
+  return sj(nenJu,otherNen)*2+sj(tsuJu,nenJu);
+}
+
+function getPersonalLabel(score){
+  if(score>=3) return {mark:'◎',color:'#1a6b3a',bg:'#e8f5e8',line:'#2a8c4a'};
+  if(score>=1) return {mark:'○',color:'#2a5ca8',bg:'#e8eef5',line:'#4a7acc'};
+  if(score===0) return {mark:'△',color:'#8a6800',bg:'#f5f0e0',line:'#b8a000'};
+  return {mark:'▲',color:'#c0392b',bg:'#fde8e8',line:'#e05040'};
+}
+
+function getCompatScore(p1,p2){
+  var s1=getPersonalScore(p1.ht,p2.nenShi,p2.tsuShi,p2.nichiShi,p2.ht,p1.nenShi);
+  var s2=getPersonalScore(p2.ht,p1.nenShi,p1.tsuShi,p1.nichiShi,p1.ht,p2.nenShi);
   var nc=getNayinCompat(p1.nichiN,p2.nichiN);
-  if(/名コンビ|相性は抜群|言葉がなくても|心が通じ|最強|ベスト/.test(nc)) score++;
-  if(/水と油|腹立たしく|うんざり|手こずる/.test(nc)) score--;
-  return score; // -3〜3
+  var bonus=0;
+  if(/名コンビ|相性は抜群|言葉がなくても|心が通じ|最強|ベスト/.test(nc)) bonus=1;
+  if(/水と油|腹立たしく|うんざり|手こずる/.test(nc)) bonus=-1;
+  return s1+s2+bonus;
 }
 
 function getCompatLabel(score){
@@ -587,7 +616,14 @@ function calcGraph(){
       var nenJu2=getJuniUnki(persons[j].ht,persons[i].nenShi);
       var tsuJu1=getJuniUnki(persons[i].ht,persons[j].tsuShi);
       var tsuJu2=getJuniUnki(persons[j].ht,persons[i].tsuShi);
-      pairs.push({i:i,j:j,score:score,label:label,comment:comment,nenJu1:nenJu1,nenJu2:nenJu2,tsuJu1:tsuJu1,tsuJu2:tsuJu2});
+      var nichiJu1=getJuniUnki(persons[i].ht,persons[j].nichiShi);
+      var nichiJu2=getJuniUnki(persons[j].ht,persons[i].nichiShi);
+      // 個人視点のスコアとラベル
+      var score1=getPersonalScore(persons[i].ht,persons[j].nenShi,persons[j].tsuShi,persons[j].nichiShi,persons[j].ht,persons[i].nenShi);
+      var score2=getPersonalScore(persons[j].ht,persons[i].nenShi,persons[i].tsuShi,persons[i].nichiShi,persons[i].ht,persons[j].nenShi);
+      var label1=getPersonalLabel(score1);
+      var label2=getPersonalLabel(score2);
+      pairs.push({i:i,j:j,score:score,label:label,label1:label1,label2:label2,comment:comment,nenJu1:nenJu1,nenJu2:nenJu2,tsuJu1:tsuJu1,tsuJu2:tsuJu2,nichiJu1:nichiJu1,nichiJu2:nichiJu2});
     }
   }
   var result={persons:persons,pairs:pairs};
@@ -603,6 +639,11 @@ function showResult(result){
   document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
   drawDiagram(result);
   drawList(result);
+  // 質問フェーズを表示
+  buildQuestionForms(result);
+  document.getElementById('questionSection').classList.remove('hidden');
+  document.getElementById('adviceSection').classList.add('hidden');
+  document.getElementById('adviceText').style.display='none';
 }
 
 // ===== 相関図描画 =====
@@ -610,52 +651,105 @@ function drawDiagram(result){
   var persons=result.persons;
   var pairs=result.pairs;
   var n=persons.length;
-  // レイアウト：人数に応じた位置
-  var W=360,H=360;
+  var W=380,H=380;
   var positions=getPositions(n,W,H);
   var svg=document.getElementById('diagramSvg');
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
   svg.innerHTML='';
-  // 罫線はCSSで出しているのでSVGは背景なし
-  // ① まず接続線を描画（カードの下に来るように）
+
+  // SVGにarrowheadマーカーを定義
+  var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  ['green','blue','orange','red'].forEach(function(name,ci){
+    var colors=['#2a8c4a','#4a7acc','#b8a000','#e05040'];
+    var marker=document.createElementNS('http://www.w3.org/2000/svg','marker');
+    marker.setAttribute('id','arrow-'+name);
+    marker.setAttribute('markerWidth','8');
+    marker.setAttribute('markerHeight','8');
+    marker.setAttribute('refX','6');
+    marker.setAttribute('refY','3');
+    marker.setAttribute('orient','auto');
+    var poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points','0 0, 8 3, 0 6');
+    poly.setAttribute('fill',colors[ci]);
+    marker.appendChild(poly);
+    defs.appendChild(marker);
+  });
+  svg.appendChild(defs);
+
+  function getArrowMarker(label){
+    if(label.line==='#2a8c4a') return 'url(#arrow-green)';
+    if(label.line==='#4a7acc') return 'url(#arrow-blue)';
+    if(label.line==='#b8a000') return 'url(#arrow-orange)';
+    return 'url(#arrow-red)';
+  }
+
+  var nodeW=68,nodeH=74;
+  var nr=nodeW/2; // ノード半径（矢印を止める位置用）
+
+  // ① 接続線（2本の矢印＋中央総括ラベル）
   pairs.forEach(function(pair){
-    var p1=positions[pair.i],p2=positions[pair.j];
-    var cx1=p1.x,cy1=p1.y,cx2=p2.x,cy2=p2.y;
-    var lx=(cx1+cx2)/2,ly=(cy1+cy2)/2;
-    // 線
-    var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',cx1);line.setAttribute('y1',cy1);
-    line.setAttribute('x2',cx2);line.setAttribute('y2',cy2);
-    line.setAttribute('stroke',pair.label.color);
-    line.setAttribute('stroke-width','1.8');
-    line.setAttribute('stroke-opacity','0.6');
-    svg.appendChild(line);
-    // 相性ラベルボックス（外国人オブジェクト）
-    var fw=50,fh=22;
+    var pos1=positions[pair.i],pos2=positions[pair.j];
+    var dx=pos2.x-pos1.x,dy=pos2.y-pos1.y;
+    var dist=Math.sqrt(dx*dx+dy*dy);
+    var ux=dx/dist,uy=dy/dist;
+    var px=-uy,py=ux; // 垂直方向
+    var offset=7; // 2本線のオフセット
+
+    // 矢印の始点・終点（ノードの端から始まる）
+    var margin=nr+4;
+
+    // 矢印1：p1→p2（pair.label1の色）
+    var s1x=pos1.x+ux*margin+px*offset;
+    var s1y=pos1.y+uy*margin+py*offset;
+    var e1x=pos2.x-ux*margin+px*offset;
+    var e1y=pos2.y-uy*margin+py*offset;
+
+    // 矢印2：p2→p1（pair.label2の色）
+    var s2x=pos2.x-ux*margin-px*offset;
+    var s2y=pos2.y-uy*margin-py*offset;
+    var e2x=pos1.x+ux*margin-px*offset;
+    var e2y=pos1.y+uy*margin-py*offset;
+
+    function makeLine(sx,sy,ex,ey,lbl,clickFn){
+      var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',sx);line.setAttribute('y1',sy);
+      line.setAttribute('x2',ex);line.setAttribute('y2',ey);
+      line.setAttribute('stroke',lbl.line);
+      line.setAttribute('stroke-width','2');
+      line.setAttribute('stroke-opacity','0.75');
+      line.setAttribute('marker-end',getArrowMarker(lbl));
+      line.style.cursor='pointer';
+      line.onclick=clickFn;
+      svg.appendChild(line);
+    }
+
+    // p1→p2の矢印（p1視点でp2がどういう相手か）
+    makeLine(s1x,s1y,e1x,e1y,pair.label1,(function(pr){
+      return function(){showDirectionalDetail(pr,'forward');};
+    })(pair));
+
+    // p2→p1の矢印（p2視点でp1がどういう相手か）
+    makeLine(s2x,s2y,e2x,e2y,pair.label2,(function(pr){
+      return function(){showDirectionalDetail(pr,'backward');};
+    })(pair));
+
+    // 中央：総括ラベル
+    var lx=(pos1.x+pos2.x)/2;
+    var ly=(pos1.y+pos2.y)/2;
+    var fw=44,fh=22;
     var fo=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
     fo.setAttribute('x',lx-fw/2);fo.setAttribute('y',ly-fh/2);
     fo.setAttribute('width',fw);fo.setAttribute('height',fh);
     fo.style.cursor='pointer';
     fo.onclick=(function(pr){return function(){showCompatDetail(pr);};})(pair);
     var div=document.createElement('div');
-    div.className='compat-label-box';
-    div.style.background=pair.label.bg;
-    div.style.color=pair.label.color;
-    div.style.borderColor=pair.label.color;
-    div.style.fontSize='0.7rem';
-    div.style.fontWeight='700';
-    div.style.padding='0.15rem 0.35rem';
-    div.style.borderRadius='4px';
-    div.style.border='1.5px solid';
-    div.style.textAlign='center';
-    div.style.lineHeight='1.3';
-    div.style.whiteSpace='nowrap';
-    div.textContent=pair.label.mark+' '+pair.label.text;
+    div.style.cssText='background:'+pair.label.bg+';color:'+pair.label.color+';border:1.5px solid '+pair.label.color+';font-size:0.72rem;font-weight:700;padding:0.12rem 0.3rem;border-radius:4px;text-align:center;line-height:1.4;white-space:nowrap;cursor:pointer';
+    div.textContent=pair.label.mark;
     fo.appendChild(div);
     svg.appendChild(fo);
   });
+
   // ② 人物カード
-  var nodeW=72,nodeH=78;
   persons.forEach(function(p,i){
     var pos=positions[i];
     var rc=getRokkaColor(p.ht);
@@ -666,32 +760,21 @@ function drawDiagram(result){
     fo.style.cursor='pointer';
     fo.onclick=(function(idx){return function(){showPersonDetail(idx);};})(i);
     var div=document.createElement('div');
-    div.className='person-node';
-    div.style.background='#fff';
-    div.style.border='2px solid '+rc.border;
-    div.style.borderRadius='8px';
-    div.style.padding='0.3rem 0.2rem';
-    div.style.textAlign='center';
-    div.style.height='100%';
-    div.style.display='flex';
-    div.style.flexDirection='column';
-    div.style.alignItems='center';
-    div.style.justifyContent='center';
-    // 六花人アイコン
+    div.style.cssText='background:#fff;border:2px solid '+rc.border+';border-radius:8px;padding:0.25rem 0.2rem;text-align:center;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1)';
     var icon=document.createElement('div');
-    icon.style.cssText='width:36px;height:36px;border-radius:6px;background:'+rc.bg+';border:1.5px solid '+rc.border+';display:flex;align-items:center;justify-content:center;margin-bottom:3px;font-size:0.6rem;font-weight:700;color:'+rc.col+';text-align:center;line-height:1.2';
+    icon.style.cssText='width:34px;height:34px;border-radius:5px;background:'+rc.bg+';border:1.5px solid '+rc.border+';display:flex;align-items:center;justify-content:center;margin-bottom:3px;font-size:0.58rem;font-weight:700;color:'+rc.col+';line-height:1.2;text-align:center';
     icon.textContent=htBase;
     var nameEl=document.createElement('div');
-    nameEl.style.cssText='font-size:0.72rem;font-weight:700;color:#1a1208;line-height:1.3;max-width:65px;word-break:break-all;text-align:center';
+    nameEl.style.cssText='font-size:0.7rem;font-weight:700;color:#1a1208;line-height:1.3;max-width:62px;word-break:break-all;text-align:center';
     nameEl.textContent=p.name;
     var roleEl=document.createElement('div');
-    roleEl.style.cssText='font-size:0.58rem;color:#7a6b52;margin-top:2px;text-align:center';
+    roleEl.style.cssText='font-size:0.56rem;color:#7a6b52;margin-top:2px;text-align:center';
     roleEl.textContent=p.role.replace('あなた（本人）','本人');
     div.appendChild(icon);div.appendChild(nameEl);div.appendChild(roleEl);
     fo.appendChild(div);
     svg.appendChild(fo);
   });
-  // wrapのheightを調整
+
   var wrapEl=document.getElementById('diagramWrap');
   function updateDiagramHeight(){
     wrapEl.style.height=(H*(wrapEl.offsetWidth/W))+'px';
@@ -813,6 +896,54 @@ async function fetchAIComment(pair,p1,p2){
 }
 
 
+// 矢印タップ：一方向の詳細（forward=p1→p2視点、backward=p2→p1視点）
+function showDirectionalDetail(pair,direction){
+  if(!RESULT_DATA) return;
+  var isForward=(direction==='forward');
+  var me=RESULT_DATA.persons[isForward?pair.i:pair.j];
+  var them=RESULT_DATA.persons[isForward?pair.j:pair.i];
+  var myLabel=isForward?pair.label1:pair.label2;
+  var nenJu=isForward?pair.nenJu1:pair.nenJu2;
+  var tsuJu=isForward?pair.tsuJu1:pair.tsuJu2;
+  var nichiJu=isForward?pair.nichiJu1:pair.nichiJu2;
+  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
+  var badJ=['内省','狂咲','引寒','休眠','残雪'];
+  function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'○（増幅）':'○';}
+  document.getElementById('modalMark').textContent=myLabel.mark;
+  document.getElementById('modalMark').style.color=myLabel.color;
+  document.getElementById('modalTitle').textContent=me.name+'にとっての'+them.name;
+  document.getElementById('modalComment').innerHTML=
+    '<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.5rem">'+me.name+'から見た'+them.name+'の影響</div>';
+  var JUNI_PLAIN_DIR={
+    '発芽':'新たな挑戦や実りをもたらしてくれる。思った以上の成果が生まれやすい',
+    '青葉':'自分を成長させてくれる。適度な距離感が大切',
+    '開花':'良いものも悪いものも増幅される。他の運気の影響が強まる',
+    '成天':'最も求めていた縁の相手。やりたかったことを叶えてくれる',
+    '狂咲':'ついつい従ってしまい心が乱れやすい。本来の自分を見失うことも',
+    '豊穣':'できなかったことにチャンスをくれる相手',
+    '穂分':'安定と恵みをもたらしてくれる。財産となるものをもたらす',
+    '平凪':'一緒にいると安心感がある。将来成功できる気がする',
+    '内省':'疲れや追い詰められ感を感じやすい。反省点に気づかせてくれる面も',
+    '引寒':'小さなトラブルを持ち込みがち。長期的には注意が必要',
+    '休眠':'やりたいことを先取りされやすい。伝えても通じにくい',
+    '残雪':'最初は良さそうに見えるが結果になりにくい。トラブルに発展しやすい'
+  };
+  document.getElementById('modalDetails').innerHTML=
+    '<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
+    +'<span class="modal-detail-label">長期的に見ると（根本）</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(nenJu)+' '+nenJu+'：'+(JUNI_PLAIN[nenJu]||JUNI_PLAIN_DIR[nenJu]||nenJu)+'</span>'
+    +'</div>'
+    +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
+    +'<span class="modal-detail-label">普段の付き合いでは</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(tsuJu)+' '+tsuJu+'：'+(JUNI_PLAIN[tsuJu]||JUNI_PLAIN_DIR[tsuJu]||tsuJu)+'</span>'
+    +'</div>'
+    +'<div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem">'
+    +'<span class="modal-detail-label">深く関わると（本音）</span>'
+    +'<span style="font-size:0.88rem;line-height:1.8">'+ri(nichiJu)+' '+nichiJu+'：'+(JUNI_PLAIN[nichiJu]||JUNI_PLAIN_DIR[nichiJu]||nichiJu)+'</span>'
+    +'</div>';
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
 async function showCompatDetail(pair){
   if(!RESULT_DATA) return;
   var p1=RESULT_DATA.persons[pair.i],p2=RESULT_DATA.persons[pair.j];
@@ -882,6 +1013,116 @@ function showPersonDetail(idx){
 
 function closeModal(){
   document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+// ===== 質問フェーズ =====
+var QUESTION_ANSWERS={};
+
+function buildQuestionForms(result){
+  var el=document.getElementById('questionForms');
+  el.innerHTML='';
+  QUESTION_ANSWERS={};
+  var persons=result.persons;
+  var me=persons[0];
+
+  // Q1: 各ペアの同居状況
+  persons.slice(1).forEach(function(p,idx){
+    var qDiv=document.createElement('div');
+    qDiv.style.cssText='margin-bottom:1rem;padding:0.8rem;background:#faf6ef;border-radius:8px;border:1px solid rgba(184,134,11,0.15)';
+    qDiv.innerHTML='<div style="font-size:0.88rem;font-weight:700;color:#4a3c28;margin-bottom:0.5rem">'
+      +me.name+'と'+p.name+'の関係</div>'
+      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">現在どのくらい接触がありますか？</div>'
+      +'<select id="contact-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.6rem">'
+      +'<option value="毎日会う">毎日会う（同居・職場など）</option>'
+      +'<option value="週数回会う">週に数回会う</option>'
+      +'<option value="月数回会う">月に数回会う</option>'
+      +'<option value="たまに会う">たまに会う</option>'
+      +'<option value="ほとんど会わない">ほとんど会わない</option>'
+      +'</select>'
+      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">今の関係についてどう感じていますか？</div>'
+      +'<select id="feeling-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.6rem">'
+      +'<option value="良好で満足">良好で満足している</option>'
+      +'<option value="まあまあ">まあまあ、普通</option>'
+      +'<option value="少し難しさを感じる">少し難しさを感じる</option>'
+      +'<option value="かなりしんどい">かなりしんどい</option>'
+      +'<option value="距離を置きたい">距離を置きたい</option>'
+      +'</select>'
+      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">この関係をどうしたいですか？</div>'
+      +'<select id="wish-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff">'
+      +'<option value="今のままで良い">今のままで良い</option>'
+      +'<option value="もっと仲良くなりたい">もっと仲良くなりたい</option>'
+      +'<option value="適度な距離を保ちたい">適度な距離を保ちたい</option>'
+      +'<option value="距離を置きたい">距離を置きたい</option>'
+      +'<option value="関係を改善したい">関係を改善したい</option>'
+      +'</select>';
+    el.appendChild(qDiv);
+  });
+}
+
+async function getRelationAdvice(){
+  if(!RESULT_DATA) return;
+  document.getElementById('adviceSection').classList.remove('hidden');
+  document.getElementById('adviceLoading').style.display='flex';
+  document.getElementById('adviceText').style.display='none';
+
+  var persons=RESULT_DATA.persons;
+  var me=persons[0];
+  var pairs=RESULT_DATA.pairs;
+
+  // 相性データまとめ
+  var compatSummary=pairs.map(function(pair){
+    var p1=persons[pair.i],p2=persons[pair.j];
+    var contact=document.getElementById('contact-'+(pair.j-1));
+    var feeling=document.getElementById('feeling-'+(pair.j-1));
+    var wish=document.getElementById('wish-'+(pair.j-1));
+    return [
+      p1.name+'('+p1.role+')と'+p2.name+'('+p2.role+')',
+      '総合相性：'+pair.label.mark+pair.label.text,
+      p1.name+'視点：'+pair.label1.mark+'（長期：'+pair.nenJu1+' 日常：'+pair.tsuJu1+' 深層：'+pair.nichiJu1+'）',
+      p2.name+'視点：'+pair.label2.mark+'（長期：'+pair.nenJu2+' 日常：'+pair.tsuJu2+' 深層：'+pair.nichiJu2+'）',
+      contact?'接触頻度：'+contact.value:'',
+      feeling?'今の気持ち：'+feeling.value:'',
+      wish?'望み：'+wish.value:''
+    ].filter(Boolean).join(' / ');
+  }).join(' | ');
+
+  var parts=[
+    '相関図の主人公：'+me.name+'（'+me.role+'）',
+    '登場人物：'+persons.map(function(p){return p.name+'('+p.role+')'}).join('、'),
+    '各ペアの相性と状況：',
+    compatSummary,
+    '上記を元に、'+me.name+'を主人公として関係性全体を分析し、具体的な行動アドバイスをください。',
+    '特に相性が悪い相手には距離の置き方の具体策を、相性が良い相手には活かし方を。',
+    '接触頻度が高いのに相性が悪い場合は特に丁寧に対処法を。',
+    '望みに合わせたアドバイスを。Markdown不可。500〜700文字で。'
+  ];
+
+  var sysPrompt='あなたは花人占術の鑑定師です。相関図全体を俯瞰して、主人公にとっての人間関係マップを読み解き、具体的で温かいアドバイスをしてください。距離の置き方、付き合い方の工夫など、現実的な提案を含めてください。';
+
+  try{
+    var res=await fetch(WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:parts.join(' ')}],max_tokens:800})
+    });
+    var data=await res.json();
+    var text='';
+    if(data.content&&data.content.length>0){
+      text=data.content.map(function(b){return b.text||'';}).join('');
+    }
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    document.getElementById('adviceLoading').style.display='none';
+    document.getElementById('adviceText').textContent=text;
+    document.getElementById('adviceText').style.display='block';
+    if(data.remaining!==undefined){
+      document.getElementById('adviceCount').textContent='本日の残り鑑定回数：'+data.remaining+'回';
+    }
+    document.getElementById('adviceSection').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    document.getElementById('adviceLoading').style.display='none';
+    document.getElementById('adviceText').textContent='通信エラーが発生しました。';
+    document.getElementById('adviceText').style.display='block';
+  }
 }
 
 // ===== ビュー切り替え =====
