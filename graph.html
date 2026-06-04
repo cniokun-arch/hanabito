@@ -570,6 +570,20 @@ function updateAddBtn(){
 }
 
 // ===== 計算・描画 =====
+function renderMarkdown(t){
+  if(!t) return "";
+  var h3s="font-size:1rem;color:#b8860b;margin:1rem 0 0.5rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(184,134,11,0.25)";
+  var h4s="font-size:0.92rem;color:#4a3c28;margin:0.8rem 0 0.4rem;font-weight:700";
+  t=t.replace(/^## (.+)$/gm,function(m,g){return "<h3 style=\""+h3s+"\">"+g+"</h3>";});
+  t=t.replace(/^### (.+)$/gm,function(m,g){return "<h4 style=\""+h4s+"\">"+g+"</h4>";});
+  t=t.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  t=t.replace(/^\d+\. (.+)$/gm,"<div style=\"display:flex;gap:0.4rem;margin:0.3rem 0;line-height:1.8\"><span style=\"color:#b8860b;font-weight:700;flex-shrink:0\">•</span><span>$1</span></div>");
+  t=t.replace(/^\* (.+)$/gm,"<div style=\"display:flex;gap:0.4rem;margin:0.25rem 0;line-height:1.8\"><span style=\"color:#b8860b;flex-shrink:0\">・</span><span>$1</span></div>");
+  t=t.replace(/\n\n/g,"</p><p style=\"margin:0.5rem 0;line-height:1.9\">");
+  t=t.replace(/\n/g,"<br>");
+  return "<div style=\"font-size:0.9rem;line-height:1.9;color:#1a1208\">"+t+"</div>";
+}
+
 function showError(msg){
   var el=document.getElementById('inputError');
   if(!el) return;
@@ -767,7 +781,7 @@ function drawDiagram(result){
       line.onclick=clickFn;
       line.addEventListener('touchend',function(e){e.preventDefault();clickFn();});
       svg.appendChild(line);
-      // 見た目用の細い線
+      // 見た目用の細い線（marker-endは細い線だけに付ける）
       var vis=document.createElementNS('http://www.w3.org/2000/svg','line');
       vis.setAttribute('x1',sx);vis.setAttribute('y1',sy);
       vis.setAttribute('x2',ex);vis.setAttribute('y2',ey);
@@ -777,6 +791,8 @@ function drawDiagram(result){
       vis.setAttribute('pointer-events','none');
       vis.setAttribute('marker-end',getArrowMarker(lbl));
       svg.appendChild(vis);
+      // 透明ヒット領域（marker-endなし）
+      line.setAttribute('marker-end','none');
     }
 
     function addMarkLabel(x,y,lbl,clickFn){
@@ -820,9 +836,20 @@ function drawDiagram(result){
       return function(){showDirectionalDetail(pr,'backward');};
     })(pair));
 
-    // 中央：総括マーク（2本矢印の外側、垂直方向にオフセット）
-    var cx=(pos1.x+pos2.x)/2 + px*22;
-    var cy2=(pos1.y+pos2.y)/2 + py*22;
+    // 総括マーク：三角形の重心から外側方向にオフセット
+    // 重心を計算して逆方向に配置
+    var n=persons.length;
+    var gx=0,gy=0;
+    for(var gi=0;gi<n;gi++){gx+=positions[gi].x;gy+=positions[gi].y;}
+    gx/=n;gy/=n;
+    // 辺の中点から重心への方向を計算して逆方向（外側）に配置
+    var midX=(pos1.x+pos2.x)/2;
+    var midY=(pos1.y+pos2.y)/2;
+    var outDirX=midX-gx;var outDirY=midY-gy;
+    var outLen=Math.sqrt(outDirX*outDirX+outDirY*outDirY)||1;
+    var outOffset=32;
+    var cx=midX+(outDirX/outLen)*outOffset;
+    var cy2=midY+(outDirY/outLen)*outOffset;
     var cfw=40,cfh=32;
     var fo2=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
     fo2.setAttribute('x',cx-cfw/2);fo2.setAttribute('y',cy2-cfh/2);
@@ -1306,7 +1333,8 @@ async function getRelationAdvice(){
     '望みに合わせたアドバイスを。Markdown不可。500〜700文字で。'
   ];
 
-  var sysPrompt='あなたは花人占術の鑑定師です。相関図全体を俯瞰して、主人公にとっての人間関係マップを読み解き、具体的で温かいアドバイスをしてください。距離の置き方、付き合い方の工夫など、現実的な提案を含めてください。';
+  var sysPrompt='あなたは花人占術の鑑定師です。以下の【出力フォーマット】を必ず守って回答してください。\n\n【出力フォーマット】\n## 🌟 全体のひとこと\n（2〜3行で簡潔に）\n\n### 👤 各関係の分析\n**（相手の名前と続柄）との関係：** （簡潔に1〜2行）\n（他の相手も同様に）\n\n### 📌 今すぐできること\n1. （具体的なアクション）\n2. （具体的なアクション）\n3. （具体的なアクション）\n\n【ルール】Markdownの見出し・箇条書きを必ず使うこと。各セクションは短く。合計300〜400文字で。';
+
 
   try{
     var res=await fetch(WORKER_URL,{
@@ -1321,7 +1349,7 @@ async function getRelationAdvice(){
     }
     text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
     document.getElementById('adviceLoading').style.display='none';
-    document.getElementById('adviceText').textContent=text;
+    document.getElementById('adviceText').innerHTML=renderMarkdown(text);
     document.getElementById('adviceText').style.display='block';
     document.getElementById('adviceSpeakBtn').style.display='block';
     document.getElementById('adviceVoiceGender').style.display='block';
