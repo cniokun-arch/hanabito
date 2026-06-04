@@ -111,7 +111,7 @@ ruby rt{font-size:0.55em}
     <div class="section-title" id="groupTitle">◆ 人物登録</div>
     <div class="person-form-grid" id="personForms"></div>
     <button class="add-person-btn" onclick="addPersonForm()" id="addPersonBtn">＋ 人物を追加する（最大5人）</button>
-    <div id="inputError" class="error-msg hidden"></div>
+    <div id="inputError" class="error-msg" style="display:none"></div>
     <button class="calc-btn" onclick="calcGraph()">🌸 相関図を生成する</button>
   </div>
 
@@ -553,11 +553,12 @@ function updateAddBtn(){
 // ===== 計算・描画 =====
 function showError(msg){
   var el=document.getElementById('inputError');
+  if(!el) return;
   el.textContent=msg;
+  el.style.display='block';
   el.classList.remove('hidden');
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
-  // 3秒後に自動消去
-  setTimeout(function(){el.classList.add('hidden');},4000);
+  setTimeout(function(){el.style.display='none';},5000);
 }
 
 var RESULT_DATA=null;
@@ -712,7 +713,7 @@ function drawDiagram(result){
 
   var nodeW=76,nodeH=82;
   var margin=nodeW/2+3;
-  var arrowOffset=9; // 2本線の間隔
+  var arrowOffset=13; // 2本線の間隔
   var markOffset=0.35; // 矢印上のマーク位置（0=始点 0.5=中央 1=終点）
   var fw=26,fh=22; // マークボックスサイズ
 
@@ -1122,20 +1123,6 @@ async function showCompatDetail(pair){
   var p1=RESULT_DATA.persons[pair.i],p2=RESULT_DATA.persons[pair.j];
   var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
   var badJ=['内省','狂咲','引寒','休眠','残雪'];
-  var JUNI_PLAIN={
-    '発芽':'新たな挑戦や実りをもたらしてくれる',
-    '青葉':'自分を成長させてくれる',
-    '開花':'良いものも悪いものも増幅する',
-    '成天':'最も求めていた縁の相手',
-    '狂咲':'ついつい従ってしまい心が乱れやすい',
-    '豊穣':'できなかったことのチャンスをくれる',
-    '穂分':'安定と恵みをもたらしてくれる',
-    '平凪':'一緒にいると安心できる',
-    '内省':'疲れを感じやすいが気づきをくれる',
-    '引寒':'小さなトラブルを持ち込みやすい',
-    '休眠':'やりたいことを先取りされやすい',
-    '残雪':'最初は良さそうに見えるが結果になりにくい'
-  };
   function ri(j){return goodJ.indexOf(j)>=0?'◎':badJ.indexOf(j)>=0?'▲':j==='開花'?'◎':'○';}
   function rl(n1,n2,j){return ri(j)+' '+n2+'にとって'+n1+'は「'+(JUNI_PLAIN[j]||j)+'」相手';}
 
@@ -1199,29 +1186,32 @@ function buildQuestionForms(result){
   var me=persons[0];
 
   // Q1: 各ペアの同居状況
-  persons.slice(1).forEach(function(p,idx){
+  var pairs=result.pairs;
+  pairs.forEach(function(pair){
+    var p=persons[pair.j];
+    var pid=pair.i+'-'+pair.j;
     var qDiv=document.createElement('div');
-    qDiv.style.cssText='margin-bottom:1rem;padding:0.8rem;background:#faf6ef;border-radius:8px;border:1px solid rgba(184,134,11,0.15)';
-    qDiv.innerHTML='<div style="font-size:0.88rem;font-weight:700;color:#4a3c28;margin-bottom:0.5rem">'
-      +me.name+'と'+p.name+'の関係</div>'
-      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">現在どのくらい接触がありますか？</div>'
-      +'<select id="contact-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.6rem">'
+    qDiv.style.cssText='margin-bottom:1rem;padding:0.9rem;background:#faf6ef;border-radius:8px;border:1px solid rgba(184,134,11,0.15)';
+    qDiv.innerHTML='<div style="font-size:0.9rem;font-weight:700;color:#4a3c28;margin-bottom:0.6rem">'
+      +me.name+'と'+p.name+'（'+p.role+'）の関係</div>'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">現在どのくらい接触がありますか？</div>'
+      +'<select id="contact-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.7rem">'
       +'<option value="毎日会う">毎日会う（同居・職場など）</option>'
       +'<option value="週数回会う">週に数回会う</option>'
       +'<option value="月数回会う">月に数回会う</option>'
       +'<option value="たまに会う">たまに会う</option>'
       +'<option value="ほとんど会わない">ほとんど会わない</option>'
       +'</select>'
-      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">今の関係についてどう感じていますか？</div>'
-      +'<select id="feeling-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.6rem">'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">今の関係についてどう感じていますか？</div>'
+      +'<select id="feeling-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.7rem">'
       +'<option value="良好で満足">良好で満足している</option>'
       +'<option value="まあまあ">まあまあ、普通</option>'
       +'<option value="少し難しさを感じる">少し難しさを感じる</option>'
       +'<option value="かなりしんどい">かなりしんどい</option>'
       +'<option value="距離を置きたい">距離を置きたい</option>'
       +'</select>'
-      +'<div style="font-size:0.82rem;color:#7a6b52;margin-bottom:0.4rem">この関係をどうしたいですか？</div>'
-      +'<select id="wish-'+idx+'" style="width:100%;font-size:0.88rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff">'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">この関係をどうしたいですか？</div>'
+      +'<select id="wish-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff">'
       +'<option value="今のままで良い">今のままで良い</option>'
       +'<option value="もっと仲良くなりたい">もっと仲良くなりたい</option>'
       +'<option value="適度な距離を保ちたい">適度な距離を保ちたい</option>'
@@ -1245,9 +1235,10 @@ async function getRelationAdvice(){
   // 相性データまとめ
   var compatSummary=pairs.map(function(pair){
     var p1=persons[pair.i],p2=persons[pair.j];
-    var contact=document.getElementById('contact-'+(pair.j-1));
-    var feeling=document.getElementById('feeling-'+(pair.j-1));
-    var wish=document.getElementById('wish-'+(pair.j-1));
+    var pid=pair.i+'-'+pair.j;
+    var contact=document.getElementById('contact-'+pid);
+    var feeling=document.getElementById('feeling-'+pid);
+    var wish=document.getElementById('wish-'+pid);
     return [
       p1.name+'('+p1.role+')と'+p2.name+'('+p2.role+')',
       '総合相性：'+pair.label.mark+pair.label.text,
