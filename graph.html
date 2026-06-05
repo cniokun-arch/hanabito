@@ -140,6 +140,39 @@ ruby rt{font-size:0.55em}
       <div id="relationList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
     </div>
   </div>
+  <!-- 質問フェーズ -->
+  <div class="section hidden" id="questionSection" style="margin-top:1rem">
+    <div class="section-title">◆ 関係性について教えてください</div>
+    <p style="font-size:0.85rem;color:#7a6b52;margin-bottom:1rem;line-height:1.8">より精細なアドバイスのために、今の状況を教えてください。</p>
+    <div id="questionForms"></div>
+    <button class="calc-btn" style="margin-top:0.8rem" onclick="getRelationAdvice()">🔮 AIに関係性のアドバイスを聞く</button>
+  </div>
+
+  <!-- AIアドバイス -->
+  <div class="section hidden" id="adviceSection" style="margin-top:1rem">
+    <div class="section-title">◆ 花人占術AIによる関係性アドバイス</div>
+    <div id="adviceLoading" class="ai-loading" style="display:none">
+      <span>🌸</span><span>鑑定中です<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>
+    </div>
+    <div id="adviceText" class="ai-answer-box" style="display:none"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap">
+      <button class="speak-btn" id="adviceSpeakBtn" onclick="speakAdvice(this)" style="display:none">🔊 読み上げ</button>
+      <select id="adviceVoiceGender" style="font-size:0.82rem;padding:0.4rem 0.6rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#faf6ef;color:#4a3c28;display:none">
+        <option value="female">女性の声</option>
+        <option value="male">男性の声</option>
+      </select>
+    </div>
+    <div id="adviceChatArea" style="display:none;margin-top:1rem">
+      <div id="adviceChatHistory" style="margin-bottom:0.6rem"></div>
+      <div style="display:flex;gap:0.5rem;align-items:flex-end">
+        <textarea id="adviceChatInput" rows="2" placeholder="さらに質問する..." style="flex:1;font-size:0.88rem;padding:0.55rem 0.7rem;border:1px solid rgba(184,134,11,0.4);border-radius:6px;background:#faf6ef;color:#1a1208;outline:none;resize:none;line-height:1.6"></textarea>
+        <button onclick="sendAdviceChat()" style="padding:0.55rem 0.9rem;font-size:0.85rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap">送信</button>
+      </div>
+      <div id="adviceChatLoading" class="ai-loading" style="display:none"><span>🌸</span><span>鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></span></div>
+    </div>
+    <div id="adviceCount" style="font-size:0.78rem;color:#7a6b52;text-align:right;margin-top:0.4rem"></div>
+  </div>
+
 
 <!-- テンプレート詳細ポップアップ -->
 <div id="detail-popup" style="
@@ -699,16 +732,15 @@ function showResult(result){
   document.getElementById('resultSection').classList.remove('hidden');
   document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
   drawDiagram(result);
-  drawList(result);
   // 質問フェーズを表示
   buildQuestionForms(result);
-  document.getElementById('questionSection').classList.remove('hidden');
-  document.getElementById('adviceSection').classList.add('hidden');
-  document.getElementById('adviceText').style.display='none';
-  document.getElementById('adviceSpeakBtn').style.display='none';
-  document.getElementById('adviceVoiceGender').style.display='none';
-  document.getElementById('adviceChatArea').style.display='none';
-  document.getElementById('adviceChatHistory').innerHTML='';
+  var qs=document.getElementById('questionSection');if(qs) qs.classList.remove('hidden');
+  var ads=document.getElementById('adviceSection');if(ads) ads.classList.add('hidden');
+  var at=document.getElementById('adviceText');if(at) at.style.display='none';
+  var asb=document.getElementById('adviceSpeakBtn');if(asb) asb.style.display='none';
+  var avg=document.getElementById('adviceVoiceGender');if(avg) avg.style.display='none';
+  var aca=document.getElementById('adviceChatArea');if(aca) aca.style.display='none';
+  var ach=document.getElementById('adviceChatHistory');if(ach) ach.innerHTML='';
   ADVICE_CHAT_HISTORY=[];
   DIR_AI_CACHE={};
   DIR_CHAT_HISTORY={};
