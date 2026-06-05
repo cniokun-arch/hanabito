@@ -780,15 +780,15 @@ function updateStageTransform(){
 }
 
 function initDiagramEngine(nodes,edges){
-  diagNodes=nodes;diagEdges=edges;
+  diagNodes=nodes; diagEdges=edges;
   var wrap=document.getElementById('diagramWrap');
   var svgEl=document.getElementById('ln');
   var nc=document.getElementById('nodes-container');
   if(!wrap||!svgEl||!nc) return;
   nc.querySelectorAll('.dnd,.dmemo').forEach(function(el){el.remove();});
-  camX=0;camY=0;camScale=1;updateStageTransform();
+  camX=0; camY=0; camScale=1; updateStageTransform();
 
-  var R=38,OFFSET=12;
+  var R=38, OFFSET=12;
   var CL_D=[
     {bg:'#e8eef5',tx:'#1a2a7a',st:'#4a7acc'},
     {bg:'#e8f0e4',tx:'#2d5a1b',st:'#5a8c3a'},
@@ -801,6 +801,7 @@ function initDiagramEngine(nodes,edges){
 
   function hasPair(e){return diagEdges.some(function(o){return o.id!==e.id&&o.from===e.to&&o.to===e.from;});}
 
+  // ===== SVG描画（Gemini最新版: groupでカメラ変換） =====
   function renderEdgesD(){
     svgEl.innerHTML='';
     var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
@@ -813,6 +814,10 @@ function initDiagramEngine(nodes,edges){
       mk.appendChild(mp);defs.appendChild(mk);
     });
     svgEl.appendChild(defs);
+    // groupにカメラ変換を適用→見切れ防止
+    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform','translate('+camX+','+camY+') scale('+camScale+')');
+    svgEl.appendChild(g);
     diagEdges.forEach(function(e){
       var fn=diagNodes.find(function(n){return n.id===e.from;});
       var tn=diagNodes.find(function(n){return n.id===e.to;});
@@ -828,36 +833,37 @@ function initDiagramEngine(nodes,edges){
       else if(lbl.indexOf('▲')>=0){lColor='#b8a000';mid='orange';}
       else if(lbl.indexOf('✕')>=0||lbl.indexOf('×')>=0){lColor='#c04040';mid='red';}
       var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+      line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+      line.setAttribute('x2',x2);line.setAttribute('y2',y2);
       line.setAttribute('stroke',lColor);line.setAttribute('stroke-width','2');
       line.setAttribute('marker-end','url(#ar-'+mid+')');
-      svgEl.appendChild(line);
+      g.appendChild(line);
       if(lbl){
         var lOx=paired?nx*16:0,lOy=paired?ny*16:0;
         var mx=(x1+x2)/2+lOx,my=(y1+y2)/2+lOy,tw=lbl.length*11+28,fh=26;
         var hit=document.createElementNS('http://www.w3.org/2000/svg','rect');
         hit.setAttribute('x',mx-tw/2-8);hit.setAttribute('y',my-fh/2-8);
         hit.setAttribute('width',tw+16);hit.setAttribute('height',fh+16);
-        hit.setAttribute('fill','transparent');hit.setAttribute('pointer-events','all');
-        hit.style.cursor='pointer';
+        hit.setAttribute('fill','transparent');
+        hit.setAttribute('style','pointer-events:visiblePainted;cursor:pointer');
         (function(ee,c){
-          hit.addEventListener('click',function(ev){ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);});
-          hit.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);});
+          hit.onclick=function(ev){ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);};
+          hit.ontouchstart=function(ev){ev.stopPropagation();ev.preventDefault();showDiagDetail(ee.label,ee.detail||'',c);};
         })(e,lColor);
-        svgEl.appendChild(hit);
+        g.appendChild(hit);
         var bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
         bg.setAttribute('x',mx-tw/2);bg.setAttribute('y',my-fh/2);
         bg.setAttribute('width',tw);bg.setAttribute('height',fh);
         bg.setAttribute('rx','13');bg.setAttribute('fill','#fff');
         bg.setAttribute('stroke',lColor);bg.setAttribute('stroke-width','1.8');
         bg.setAttribute('pointer-events','none');
-        svgEl.appendChild(bg);
+        g.appendChild(bg);
         var tx=document.createElementNS('http://www.w3.org/2000/svg','text');
         tx.setAttribute('x',mx);tx.setAttribute('y',my+5);tx.setAttribute('text-anchor','middle');
         tx.setAttribute('fill',lColor);tx.setAttribute('font-size','12');tx.setAttribute('font-weight','600');
         tx.setAttribute('pointer-events','none');
         tx.setAttribute('font-family','-apple-system,Hiragino Sans,sans-serif');
-        tx.textContent=lbl;svgEl.appendChild(tx);
+        tx.textContent=lbl;g.appendChild(tx);
       }
     });
   }
@@ -886,39 +892,27 @@ function initDiagramEngine(nodes,edges){
     });
   }
 
-  // ===== Gemini最新版タッチエンジン =====
-  // 状態変数はinitDiagramEngine内でローカル管理
-  var mode_touch=null; // 'node','canvas','zoom'
-  var dragNode=null;
-  var aTouch={}; // 全タッチ追跡
-  var pinchStart=0,pinchScaleStart=1,pinchMX=0,pinchMY=0,pinchCX=0,pinchCY=0;
-  var panStartX=0,panStartY=0,panCamX=0,panCamY=0;
-  var nodeTouchId=null,nodeSX=0,nodeSY=0,nodeNSX=0,nodeNSY=0;
+  // ===== Gemini最新版タッチエンジン（endDragで完全リセット） =====
+  var dMode=null,dNode=null,aTouch={};
+  var startDist2=0,startScale2=1,pMX=0,pMY=0,pCX=0,pCY=0;
+  var panSX=0,panSY=0,panCX=0,panCY=0;
+  var nodeSX=0,nodeSY=0,nNSX=0,nNSY=0;
   var totalDist=0;
 
-  function getNodeAt(clientX,clientY){
-    var rect=wrap.getBoundingClientRect();
-    var wx=(clientX-rect.left-camX)/camScale;
-    var wy=(clientY-rect.top-camY)/camScale;
+  function endDragD(){
+    dMode=null; dNode=null; aTouch={};
+  }
+
+  function getNodeAt(cx,cy){
     for(var i=diagNodes.length-1;i>=0;i--){
       var n=diagNodes[i];
-      if((wx-n.x)*(wx-n.x)+(wy-n.y)*(wy-n.y)<=R*R) return n;
+      if((cx-n.x)*(cx-n.x)+(cy-n.y)*(cy-n.y)<=R*R) return n;
     }
     return null;
   }
 
-  function updateNode(n,clientX,clientY,startCX,startCY,startNX,startNY){
-    var dx=clientX-startCX,dy=clientY-startCY;
-    n.x=startNX+dx/camScale;n.y=startNY+dy/camScale;
-    var el=document.getElementById('dnd'+n.id);
-    if(el){el.style.left=(n.x-R)+'px';el.style.top=(n.y-R)+'px';}
-    var memo=document.getElementById('dmemo'+n.id);
-    if(memo){memo.style.left=n.x+'px';memo.style.top=(n.y+R+5)+'px';}
-    renderEdgesD();
-  }
-
-  // touchstart
   wrap.addEventListener('touchstart',function(e){
+    if(e.target.closest('.modal-overlay')||e.target.closest('#detail-popup')) return;
     e.preventDefault();
     for(var i=0;i<e.changedTouches.length;i++){
       var t=e.changedTouches[i];
@@ -926,135 +920,136 @@ function initDiagramEngine(nodes,edges){
     }
     var ids=Object.keys(aTouch);
     totalDist=0;
-
     if(ids.length===1){
-      var t=e.changedTouches[0];
-      var hit=getNodeAt(t.clientX,t.clientY);
-      if(hit){
-        mode_touch='node';dragNode=hit;nodeTouchId=t.identifier;
-        nodeSX=t.clientX;nodeSY=t.clientY;nodeNSX=hit.x;nodeNSY=hit.y;
-      } else {
-        mode_touch='canvas';
-        panStartX=t.clientX;panStartY=t.clientY;panCamX=camX;panCamY=camY;
-      }
-    } else if(ids.length>=2){
-      mode_touch='zoom';
-      var t1=aTouch[ids[0]],t2=aTouch[ids[1]];
-      pinchStart=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
-      pinchScaleStart=camScale;
+      var t=e.targetTouches[0];
       var rect=wrap.getBoundingClientRect();
-      pinchMX=((t1.x+t2.x)/2)-rect.left;
-      pinchMY=((t1.y+t2.y)/2)-rect.top;
-      pinchCX=(pinchMX-camX)/camScale;
-      pinchCY=(pinchMY-camY)/camScale;
+      var wx=(t.clientX-rect.left-camX)/camScale;
+      var wy=(t.clientY-rect.top-camY)/camScale;
+      var hit=getNodeAt(wx,wy);
+      if(hit){
+        dMode='node';dNode=hit;
+        nodeSX=t.clientX;nodeSY=t.clientY;nNSX=hit.x;nNSY=hit.y;
+      } else {
+        dMode='canvas';
+        panSX=t.clientX;panSY=t.clientY;panCX=camX;panCY=camY;
+      }
+    } else if(ids.length===2){
+      dMode='zoom';
+      var t1=aTouch[ids[0]],t2=aTouch[ids[1]];
+      startDist2=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
+      startScale2=camScale;
+      var rect=wrap.getBoundingClientRect();
+      pMX=((t1.x+t2.x)/2)-rect.left;
+      pMY=((t1.y+t2.y)/2)-rect.top;
+      pCX=(pMX-camX)/camScale;
+      pCY=(pMY-camY)/camScale;
     }
   },{passive:false});
 
-  // touchmove
-  wrap.addEventListener('touchmove',function(e){
-    e.preventDefault();
+  window.addEventListener('touchmove',function(e){
+    if(!dMode) return;
     for(var i=0;i<e.touches.length;i++){
       var t=e.touches[i];
       if(aTouch[t.identifier]) aTouch[t.identifier]={x:t.clientX,y:t.clientY};
     }
     var ids=Object.keys(aTouch);
-
-    // 1本→2本に増えたらzoomに切り替え
-    if(ids.length>=2&&mode_touch!=='zoom'){
-      mode_touch='zoom';
+    // 1本→2本になったらzoomに切り替え
+    if(ids.length>=2&&dMode!=='zoom'){
       var t1=aTouch[ids[0]],t2=aTouch[ids[1]];
-      pinchStart=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
-      pinchScaleStart=camScale;
+      startDist2=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
+      startScale2=camScale;
       var rect=wrap.getBoundingClientRect();
-      pinchMX=((t1.x+t2.x)/2)-rect.left;
-      pinchMY=((t1.y+t2.y)/2)-rect.top;
-      pinchCX=(pinchMX-camX)/camScale;
-      pinchCY=(pinchMY-camY)/camScale;
-      return;
+      pMX=((t1.x+t2.x)/2)-rect.left;
+      pMY=((t1.y+t2.y)/2)-rect.top;
+      pCX=(pMX-camX)/camScale;
+      pCY=(pMY-camY)/camScale;
+      dMode='zoom';
     }
-
-    if(mode_touch==='node'&&dragNode){
-      var t=null;
-      for(var i=0;i<e.touches.length;i++){if(e.touches[i].identifier===nodeTouchId){t=e.touches[i];break;}}
-      if(!t) return;
-      totalDist+=Math.abs(t.clientX-nodeSX)+Math.abs(t.clientY-nodeSY);
-      updateNode(dragNode,t.clientX,t.clientY,nodeSX,nodeSY,nodeNSX,nodeNSY);
-    } else if(mode_touch==='canvas'){
+    if(dMode==='node'&&dNode){
       var t=e.touches[0];
-      camX=panCamX+(t.clientX-panStartX);
-      camY=panCamY+(t.clientY-panStartY);
+      var dx=t.clientX-nodeSX,dy=t.clientY-nodeSY;
+      totalDist+=Math.sqrt(dx*dx+dy*dy);
+      dNode.x=nNSX+dx/camScale;dNode.y=nNSY+dy/camScale;
+      var el=document.getElementById('dnd'+dNode.id);
+      if(el){el.style.left=(dNode.x-R)+'px';el.style.top=(dNode.y-R)+'px';}
+      var mm=document.getElementById('dmemo'+dNode.id);
+      if(mm){mm.style.left=dNode.x+'px';mm.style.top=(dNode.y+R+5)+'px';}
+      renderEdgesD();
+    } else if(dMode==='canvas'){
+      var t=e.touches[0];
+      var dx=t.clientX-panSX,dy=t.clientY-panSY;
+      totalDist+=Math.sqrt(dx*dx+dy*dy);
+      camX=panCX+dx;camY=panCY+dy;
       updateStageTransform();renderEdgesD();
-    } else if(mode_touch==='zoom'){
+    } else if(dMode==='zoom'){
       if(ids.length<2) return;
       var t1=aTouch[ids[0]],t2=aTouch[ids[1]];
       var dist=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
-      camScale=Math.max(0.3,Math.min(3,pinchScaleStart*(dist/pinchStart)));
-      camX=pinchMX-pinchCX*camScale;
-      camY=pinchMY-pinchCY*camScale;
+      camScale=Math.max(0.3,Math.min(3,startScale2*(dist/startDist2)));
+      camX=pMX-pCX*camScale;camY=pMY-pCY*camScale;
       updateStageTransform();renderEdgesD();
     }
   },{passive:false});
 
-  // touchend
-  wrap.addEventListener('touchend',function(e){
-    e.preventDefault();
+  window.addEventListener('touchend',function(e){
+    // タップ判定（状態リセット前に保存）
+    var wasTap=totalDist<10&&dNode&&dMode==='node';
+    var tapped=dNode;
+    // 指を削除
     for(var i=0;i<e.changedTouches.length;i++){
       delete aTouch[e.changedTouches[i].identifier];
     }
-    var remaining=Object.keys(aTouch).length;
-    if(remaining===0){
-      // タップ判定（状態リセットを先に行う）
-      var wasTap=totalDist<8&&dragNode&&mode_touch==='node';
-      var tappedNode=dragNode;
-      mode_touch=null;dragNode=null;nodeTouchId=null;aTouch={};
-      if(wasTap&&tappedNode){
-        var kb=NAYIN_KB[tappedNode.person?tappedNode.person.nichiN:'']||{};
-        var htBase=tappedNode.person?tappedNode.person.ht.replace(/[＋－]/g,''):'';
-        var detail=htBase+'\n'+(tappedNode.person?tappedNode.person.nenKS+' / '+tappedNode.person.tsuKS+' / '+tappedNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
-        showDiagDetail(tappedNode.name+'\uff08'+tappedNode.memo+'\uff09',detail,'#b8860b');
-      }
-    } else if(remaining===1){
-      // 2本→1本：残った指でパンに切り替え
-      var remainId=Object.keys(aTouch)[0];
-      var rt=aTouch[remainId];
-      mode_touch='canvas';
-      panStartX=rt.x;panStartY=rt.y;panCamX=camX;panCamY=camY;
+    if(Object.keys(aTouch).length===0){
+      endDragD(); // 完全リセット（Gemini推奨: activeTouches={}）
+    } else {
+      dMode=null;dNode=null; // 残った指でパンに備える
     }
-  },{passive:false});
-
-  wrap.addEventListener('touchcancel',function(){
-    aTouch={};mode_touch=null;dragNode=null;nodeTouchId=null;
+    if(wasTap&&tapped){
+      var kb=NAYIN_KB[tapped.person?tapped.person.nichiN:'']||{};
+      var htBase=tapped.person?tapped.person.ht.replace(/[＋－]/g,''):'';
+      var detail=htBase+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+      showDiagDetail(tapped.name+'\uff08'+tapped.memo+'\uff09',detail,'#b8860b');
+    }
   });
 
-  // マウス操作（PC用）
-  var mouseDragMode=null,mouseDragNode=null;
-  var mSX=0,mSY=0,mNSX=0,mNSY=0,mCX=0,mCY=0,mDist=0;
+  window.addEventListener('touchcancel',function(){endDragD();});
+
+  // マウス（PC用）
+  var mMode=null,mNode=null,mSX=0,mSY=0,mNSX=0,mNSY=0,mCX=0,mCY=0,mDist=0;
   wrap.addEventListener('mousedown',function(e){
     if(e.button!==0) return;
     mDist=0;
-    var hit=getNodeAt(e.clientX,e.clientY);
-    if(hit){mouseDragMode='node';mouseDragNode=hit;mSX=e.clientX;mSY=e.clientY;mNSX=hit.x;mNSY=hit.y;}
-    else{mouseDragMode='canvas';mSX=e.clientX;mSY=e.clientY;mCX=camX;mCY=camY;}
+    var rect=wrap.getBoundingClientRect();
+    var wx=(e.clientX-rect.left-camX)/camScale;
+    var wy=(e.clientY-rect.top-camY)/camScale;
+    var hit=getNodeAt(wx,wy);
+    if(hit){mMode='node';mNode=hit;mSX=e.clientX;mSY=e.clientY;mNSX=hit.x;mNSY=hit.y;}
+    else{mMode='canvas';mSX=e.clientX;mSY=e.clientY;mCX=camX;mCY=camY;}
   });
   window.addEventListener('mousemove',function(e){
-    if(!mouseDragMode) return;
-    mDist+=Math.abs(e.clientX-mSX)+Math.abs(e.clientY-mSY);
-    if(mouseDragMode==='node'&&mouseDragNode){
-      updateNode(mouseDragNode,e.clientX,e.clientY,mSX,mSY,mNSX,mNSY);
-    } else if(mouseDragMode==='canvas'){
-      camX=mCX+(e.clientX-mSX);camY=mCY+(e.clientY-mSY);
-      updateStageTransform();renderEdgesD();
+    if(!mMode) return;
+    var dx=e.clientX-mSX,dy=e.clientY-mSY;
+    mDist+=Math.sqrt(dx*dx+dy*dy);
+    if(mMode==='node'&&mNode){
+      mNode.x=mNSX+dx/camScale;mNode.y=mNSY+dy/camScale;
+      var el=document.getElementById('dnd'+mNode.id);
+      if(el){el.style.left=(mNode.x-R)+'px';el.style.top=(mNode.y-R)+'px';}
+      var mm=document.getElementById('dmemo'+mNode.id);
+      if(mm){mm.style.left=mNode.x+'px';mm.style.top=(mNode.y+R+5)+'px';}
+      renderEdgesD();
+    } else if(mMode==='canvas'){
+      camX=mCX+dx;camY=mCY+dy;updateStageTransform();renderEdgesD();
     }
   });
   window.addEventListener('mouseup',function(){
-    var wasMouseTap=mDist<8&&mouseDragNode&&mouseDragMode==='node';
-    var tappedMNode=mouseDragNode;
-    mouseDragMode=null;mouseDragNode=null;
-    if(wasMouseTap&&tappedMNode){
-      var kb=NAYIN_KB[tappedMNode.person?tappedMNode.person.nichiN:'']||{};
-      var htBase=tappedMNode.person?tappedMNode.person.ht.replace(/[＋－]/g,''):'';
-      var detail=htBase+'\n'+(tappedMNode.person?tappedMNode.person.nenKS+' / '+tappedMNode.person.tsuKS+' / '+tappedMNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
-      showDiagDetail(tappedMNode.name+'（'+tappedMNode.memo+'）',detail,'#b8860b');
+    var wasTap=mDist<10&&mNode&&mMode==='node';
+    var tapped=mNode;
+    mMode=null;mNode=null;
+    if(wasTap&&tapped){
+      var kb=NAYIN_KB[tapped.person?tapped.person.nichiN:'']||{};
+      var htBase=tapped.person?tapped.person.ht.replace(/[＋－]/g,''):'';
+      var detail=htBase+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+      showDiagDetail(tapped.name+'\uff08'+tapped.memo+'\uff09',detail,'#b8860b');
     }
   });
   wrap.addEventListener('wheel',function(e){
