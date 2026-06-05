@@ -128,11 +128,10 @@ ruby rt{font-size:0.55em}
     </div>
     <div id="tabCanvas">
       <div id="diagramWrap" style="position:relative;border:1px solid rgba(184,134,11,0.15);border-radius:10px;overflow:hidden;height:420px;background:#f5f0e8;touch-action:none;cursor:grab">
-        <div id="stage" style="position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;pointer-events:none">
-        <svg id="ln" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none;overflow:visible"></svg>
-        <div id="nodes-container" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none"></div>
+        <div id="stage" style="position:absolute;top:0;left:0;width:5000px;height:5000px;transform-origin:0 0;will-change:transform;">
+        <svg id="ln" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1"></svg>
+        <div id="nodes-container" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2"></div>
         </div>
-      </div>
       <p style="font-size:0.78rem;color:#7a6b52;text-align:center;margin:0.4rem 0 0.8rem">ドラッグで移動 / 矢印ラベルをタップで詳細</p>
     </div>
     <div id="tabPeople" class="hidden">
@@ -776,7 +775,6 @@ var camStartX=0,camStartY=0;
 function updateStageTransform(){
   var st=document.getElementById('stage');
   if(st) st.style.transform='translate('+camX+'px,'+camY+'px) scale('+camScale+')';
-  // SVGのgroupもカメラに同期（renderEdgesを呼ぶことで再描画）
 }
 
 function initDiagramEngine(nodes,edges){
@@ -814,10 +812,7 @@ function initDiagramEngine(nodes,edges){
       mk.appendChild(mp);defs.appendChild(mk);
     });
     svgEl.appendChild(defs);
-    // groupにカメラ変換を適用→見切れ防止
-    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('transform','translate('+camX+','+camY+') scale('+camScale+')');
-    svgEl.appendChild(g);
+    // groupなし: svgElに直接描画（stageがCSS変換するので座標変換不要）
     diagEdges.forEach(function(e){
       var fn=diagNodes.find(function(n){return n.id===e.from;});
       var tn=diagNodes.find(function(n){return n.id===e.to;});
@@ -837,7 +832,7 @@ function initDiagramEngine(nodes,edges){
       line.setAttribute('x2',x2);line.setAttribute('y2',y2);
       line.setAttribute('stroke',lColor);line.setAttribute('stroke-width','2');
       line.setAttribute('marker-end','url(#ar-'+mid+')');
-      g.appendChild(line);
+      svgEl.appendChild(line);
       if(lbl){
         var lOx=paired?nx*16:0,lOy=paired?ny*16:0;
         var mx=(x1+x2)/2+lOx,my=(y1+y2)/2+lOy,tw=lbl.length*11+28,fh=26;
@@ -850,20 +845,20 @@ function initDiagramEngine(nodes,edges){
           hit.onclick=function(ev){ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);};
           hit.ontouchstart=function(ev){ev.stopPropagation();ev.preventDefault();showDiagDetail(ee.label,ee.detail||'',c);};
         })(e,lColor);
-        g.appendChild(hit);
+        svgEl.appendChild(hit);
         var bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
         bg.setAttribute('x',mx-tw/2);bg.setAttribute('y',my-fh/2);
         bg.setAttribute('width',tw);bg.setAttribute('height',fh);
         bg.setAttribute('rx','13');bg.setAttribute('fill','#fff');
         bg.setAttribute('stroke',lColor);bg.setAttribute('stroke-width','1.8');
         bg.setAttribute('pointer-events','none');
-        g.appendChild(bg);
+        svgEl.appendChild(bg);
         var tx=document.createElementNS('http://www.w3.org/2000/svg','text');
         tx.setAttribute('x',mx);tx.setAttribute('y',my+5);tx.setAttribute('text-anchor','middle');
         tx.setAttribute('fill',lColor);tx.setAttribute('font-size','12');tx.setAttribute('font-weight','600');
         tx.setAttribute('pointer-events','none');
         tx.setAttribute('font-family','-apple-system,Hiragino Sans,sans-serif');
-        tx.textContent=lbl;g.appendChild(tx);
+        tx.textContent=lbl;svgEl.appendChild(tx);
       }
     });
   }
@@ -980,14 +975,14 @@ function initDiagramEngine(nodes,edges){
       var dx=t.clientX-panSX,dy=t.clientY-panSY;
       totalDist+=Math.sqrt(dx*dx+dy*dy);
       camX=panCX+dx;camY=panCY+dy;
-      updateStageTransform();renderEdgesD();
+      updateStageTransform();
     } else if(dMode==='zoom'){
       if(ids.length<2) return;
       var t1=aTouch[ids[0]],t2=aTouch[ids[1]];
       var dist=Math.sqrt((t2.x-t1.x)*(t2.x-t1.x)+(t2.y-t1.y)*(t2.y-t1.y))||1;
       camScale=Math.max(0.3,Math.min(3,startScale2*(dist/startDist2)));
       camX=pMX-pCX*camScale;camY=pMY-pCY*camScale;
-      updateStageTransform();renderEdgesD();
+      updateStageTransform();
     }
   },{passive:false});
 
@@ -1038,7 +1033,7 @@ function initDiagramEngine(nodes,edges){
       if(mm){mm.style.left=mNode.x+'px';mm.style.top=(mNode.y+R+5)+'px';}
       renderEdgesD();
     } else if(mMode==='canvas'){
-      camX=mCX+dx;camY=mCY+dy;updateStageTransform();renderEdgesD();
+      camX=mCX+dx;camY=mCY+dy;updateStageTransform();
     }
   });
   window.addEventListener('mouseup',function(){
@@ -1059,7 +1054,7 @@ function initDiagramEngine(nodes,edges){
     var cx=(mx-camX)/camScale,cy=(my-camY)/camScale;
     camScale=Math.max(0.3,Math.min(3,camScale*(e.deltaY<0?1.1:0.91)));
     camX=mx-cx*camScale;camY=my-cy*camScale;
-    updateStageTransform();renderEdgesD();
+    updateStageTransform();
   },{passive:false});
 
   syncNodesDOMD();renderEdgesD();
