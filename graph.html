@@ -932,6 +932,23 @@ function switchResultTab(tab,btn){
 }
 
 
+// ===== グループモーダル =====
+function openGroupModal(){
+  document.getElementById('groupNameInput').value='';
+  document.getElementById('groupModalOverlay').classList.remove('hidden');
+}
+function closeGroupModal(){
+  document.getElementById('groupModalOverlay').classList.add('hidden');
+}
+function confirmAddGroup(){
+  var name=document.getElementById('groupNameInput').value.trim();
+  if(!name) return;
+  var newId=GROUPS.reduce(function(mx,g){return Math.max(mx,g.id);},0)+1;
+  GROUPS.push({id:newId,name:name,persons:[],result:null});
+  closeGroupModal();
+  switchGroup(newId);
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   renderGroupTabs();
   loadGroupForms();
