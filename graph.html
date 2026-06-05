@@ -128,8 +128,8 @@ ruby rt{font-size:0.55em}
     </div>
     <div id="tabCanvas">
       <div id="diagramWrap" style="position:relative;border:1px solid rgba(184,134,11,0.15);border-radius:10px;overflow:hidden;height:420px;background:#f5f0e8;touch-action:none;cursor:grab">
-        <div id="stage" style="position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;pointer-events:none">
-        <svg id="ln" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none"></svg>
+        <div id="stage" style="position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;pointer-events:none"><style>#stage svg{pointer-events:auto}#stage .dnd{pointer-events:auto}</style>
+        <svg id="ln" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none;overflow:visible"></svg>
         <div id="nodes-container" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none"></div>
         </div>
       </div>
@@ -843,6 +843,7 @@ function initDiagramEngine(nodes,edges){
         hitRect.setAttribute('x',mx-tw/2-8);hitRect.setAttribute('y',my-fh/2-8);
         hitRect.setAttribute('width',tw+16);hitRect.setAttribute('height',fh+16);
         hitRect.setAttribute('fill','transparent');
+        hitRect.setAttribute('pointer-events','all');
         hitRect.style.cursor='pointer';
         (function(ee,c){
           hitRect.addEventListener('click',function(ev){ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);});
@@ -1067,8 +1068,8 @@ function drawDiagram(result){
   var nodes=persons.map(function(p,i){
     var htBase=p.ht.replace(/[＋－]/g,'');
     var angle=(i/n)*Math.PI*2-Math.PI/2;
-    var radius=Math.min(W,H)*0.30;
-    return {id:i+1,x:Math.round(W/2+radius*Math.cos(angle)),y:Math.round(H/2+radius*Math.sin(angle)),
+    var radius=130;
+    return {id:i+1,x:Math.round(200+radius*Math.cos(angle)),y:Math.round(210+radius*Math.sin(angle)),
       name:p.name,memo:p.role.replace('あなた（本人）','本人'),color:ROKKA_TO_CL[htBase]||0,person:p};
   });
   var edges=[],eid=1;
