@@ -1003,14 +1003,16 @@ function initDiagramEngine(nodes,edges){
     }
     var remaining=Object.keys(aTouch).length;
     if(remaining===0){
-      // タップ判定
-      if(totalDist<8&&dragNode&&mode_touch==='node'){
-        var kb=NAYIN_KB[dragNode.person?dragNode.person.nichiN:'']||{};
-        var htBase=dragNode.person?dragNode.person.ht.replace(/[\u＋\u－]/g,'').replace(/[\uFF0B\uFF0D]/g,''):'';
-        var detail=htBase+'\n'+(dragNode.person?dragNode.person.nenKS+' / '+dragNode.person.tsuKS+' / '+dragNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
-        showDiagDetail(dragNode.name+'\uff08'+dragNode.memo+'\uff09',detail,'#b8860b');
+      // タップ判定（状態リセットを先に行う）
+      var wasTap=totalDist<8&&dragNode&&mode_touch==='node';
+      var tappedNode=dragNode;
+      mode_touch=null;dragNode=null;nodeTouchId=null;aTouch={};
+      if(wasTap&&tappedNode){
+        var kb=NAYIN_KB[tappedNode.person?tappedNode.person.nichiN:'']||{};
+        var htBase=tappedNode.person?tappedNode.person.ht.replace(/[＋－]/g,''):'';
+        var detail=htBase+'\n'+(tappedNode.person?tappedNode.person.nenKS+' / '+tappedNode.person.tsuKS+' / '+tappedNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+        showDiagDetail(tappedNode.name+'\uff08'+tappedNode.memo+'\uff09',detail,'#b8860b');
       }
-      mode_touch=null;dragNode=null;nodeTouchId=null;
     } else if(remaining===1){
       // 2本→1本：残った指でパンに切り替え
       var remainId=Object.keys(aTouch)[0];
@@ -1045,13 +1047,15 @@ function initDiagramEngine(nodes,edges){
     }
   });
   window.addEventListener('mouseup',function(){
-    if(mDist<8&&mouseDragNode&&mouseDragMode==='node'){
-      var kb=NAYIN_KB[mouseDragNode.person?mouseDragNode.person.nichiN:'']||{};
-      var htBase=mouseDragNode.person?mouseDragNode.person.ht.replace(/[＋－]/g,''):'';
-      var detail=htBase+'\n'+(mouseDragNode.person?mouseDragNode.person.nenKS+' / '+mouseDragNode.person.tsuKS+' / '+mouseDragNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
-      showDiagDetail(mouseDragNode.name+'（'+mouseDragNode.memo+'）',detail,'#b8860b');
-    }
+    var wasMouseTap=mDist<8&&mouseDragNode&&mouseDragMode==='node';
+    var tappedMNode=mouseDragNode;
     mouseDragMode=null;mouseDragNode=null;
+    if(wasMouseTap&&tappedMNode){
+      var kb=NAYIN_KB[tappedMNode.person?tappedMNode.person.nichiN:'']||{};
+      var htBase=tappedMNode.person?tappedMNode.person.ht.replace(/[＋－]/g,''):'';
+      var detail=htBase+'\n'+(tappedMNode.person?tappedMNode.person.nenKS+' / '+tappedMNode.person.tsuKS+' / '+tappedMNode.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+      showDiagDetail(tappedMNode.name+'（'+tappedMNode.memo+'）',detail,'#b8860b');
+    }
   });
   wrap.addEventListener('wheel',function(e){
     e.preventDefault();
