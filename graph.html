@@ -128,8 +128,8 @@ ruby rt{font-size:0.55em}
     </div>
     <div id="tabCanvas">
       <div id="diagramWrap" style="position:relative;border:1px solid rgba(184,134,11,0.15);border-radius:10px;overflow:hidden;height:420px;background:#f5f0e8;touch-action:none;cursor:grab">
-        <svg id="ln" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:10"></svg>
-        <div id="stage" style="position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;pointer-events:none;z-index:20">
+        <div id="stage" style="position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;will-change:transform;pointer-events:none">
+        <svg id="ln" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none;overflow:visible"></svg>
         <div id="nodes-container" style="position:absolute;top:0;left:0;width:5000px;height:5000px;pointer-events:none"></div>
         </div>
       </div>
@@ -815,10 +815,6 @@ function initDiagramEngine(nodes,edges){
       mk.appendChild(mp);defs.appendChild(mk);
     });
     svgEl.appendChild(defs);
-    // Gemini最新版: groupにカメラ変換を適用（見切れ防止）
-    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('transform','translate('+camX+','+camY+') scale('+camScale+')');
-    svgEl.appendChild(g);
     diagEdges.forEach(function(e){
       var fn=diagNodes.find(function(n){return n.id===e.from;});
       var tn=diagNodes.find(function(n){return n.id===e.to;});
@@ -837,7 +833,7 @@ function initDiagramEngine(nodes,edges){
       var line=document.createElementNS('http://www.w3.org/2000/svg','line');
       line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
       line.setAttribute('stroke',lColor);line.setAttribute('stroke-width','2');line.setAttribute('marker-end','url(#ar-'+mid.replace('ar-','')+')');
-      g.appendChild(line);
+      svgEl.appendChild(line);
       if(lbl){
         var lOx=paired?nx*16:0,lOy=paired?ny*16:0;
         var mx=(x1+x2)/2+lOx,my=(y1+y2)/2+lOy;
@@ -853,21 +849,21 @@ function initDiagramEngine(nodes,edges){
           hitRect.addEventListener('click',function(ev){ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);});
           hitRect.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();showDiagDetail(ee.label,ee.detail||'',c);});
         })(e,lColor);
-        g.appendChild(hitRect);
+        svgEl.appendChild(hitRect);
         var bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
         bg.setAttribute('x',mx-tw/2);bg.setAttribute('y',my-fh/2);
         bg.setAttribute('width',tw);bg.setAttribute('height',fh);
         bg.setAttribute('rx','13');bg.setAttribute('fill','#fff');
         bg.setAttribute('stroke',lColor);bg.setAttribute('stroke-width','1.8');
         bg.setAttribute('pointer-events','none');
-        g.appendChild(bg);
+        svgEl.appendChild(bg);
         var tx=document.createElementNS('http://www.w3.org/2000/svg','text');
         tx.setAttribute('x',mx);tx.setAttribute('y',my+5);tx.setAttribute('text-anchor','middle');
         tx.setAttribute('fill',lColor);tx.setAttribute('font-size','12');
         tx.setAttribute('font-weight','600');
         tx.setAttribute('pointer-events','none');
         tx.setAttribute('font-family','-apple-system,Hiragino Sans,sans-serif');
-        tx.textContent=lbl;g.appendChild(tx);
+        tx.textContent=lbl;svgEl.appendChild(tx);
       }
     });
   }
