@@ -806,7 +806,7 @@ function initDiagramEngine(nodes,edges){
       svgEl.appendChild(line);
       if(lbl){
         var lOx=paired?nx*14:0,lOy=paired?ny*14:0;
-        var mx=(x1+x2)/2+lOx,my=(y1+y2)/2+lOy,tw=lbl.length*7+14;
+        var mx=(x1+x2)/2+lOx,my=(y1+y2)/2+lOy,tw=lbl.length*11+28;
         var bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
         bg.setAttribute('x',mx-tw/2);bg.setAttribute('y',my-11);bg.setAttribute('width',tw);bg.setAttribute('height',22);
         bg.setAttribute('rx','11');bg.setAttribute('fill','#fff');bg.setAttribute('stroke',lColor);bg.setAttribute('stroke-width','1.5');
@@ -818,7 +818,7 @@ function initDiagramEngine(nodes,edges){
         svgEl.appendChild(bg);
         var tx=document.createElementNS('http://www.w3.org/2000/svg','text');
         tx.setAttribute('x',mx);tx.setAttribute('y',my+5);tx.setAttribute('text-anchor','middle');
-        tx.setAttribute('fill',lColor);tx.setAttribute('font-size','11');tx.setAttribute('pointer-events','none');
+        tx.setAttribute('fill',lColor);tx.setAttribute('font-size','12');tx.setAttribute('pointer-events','none');
         tx.setAttribute('font-family','-apple-system,Hiragino Sans,sans-serif');
         tx.textContent=lbl;svgEl.appendChild(tx);
       }
@@ -849,12 +849,23 @@ function initDiagramEngine(nodes,edges){
   }
   var dDN=null,dDTId=null,dDSX=0,dDSY=0,dDNSX=0,dDNSY=0;
   function setupDNodeEvents(el,n){
+    var dndMoved=false;
     el.addEventListener('touchstart',function(e){
       e.preventDefault();e.stopPropagation();
       var t=e.changedTouches[0];
-      dDN=n;dDTId=t.identifier;dDSX=t.clientX;dDSY=t.clientY;dDNSX=n.x;dDNSY=n.y;
+      dDN=n;dDTId=t.identifier;dDSX=t.clientX;dDSY=t.clientY;dDNSX=n.x;dDNSY=n.y;dndMoved=false;
     },{passive:false});
-    el.addEventListener('mousedown',function(e){dDN=n;dDTId=null;dDSX=e.clientX;dDSY=e.clientY;dDNSX=n.x;dDNSY=n.y;});
+    el.addEventListener('touchmove',function(){dndMoved=true;},{passive:true});
+    el.addEventListener('touchend',function(e){
+      if(!dndMoved){
+        e.preventDefault();
+        var kb=NAYIN_KB[n.person?n.person.nichiN:'']||{};
+        var htBase=n.person?n.person.ht.replace(/[＋－]/g,''):'';
+        var detail=htBase+'\n'+(n.person?n.person.nenKS+' / '+n.person.tsuKS+' / '+n.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+        showDiagDetail(n.name+'（'+n.memo+'）',detail,'#b8860b');
+      }
+    },{passive:false});
+    el.addEventListener('mousedown',function(e){dDN=n;dDTId=null;dDSX=e.clientX;dDSY=e.clientY;dDNSX=n.x;dDNSY=n.y;dndMoved=false;});
     el.addEventListener('click',function(){
       var kb=NAYIN_KB[n.person?n.person.nichiN:'']||{};
       var htBase=n.person?n.person.ht.replace(/[\u＋\u－]/g,'').replace(/[\uFF0B\uFF0D]/g,''):'';
@@ -995,6 +1006,194 @@ function confirmAddGroup(){
   GROUPS.push({id:newId,name:name,persons:[],result:null});
   closeGroupModal();
   switchGroup(newId);
+}
+
+// ===== 質問フォーム =====
+function buildQuestionForms(result){
+  var el=document.getElementById('questionForms');
+  if(!el) return;
+  el.innerHTML='';
+  var me=result.persons[0];
+  result.pairs.filter(function(pair){return pair.i===0;}).forEach(function(pair){
+    var p=result.persons[pair.j];
+    var pid=pair.i+'-'+pair.j;
+    var qDiv=document.createElement('div');
+    qDiv.style.cssText='margin-bottom:1rem;padding:0.9rem;background:#faf6ef;border-radius:8px;border:1px solid rgba(184,134,11,0.15)';
+    qDiv.innerHTML='<div style="font-size:0.9rem;font-weight:700;color:#4a3c28;margin-bottom:0.6rem">'+me.name+'と'+p.name+'（'+p.role+'）の関係</div>'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">現在どのくらい接触がありますか？</div>'
+      +'<select id="contact-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.7rem">'
+      +'<option value="毎日会う">毎日会う（同居・職場など）</option>'
+      +'<option value="週数回会う">週に数回会う</option>'
+      +'<option value="月数回会う">月に数回会う</option>'
+      +'<option value="たまに会う">たまに会う</option>'
+      +'<option value="ほとんど会わない">ほとんど会わない</option>'
+      +'</select>'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">今の関係についてどう感じていますか？</div>'
+      +'<select id="feeling-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff;margin-bottom:0.7rem">'
+      +'<option value="良好で満足">良好で満足している</option>'
+      +'<option value="まあまあ">まあまあ、普通</option>'
+      +'<option value="少し難しさを感じる">少し難しさを感じる</option>'
+      +'<option value="かなりしんどい">かなりしんどい</option>'
+      +'<option value="距離を置きたい">距離を置きたい</option>'
+      +'</select>'
+      +'<div style="font-size:0.84rem;color:#7a6b52;margin-bottom:0.4rem">この関係をどうしたいですか？</div>'
+      +'<select id="wish-'+pid+'" style="width:100%;font-size:0.9rem;padding:0.55rem;border:1px solid rgba(184,134,11,0.35);border-radius:6px;background:#fff">'
+      +'<option value="今のままで良い">今のままで良い</option>'
+      +'<option value="もっと仲良くなりたい">もっと仲良くなりたい</option>'
+      +'<option value="適度な距離を保ちたい">適度な距離を保ちたい</option>'
+      +'<option value="距離を置きたい">距離を置きたい</option>'
+      +'<option value="関係を改善したい">関係を改善したい</option>'
+      +'</select>';
+    el.appendChild(qDiv);
+  });
+}
+
+// ===== AI関係性アドバイス =====
+var ADVICE_CHAT_HISTORY=[];
+var currentAudio=null;
+
+async function getRelationAdvice(){
+  if(!RESULT_DATA) return;
+  var qs=document.getElementById('questionSection');
+  var ads=document.getElementById('adviceSection');
+  if(ads) ads.classList.remove('hidden');
+  var loadEl=document.getElementById('adviceLoading');
+  if(loadEl) loadEl.style.display='flex';
+  var at=document.getElementById('adviceText');
+  if(at) at.style.display='none';
+
+  var persons=RESULT_DATA.persons;
+  var me=persons[0];
+  var pairs=RESULT_DATA.pairs;
+  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
+  var badJ=['内省','狂咲','引寒','休眠','残雪'];
+  function jr(j){return goodJ.indexOf(j)>=0?'良':badJ.indexOf(j)>=0?'要注意':'普通';}
+
+  var compatSummary=pairs.filter(function(pair){return pair.i===0;}).map(function(pair){
+    var p=persons[pair.j];
+    var pid=pair.i+'-'+pair.j;
+    var contact=document.getElementById('contact-'+pid);
+    var feeling=document.getElementById('feeling-'+pid);
+    var wish=document.getElementById('wish-'+pid);
+    return me.name+'と'+p.name+'('+p.role+') '
+      +'長期：'+pair.nenJu1+'('+jr(pair.nenJu1)+') 日常：'+pair.tsuJu1+'('+jr(pair.tsuJu1)+')'
+      +(contact?' 接触：'+contact.value:'')
+      +(feeling?' 気持ち：'+feeling.value:'')
+      +(wish?' 望み：'+wish.value:'');
+  }).join(' / ');
+
+  var allPairs=pairs.map(function(pair){
+    var pa=persons[pair.i],pb=persons[pair.j];
+    return pa.name+'→'+pb.name+'：'+buildEdgeLabel(pair.label1)+' / '+pb.name+'→'+pa.name+'：'+buildEdgeLabel(pair.label2);
+  }).join(', ');
+
+  var parts=[
+    '主人公：'+me.name+'（'+me.role+'）',
+    '登場人物：'+persons.map(function(p){return p.name+'('+p.role+')';}).join('、'),
+    '相性データ：'+allPairs,
+    '状況：'+compatSummary,
+    me.name+'を主人公として関係性全体を分析し具体的なアドバイスを。500〜700文字。Markdown必須（##・###・箇条書き）。干支漢字・納音・蔵干などの専門用語は使わないこと。'
+  ];
+
+  var sysPrompt='あなたは花人占術の鑑定師です。相関図全体を俯瞰して、主人公にとっての人間関係を読み解き、具体的で温かいアドバイスをしてください。距離の置き方・付き合い方の工夫など現実的な提案を含めてください。';
+
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:parts.join(' ')}]})
+    });
+    var data=await res.json();
+    var text='';
+    if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
+    if(loadEl) loadEl.style.display='none';
+    if(at){
+      at.innerHTML=renderMarkdown(text);
+      at.style.display='block';
+    }
+    var asb=document.getElementById('adviceSpeakBtn');
+    var avg=document.getElementById('adviceVoiceGender');
+    if(asb) asb.style.display='block';
+    if(avg) avg.style.display='block';
+    var aca=document.getElementById('adviceChatArea');
+    if(aca) aca.style.display='block';
+    ADVICE_CHAT_HISTORY=[{role:'assistant',content:text}];
+    var ac=document.getElementById('adviceCount');
+    if(ac&&data.remaining!==undefined) ac.textContent='本日の残り鑑定回数：'+data.remaining+'回';
+    if(ads) ads.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    if(loadEl) loadEl.style.display='none';
+    if(at){at.textContent='通信エラーが発生しました。';at.style.display='block';}
+  }
+}
+
+async function speakAdvice(btn){
+  if(currentAudio&&!currentAudio.paused){currentAudio.pause();currentAudio=null;btn.textContent='🔊 読み上げ';return;}
+  var rawText=document.getElementById('adviceText').textContent||'';
+  if(!rawText) return;
+  var gender=document.getElementById('adviceVoiceGender').value||'female';
+  var t=rawText;
+  ['#','*','【','】','「','」'].forEach(function(c){while(t.indexOf(c)>=0)t=t.replace(c,'');});
+  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん']].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  btn.textContent='⏳ 生成中...';btn.disabled=true;
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,gender:gender})});
+    if(!res.ok) throw new Error('失敗');
+    var data=await res.json();
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){btn.textContent='⏹ 停止';btn.disabled=false;};
+    audio.onended=function(){btn.textContent='🔊 読み上げ';currentAudio=null;};
+    audio.onerror=function(){btn.textContent='🔊 読み上げ';btn.disabled=false;currentAudio=null;};
+    await audio.play();
+  }catch(e){btn.textContent='🔊 読み上げ';btn.disabled=false;}
+}
+
+async function speakChatBubble(btn){
+  if(currentAudio&&!currentAudio.paused){currentAudio.pause();currentAudio=null;btn.textContent='🔊 読み上げ';return;}
+  var rawText=btn.getAttribute('data-text')||'';
+  if(!rawText) return;
+  btn.textContent='⏳ 生成中...';btn.disabled=true;
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:rawText,gender:'female'})});
+    var data=await res.json();
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){btn.textContent='⏹ 停止';btn.disabled=false;};
+    audio.onended=function(){btn.textContent='🔊 読み上げ';currentAudio=null;};
+    audio.onerror=function(){btn.textContent='🔊 読み上げ';btn.disabled=false;currentAudio=null;};
+    await audio.play();
+  }catch(e){btn.textContent='🔊 読み上げ';btn.disabled=false;}
+}
+
+async function sendAdviceChat(){
+  var input=document.getElementById('adviceChatInput');
+  if(!input) return;
+  var userMsg=input.value.trim();
+  if(!userMsg) return;
+  input.value='';
+  ADVICE_CHAT_HISTORY.push({role:'user',content:userMsg});
+  var histEl=document.getElementById('adviceChatHistory');
+  if(histEl){var ud=document.createElement('div');ud.className='chat-bubble-user';ud.textContent=userMsg;histEl.appendChild(ud);}
+  var loadEl=document.getElementById('adviceChatLoading');
+  if(loadEl) loadEl.style.display='flex';
+  var messages=ADVICE_CHAT_HISTORY.slice(-10);
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemPrompt:'あなたは花人占術の鑑定師です。Markdown不可。',messages:messages})});
+    var data=await res.json();
+    var text='';
+    if(data.content) text=data.content.map(function(b){return b.text||'';}).join('');
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    ADVICE_CHAT_HISTORY.push({role:'assistant',content:text});
+    if(loadEl) loadEl.style.display='none';
+    if(histEl){
+      var ad=document.createElement('div');ad.className='chat-bubble-ai';ad.textContent=text;
+      var sb=document.createElement('button');sb.className='chat-speak-btn';sb.textContent='🔊 読み上げ';sb.setAttribute('data-text',text);sb.onclick=function(){speakChatBubble(this);};
+      var wrap=document.createElement('div');wrap.appendChild(ad);wrap.appendChild(sb);histEl.appendChild(wrap);
+      wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    var ac=document.getElementById('adviceCount');
+    if(ac&&data.remaining!==undefined) ac.textContent='本日の残り回数：'+data.remaining+'回';
+  }catch(e){if(loadEl) loadEl.style.display='none';}
 }
 
 document.addEventListener('DOMContentLoaded',function(){
