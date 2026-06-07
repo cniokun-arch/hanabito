@@ -2341,6 +2341,20 @@ function buildSystemPrompt(isPersonal){
     ? '【転化天蛹とは】大運干支（10年ごとに変わる運気の柱）がその人の転化天蛹の対象支にあたる10年間のことを指す。命式（年柱・月柱・日柱）の干支が転化天蛹の支であっても、それは転化天蛹ではない。大運表で対象支の期間を確認すること。' + (KB['転化天蛹']['説明']||'') + ' 過ごし方：' + (KB['転化天蛹']['過ごし方']||'')
     : '';
 
+  // 十二支データ（年支=内面・本能 / 月支=表面・社会的な顔 / 日支=哲学・方向性・結論）
+  var junishiInfo = '';
+  if(typeof JUNISHI_KB !== 'undefined' && typeof G !== 'undefined'){
+    var jNen = G.nenShi ? JUNISHI_KB[G.nenShi] : null;
+    var jTsu = G.tsuShi ? JUNISHI_KB[G.tsuShi] : null;
+    var jNichi = G.nichiShi ? JUNISHI_KB[G.nichiShi] : null;
+    var jParts = [];
+    if(jNen) jParts.push('【年支「'+G.nenShi+'」＝内面・本能】'+jNen['内面本能']);
+    if(jTsu) jParts.push('【月支「'+G.tsuShi+'」＝表面・社会的な顔】'+jTsu['社会的顔']);
+    if(jNichi) jParts.push('【日支「'+G.nichiShi+'」＝哲学・方向性・結論】'+jNichi['哲学方向性']);
+    if(jNen && jNen['組合せ法則']) jParts.push('【年支×月支の組合せ】'+jNen['組合せ法則']);
+    junishiInfo = jParts.join('\n');
+  }
+
   return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
     + '【知識ベース】\n' + starInfo + '\n\n' + junishiInfo + '\n\n【十二運気】\n' + juniInfo + '\n\n' + daiInfo + '\n\n'
     + (customInfo ? '【追加知識】\n' + customInfo + '\n\n' : '')
