@@ -2684,16 +2684,20 @@ async function speakText(text, btn){
 
 // 年・日のセレクトボックスを動的生成
 document.addEventListener('DOMContentLoaded', function(){
-  // home.htmlからの遷移：URLパラメータで自動入力
+  // home.htmlからの遷移：URLパラメータで自動入力（Gemini方式）
   (function(){
     var p=new URLSearchParams(window.location.search);
     var y=p.get('y'),m=p.get('m'),d=p.get('d');
     if(y&&m&&d){
       var yEl=document.getElementById('by'),mEl=document.getElementById('bm'),dEl=document.getElementById('bd');
-      if(yEl)yEl.value=parseInt(y);
-      if(mEl)mEl.value=parseInt(m);
-      if(dEl)dEl.value=parseInt(d);
-      setTimeout(function(){var btn=document.querySelector('.btn');if(btn)btn.click();},400);
+      if(yEl){yEl.value=parseInt(y);yEl.dispatchEvent(new Event('change'));}
+      if(mEl){mEl.value=parseInt(m);mEl.dispatchEvent(new Event('change'));}
+      setTimeout(function(){
+        if(dEl)dEl.value=parseInt(d);
+        setTimeout(function(){
+          var btn=document.querySelector('.btn');if(btn)btn.click();
+        },200);
+      },300);
     }
   })();
   var byEl = document.getElementById('by');

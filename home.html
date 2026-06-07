@@ -813,26 +813,45 @@ function goToCompat(){
   }
   window.location.href=url;
 }
-function goTo(url,personId){
+function goTo(url){
   const data=HB.load();
   if(!data){window.location.href=url;return;}
-  // 表示中の人物を特定
-  const pid=personId||currentPersonId;
-  const isMe=pid==='me';
-  const person=isMe?data.account:data.people.find(p=>p.id===pid);
-  if(person&&person.birthday){
-    const bd=person.birthday.split('-');
-    // localStorageに「home経由の遷移データ」を保存（再入力不要）
-    localStorage.setItem('hb_nav',JSON.stringify({
-      y:parseInt(bd[0]),m:parseInt(bd[1]),d:parseInt(bd[2]),
-      name:isMe?person.nickname:person.name,
-      fromHome:true
-    }));
-    window.location.href=url+(url.includes('?')?'&':'?')+`y=${bd[0]}&m=${bd[1]}&d=${bd[2]}`;
+  const isMe=currentPersonId==='me';
+  const myBd=data.account.birthday?data.account.birthday.split('-'):null;
+  if(!myBd){window.location.href=url;return;}
+  const myY=parseInt(myBd[0]),myM=parseInt(myBd[1]),myD=parseInt(myBd[2]);
+  let targetUrl='';
+  if(url.includes('compat.html')){
+    if(!isMe){
+      const p=data.people.find(x=>x.id===currentPersonId);
+      if(p&&p.birthday){
+        const pb=p.birthday.split('-');
+        targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD
+          +'&y2='+parseInt(pb[0])+'&m2='+parseInt(pb[1])+'&d2='+parseInt(pb[2]);
+      } else {
+        targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
+      }
+    } else {
+      targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
+    }
   } else {
-    window.location.href=url;
+    // index.html - 表示中の人物の命式を開く
+    if(!isMe){
+      const p=data.people.find(x=>x.id===currentPersonId);
+      if(p&&p.birthday){
+        const pb=p.birthday.split('-');
+        targetUrl='index.html?y='+parseInt(pb[0])+'&m='+parseInt(pb[1])+'&d='+parseInt(pb[2]);
+      } else {
+        targetUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
+      }
+    } else {
+      targetUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
+    }
   }
+  window.location.href=targetUrl;
 }
+function goToCompat(){goTo('compat.html');}
+
 function navTo(tab,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
