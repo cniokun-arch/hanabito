@@ -892,13 +892,19 @@ document.addEventListener('DOMContentLoaded',function(){
     var y=p.get('y'),m=p.get('m'),d=p.get('d');
     var y2=p.get('y2'),m2=p.get('m2'),d2=p.get('d2');
     if(y&&m&&d){
-      var yEl=document.getElementById('year1'),mEl=document.getElementById('month1'),dEl=document.getElementById('day1');
-      if(yEl)yEl.value=y;if(mEl)mEl.value=m;if(dEl)dEl.value=d;
+      var myY=document.getElementById('myY'),myM=document.getElementById('myM'),myD=document.getElementById('myD');
+      if(myY)myY.value=parseInt(y);
+      if(myM)myM.value=parseInt(m);
+      if(myD)myD.value=parseInt(d);
     }
     if(y2&&m2&&d2){
-      var yEl2=document.getElementById('year2'),mEl2=document.getElementById('month2'),dEl2=document.getElementById('day2');
-      if(yEl2)yEl2.value=y2;if(mEl2)mEl2.value=m2;if(dEl2)dEl2.value=d2;
-      if(y&&m&&d){setTimeout(function(){var btn=document.querySelector('.calc-btn');if(btn)btn.click();},300);}
+      var thY=document.getElementById('theirY'),thM=document.getElementById('theirM'),thD=document.getElementById('theirD');
+      if(thY)thY.value=parseInt(y2);
+      if(thM)thM.value=parseInt(m2);
+      if(thD)thD.value=parseInt(d2);
+    }
+    if(y&&m&&d&&y2&&m2&&d2){
+      setTimeout(function(){var btn=document.querySelector('.btn-calc');if(btn)btn.click();},400);
     }
   })();
   var cy=new Date().getFullYear();
