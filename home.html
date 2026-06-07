@@ -130,17 +130,22 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 
 /* ボトムナビ */
 .bottom-nav{
-  display:flex;background:#fff;border-top:1px solid var(--border);
-  padding:0.5rem 0 calc(env(safe-area-inset-bottom,0) + 0.5rem);
+  display:flex;background:#fff;
+  border-top:2px solid var(--border);
+  box-shadow:0 -4px 20px rgba(26,18,8,0.08);
+  padding:0.6rem 0 calc(env(safe-area-inset-bottom,0) + 0.6rem);
   position:sticky;bottom:0;z-index:100
 }
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;
   padding:0.4rem;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  border:none;background:none;font-family:'Noto Serif JP',serif}
-.nav-btn-icon{font-size:1.3rem}
-.nav-btn-label{font-size:0.6rem;color:var(--ink3);letter-spacing:0.05em}
-.nav-btn.active .nav-btn-label{color:var(--gold)}
+  border:none;background:none;font-family:'Noto Serif JP',serif;
+  transition:transform 0.15s}
+.nav-btn:active{transform:scale(0.92)}
+.nav-btn-icon{font-size:1.5rem}
+.nav-btn-label{font-size:0.65rem;color:var(--ink3);letter-spacing:0.05em;font-weight:500}
+.nav-btn.active .nav-btn-label{color:var(--gold);font-weight:700}
 .nav-btn.active .nav-btn-icon{filter:sepia(1) saturate(3) hue-rotate(5deg)}
+.nav-btn.active{border-top:2px solid var(--gold);margin-top:-2px}
 
 /* 人物登録モーダル */
 .modal-overlay{
@@ -293,9 +298,12 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
     <!-- 今日のカード -->
     <div class="today-card" id="todayCard">
       <div class="today-date" id="todayDate"></div>
-      <div class="today-unki">
-        <span class="unki-badge" id="todayUnkiBadge"></span>
-        <span id="todayUnkiName" style="font-size:0.82rem;color:var(--ink2)"></span>
+      <div style="margin-bottom:0.6rem">
+        <div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.08em;margin-bottom:0.35rem">✦ 今日の運気</div>
+        <div class="today-unki">
+          <span class="unki-badge" id="todayUnkiBadge"></span>
+          <span id="todayUnkiName" style="font-size:0.82rem;color:var(--ink2)"></span>
+        </div>
       </div>
       <div class="today-daiun" id="todayDaiun"></div>
       <div class="today-advice" id="todayAdvice">
@@ -314,7 +322,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
         <span class="quick-btn-icon">📿</span>
         <span class="quick-btn-label">命式を詳しく見る</span>
       </div>
-      <div class="quick-btn" onclick="goTo('compat.html')">
+      <div class="quick-btn" id="quickCompat" onclick="goToCompat()">
         <span class="quick-btn-icon">❤</span>
         <span class="quick-btn-label">相性を見る</span>
       </div>
@@ -333,19 +341,19 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 
   <!-- ボトムナビ -->
   <div class="bottom-nav">
-    <button class="nav-btn active" onclick="showTab('home',this)">
+    <button class="nav-btn active" id="navHome" onclick="navTo('home',this)">
       <span class="nav-btn-icon">🏠</span>
       <span class="nav-btn-label">ホーム</span>
     </button>
-    <button class="nav-btn" onclick="openChat()">
+    <button class="nav-btn" id="navChat" onclick="navTo('chat',this)">
       <span class="nav-btn-icon">🔮</span>
       <span class="nav-btn-label">相談</span>
     </button>
-    <button class="nav-btn" onclick="goTo('index.html')">
+    <button class="nav-btn" id="navMeishiki" onclick="goTo('index.html')">
       <span class="nav-btn-icon">📿</span>
       <span class="nav-btn-label">命式</span>
     </button>
-    <button class="nav-btn" onclick="goTo('graph.html')">
+    <button class="nav-btn" id="navGraph" onclick="goTo('graph.html')">
       <span class="nav-btn-icon">🕸</span>
       <span class="nav-btn-label">相関図</span>
     </button>
@@ -782,18 +790,48 @@ function autoResize(el){
 
 // ===== その他 =====
 function openSettings(){alert('設定機能は近日公開予定です');}
-function goTo(url){
+function goToCompat(){
   const data=HB.load();
-  if(data&&data.account.birthday){
-    const bd=data.account.birthday.split('-');
+  if(!data)return;
+  const acc=data.account;
+  if(!acc.birthday){window.location.href='compat.html';return;}
+  const bd=acc.birthday.split('-');
+  let url='compat.html?y='+bd[0]+'&m='+bd[1]+'&d='+bd[2];
+  // 表示中が自分以外なら相手の情報も渡す
+  if(currentPersonId!=='me'){
+    const p=data.people.find(x=>x.id===currentPersonId);
+    if(p&&p.birthday){
+      const pb=p.birthday.split('-');
+      url+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2];
+    }
+  }
+  window.location.href=url;
+}
+function goTo(url,personId){
+  const data=HB.load();
+  if(!data){window.location.href=url;return;}
+  // 表示中の人物を特定
+  const pid=personId||currentPersonId;
+  const isMe=pid==='me';
+  const person=isMe?data.account:data.people.find(p=>p.id===pid);
+  if(person&&person.birthday){
+    const bd=person.birthday.split('-');
+    // localStorageに「home経由の遷移データ」を保存（再入力不要）
+    localStorage.setItem('hb_nav',JSON.stringify({
+      y:parseInt(bd[0]),m:parseInt(bd[1]),d:parseInt(bd[2]),
+      name:isMe?person.nickname:person.name,
+      fromHome:true
+    }));
     window.location.href=url+(url.includes('?')?'&':'?')+`y=${bd[0]}&m=${bd[1]}&d=${bd[2]}`;
   } else {
     window.location.href=url;
   }
 }
-function showTab(tab,btn){
+function navTo(tab,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  if(tab==='chat'){openChat();}
+  else if(tab==='home'){closeChat();}
 }
 
 // ===== 初期化 =====
