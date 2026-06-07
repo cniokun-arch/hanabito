@@ -222,6 +222,19 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   <div class="loading-flower">🌸</div>
   <div class="loading-text">花人占術</div>
 </div>
+<!-- エラー表示 -->
+<div id="errmsg" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff0f0;border-bottom:2px solid #c04040;color:#900;padding:0.7rem 1rem;font-size:0.82rem;word-break:break-all"></div>
+<script>
+window.onerror=function(msg,src,line,col,err){
+  var el=document.getElementById('errmsg');
+  if(el){el.style.display='block';el.textContent='⚠ '+msg+' ['+line+':'+col+']';}
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  var el=document.getElementById('errmsg');
+  if(el){el.style.display='block';el.textContent='⚠ '+String(e.reason);}
+});
+</script>
 
 <!-- ログイン・登録画面 -->
 <div id="loginScreen" class="screen">
@@ -458,37 +471,26 @@ const HB = {
   isLoggedIn(){const d=this.load();return !!(d&&d.account);}
 };
 
-// ===== 命式計算（index.htmlと共通のロジックをここに移植） =====
-// 六十干支・干支計算の基本定数
+// ===== 命式計算（index.htmlと同一ロジック） =====
 const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
 const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
-
-function getYearKS(y,m,d){
-  const bd=new Date(y,m-1,d);
-  const sS=getSetsuForYear(y,2);
-  const base=bd>=new Date(sS.getFullYear(),sS.getMonth(),sS.getDate())?y:y-1;
-  return ROKUJU[((base-1984)%60+60)%60];
-}
-function getSetsuForYear(y,mo){
-  // 簡易節入り計算（index.htmlから）
-  const SETSU_DATA={1:[6,5,5,5,5,6,7,7,7,7,7,6,6,6,5,5,5,5,5,5,6,6,6,6,6,5],2:[4,4,4,4,4,4,4,4,4,4,3,3,3,4,4,4,4,4,4,3,3,3,3,3,4,4],3:[6,6,6,6,6,6,6,6,5,5,5,5,6,6,6,6,6,6,5,5,5,5,5,6,6,6],4:[5,5,5,5,5,5,5,5,5,5,4,4,4,4,5,5,5,5,5,4,4,4,4,4,5,5],5:[6,6,6,6,6,6,6,6,6,5,5,5,5,5,6,6,6,6,5,5,5,5,5,5,6,6],6:[6,6,6,6,6,6,6,6,6,6,5,5,5,5,5,6,6,6,5,5,5,5,5,5,6,6],7:[7,7,7,7,7,7,7,8,8,7,7,7,7,7,7,7,7,7,7,7,6,7,7,7,7,7],8:[8,8,8,8,8,8,8,8,8,8,7,7,7,7,7,7,8,7,7,7,7,7,7,7,7,8],9:[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,7,7,7,7,7,8,8],10:[8,8,8,8,8,8,8,9,9,8,8,8,8,8,8,8,8,8,8,8,7,8,8,8,8,8],11:[7,7,7,8,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7],12:[7,7,7,8,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,7,7,7,7,7]};
-  const idx=y-1984; const day=(SETSU_DATA[mo]&&SETSU_DATA[mo][idx])||7;
-  return new Date(y,mo-1,day);
-}
-function getYearShi(y,m,d){return getYearKS(y,m,d).slice(1);}
-function getYearKan(y,m,d){return getYearKS(y,m,d).slice(0,1);}
-
-// 六花人判定
-const HOSHI_BY_IDX=['水花人','水花人','仙花人','仙花人','風花人','風花人','離花人','離花人','白花人','白花人','天花人','天花人','水花人','水花人','仙花人','仙花人','風花人','風花人','離花人','離花人','白花人','白花人','天花人','天花人','水花人','水花人','仙花人','仙花人','風花人','風花人','離花人','離花人','白花人','白花人','天花人','天花人','水花人','水花人','仙花人','仙花人','風花人','風花人','離花人','離花人','白花人','白花人','天花人','天花人','水花人','水花人','仙花人','仙花人','風花人','風花人','離花人','離花人','白花人','白花人','天花人','天花人'];
+const HOSHI_BY_IDX=['天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人'];
+// 節入り（index.htmlと同一）
+const SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,957505740000,960198120000,962913780000,965636460000,968326020000,970974540000,973578000000,976134780000];
+const TROPICAL_YEAR_MS=365.24219879*86400000;
+function getSetsuDate(y,m){const b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
+// 日柱（index.htmlと同一）
+function getDayKS(y,m,d){const diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
+// 年柱（index.htmlと同一）
+function getYearKS(y,m,d){const bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
+// 六花人（日柱から計算 - index.htmlのgetHoshiTypeと同一）
 function getHoshi(y,m,d){
-  // 日柱を使って六花人を計算（index.htmlのgetHoshiType相当）
-  // 簡易版：年干支から計算
-  const ks=getYearKS(y,m,d);
-  const idx=ROKUJU.indexOf(ks);
-  const name=HOSHI_BY_IDX[idx];
-  const num=idx+1;
+  const dayKS=getDayKS(y,m,d);
+  const name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)];
+  const nenKS=getYearKS(y,m,d);
+  const num=ROKUJU.indexOf(nenKS)+1;
   return name+(num%2===1?'＋':'－');
 }
 
@@ -500,20 +502,24 @@ function formatDate(dateStr){
 function today(){return new Date();}
 function todayStr(){const d=today();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
-// 今年の運気（簡易）
+// 今年の運気（index.htmlのgetJuniUnkiと同一ロジック）
+const TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
+const JUNI_NAMES=['発芽','青葉','開花','成天','豊穣','穂分','平凪','内省','狂咲','引寒','休眠','残雪'];
+function getJuniUnki(ht,shi){
+  const base=TEISHI[ht];
+  if(base===undefined)return '平凪';
+  const shiIdx=JUNISHI.indexOf(shi);
+  if(shiIdx<0)return '平凪';
+  return JUNI_NAMES[((shiIdx-base)%12+12)%12];
+}
+function getTodayYearShi(){
+  const y=today().getFullYear();
+  return getYearKS(y,1,15).slice(1);
+}
 function getNenUnki(birthday,ht){
-  if(!birthday)return null;
-  const bd=new Date(birthday+'T00:00:00');
-  const y=bd.getFullYear(),m=bd.getMonth()+1,d=bd.getDate();
-  const todayY=today().getFullYear();
-  const nenShi=getYearShi(todayY,1,15); // 今年の支
-  const pShi=getYearShi(y,m,d); // 生まれ年の支
-  // 六花人の今年の支との関係で運気を計算（簡易）
-  const JUNI_ORDER=['発芽','青葉','開花','成天','豊穣','穂分','平凪','内省','狂咲','引寒','休眠','残雪'];
-  const shiIdx=JUNISHI.indexOf(nenShi);
-  const pShiIdx=JUNISHI.indexOf(pShi);
-  const diff=((shiIdx-pShiIdx)+12)%12;
-  return JUNI_ORDER[diff]||'平凪';
+  if(!birthday||!ht)return null;
+  const shi=getTodayYearShi();
+  return getJuniUnki(ht,shi);
 }
 
 // ===== アバター色 =====
