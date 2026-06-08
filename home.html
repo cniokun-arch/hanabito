@@ -70,16 +70,7 @@ body.theme-dark .uranai-form{background:var(--card)}
 body.theme-dark .uranai-form input,body.theme-dark .uranai-form select{background:var(--bg);color:var(--text)}
 body.theme-dark .setting-sec{background:var(--card)}
 
-/* ===== 花びら演出 ===== */
-.petal-container{position:fixed;top:0;left:0;width:100%;height:100%;
-  pointer-events:none;z-index:1;overflow:hidden}
-.petal{position:absolute;top:-40px;font-size:1.2rem;opacity:0;
-  animation:petalFall linear forwards;user-select:none}
-@keyframes petalFall{
-  0%{transform:translateY(0) rotate(0deg) scale(1);opacity:0.7}
-  50%{opacity:0.5}
-  100%{transform:translateY(110vh) rotate(720deg) scale(0.5);opacity:0}
-}
+/* 花びら：canvasで描画 */
 
 /* ===== スプラッシュ ===== */
 #splashScreen{position:fixed;inset:0;z-index:9000;display:flex;
@@ -361,7 +352,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
 <div id="errmsg"></div>
 
 <!-- 花びらコンテナ（常時） -->
-<div class="petal-container" id="petalContainer"></div>
+<canvas id="petalCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.75;display:none"></canvas>
 
 <!-- スプラッシュ画面 -->
 <div id="splashScreen">
@@ -761,36 +752,230 @@ function loadTheme(){
   else setTheme('pink');
 }
 
-// ===== 花びら演出 =====
-var petalOn=true;
-var petalTimer=null;
-var PETALS=['🌸','🌺','🌼','🌷','💮'];
-function startPetals(){
-  if(petalTimer)clearInterval(petalTimer);
-  petalTimer=setInterval(function(){
-    if(!petalOn)return;
-    var p=document.createElement('div');
-    p.className='petal';
-    p.textContent=PETALS[Math.floor(Math.random()*PETALS.length)];
-    p.style.left=Math.random()*100+'%';
-    p.style.fontSize=(0.8+Math.random()*0.8)+'rem';
-    p.style.opacity=(0.3+Math.random()*0.4);
-    var dur=4+Math.random()*4;
-    p.style.animationDuration=dur+'s';
-    p.style.animationDelay=Math.random()*0.5+'s';
-    document.getElementById('petalContainer').appendChild(p);
-    setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p);},dur*1000+600);
-  },1200);
+// ===== 花びら演出（canvasベース・index.htmlと同一） =====
+let petalAnim = null, petalActive = false;
+const canvas = document.getElementById('petalCanvas');
+const ctx = canvas.getContext('2d');
+let petals = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+const PETAL_COLORS = [
+  ['#ffb7c5','#ff6b8a'],  // ピンク
+  ['#ffc8d4','#ff85a1'],  // 薄ピンク
+  ['#b8e8b8','#5cbd5c'],  // 緑
+  ['#fff0a0','#ffd020'],  // 黄
+  ['#d4a0ff','#9040ff'],  // 紫
+  ['#a0d4ff','#40a0ff'],  // 水色
+  ['#ffc090','#ff7830'],  // オレンジ
+  ['#ff90b0','#ff3070'],  // 濃いピンク
+  ['#c0a0ff','#7040ff'],  // 青紫
+  ['#a0ffcc','#20c060'],  // 薄緑
+  ['#ffb080','#ff6020'],  // 赤オレンジ
+  ['#80c8ff','#2080e0'],  // 青
+];
+
+// ===== 風システム =====
+let wind = { strength: 0, target: 0, timer: 0 };
+function updateWind() {
+  wind.timer--;
+  if (wind.timer <= 0) {
+    const r = Math.random();
+    if (r < 0.5) {
+      wind.target = (Math.random() - 0.5) * 1.5;
+      wind.timer = 60 + Math.random() * 120;
+    } else if (r < 0.8) {
+      wind.target = (Math.random() - 0.3) * 3.0;
+      wind.timer = 40 + Math.random() * 80;
+    } else {
+      wind.target = (Math.random() > 0.5 ? 1 : -1) * (2.5 + Math.random() * 3.0);
+      wind.timer = 20 + Math.random() * 40;
+    }
+  }
+  wind.strength += (wind.target - wind.strength) * 0.02;
+}
+
+function createPetal() {
+  const colorPair = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)];
+  const depth = Math.random();
+  const sz = 6 + depth * 18;
+  const shape = Math.floor(Math.random() * 8);
+  let startX = Math.random() * canvas.width;
+  if (wind.strength > 2.0) startX = -sz;
+  else if (wind.strength < -2.0) startX = canvas.width + sz;
+  return {
+    x: startX,
+    y: -sz * 2,
+    size: sz,
+    depth: depth,
+    shape: shape,
+    speedY: (0.2 + depth * 0.8) + Math.random() * 0.4,
+    speedX: (Math.random() - 0.5) * 0.4,
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.02,
+    sway: Math.random() * Math.PI * 2,
+    swaySpeed: 0.004 + Math.random() * 0.008,
+    swayAmt: 0.5 + depth * 2.5,
+    color: colorPair[0],
+    colorDark: colorPair[1],
+    opacity: 0.3 + depth * 0.55,
+    flip: Math.random() * Math.PI * 2,
+    flipSpeed: (Math.random() > 0.5 ? 1 : -1) * (0.008 + depth * 0.02),
+    windResponse: 0.3 + Math.random() * 0.7,
+  };
+}
+
+function drawPetal(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.rotation);
+  // Y軸回転（scaleXで表裏を表現）
+  const flipScale = Math.cos(p.flip);
+  ctx.scale(flipScale, 1);
+  const s = p.size;
+
+  // 形のバリエーション（花の分類図を参考）
+  ctx.beginPath();
+  switch(p.shape) {
+    case 0: // バラ形花 - 丸みのある広い花びら
+      ctx.moveTo(0, s*0.75);
+      ctx.bezierCurveTo(-s*0.1, s*0.3, -s*0.85, s*0.05, -s*0.65, -s*0.45);
+      ctx.bezierCurveTo(-s*0.45, -s*0.95, s*0.45, -s*0.95, s*0.65, -s*0.45);
+      ctx.bezierCurveTo(s*0.85, s*0.05, s*0.1, s*0.3, 0, s*0.75);
+      break;
+    case 1: // ユリ形 - 細長くスリム、先端がわずかに広がる
+      ctx.moveTo(0, s*0.95);
+      ctx.bezierCurveTo(-s*0.08, s*0.5, -s*0.38, -s*0.1, -s*0.32, -s*0.6);
+      ctx.bezierCurveTo(-s*0.22, -s*1.0, s*0.22, -s*1.0, s*0.32, -s*0.6);
+      ctx.bezierCurveTo(s*0.38, -s*0.1, s*0.08, s*0.5, 0, s*0.95);
+      break;
+    case 2: // 十字形花 - やや細めで先端が丸い
+      ctx.moveTo(0, s*0.85);
+      ctx.bezierCurveTo(-s*0.06, s*0.4, -s*0.42, s*0.05, -s*0.38, -s*0.5);
+      ctx.bezierCurveTo(-s*0.28, -s*0.95, s*0.28, -s*0.95, s*0.38, -s*0.5);
+      ctx.bezierCurveTo(s*0.42, s*0.05, s*0.06, s*0.4, 0, s*0.85);
+      break;
+    case 3: // スミレ形 - 丸みがあり下が少し広がる
+      ctx.moveTo(0, s*0.7);
+      ctx.bezierCurveTo(-s*0.25, s*0.4, -s*0.8, s*0.15, -s*0.72, -s*0.35);
+      ctx.bezierCurveTo(-s*0.55, -s*0.88, s*0.55, -s*0.88, s*0.72, -s*0.35);
+      ctx.bezierCurveTo(s*0.8, s*0.15, s*0.25, s*0.4, 0, s*0.7);
+      break;
+    case 4: // ナデシコ形 - 先端に切れ込みが入った形
+      ctx.moveTo(0, s*0.8);
+      ctx.bezierCurveTo(-s*0.08, s*0.3, -s*0.75, s*0.0, -s*0.6, -s*0.4);
+      ctx.bezierCurveTo(-s*0.45, -s*0.75, -s*0.18, -s*0.85, 0, -s*0.7);
+      ctx.bezierCurveTo(s*0.05, -s*0.78, s*0.0, -s*0.9, s*0.12, -s*0.88);  // 切れ込み
+      ctx.bezierCurveTo(s*0.22, -s*0.82, s*0.15, -s*0.72, s*0.2, -s*0.65);
+      ctx.bezierCurveTo(s*0.45, -s*0.7, s*0.65, -s*0.35, s*0.6, -s*0.4);
+      ctx.bezierCurveTo(s*0.75, s*0.0, s*0.08, s*0.3, 0, s*0.8);
+      break;
+    case 5: // 蝶形花（旗弁）- 上が広く丸い、下がやや細い
+      ctx.moveTo(0, s*0.6);
+      ctx.bezierCurveTo(-s*0.3, s*0.3, -s*0.82, s*0.05, -s*0.75, -s*0.42);
+      ctx.bezierCurveTo(-s*0.62, -s*0.88, -s*0.1, -s*1.0, s*0.0, -s*0.95);
+      ctx.bezierCurveTo(s*0.1, -s*1.0, s*0.62, -s*0.88, s*0.75, -s*0.42);
+      ctx.bezierCurveTo(s*0.82, s*0.05, s*0.3, s*0.3, 0, s*0.6);
+      break;
+    case 6: // 細長い涙形 - ユリより細くシャープ
+      ctx.moveTo(0, s*0.95);
+      ctx.bezierCurveTo(-s*0.05, s*0.45, -s*0.28, -s*0.05, -s*0.22, -s*0.65);
+      ctx.bezierCurveTo(-s*0.14, -s*1.05, s*0.14, -s*1.05, s*0.22, -s*0.65);
+      ctx.bezierCurveTo(s*0.28, -s*0.05, s*0.05, s*0.45, 0, s*0.95);
+      break;
+    case 7: // 自然な非対称花びら
+      ctx.moveTo(0, s*0.8);
+      ctx.bezierCurveTo(-s*0.05, s*0.3, -s*0.9, s*0.08, -s*0.68, -s*0.42);
+      ctx.bezierCurveTo(-s*0.48, -s*0.88, s*0.28, -s*1.0, s*0.58, -s*0.52);
+      ctx.bezierCurveTo(s*0.78, -s*0.02, s*0.12, s*0.32, 0, s*0.8);
+      break;
+  }
+  ctx.closePath();
+
+  // 中心が白〜外側がカラフルなグラデーション（参考画像のように）
+  const grad = ctx.createRadialGradient(0, -s*0.1, s*0.05, 0, s*0.1, s*1.1);
+  grad.addColorStop(0, 'rgba(255,255,255,0.95)');
+  grad.addColorStop(0.3, p.color + 'cc');
+  grad.addColorStop(1, p.colorDark + 'aa');
+
+  ctx.globalAlpha = p.opacity;
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // ぼかし効果（ソフトな質感）
+  ctx.globalAlpha = p.opacity * 0.3;
+  ctx.fillStyle = p.color;
+  ctx.filter = 'blur(2px)';
+  ctx.fill();
+  ctx.filter = 'none';
+
+  ctx.restore();
+}
+
+function animatePetals() {
+  if (!petalActive) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 風を更新
+  updateWind();
+
+  // 花びら発生（強風時は多め）
+  const spawnRate = Math.abs(wind.strength) > 2 ? 0.08 : 0.04;
+  const maxPetals = Math.abs(wind.strength) > 2 ? 40 : 25;
+  if (Math.random() < spawnRate && petals.length < maxPetals) petals.push(createPetal());
+
+  // 画面外に出た花びらを除去（横方向も考慮）
+  petals = petals.filter(p => p.y < canvas.height + 40 && p.x > -100 && p.x < canvas.width + 100);
+
+  // 奥から手前の順で描画（depthでソート）
+  petals.sort((a, b) => a.depth - b.depth);
+
+  petals.forEach(p => {
+    p.sway += p.swaySpeed;
+    // 風の影響＋個体差
+    p.x += p.speedX + Math.sin(p.sway) * p.swayAmt + wind.strength * p.windResponse * 0.4;
+    p.y += p.speedY;
+    p.rotation += p.rotSpeed + wind.strength * 0.003;
+    p.flip += p.flipSpeed + Math.abs(wind.strength) * 0.002;
+    drawPetal(p);
+  });
+  petalAnim = requestAnimationFrame(animatePetals);
+}
+
+function startPetals() {
+  if (petalActive) return;
+  petalActive = true;
+  canvas.style.display = 'block';
+  animatePetals();
+}
+function stopPetals() {
+  petalActive = false;
+  cancelAnimationFrame(petalAnim);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = 'none';
+  petals = [];
+}
+
 function togglePetals(){
-  petalOn=!petalOn;
+  if(petalActive){stopPetals();}
+  else{startPetals();}
+  petalOn=petalActive;
   var btn=document.getElementById('petalToggleBtn');
   if(btn)btn.textContent=petalOn?'ON':'OFF';
   var data=S.load();if(data){data._petals=petalOn;S.save(data);}
 }
+var petalOn=true;
 function loadPetalSetting(){
   var data=S.load();
-  if(data&&data._petals===false){petalOn=false;var b=document.getElementById('petalToggleBtn');if(b)b.textContent='OFF';}
+  if(data&&data._petals===false){petalOn=false;}
+  else{petalOn=true;}
+  var b=document.getElementById('petalToggleBtn');
+  if(b)b.textContent=petalOn?'ON':'OFF';
 }
 
 // ===== スプラッシュ =====
@@ -1207,10 +1392,13 @@ async function sendChat(){
 // 起動
 window.addEventListener('DOMContentLoaded',function(){
   initDateSel('rBdY','rBdM','rBdD');
+  // canvasリサイズ
+  window.addEventListener('resize',function(){if(typeof resizeCanvas==='function')resizeCanvas();});
+  if(typeof resizeCanvas==='function')resizeCanvas();
   initDateSel('urBdY','urBdM','urBdD');
   loadTheme();
   loadPetalSetting();
-  startPetals();
+  if(petalOn)startPetals();
   // スプラッシュを1.8秒表示してから本体を起動
   setTimeout(function(){
     hideSplash(function(){
