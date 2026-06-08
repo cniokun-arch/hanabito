@@ -955,7 +955,9 @@ function showTerms(){
 
 // ===== 運気・ラッキーカラーウィジェット関数 =====
 // オフセット（0=今日、+1=明日、-1=昨日 など）
-var unqiOffset = {day:0, month:0, year:0};
+var unqiOffsetDay = 0;
+var unqiOffsetMonth = 0;
+var unqiOffsetYear = 0;
 var lcOffset = 0;
 
 function getOffsetDate(tab, offset) {
@@ -988,7 +990,9 @@ function formatOffsetLabel(tab, offset, dt) {
 }
 
 function unqiNav(dir) {
-  unqiOffset[currentUnqiTab] += dir;
+  if(currentUnqiTab==='day')unqiOffsetDay+=dir;
+  else if(currentUnqiTab==='month')unqiOffsetMonth+=dir;
+  else unqiOffsetYear+=dir;
   switchUnqiTab(currentUnqiTab);
 }
 function lcNav(dir) {
@@ -1074,7 +1078,7 @@ function buildUnqiHTML(tab){
   if(!_widgetBd)return '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem">生年月日が未登録です</div>';
   var bd=_widgetBd.split('-'),y=+bd[0],m=+bd[1],d=+bd[2];
   var ht=hoshi(y,m,d);
-  var offset = unqiOffset[tab] || 0;
+  var offset = tab==='day'?unqiOffsetDay:tab==='month'?unqiOffsetMonth:unqiOffsetYear;
   var dtInfo = getOffsetDate(tab, offset);
   var ny=dtInfo.y, nm=dtInfo.m, nd=dtInfo.d;
   var shi,dateLabel;
@@ -1189,7 +1193,7 @@ function switchLcTab(tab){
   if(body)body.innerHTML=buildLcHTML(tab);
 }
 function updateWidgets(bd){
-  unqiOffset = {day:0, month:0, year:0};
+  unqiOffsetDay=0;unqiOffsetMonth=0;unqiOffsetYear=0;
   lcOffset = 0;
   _widgetBd=bd;
   var parts=bd.split('-'),y=+parts[0],m=+parts[1],d=+parts[2];
