@@ -285,8 +285,13 @@ body.theme-dark .dsetting{background:rgba(230,198,135,0.15);border-color:rgba(23
 .hero{background:linear-gradient(145deg,#ffffff 0%,#fffbfb 100%);border:1px solid var(--border);
   border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1.2rem;
   box-shadow:0 8px 24px rgba(254,197,187,0.15)}
+.hero-label{font-size:0.75rem;color:var(--gold2);letter-spacing:0.12em;
+  font-family:var(--serif);margin-bottom:0.4rem;font-weight:600}
 .hero-top{display:flex;justify-content:space-between;align-items:baseline;
-  border-bottom:1px solid var(--border);padding-bottom:0.8rem;margin-bottom:1.2rem}
+  border-bottom:1px solid var(--border);padding-bottom:0.6rem;margin-bottom:1rem}
+.hero-tap-hint{font-size:0.72rem;color:var(--text2);letter-spacing:0.04em;
+  margin-bottom:1rem;display:flex;align-items:center;gap:0.3rem}
+.hero-tap-hint::before{content:'👆';font-size:0.85rem}
 .hero-name{font-family:var(--serif);font-size:1.4rem;color:var(--gold2);font-weight:600;
   display:flex;align-items:center;gap:0.4rem}
 .hero-name-hint{font-size:0.78rem;color:var(--text2);font-weight:400;font-family:'Noto Serif JP',serif}
@@ -544,12 +549,12 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
 
     <!-- ヒーローカード（タップで詳細） -->
     <div class="hero tappable" onclick="showHeroDetail()">
+      <div class="hero-label">✦ あなたの今日の運勢</div>
       <div class="hero-top">
-        <span class="hero-name" id="hName">---
-          <span class="hero-name-hint">タップで詳細 ›</span>
-        </span>
+        <span class="hero-name" id="hName">---</span>
         <span class="hero-age" id="hAge"></span>
       </div>
+      <div class="hero-tap-hint">タップすると詳細な鑑定を見られます ›</div>
       <div class="sgrid">
         <div class="snode"><span class="lbl">今日の運気</span><span class="val hi" id="hUnki">--</span></div>
         <div class="snode"><span class="lbl">吉凶</span><span class="val hi" id="hKikkyo">--</span></div>
@@ -1196,8 +1201,9 @@ function renderDash(){
   var kk=kikkyo(c.unki,c.ht);
   var kc=kkColor(c.unki,c.ht);
 
-  document.getElementById('hName').innerHTML=pname+(isME?' (あなた)':' さん')
-    +'<span class="hero-name-hint">タップで詳細 ›</span>';
+  var heroLabel=document.querySelector('.hero-label');
+  if(heroLabel)heroLabel.textContent='✦ '+(isME?'あなたの今日の運勢':pname+'さんの今日の運勢');
+  document.getElementById('hName').textContent=pname+(isME?'':'さん');
   document.getElementById('hAge').textContent=age+'歳';
   var uEl=document.getElementById('hUnki');
   uEl.textContent=c.unki;uEl.style.color=kc;
