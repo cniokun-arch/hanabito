@@ -8,256 +8,235 @@
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Noto+Serif+JP:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0b0a08;--card:#14120e;--card2:#1c1914;
-  --gold:#e6c687;--gold2:#b89146;
-  --gold-grad:linear-gradient(135deg,#e6c687 0%,#b89146 100%);
-  --glow:rgba(230,198,135,0.15);
-  --text:#f4f0ea;--text2:#b5ae9f;
-  --border:rgba(230,198,135,0.15);--border2:rgba(230,198,135,0.5);
-  --r:20px;--rm:12px;
+  --bg:#fff9f6;
+  --bg-grad:linear-gradient(135deg,#fff5f2 0%,#feeef0 50%,#fdf0f7 100%);
+  --card:#ffffff;--card2:#fff5f6;
+  --gold:#d4a373;--gold2:#b58255;
+  --gold-grad:linear-gradient(135deg,#fae1dd 0%,#fec5bb 100%);
+  --glow:rgba(254,197,187,0.3);
+  --text:#4a3f3d;--text2:#8a7a77;
+  --border:rgba(254,197,187,0.4);--border2:rgba(212,163,115,0.5);
+  --r:22px;--rm:14px;
   --serif:'Zen Old Mincho','Noto Serif JP',serif;
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 html,body{min-height:100vh;background:var(--bg);color:var(--text);
   font-family:'Noto Serif JP',serif;line-height:1.6}
-body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,transparent 70%)}
+body{background-image:var(--bg-grad);background-attachment:fixed}
 
-/* ===== エラー ===== */
 #errmsg{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
-  background:rgba(192,64,64,0.95);color:#fff;padding:0.7rem 1rem;
+  background:rgba(230,100,100,0.95);color:#fff;padding:0.7rem 1rem;
   font-size:0.8rem;word-break:break-all}
 
-/* ===== スクリーン ===== */
-.scr{display:none;opacity:0;transform:translateY(8px);
-  transition:opacity 0.35s ease,transform 0.35s ease}
+.scr{display:none;opacity:0;transform:translateY(8px);transition:opacity 0.35s ease,transform 0.35s ease}
 .scr.on{display:block;opacity:1;transform:translateY(0)}
 
-/* ===== 認証画面 ===== */
-#scrAuth{min-height:100vh;display:none;align-items:center;
-  justify-content:center;padding:2rem 1.2rem}
+/* 認証 */
+#scrAuth{min-height:100vh;display:none;align-items:center;justify-content:center;padding:2rem 1.2rem}
 #scrAuth.on{display:flex;opacity:1;transform:none}
 .auth-wrap{width:100%;max-width:380px}
 .brand{text-align:center;margin-bottom:2rem}
-.brand-en{font-family:'Marcellus',serif;font-size:0.72rem;letter-spacing:0.4em;
-  color:var(--gold2);text-transform:uppercase;margin-bottom:0.3rem}
-.brand h1{font-family:var(--serif);font-size:2rem;font-weight:500;
-  letter-spacing:0.25em;background:var(--gold-grad);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.brand-tag{font-size:0.72rem;color:var(--text2);margin-top:0.4rem;letter-spacing:0.1em}
+.brand-en{font-family:'Marcellus',serif;font-size:0.75rem;letter-spacing:0.4em;color:var(--gold2);text-transform:uppercase;margin-bottom:0.4rem}
+.brand h1{font-family:var(--serif);font-size:2.2rem;font-weight:600;letter-spacing:0.25em;color:var(--gold2)}
+.brand-tag{font-size:0.75rem;color:var(--text2);margin-top:0.5rem;letter-spacing:0.12em}
 .glass{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:2rem 1.5rem;box-shadow:0 12px 40px rgba(0,0,0,0.6),
-  inset 0 1px 1px rgba(255,255,255,0.04)}
+  padding:2rem 1.5rem;box-shadow:0 12px 30px rgba(254,197,187,0.2),inset 0 1px 2px rgba(255,255,255,0.8)}
 .atabs{display:flex;margin-bottom:1.4rem;border-bottom:1px solid var(--border)}
 .atab{flex:1;padding:0.6rem;background:none;border:none;color:var(--text2);
-  font-family:'Noto Serif JP',serif;font-size:0.85rem;cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:all 0.2s;letter-spacing:0.05em}
-.atab.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+  font-family:'Noto Serif JP',serif;font-size:0.9rem;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;letter-spacing:0.05em}
+.atab.on{color:var(--gold2);border-bottom-color:var(--gold2);font-weight:600}
 .fld{margin-bottom:1.1rem}
-.fld label{display:block;font-size:0.75rem;font-weight:600;color:var(--gold);
-  margin-bottom:0.4rem;letter-spacing:0.05em}
-.fld input,.fld select{width:100%;padding:0.9rem 1rem;
-  border:1px solid var(--border);border-radius:var(--rm);
-  background:var(--bg);color:#fff;font-family:'Noto Serif JP',serif;
-  font-size:0.95rem;outline:none;transition:all 0.25s;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,0.4)}
-.fld input:focus,.fld select:focus{border-color:var(--gold);
-  box-shadow:0 0 10px var(--glow),inset 0 2px 4px rgba(0,0,0,0.4)}
-.fld select option{background:#1c1914}
-.btn-p{width:100%;padding:1rem;background:var(--gold-grad);color:#0b0a08;
-  border:none;border-radius:var(--rm);font-family:var(--serif);font-size:1rem;
-  font-weight:700;cursor:pointer;letter-spacing:0.12em;
-  box-shadow:0 6px 20px rgba(184,145,70,0.3);transition:all 0.25s;margin-top:0.3rem}
+.fld label{display:block;font-size:0.78rem;font-weight:600;color:var(--gold2);margin-bottom:0.4rem;letter-spacing:0.05em}
+.fld input,.fld select{width:100%;padding:0.85rem 1rem;border:1px solid var(--border);border-radius:var(--rm);
+  background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.95rem;
+  outline:none;transition:all 0.25s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.03)}
+.fld input:focus,.fld select:focus{border-color:var(--gold);box-shadow:0 0 10px var(--glow),inset 0 1px 3px rgba(0,0,0,0.03)}
+.fld select option{background:#fff;color:var(--text)}
+.date-grp{display:flex;gap:0.4rem}
+.date-grp select{flex:1;padding:0.85rem 0.4rem;text-align:center}
+.btn-p{width:100%;padding:1rem;background:var(--gold-grad);color:var(--text);border:none;
+  border-radius:var(--rm);font-family:var(--serif);font-size:1rem;font-weight:700;cursor:pointer;
+  letter-spacing:0.12em;box-shadow:0 6px 15px rgba(254,197,187,0.4);transition:all 0.25s;margin-top:0.3rem}
 .btn-p:active{transform:scale(0.98)}
-.btn-lnk{background:none;color:var(--text2);border:none;margin-top:1rem;
-  font-size:0.8rem;text-decoration:underline;cursor:pointer;
-  font-family:'Noto Serif JP',serif;letter-spacing:0.05em}
-.aerr{font-size:0.75rem;color:#ff7070;text-align:center;margin-top:0.5rem;min-height:1em}
+.btn-lnk{background:none;color:var(--text2);border:none;margin-top:1rem;font-size:0.8rem;
+  text-decoration:underline;cursor:pointer;font-family:'Noto Serif JP',serif;letter-spacing:0.05em}
+.aerr{font-size:0.75rem;color:#e05050;text-align:center;margin-top:0.5rem;min-height:1em}
 
-/* ===== ダッシュボード ===== */
-#scrDash{padding:0 0 calc(var(--safe-b) + 5rem)}
-.dhead{background:linear-gradient(135deg,#1c1810 0%,#110e0a 100%);
-  padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;
-  border-bottom:1px solid var(--border)}
-.dhead-top{display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:0.8rem}
-.dgreeting{font-family:var(--serif);font-size:0.95rem;color:var(--gold);
-  letter-spacing:0.08em}
-.dsetting{background:rgba(230,198,135,0.08);border:1px solid var(--border);
-  color:var(--text2);border-radius:16px;padding:0.28rem 0.8rem;
-  font-size:0.72rem;cursor:pointer;font-family:'Noto Serif JP',serif}
+/* ダッシュボード */
+#scrDash{padding:0 0 calc(var(--safe-b) + 6rem)}
+.dhead{background:linear-gradient(135deg,#fff0f2 0%,#ffe5e9 100%);
+  padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;border-bottom:1px solid var(--border)}
+.dhead-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem}
+.dgreeting{font-family:var(--serif);font-size:1rem;color:var(--gold2);letter-spacing:0.08em;font-weight:600}
+.dsetting{background:rgba(255,255,255,0.6);border:1px solid var(--border);color:var(--text2);
+  border-radius:16px;padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:'Noto Serif JP',serif}
 
 /* メンバータブ */
-.mtabs{display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:2px;
-  scrollbar-width:none}
+.mtabs{display:flex;gap:0.6rem;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .mtabs::-webkit-scrollbar{display:none}
-.mtab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  gap:0.25rem;padding:0.4rem 0.6rem;border-radius:10px;cursor:pointer;
-  border:2px solid transparent;transition:all 0.2s}
-.mtab.on{background:rgba(230,198,135,0.1);border-color:rgba(230,198,135,0.35)}
-.mtab-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:0.95rem;font-family:var(--serif);font-weight:700}
-.mtab-nm{font-size:0.62rem;color:rgba(244,240,234,0.8);white-space:nowrap}
-.mtab-add{width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:rgba(230,198,135,0.06);border:2px dashed rgba(230,198,135,0.25);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;color:rgba(230,198,135,0.4);cursor:pointer;margin-top:2px}
+.mtab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0.3rem;
+  padding:0.5rem 0.7rem;border-radius:12px;cursor:pointer;border:2px solid transparent;
+  transition:all 0.2s;background:rgba(255,255,255,0.4)}
+.mtab.on{background:#fff;border-color:var(--border2);box-shadow:0 4px 10px rgba(254,197,187,0.2)}
+.mtab-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;font-family:var(--serif);font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.mtab-nm{font-size:0.68rem;color:var(--text);white-space:nowrap;font-weight:500}
+.mtab-add{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:#fff;
+  border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;color:var(--gold2);cursor:pointer;margin-top:2px}
 
-/* コンテンツ */
 .dcnt{padding:1.2rem}
 
-/* ヒーローカード */
-.hero{background:linear-gradient(145deg,#1a1610 0%,#110e0a 100%);
-  border:1px solid rgba(230,198,135,0.25);border-radius:var(--r);
-  padding:1.8rem 1.4rem;margin-bottom:1.2rem;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-.hero-top{display:flex;justify-content:space-between;align-items:baseline;
-  border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:0.8rem;margin-bottom:1.2rem}
-.hero-name{font-family:var(--serif);font-size:1.3rem;color:var(--gold);font-weight:500}
-.hero-age{font-size:0.8rem;color:var(--text2)}
-.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem}
-.snode{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.03);
-  border-radius:var(--rm);padding:0.9rem 0.4rem;text-align:center;transition:0.3s}
-.snode:hover{background:rgba(230,198,135,0.03);border-color:rgba(230,198,135,0.1)}
-.snode .lbl{display:block;font-size:0.65rem;color:var(--text2);margin-bottom:0.4rem;letter-spacing:0.04em}
-.snode .val{font-family:var(--serif);font-size:1rem;color:var(--text);font-weight:600}
-.snode .val.hi{color:var(--gold);text-shadow:0 0 8px rgba(230,198,135,0.3)}
+/* タップ可能エリア */
+.tappable{cursor:pointer;transition:all 0.25s}
+.tappable:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(254,197,187,0.25)}
+.tappable:active{transform:scale(0.99)}
 
-/* ブリッジボタン */
+/* ヒーローカード */
+.hero{background:linear-gradient(145deg,#ffffff 0%,#fffbfb 100%);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1.2rem;
+  box-shadow:0 8px 24px rgba(254,197,187,0.15)}
+.hero-top{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:1px solid var(--border);padding-bottom:0.8rem;margin-bottom:1.2rem}
+.hero-name{font-family:var(--serif);font-size:1.4rem;color:var(--gold2);font-weight:600;
+  display:flex;align-items:center;gap:0.4rem}
+.hero-name-hint{font-size:0.72rem;color:var(--text2);font-weight:400;font-family:'Noto Serif JP',serif}
+.hero-age{font-size:0.85rem;color:var(--text2)}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem}
+.snode{background:var(--bg);border:1px solid var(--border);border-radius:var(--rm);padding:0.9rem 0.4rem;text-align:center}
+.snode .lbl{display:block;font-size:0.68rem;color:var(--text2);margin-bottom:0.4rem;letter-spacing:0.04em}
+.snode .val{font-family:var(--serif);font-size:1.05rem;color:var(--text);font-weight:700}
+.snode .val.hi{color:var(--gold2)}
+
+/* ブリッジ */
 .bridge{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem}
-.blink{background:rgba(20,18,14,0.8);border:1px solid var(--border);
-  border-radius:var(--rm);padding:1rem;color:var(--text);cursor:pointer;
-  font-family:'Noto Serif JP',serif;transition:all 0.25s;
-  display:flex;flex-direction:column;align-items:center;gap:0.35rem;text-align:center}
-.blink:hover{border-color:var(--gold);background:rgba(230,198,135,0.05)}
+.blink{background:#fff;border:1px solid var(--border);border-radius:var(--rm);padding:1.1rem;
+  color:var(--text);cursor:pointer;font-family:'Noto Serif JP',serif;
+  transition:all 0.25s;display:flex;flex-direction:column;align-items:center;
+  gap:0.4rem;text-align:center;box-shadow:0 4px 12px rgba(254,197,187,0.1)}
+.blink:hover{border-color:var(--gold);background:var(--card2);transform:translateY(-2px)}
 .blink:active{transform:scale(0.97)}
-.blink .bi{font-size:1.4rem}
-.blink .bt{font-size:0.82rem;font-weight:600;color:var(--gold)}
-.blink .bd{font-size:0.68rem;color:var(--text2)}
+.blink .bi{font-size:1.6rem}
+.blink .bt{font-size:0.88rem;font-weight:700;color:var(--gold2)}
+.blink .bd{font-size:0.72rem;color:var(--text2)}
 
 /* セクション */
-.sec{background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r);padding:1.4rem;margin-bottom:1.2rem}
-.sec-ttl{font-family:var(--serif);color:var(--gold);font-size:1rem;
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 6px 18px rgba(254,197,187,0.1)}
+.sec-ttl{font-family:var(--serif);color:var(--gold2);font-size:1.05rem;font-weight:600;
   margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;
-  border-left:3px solid var(--gold2);padding-left:0.6rem}
-.fate-txt{font-size:0.87rem;color:var(--text);line-height:1.75;text-align:justify}
-.rlist{list-style:none}
-.ritem{background:var(--card2);border-radius:var(--rm);padding:0.85rem 1rem;
-  margin-bottom:0.55rem;font-size:0.85rem;display:flex;align-items:flex-start;
-  gap:0.65rem;border-left:2px solid rgba(230,198,135,0.3)}
-.rbadge{background:rgba(230,198,135,0.12);color:var(--gold);font-size:0.68rem;
-  padding:0.1rem 0.45rem;border-radius:4px;white-space:nowrap;margin-top:0.1rem;flex-shrink:0}
-.rtxt{color:var(--text)}
+  border-left:3px solid var(--gold);padding-left:0.6rem}
+.tap-hint{font-size:0.7rem;font-weight:400;color:var(--text2);margin-left:auto}
+.fate-txt{font-size:0.9rem;color:var(--text);line-height:1.8;text-align:justify}
 
 /* 命式グリッド */
-.mcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem}
-.mcitem{background:var(--card2);border-radius:10px;padding:0.6rem;text-align:center}
-.mclbl{font-size:0.62rem;color:var(--text2);margin-bottom:0.25rem}
-.mcval{font-family:var(--serif);font-size:0.9rem;color:var(--text);font-weight:700}
+.mcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem}
+.mcitem{background:var(--card2);border-radius:12px;padding:0.75rem 0.5rem;text-align:center;
+  border:1px solid rgba(254,197,187,0.2)}
+.mclbl{font-size:0.68rem;color:var(--text2);margin-bottom:0.3rem}
+.mcval{font-family:var(--serif);font-size:1rem;color:var(--text);font-weight:700}
+
+/* リフレッシュ */
+.rlist{list-style:none}
+.ritem{background:var(--card2);border-radius:var(--rm);padding:0.9rem 1.1rem;
+  margin-bottom:0.6rem;font-size:0.88rem;display:flex;align-items:flex-start;
+  gap:0.7rem;border-left:3px solid var(--border2)}
+.rbadge{background:var(--gold-grad);color:var(--text);font-size:0.72rem;font-weight:600;
+  padding:0.15rem 0.5rem;border-radius:6px;white-space:nowrap;margin-top:0.1rem;flex-shrink:0}
+.rtxt{color:var(--text);line-height:1.5}
 
 /* AIチャット */
-.ai-room{background:linear-gradient(180deg,var(--card) 0%,#100f0b 100%);
-  border:1px solid var(--border);border-radius:var(--r);
-  padding:1.2rem;margin-bottom:1.2rem}
+.ai-room{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:1.3rem;margin-bottom:1.2rem;box-shadow:0 6px 18px rgba(254,197,187,0.1)}
 .chat-disp{height:220px;overflow-y:auto;margin-bottom:0.9rem;padding-right:0.3rem}
-.chat-disp::-webkit-scrollbar{width:3px}
-.chat-disp::-webkit-scrollbar-thumb{background:rgba(230,198,135,0.2);border-radius:2px}
-.bbl{margin-bottom:0.9rem;display:flex;flex-direction:column;max-width:86%;
-  animation:bblIn 0.35s ease forwards}
+.chat-disp::-webkit-scrollbar{width:4px}
+.chat-disp::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.bbl{margin-bottom:0.9rem;display:flex;flex-direction:column;max-width:86%;animation:bblIn 0.35s ease forwards}
 @keyframes bblIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .bbl.ai{margin-right:auto;align-items:flex-start}
 .bbl.usr{margin-left:auto;align-items:flex-end}
-.bbl .slbl{font-size:0.62rem;color:var(--text2);margin-bottom:0.2rem;padding:0 0.2rem}
-.bbl .msg{padding:0.75rem 0.9rem;border-radius:var(--rm);font-size:0.85rem;
-  line-height:1.55;text-align:justify}
-.bbl.ai .msg{background:var(--card2);color:var(--text);
-  border:1px solid rgba(255,255,255,0.03);border-top-left-radius:4px}
-.bbl.usr .msg{background:var(--gold-grad);color:#0b0a08;font-weight:500;
-  border-top-right-radius:4px;box-shadow:0 4px 10px rgba(184,145,70,0.15)}
+.bbl .slbl{font-size:0.68rem;color:var(--text2);margin-bottom:0.2rem;padding:0 0.2rem}
+.bbl .msg{padding:0.8rem 1rem;border-radius:var(--rm);font-size:0.88rem;line-height:1.6;text-align:justify}
+.bbl.ai .msg{background:var(--card2);color:var(--text);border:1px solid var(--border);border-top-left-radius:4px}
+.bbl.usr .msg{background:var(--gold-grad);color:var(--text);font-weight:600;border-top-right-radius:4px;
+  box-shadow:0 4px 12px rgba(254,197,187,0.3)}
 .chat-chips{display:flex;gap:0.4rem;overflow-x:auto;margin-bottom:0.8rem;scrollbar-width:none}
 .chat-chips::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;background:rgba(230,198,135,0.08);
-  border:1px solid var(--border);border-radius:16px;
-  padding:0.28rem 0.7rem;font-size:0.72rem;color:var(--text2);
-  cursor:pointer;white-space:nowrap;font-family:'Noto Serif JP',serif;transition:0.2s}
-.chip:active{background:rgba(230,198,135,0.15)}
+.chip{flex-shrink:0;background:rgba(255,255,255,0.8);border:1px solid var(--border);border-radius:18px;
+  padding:0.35rem 0.8rem;font-size:0.75rem;color:var(--text);cursor:pointer;white-space:nowrap;
+  font-family:'Noto Serif JP',serif;transition:0.2s}
+.chip:hover{background:var(--card2);border-color:var(--gold)}
 .chat-ctrl{display:flex;gap:0.5rem}
-.chat-inp{flex:1;padding:0.8rem 1rem;background:rgba(0,0,0,0.4);
-  border:1px solid var(--border);border-radius:var(--rm);
-  color:#fff;font-family:'Noto Serif JP',serif;font-size:0.88rem;outline:none}
+.chat-inp{flex:1;padding:0.8rem 1rem;background:#fff;border:1px solid var(--border);
+  border-radius:var(--rm);color:var(--text);font-family:'Noto Serif JP',serif;
+  font-size:0.9rem;outline:none}
 .chat-inp:focus{border-color:var(--gold)}
-.send-btn{background:var(--gold-grad);border:none;border-radius:var(--rm);
-  width:50px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:transform 0.2s;flex-shrink:0}
+.send-btn{background:var(--gold-grad);border:none;border-radius:var(--rm);width:52px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform 0.2s;flex-shrink:0;box-shadow:0 2px 6px rgba(254,197,187,0.4)}
 .send-btn:active{transform:scale(0.94)}
 
-/* 人物追加 */
-.add-form{background:rgba(20,18,14,0.6);border:1px solid rgba(230,198,135,0.1);
-  border-radius:var(--r);padding:1.2rem;margin-bottom:1.2rem}
-.add-form h3{font-family:var(--serif);color:var(--gold);font-size:0.9rem;
-  margin-bottom:0.9rem}
-.add-form input,.add-form select{width:100%;padding:0.75rem 0.9rem;
-  border:1px solid var(--border);border-radius:var(--rm);
-  background:var(--bg);color:#fff;font-family:'Noto Serif JP',serif;
-  font-size:0.88rem;outline:none;margin-bottom:0.5rem}
+/* 人物追加フォーム */
+.add-form{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 6px 18px rgba(254,197,187,0.1)}
+.add-form h3{font-family:var(--serif);color:var(--gold2);font-size:1.05rem;font-weight:600;margin-bottom:1rem}
+.add-form input,.add-form select{width:100%;padding:0.8rem 1rem;border:1px solid var(--border);
+  border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;
+  font-size:0.9rem;outline:none;margin-bottom:0.6rem}
 .add-form input:focus,.add-form select:focus{border-color:var(--gold)}
-.add-form select option{background:#1c1914}
-.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+.add-form select option{background:#fff;color:var(--text)}
 
-/* フッター */
-.foot{text-align:center;padding:1rem 0 0.5rem;
-  border-top:1px solid rgba(255,255,255,0.03)}
+.foot{text-align:center;padding:1.5rem 0 0.5rem;border-top:1px solid var(--border)}
 
 /* ボトムナビ */
-.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;
-  background:rgba(17,14,10,0.97);border-top:1px solid var(--border);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  padding-bottom:var(--safe-b);display:flex}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:0.2rem;padding:0.6rem 0.4rem;background:none;border:none;
-  color:var(--text2);font-family:'Noto Serif JP',serif;cursor:pointer;
-  border-top:2px solid transparent;transition:0.2s}
-.nbtn.on{border-top-color:var(--gold);color:var(--gold)}
-.nbtn .ni{font-size:1.3rem}
-.nbtn .nl{font-size:0.6rem;letter-spacing:0.04em}
-
-/* モーダル */
-.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  display:flex;align-items:flex-end;justify-content:center;z-index:500}
-.modal-sh{background:#18160f;border-top:1px solid var(--border);
-  border-radius:20px 20px 0 0;width:100%;max-width:480px;
-  max-height:90vh;overflow-y:auto;
-  padding:1.4rem 1.2rem calc(var(--safe-b) + 1.4rem)}
-.mhandle{width:36px;height:4px;background:rgba(255,255,255,0.12);
-  border-radius:2px;margin:0 auto 1.1rem}
-.mttl{font-family:var(--serif);color:var(--gold);font-size:0.95rem;
-  letter-spacing:0.12em;text-align:center;margin-bottom:1.1rem}
-.mfld{margin-bottom:0.8rem}
-.mfld label{display:block;font-size:0.72rem;color:var(--gold);margin-bottom:0.3rem}
-.mfld input,.mfld select{width:100%;padding:0.72rem 0.9rem;
-  border:1px solid var(--border);border-radius:var(--rm);
-  background:var(--bg);color:#fff;font-family:'Noto Serif JP',serif;
-  font-size:0.9rem;outline:none}
-.mfld input:focus,.mfld select:focus{border-color:var(--gold)}
-.mfld select option{background:#1c1914}
-.mact{display:flex;gap:0.6rem;margin-top:0.9rem}
-.mbtn-sub{flex:1;background:rgba(230,198,135,0.06);border:1px solid var(--border);
-  color:var(--text2);padding:0.65rem;border-radius:var(--rm);
-  font-family:'Noto Serif JP',serif;font-size:0.85rem;cursor:pointer}
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:rgba(255,255,255,0.92);border-top:1px solid var(--border);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding-bottom:var(--safe-b);display:flex;box-shadow:0 -4px 15px rgba(0,0,0,0.03)}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;
+  padding:0.7rem 0.4rem;background:none;border:none;color:var(--text2);
+  font-family:'Noto Serif JP',serif;cursor:pointer;border-top:3px solid transparent;transition:0.2s}
+.nbtn.on{border-top-color:var(--gold);color:var(--gold2);font-weight:600}
+.nbtn .ni{font-size:1.4rem}
+.nbtn .nl{font-size:0.65rem;letter-spacing:0.04em}
 
 /* ローディング */
-.ldsc{display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:100vh;gap:0.8rem}
-.ldfl{font-size:2.5rem;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.7}}
-.ldtx{font-family:var(--serif);font-size:0.82rem;color:var(--text2);letter-spacing:0.22em}
+.ldsc{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;gap:1rem;background:var(--bg-grad)}
+.ldfl{font-size:3rem;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.15);opacity:0.6}}
+.ldtx{font-family:var(--serif);font-size:1rem;color:var(--gold2);letter-spacing:0.3em;font-weight:600}
+
+/* 詳細モーダル */
+.detail-ov{display:none;position:fixed;inset:0;background:rgba(74,63,61,0.4);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:800;align-items:flex-end;justify-content:center}
+.detail-ov.on{display:flex}
+.detail-sh{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:520px;
+  max-height:85vh;overflow-y:auto;
+  padding:1.5rem 1.4rem calc(var(--safe-b) + 1.5rem)}
+.detail-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.2rem}
+.detail-ttl{font-family:var(--serif);color:var(--gold2);font-size:1.1rem;
+  letter-spacing:0.12em;margin-bottom:1.2rem;text-align:center;font-weight:600}
+.detail-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;
+  font-size:1.4rem;color:var(--text2);cursor:pointer;line-height:1}
+.detail-item{background:var(--card2);border-radius:12px;padding:1rem;
+  margin-bottom:0.8rem;border:1px solid var(--border)}
+.detail-item-lbl{font-size:0.72rem;color:var(--gold2);font-weight:600;
+  letter-spacing:0.06em;margin-bottom:0.3rem}
+.detail-item-val{font-family:var(--serif);font-size:1rem;color:var(--text);font-weight:700;margin-bottom:0.2rem}
+.detail-item-txt{font-size:0.85rem;color:var(--text2);line-height:1.7}
+.detail-btn{width:100%;padding:0.8rem;background:var(--gold-grad);color:var(--text);
+  border:none;border-radius:var(--rm);font-family:var(--serif);font-size:0.95rem;
+  font-weight:700;cursor:pointer;letter-spacing:0.1em;margin-top:0.8rem;
+  box-shadow:0 4px 12px rgba(254,197,187,0.4)}
+.detail-btn:active{transform:scale(0.98)}
 </style>
 </head>
 <body>
-
 <div id="errmsg"></div>
 
 <!-- ローディング -->
@@ -267,10 +246,10 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
 </div>
 
 <!-- 認証 -->
-<div id="scrAuth" class="scr" style="min-height:100vh;display:none;align-items:center;justify-content:center;padding:2rem 1.2rem">
+<div id="scrAuth" class="scr">
   <div class="auth-wrap">
     <div class="brand">
-      <div class="brand-en">Kajin Senshutu</div>
+      <div class="brand-en">Kajin Senshutsu</div>
       <h1>花人占術</h1>
       <div class="brand-tag">AIエターナル・ライフパートナー</div>
     </div>
@@ -279,7 +258,6 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
         <button class="atab on" id="aTab0" onclick="switchATab(0)">ログイン</button>
         <button class="atab" id="aTab1" onclick="switchATab(1)">新規登録</button>
       </div>
-      <!-- ログイン -->
       <div id="aForm0">
         <div class="fld"><label>ニックネーム</label>
           <input type="text" id="lName" placeholder="例：まこと" autocomplete="off"></div>
@@ -288,15 +266,19 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
         <button class="btn-p" onclick="doLogin()">ログイン</button>
         <div class="aerr" id="lErr"></div>
       </div>
-      <!-- 登録 -->
       <div id="aForm1" style="display:none">
         <div class="fld"><label>ニックネーム</label>
           <input type="text" id="rName" placeholder="例：まこと" autocomplete="off"></div>
         <div class="fld"><label>生年月日</label>
-          <input type="date" id="rBd"></div>
+          <div class="date-grp">
+            <select id="rBdY"></select>
+            <select id="rBdM"></select>
+            <select id="rBdD"></select>
+          </div>
+        </div>
         <div class="fld"><label>性別</label>
           <select id="rGen"><option value="male">男性</option><option value="female">女性</option></select></div>
-        <div class="fld"><label>趣味（AI記憶に同期）</label>
+        <div class="fld"><label>趣味（AIに記憶させる）</label>
           <input type="text" id="rHobby" placeholder="例：筋トレ、料理、ドライブ"></div>
         <div class="fld"><label>PIN（4桁数字）</label>
           <input type="password" id="rPin" placeholder="••••" maxlength="4" inputmode="numeric"></div>
@@ -304,7 +286,7 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
         <div class="aerr" id="rErr"></div>
       </div>
     </div>
-    <p style="text-align:center;font-size:0.68rem;color:var(--text2);margin-top:1rem;line-height:1.8">
+    <p style="text-align:center;font-size:0.7rem;color:var(--text2);margin-top:1.2rem;line-height:1.8">
       データはこのデバイスのみに保存されます
     </p>
   </div>
@@ -320,10 +302,13 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
     <div class="mtabs" id="mtabs"></div>
   </div>
   <div class="dcnt">
-    <!-- ヒーロー -->
-    <div class="hero">
+
+    <!-- ヒーローカード（タップで詳細） -->
+    <div class="hero tappable" onclick="showHeroDetail()">
       <div class="hero-top">
-        <span class="hero-name" id="hName">---</span>
+        <span class="hero-name" id="hName">---
+          <span class="hero-name-hint">タップで詳細 ›</span>
+        </span>
         <span class="hero-age" id="hAge"></span>
       </div>
       <div class="sgrid">
@@ -335,31 +320,31 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
 
     <!-- ブリッジ -->
     <div class="bridge">
-      <div class="blink" onclick="navTo('index.html')">
-        <span class="bi">🌸</span><span class="bt">精密基本鑑定</span>
+      <div class="blink" onclick="navTo('meishiki.html')">
+        <span class="bi">🌸</span><span class="bt">精密命式鑑定</span>
         <span class="bd">命式・大運・AIチャット</span>
       </div>
-      <div class="blink" onclick="navTo('compat.html')">
+      <div class="blink" onclick="navTo('aisho.html')">
         <span class="bi">💞</span><span class="bt">相性守護診断</span>
         <span class="bd">二人の宿命を重ね合わせる</span>
       </div>
     </div>
 
-    <!-- 命式 -->
-    <div class="sec">
-      <div class="sec-ttl">◆ 命式</div>
+    <!-- 命式（タップで詳細） -->
+    <div class="sec tappable" onclick="showMeishikiDetail()">
+      <div class="sec-ttl">◆ 命式 <span class="tap-hint">詳細を見る ›</span></div>
       <div class="mcgrid" id="mcgrid"></div>
     </div>
 
-    <!-- 大運 -->
-    <div class="sec">
-      <div class="sec-ttl">🪐 現在の大運（10年周期の潮流）</div>
+    <!-- 大運（タップで詳細） -->
+    <div class="sec tappable" onclick="showDaiunDetail()">
+      <div class="sec-ttl">🪐 現在の大運 <span class="tap-hint">詳細を見る ›</span></div>
       <div class="fate-txt" id="hDaiun">---</div>
     </div>
 
     <!-- リフレッシュ提案 -->
     <div class="sec">
-      <div class="sec-ttl">🌿 宿命から導く今日のリフレッシュ</div>
+      <div class="sec-ttl">🌿 今日のリフレッシュ提案</div>
       <ul class="rlist" id="rlist"></ul>
     </div>
 
@@ -371,49 +356,87 @@ body{background-image:radial-gradient(circle at 50% 0%,rgba(54,45,28,0.3) 0%,tra
       <div class="chat-ctrl">
         <input class="chat-inp" type="text" id="chatInp" placeholder="何でもお話しください...">
         <button class="send-btn" onclick="sendChat()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0b0a08" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a3f3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
     </div>
 
     <!-- 人物追加 -->
-    <div class="add-form">
-      <h3>➕ 大切な人を守護リストに加える</h3>
-      <div class="add-grid">
-        <input type="text" id="apName" placeholder="お名前">
-        <input type="date" id="apBd">
+    <div class="add-form" id="addFormArea">
+      <h3>🔮 大切な人を守護リストに加える</h3>
+      <input type="text" id="apName" placeholder="お名前">
+      <div class="date-grp" style="margin-bottom:0.6rem">
+        <select id="apBdY"></select>
+        <select id="apBdM"></select>
+        <select id="apBdD"></select>
       </div>
-      <select id="apRel">
+      <select id="apRel" style="margin-bottom:0.6rem">
         <option value="恋人・パートナー">恋人・パートナー</option>
         <option value="配偶者">配偶者</option>
         <option value="母">母</option><option value="父">父</option>
         <option value="息子">息子</option><option value="娘">娘</option>
         <option value="兄">兄</option><option value="姉">姉</option>
         <option value="弟">弟</option><option value="妹">妹</option>
-        <option value="友人">友人</option><option value="職場の同僚">職場の同僚</option>
+        <option value="友人">友人</option>
+        <option value="職場の同僚">職場の同僚</option>
         <option value="上司・先輩">上司・先輩</option>
       </select>
-      <select id="apGen"><option value="female">女性</option><option value="male">男性</option></select>
+      <select id="apGen" style="margin-bottom:0.6rem">
+        <option value="female">女性</option><option value="male">男性</option>
+      </select>
       <input type="text" id="apHobby" placeholder="趣味・好きなこと（任意）">
-      <button class="btn-p" style="padding:0.65rem;font-size:0.85rem;letter-spacing:0.1em;margin-top:0.2rem" onclick="doAddPerson()">この人を守護リストに追加する</button>
+      <button class="btn-p" style="padding:0.75rem;font-size:0.9rem;margin-top:0.2rem" onclick="doAddPerson()">守護リストに登録する</button>
     </div>
 
     <div class="foot">
-      <button class="btn-lnk" style="color:rgba(255,100,100,0.4);font-size:0.72rem" onclick="doReset()">全データを初期化する</button>
+      <button class="btn-lnk" style="color:rgba(220,80,80,0.6);font-size:0.75rem" onclick="doReset()">全データを初期化する</button>
     </div>
   </div>
+
   <div class="bnav">
     <button class="nbtn on" id="nb0" onclick="switchNav(0)"><span class="ni">🏠</span><span class="nl">ホーム</span></button>
     <button class="nbtn" id="nb1" onclick="openChatFocus()"><span class="ni">🔮</span><span class="nl">AI相談</span></button>
-    <button class="nbtn" id="nb2" onclick="navTo('index.html')"><span class="ni">📿</span><span class="nl">命式</span></button>
-    <button class="nbtn" id="nb3" onclick="navTo('graph.html')"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+    <button class="nbtn" id="nb2" onclick="navTo('meishiki.html')"><span class="ni">📿</span><span class="nl">命式</span></button>
+    <button class="nbtn" id="nb3" onclick="navTo('soukan.html')"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+  </div>
+</div>
+
+<!-- 詳細モーダル -->
+<div class="detail-ov" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-sh">
+    <div class="detail-handle"></div>
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <div class="detail-ttl" id="detailTtl"></div>
+    <div id="detailBody"></div>
   </div>
 </div>
 
 <script>
-// ===== エラー =====
 window.onerror=function(m,s,l,c){var e=document.getElementById('errmsg');if(e){e.style.display='block';e.textContent='⚠ '+m+' ['+l+':'+c+']';}return false;};
 window.addEventListener('unhandledrejection',function(e){var el=document.getElementById('errmsg');if(el){el.style.display='block';el.textContent='⚠ '+String(e.reason);}});
+
+// ===== セレクトボックス初期化 =====
+function initDateSel(idy,idm,idd){
+  var ys=document.getElementById(idy),ms=document.getElementById(idm),ds=document.getElementById(idd);
+  if(!ys||!ms||!ds)return;
+  var cy=new Date().getFullYear();
+  var hy='<option value="">年</option>';
+  for(var y=cy;y>=1900;y--)hy+='<option value="'+y+'">'+y+'年</option>';
+  ys.innerHTML=hy;
+  var hm='<option value="">月</option>';
+  for(var m=1;m<=12;m++)hm+='<option value="'+m+'">'+m+'月</option>';
+  ms.innerHTML=hm;
+  var hd='<option value="">日</option>';
+  for(var d=1;d<=31;d++)hd+='<option value="'+d+'">'+d+'日</option>';
+  ds.innerHTML=hd;
+}
+function getDateStr(idy,idm,idd){
+  var y=document.getElementById(idy).value;
+  var m=document.getElementById(idm).value;
+  var d=document.getElementById(idd).value;
+  if(!y||!m||!d)return '';
+  return y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2);
+}
 
 // ===== Store =====
 var KEY='hanabito_v2';
@@ -422,7 +445,7 @@ var S={
   save:function(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
 };
 
-// ===== 命式計算 =====
+// ===== 命式計算（index.htmlと同一ロジック） =====
 var JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 var ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
@@ -460,9 +483,9 @@ function kikkyo(ju,ht){
   if(ju==='休眠'||ju==='残雪')return ht&&ht.indexOf('＋')>=0?'変容':'注意';
   return KIKKYO[ju]||'';
 }
-function kikkyoColor(ju,ht){
+function kkColor(ju,ht){
   var k=kikkyo(ju,ht);
-  if(k==='大吉')return '#e6c687';if(k==='吉')return '#5ab87a';
+  if(k==='大吉')return '#d4a373';if(k==='吉')return '#5ab87a';
   if(k==='中吉')return '#7aabcc';if(k==='小吉')return '#9aaa7a';
   if(k==='チャンス')return '#d4880a';if(k==='注意')return '#c8b020';
   if(k==='苦難')return '#e05050';if(k==='試練')return '#c03030';
@@ -472,34 +495,30 @@ function todayShi(){return yearKS(new Date().getFullYear(),1,15).slice(1);}
 function calcP(bd){
   var p=bd.split('-'),y=+p[0],m=+p[1],d=+p[2];
   var ht=hoshi(y,m,d),nKS=yearKS(y,m,d),tKS=monthKS(y,m,d),niKS=dayKS(y,m,d);
-  var shi=todayShi(),unki=juniUnki(ht,shi);
-  return {y:y,m:m,d:d,ht:ht,nenKS:nKS,tsuKS:tKS,nichiKS:niKS,unki:unki};
+  return {y:y,m:m,d:d,ht:ht,nenKS:nKS,tsuKS:tKS,nichiKS:niKS,unki:juniUnki(ht,todayShi())};
 }
 
-// ===== アバター色 =====
-var AVC={'天花人＋':{bg:'#3a1010',col:'#e6a0a0'},'天花人－':{bg:'#2a0c0c',col:'#cc8888'},
-  '白花人＋':{bg:'#101038',col:'#a0a0e6'},'白花人－':{bg:'#0c0c2a',col:'#8888cc'},
-  '離花人＋':{bg:'#381030',col:'#e6a0d8'},'離花人－':{bg:'#2a0c24',col:'#cc88c4'},
-  '風花人＋':{bg:'#103818',col:'#a0e6a8'},'風花人－':{bg:'#0c2a12',col:'#88cc90'},
-  '仙花人＋':{bg:'#301038',col:'#c8a0e6'},'仙花人－':{bg:'#24082a',col:'#b488cc'},
-  '水花人＋':{bg:'#102838',col:'#a0c8e6'},'水花人－':{bg:'#0c1c2a',col:'#88b4cc'}};
-function avc(ht){return AVC[ht]||{bg:'#1c1810',col:'#b5ae9f'};}
+// アバター色
+var AVC={'天花人＋':{bg:'#ffebd9',col:'#d4a373'},'天花人－':{bg:'#fff0e6',col:'#e6b38a'},
+  '白花人＋':{bg:'#e3f2fd',col:'#5ba4e6'},'白花人－':{bg:'#f0f7ff',col:'#7cb7ef'},
+  '離花人＋':{bg:'#fce4ec',col:'#e07a9b'},'離花人－':{bg:'#fff1f5',col:'#ea9ab2'},
+  '風花人＋':{bg:'#e8f5e9',col:'#6fa874'},'風花人－':{bg:'#f2fbf3',col:'#8ec093'},
+  '仙花人＋':{bg:'#f3e5f5',col:'#a67bc4'},'仙花人－':{bg:'#faf4fc',col:'#be9cd6'},
+  '水花人＋':{bg:'#e0f7fa',col:'#5bc0be'},'水花人－':{bg:'#f0fdfd',col:'#80d6d4'}};
+function avc(ht){return AVC[ht]||{bg:'#fff0f2',col:'#8a7a77'};}
 
-// ===== 画面制御 =====
+// 現在の人物
 var curId='me';
 var chatCtx=[];
+var _curCalc=null;
 
+// 画面制御
 function showScr(id){
-  document.querySelectorAll('.scr').forEach(function(s){
-    s.classList.remove('on');s.style.display='none';
-  });
-  var el=document.getElementById(id);
-  if(!el)return;
-  var isFlex=id==='scrAuth';
-  el.style.display=isFlex?'flex':'block';
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');s.style.display='none';});
+  var el=document.getElementById(id);if(!el)return;
+  el.style.display=id==='scrAuth'?'flex':'block';
   setTimeout(function(){el.classList.add('on');},30);
 }
-
 function switchATab(i){
   [0,1].forEach(function(j){
     document.getElementById('aTab'+j).classList.toggle('on',j===i);
@@ -507,7 +526,7 @@ function switchATab(i){
   });
 }
 
-// ===== 認証 =====
+// 認証
 function doLogin(){
   var name=document.getElementById('lName').value.trim();
   var pin=document.getElementById('lPin').value.trim();
@@ -518,11 +537,11 @@ function doLogin(){
 }
 function doRegister(){
   var name=document.getElementById('rName').value.trim();
-  var bd=document.getElementById('rBd').value;
+  var bd=getDateStr('rBdY','rBdM','rBdD');
   var gen=document.getElementById('rGen').value;
   var hobby=document.getElementById('rHobby').value.trim();
   var pin=document.getElementById('rPin').value.trim();
-  if(!name||!bd){document.getElementById('rErr').textContent='名前と生年月日を入力してください';return;}
+  if(!name||!bd){document.getElementById('rErr').textContent='名前と生年月日をすべて選択してください';return;}
   if(!/^\d{4}$/.test(pin)){document.getElementById('rErr').textContent='PINは4桁の数字で入力してください';return;}
   S.save({account:{id:'u'+Date.now(),nickname:name,birthday:bd,gender:gen,hobby:hobby||'',pin:pin},people:[],chatHistory:[]});
   initDash();
@@ -530,12 +549,8 @@ function doRegister(){
 function doLogout(){if(confirm('ログアウトしますか？（データは保持されます）'))showScr('scrAuth');}
 function doReset(){if(confirm('全データを初期化しますか？')){localStorage.removeItem(KEY);location.reload();}}
 
-// ===== ダッシュボード =====
-function initDash(){
-  curId='me';chatCtx=[];
-  renderDash();
-  showScr('scrDash');
-}
+// ダッシュボード
+function initDash(){curId='me';chatCtx=[];_curCalc=null;renderDash();showScr('scrDash');}
 
 function renderDash(){
   var data=S.load();if(!data)return;
@@ -557,40 +572,37 @@ function renderDash(){
       +'<div class="mtab-av" style="background:'+av.bg+';color:'+av.col+'">'+(p.name?p.name[0]:'?')+'</div>'
       +'<div class="mtab-nm">'+(p.name||'')+'</div></div>';
   });
-  html+='<div class="mtab-add" onclick="doAddPerson()">＋</div>';
+  html+='<div class="mtab-add" onclick="focusAdd()">＋</div>';
   document.getElementById('mtabs').innerHTML=html;
 
   if(!person.birthday)return;
   var c=calcP(person.birthday);
+  _curCalc=c;
   var pname=isME?acc.nickname:person.name;
   var age=new Date().getFullYear()-c.y;
   var kk=kikkyo(c.unki,c.ht);
-  var kc=kikkyoColor(c.unki,c.ht);
+  var kc=kkColor(c.unki,c.ht);
 
-  document.getElementById('hName').textContent=pname+(isME?' (あなた)':' さん');
+  document.getElementById('hName').innerHTML=pname+(isME?' (あなた)':' さん')
+    +'<span class="hero-name-hint">タップで詳細 ›</span>';
   document.getElementById('hAge').textContent=age+'歳';
-  document.getElementById('hUnki').textContent=c.unki;
-  document.getElementById('hUnki').style.color=kc;
-  document.getElementById('hKikkyo').textContent=kk;
-  document.getElementById('hKikkyo').style.color=kc;
+  var uEl=document.getElementById('hUnki');
+  uEl.textContent=c.unki;uEl.style.color=kc;
+  var kkEl=document.getElementById('hKikkyo');
+  kkEl.textContent=kk;kkEl.style.color=kc;
   document.getElementById('hHt').textContent=c.ht;
 
-  // 命式
   document.getElementById('mcgrid').innerHTML=
     '<div class="mcitem"><div class="mclbl">年柱</div><div class="mcval">'+c.nenKS+'</div></div>'+
     '<div class="mcitem"><div class="mclbl">月柱</div><div class="mcval">'+c.tsuKS+'</div></div>'+
     '<div class="mcitem"><div class="mclbl">日柱</div><div class="mcval">'+c.nichiKS+'</div></div>';
 
-  // 大運（簡易）
-  var daiPool=[
-    '大樹の運気。これまで培ってきた知識や経験が幹となり、周囲を統率するポジションへとシフトする10年間。身内や大切な人との絆を強固にするのに最適な時期です。',
+  var daiPool=['大樹の運気。これまで培ってきた知識や経験が幹となり、周囲を統率するポジションへとシフトする10年間。身内や大切な人との絆を強固にするのに最適な時期です。',
     '太陽の運気。スポットライトが当たりやすく、あなたの才能が強く求められる10年。大きな環境の変化や新たなステージへのステップアップが人生をより豊かにします。',
-    '清流の運気。知性と精神性が研ぎ澄まされる10年間。無理に力でねじ伏せるよりも、内面を磨くことで驚くほど自然に物事がうまく回り始めます。',
-    '燈火の運気。内に秘めた情熱の炎が周囲を照らす10年間。職人的なこだわりや日々のルーティンが確実な果実を結びます。'
-  ];
+    '清流の運気。知性と精神性が研ぎ澄まされる10年間。内面を磨くことで驚くほど自然に物事がうまく回り始めます。',
+    '燈火の運気。内に秘めた情熱の炎が周囲を照らす10年間。職人的なこだわりや日々のルーティンが確実な果実を結びます。'];
   document.getElementById('hDaiun').textContent=daiPool[c.y%4];
 
-  // リフレッシュ提案
   var rPool=[
     [{b:'肉体精神',t:'高強度の筋トレ。限界まで肉体に負荷をかけることで脳内の雑念が消去され、最強のメンタルが宿ります。'},
      {b:'無心調理',t:'包丁で素材を刻む仕込み作業。無心で手を動かすことが最高の厄落としになります。'},
@@ -600,8 +612,7 @@ function renderDash(){
      {b:'味覚洗練',t:'少しリッチなスイーツやこだわりのお茶をゆっくり味わう時間。五感のインプットが活力を生みます。'}],
     [{b:'知性深化',t:'語学テキストを数ページ集中して進めるインプット時間。知性星が刺激され決断力がシャープになります。'},
      {b:'完全浄化',t:'サウナや温泉での温冷交代浴。極限まで汗を流した後の「ととのい」が最高の癒やしをもたらします。'},
-     {b:'空間整備',t:'デスク周りを整え好きな香りを1滴。身の回りのメンテナンスが運気の引き寄せ力を強めます。'}]
-  ];
+     {b:'空間整備',t:'デスク周りを整え好きな香りを1滴。身の回りのメンテナンスが運気の引き寄せ力を強めます。'}]];
   var rl=document.getElementById('rlist');rl.innerHTML='';
   rPool[c.d%3].forEach(function(r){
     var li=document.createElement('li');li.className='ritem';
@@ -609,22 +620,90 @@ function renderDash(){
     rl.appendChild(li);
   });
 
-  // チャット初期化
   var cd=document.getElementById('chatDisp');cd.innerHTML='';
-  var initMsg='こんにちは🌸 '+pname+'さんの今日の運気【'+c.unki+'（'+kk+'）】はすべて把握しています。'
-    +(acc.hobby?'趣味（'+acc.hobby+'）も同期済み。':'')+'何でもお気軽に相談してください。';
-  addBubble('ai',initMsg);
-
-  // チップ
+  chatCtx=[];
+  var kk2=kikkyo(c.unki,c.ht);
+  addBubble('ai','こんにちは🌸 '+pname+'さんの今日の運気【'+c.unki+'（'+kk2+'）】はすべて把握しています。'+(acc.hobby?'趣味（'+acc.hobby+'）も同期済み。':'')+'何でもお気軽に相談してください。');
   buildChips(data);
 }
 
-function switchPerson(id){curId=id;chatCtx=[];renderDash();}
+function switchPerson(id){curId=id;renderDash();}
+function focusAdd(){
+  var el=document.getElementById('addFormArea');
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  var ni=document.getElementById('apName');if(ni)setTimeout(function(){ni.focus();},400);
+}
 
-// ===== ナビ =====
+// 詳細モーダル
+function showDetail(ttl,bodyHtml){
+  document.getElementById('detailTtl').textContent=ttl;
+  document.getElementById('detailBody').innerHTML=bodyHtml;
+  document.getElementById('detailModal').classList.add('on');
+}
+function closeDetail(){document.getElementById('detailModal').classList.remove('on');}
+
+function showHeroDetail(){
+  if(!_curCalc)return;
+  var c=_curCalc;
+  var kk=kikkyo(c.unki,c.ht);
+  var kc=kkColor(c.unki,c.ht);
+  var body='<div class="detail-item">'
+    +'<div class="detail-item-lbl">六花人</div>'
+    +'<div class="detail-item-val">'+c.ht+'</div>'
+    +'<div class="detail-item-txt">あなたの本質的な性格と才能の方向性を示す花の種類です。</div></div>'
+    +'<div class="detail-item">'
+    +'<div class="detail-item-lbl">今日の運気</div>'
+    +'<div class="detail-item-val" style="color:'+kc+'">'+c.unki+'　'+kk+'</div>'
+    +'<div class="detail-item-txt">今年の干支と六花人の関係から算出した現在の運勢です。</div></div>'
+    +'<div class="detail-item">'
+    +'<div class="detail-item-lbl">命式（三柱）</div>'
+    +'<div class="detail-item-val">年柱:'+c.nenKS+'　月柱:'+c.tsuKS+'　日柱:'+c.nichiKS+'</div>'
+    +'<div class="detail-item-txt">生年月日から導かれた命の柱。年柱は育ちの刷り込み、月柱は社会的な顔、日柱は魂の核です。</div></div>'
+    +'<button class="detail-btn" onclick="closeDetail();navTo(\'meishiki.html\')">精密命式鑑定を見る →</button>';
+  showDetail('今日の宿命カルテ',body);
+}
+
+function showMeishikiDetail(){
+  if(!_curCalc)return;
+  var c=_curCalc;
+  var body='<div class="detail-item">'
+    +'<div class="detail-item-lbl">年柱 '+c.nenKS+'　─　スーパーエゴ（育ちの刷り込み）</div>'
+    +'<div class="detail-item-val">'+c.nenKS[0]+'（干）　'+c.nenKS[1]+'（支）</div>'
+    +'<div class="detail-item-txt">思考の起動パターン・第一反応。何かに直面した瞬間、意識する前に自動的に立ち上がる思考モード。幼少期から身についた行動の作法。</div></div>'
+    +'<div class="detail-item">'
+    +'<div class="detail-item-lbl">月柱 '+c.tsuKS+'　─　エゴ（社会の調整）</div>'
+    +'<div class="detail-item-val">'+c.tsuKS[0]+'（干）　'+c.tsuKS[1]+'（支）</div>'
+    +'<div class="detail-item-txt">表面・社会的な顔。落ち着いている時に他人から見える自分のデフォルト。年柱の衝動と日柱の本質の板挟みで調整している層。</div></div>'
+    +'<div class="detail-item">'
+    +'<div class="detail-item-lbl">日柱 '+c.nichiKS+'　─　イド（魂の核）</div>'
+    +'<div class="detail-item-val">'+c.nichiKS[0]+'（干）　'+c.nichiKS[1]+'（支）</div>'
+    +'<div class="detail-item-txt">消すことも止めることもできない自分の核。他者への第一印象にもなる。人生で最終的にどう結論づけるかの軸。</div></div>'
+    +'<button class="detail-btn" onclick="closeDetail();navTo(\'meishiki.html\')">命式の詳細鑑定へ →</button>';
+  showDetail('命式の三層構造',body);
+}
+
+function showDaiunDetail(){
+  if(!_curCalc)return;
+  var c=_curCalc;
+  var daiPool=['大樹の運気。これまで培ってきた知識や経験が幹となり、周囲を統率するポジションへとシフトする10年間。',
+    '太陽の運気。スポットライトが当たりやすく、あなたの才能が強く求められる10年。',
+    '清流の運気。知性と精神性が研ぎ澄まされる10年間。内面を磨くことで驚くほど自然に物事がうまく回り始めます。',
+    '燈火の運気。内に秘めた情熱の炎が周囲を照らす10年間。'];
+  var body='<div class="detail-item">'
+    +'<div class="detail-item-lbl">現在の大運</div>'
+    +'<div class="detail-item-val">'+daiPool[c.y%4]+'</div>'
+    +'</div>'
+    +'<div class="detail-item">'
+    +'<div class="detail-item-lbl">大運とは</div>'
+    +'<div class="detail-item-txt">10年ごとに変わる人生の大きな潮流です。年柱・月柱・日柱の命式に大運の干支が重なることで、その10年間のテーマと方向性が決まります。</div></div>'
+    +'<button class="detail-btn" onclick="closeDetail();navTo(\'meishiki.html\')">大運表の詳細を見る →</button>';
+  showDetail('現在の大運（10年周期）',body);
+}
+
+// ナビゲーション
 function switchNav(i){
   [0,1,2,3].forEach(function(j){
-    document.getElementById('nb'+j).classList.toggle('on',j===i);
+    var btn=document.getElementById('nb'+j);if(btn)btn.classList.toggle('on',j===i);
   });
 }
 function openChatFocus(){
@@ -635,10 +714,34 @@ function openChatFocus(){
   },100);
 }
 
-// ===== 人物追加 =====
+// navTo（URLパラメータでデータを渡す）
+function navTo(url){
+  var data=S.load();if(!data)return;
+  var acc=data.account;
+  if(!acc.birthday){window.location.href=url;return;}
+  var myBd=acc.birthday.split('-');
+  var myY=+myBd[0],myM=+myBd[1],myD=+myBd[2];
+  var finalUrl='';
+  if(url.indexOf('aisho.html')>=0){
+    finalUrl='aisho.html?y='+myY+'&m='+myM+'&d='+myD;
+    if(curId!=='me'){
+      var p=data.people.find(function(x){return x.id===curId;});
+      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2];}
+    }
+  } else if(url.indexOf('meishiki.html')>=0){
+    if(curId!=='me'){
+      var p=data.people.find(function(x){return x.id===curId;});
+      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl='meishiki.html?y='+pb[0]+'&m='+pb[1]+'&d='+pb[2];}
+      else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD;
+    } else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD;
+  } else finalUrl=url+'?y='+myY+'&m='+myM+'&d='+myD;
+  window.location.href=finalUrl;
+}
+
+// 人物追加
 function doAddPerson(){
   var name=document.getElementById('apName').value.trim();
-  var bd=document.getElementById('apBd').value;
+  var bd=getDateStr('apBdY','apBdM','apBdD');
   var rel=document.getElementById('apRel').value;
   var gen=document.getElementById('apGen').value;
   var hobby=document.getElementById('apHobby').value.trim();
@@ -647,58 +750,27 @@ function doAddPerson(){
   var p={id:'p'+Date.now(),name:name,relation:rel,birthday:bd,gender:gen,hobby:hobby||''};
   data.people.push(p);S.save(data);
   document.getElementById('apName').value='';
-  document.getElementById('apBd').value='';
   document.getElementById('apHobby').value='';
-  curId=p.id;chatCtx=[];renderDash();
+  initDateSel('apBdY','apBdM','apBdD');
+  curId=p.id;renderDash();
 }
 
-// ===== ページ遷移 =====
-function navTo(url){
-  var data=S.load();if(!data)return;
-  var acc=data.account;
-  if(!acc.birthday){window.location.href=url;return;}
-  var myBd=acc.birthday.split('-');
-  var myY=+myBd[0],myM=+myBd[1],myD=+myBd[2];
-  var finalUrl='';
-  if(url.indexOf('compat.html')>=0){
-    finalUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
-    if(curId!=='me'){
-      var p=data.people.find(function(x){return x.id===curId;});
-      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2];}
-    }
-  } else if(url.indexOf('index.html')>=0){
-    if(curId!=='me'){
-      var p=data.people.find(function(x){return x.id===curId;});
-      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl='index.html?y='+pb[0]+'&m='+pb[1]+'&d='+pb[2];}
-      else finalUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
-    } else finalUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
-  } else finalUrl=url+'?y='+myY+'&m='+myM+'&d='+myD;
-  window.location.href=finalUrl;
-}
-
-// ===== AIチャット =====
+// AIチャット
 function addBubble(role,text){
   var cd=document.getElementById('chatDisp');
   var wrap=document.createElement('div');wrap.className='bbl '+role;
   wrap.innerHTML='<span class="slbl">'+(role==='ai'?'花人AIパートナー':'あなた')+'</span>'
     +'<div class="msg">'+text+'</div>';
-  cd.appendChild(wrap);
-  cd.scrollTop=cd.scrollHeight;
+  cd.appendChild(wrap);cd.scrollTop=cd.scrollHeight;
 }
-
 function buildChips(data){
   var chips=['今日の運気を詳しく','私の強みは？','向いている仕事は？','今年の運勢を教えて'];
-  if(data.people.length>0)chips.push(data.people[0].name+'との相性は？');
-  var el=document.getElementById('chatChips');
-  el.innerHTML=chips.map(function(c){
+  if(data&&data.people.length>0)chips.push(data.people[0].name+'との相性は？');
+  document.getElementById('chatChips').innerHTML=chips.map(function(c){
     return '<div class="chip" onclick="useChip(\''+c.replace(/'/g,'')+'\')">' +c+'</div>';
   }).join('');
 }
-
-function useChip(t){
-  document.getElementById('chatInp').value=t;
-  sendChat();
-}
+function useChip(t){document.getElementById('chatInp').value=t;sendChat();}
 
 async function sendChat(){
   var inp=document.getElementById('chatInp');
@@ -706,12 +778,10 @@ async function sendChat(){
   inp.value='';
   addBubble('usr',q);
   chatCtx.push({role:'user',content:q});
-
   var ld=document.createElement('div');ld.className='bbl ai';ld.id='ld';
   ld.innerHTML='<span class="slbl">花人AIパートナー</span><div class="msg" style="color:var(--text2)">鑑定中...</div>';
   document.getElementById('chatDisp').appendChild(ld);
   document.getElementById('chatDisp').scrollTop=9999;
-
   var data=S.load();
   var acc=data?data.account:{};
   var ctx='';
@@ -722,23 +792,16 @@ async function sendChat(){
   }
   if(curId!=='me'&&data){
     var p=data.people.find(function(x){return x.id===curId;});
-    if(p&&p.birthday){
-      var pc=calcP(p.birthday);
-      ctx+='\n【現在表示中:'+p.name+'さん（'+p.relation+'）】六花人:'+pc.ht+'、今年の運気:'+pc.unki;
-    }
+    if(p&&p.birthday){var pc=calcP(p.birthday);ctx+='\n【現在表示中:'+p.name+'さん（'+p.relation+'）】六花人:'+pc.ht+'、今年の運気:'+pc.unki;}
   }
   if(data&&data.people.length>0){
     ctx+='\n【登録した人】'+data.people.map(function(p){
       if(!p.birthday)return p.name+'('+p.relation+')';
-      var pc=calcP(p.birthday);
-      return p.name+'('+p.relation+','+pc.ht+','+pc.unki+')';
+      var pc=calcP(p.birthday);return p.name+'('+p.relation+','+pc.ht+','+pc.unki+')';
     }).join('、');
   }
-
   var sys='あなたは花人占術の専属AIパートナーです。\n'+ctx
-    +'\nMarkdown不可。甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を出さない。'
-    +'200〜400文字。温かく・具体的に・その人の命式と運気に基づいて答える。';
-
+    +'\nMarkdown不可。甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を出さない。200〜400文字。温かく・具体的に・命式と運気に基づいて答える。';
   try{
     var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -762,8 +825,10 @@ async function sendChat(){
   }
 }
 
-// ===== 起動 =====
+// 起動
 window.addEventListener('DOMContentLoaded',function(){
+  initDateSel('rBdY','rBdM','rBdD');
+  initDateSel('apBdY','apBdM','apBdD');
   setTimeout(function(){
     var d=S.load();
     document.getElementById('scrLoad').style.display='none';
