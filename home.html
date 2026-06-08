@@ -1476,11 +1476,7 @@ function renderDash(){
   // ウィジェット更新
   updateWidgets(person.birthday);
   document.getElementById('hAge').textContent=age+'歳';
-  var uEl=document.getElementById('hUnki');
-  uEl.textContent=c.unki;uEl.style.color=kc;
-  var kkEl=document.getElementById('hKikkyo');
-  kkEl.textContent=kk;kkEl.style.color=kc;
-  document.getElementById('hHt').textContent=c.ht;
+  // 運気・吉凶はウィジェットで表示
 
   document.getElementById('mcgrid').innerHTML=
     '<div class="mcitem"><div class="mclbl">年柱</div><div class="mcval">'+c.nenKS+'</div></div>'+
