@@ -300,8 +300,8 @@ canvas#petalCanvas{position:fixed;top:0;left:0;width:100%;height:100%;
     </div>
     <div class="date-grp" style="margin-top:0.5rem">
       <select id="byG" style="flex:1;padding:0.75rem 0.5rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
-        <option value="男">男性</option>
-        <option value="女">女性</option>
+        <option value="male">男性</option>
+        <option value="female">女性</option>
       </select>
     </div>
     <button class="calc-btn" onclick="doCalc()">精密命式を鑑定する</button>
@@ -573,7 +573,7 @@ function initDateSel(){
   if(py)yEl.value=py;
   if(pm)mEl.value=pm;
   if(pd)dEl.value=pd;
-  if(pg){var gEl=document.getElementById('byG');if(gEl)gEl.value=pg;}
+  if(pg){var gEl=document.getElementById('byG');if(gEl)gEl.value=(pg==='男'?'male':pg==='女'?'female':pg);}
   if(py&&pm&&pd)doCalc();
   else{
     // localStorageから自分のデータを読む
@@ -612,11 +612,13 @@ function doCalc(){
   var nenNum=ROKUJU.indexOf(nenKS)+1;
   var isFwd;
   // 性別：URLパラメータ &g= を最優先、なければ選択UIの値
+  // male/female → 男/女 に変換
   var data=S.load();
   var p=new URLSearchParams(window.location.search);
-  var gender=p.get('g')||document.getElementById('byG').value||'男';
+  var gRaw=p.get('g')||document.getElementById('byG').value||'male';
+  var gender=(gRaw==='male'||gRaw==='男')?'男':(gRaw==='female'||gRaw==='女')?'女':'男';
   // gが'不明'の場合はnenNumから推定
-  if(gender==='不明'){
+  if(gRaw==='不明'){
     gender=nenNum%2===1?'男':'女';
   }
   isFwd=(nenNum%2===1&&gender==='男')||(nenNum%2===0&&gender==='女');
