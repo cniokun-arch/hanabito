@@ -3,254 +3,239 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>花人占術</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>花人占術 - マイページ</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --gold:#b8860b;--gold-light:#d4a017;--gold-pale:rgba(184,134,11,0.12);
   --bg:#faf6ef;--bg2:#f2ead8;--ink:#1a1208;--ink2:#4a3c28;--ink3:#7a6b52;
-  --border:rgba(184,134,11,0.25);--r:12px;
+  --border:rgba(184,134,11,0.25);--r:14px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;color:var(--ink)}
-.screen{display:none;min-height:100vh;flex-direction:column}
-.screen.active{display:flex}
+
+/* ===== スクリーン管理 ===== */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* ===== エラー表示 ===== */
+#errmsg{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
+  background:#fff0f0;border-bottom:2px solid #c04040;color:#900;
+  padding:0.7rem 1rem;font-size:0.82rem;word-break:break-all}
 
 /* ===== ログイン・登録画面 ===== */
-#loginScreen{align-items:center;justify-content:center;padding:2rem 1.2rem;background:linear-gradient(160deg,#fdf8f0 0%,#f5ead8 100%)}
-.login-box{width:100%;max-width:380px}
-.login-logo{text-align:center;margin-bottom:2rem}
-.login-logo h1{font-family:'Zen Old Mincho',serif;font-size:1.8rem;letter-spacing:0.3em;color:var(--gold)}
-.login-logo p{font-size:0.82rem;color:var(--ink3);margin-top:0.4rem;letter-spacing:0.08em}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;box-shadow:0 4px 20px rgba(26,18,8,0.06);margin-bottom:1rem}
-.card h2{font-family:'Zen Old Mincho',serif;font-size:1rem;color:var(--gold);letter-spacing:0.15em;margin-bottom:1.2rem;text-align:center}
+#scrAuth{display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:2rem 1.2rem;
+  background:linear-gradient(160deg,#fdf8f0 0%,#f5ead8 100%)}
+.auth-box{width:100%;max-width:380px}
+.auth-logo{text-align:center;margin-bottom:2rem}
+.auth-logo h1{font-family:'Zen Old Mincho',serif;font-size:2rem;
+  letter-spacing:0.3em;color:var(--gold)}
+.auth-logo p{font-size:0.8rem;color:var(--ink3);margin-top:0.3rem;letter-spacing:0.1em}
+.auth-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:1.6rem;box-shadow:0 4px 20px rgba(26,18,8,0.08)}
+.auth-tabs{display:flex;margin-bottom:1.4rem;border-bottom:2px solid var(--bg2)}
+.auth-tab{flex:1;padding:0.6rem;background:none;border:none;
+  font-family:'Noto Serif JP',serif;font-size:0.88rem;color:var(--ink3);
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:all 0.2s;letter-spacing:0.05em}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
 .field{margin-bottom:0.9rem}
-.field label{display:block;font-size:0.78rem;color:var(--ink3);margin-bottom:0.3rem;letter-spacing:0.05em}
-.field input,.field select{
-  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;
-  padding:0.6rem 0.8rem;font-family:'Noto Serif JP',serif;font-size:0.95rem;
-  color:var(--ink);outline:none;transition:border-color 0.2s
-}
+.field label{display:block;font-size:0.78rem;color:var(--ink3);margin-bottom:0.3rem}
+.field input,.field select{width:100%;background:var(--bg);
+  border:1px solid var(--border);border-radius:6px;
+  padding:0.65rem 0.8rem;font-family:'Noto Serif JP',serif;
+  font-size:0.95rem;color:var(--ink);outline:none;transition:border-color 0.2s}
 .field input:focus,.field select:focus{border-color:var(--gold)}
-.btn-gold{
-  width:100%;background:var(--gold);color:#fff;border:none;padding:0.75rem;
-  font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.15em;
-  cursor:pointer;border-radius:8px;margin-top:0.4rem;transition:background 0.2s;
-  -webkit-tap-highlight-color:transparent
-}
-.btn-gold:hover{background:var(--gold-light)}
-.tab-btns{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.2rem}
-.tab-btn{flex:1;padding:0.6rem;font-family:'Noto Serif JP',serif;font-size:0.85rem;
-  color:var(--ink3);background:none;border:none;cursor:pointer;letter-spacing:0.1em;
-  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s}
-.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
-.err-msg{font-size:0.8rem;color:#c04040;text-align:center;margin-top:0.5rem;min-height:1.2rem}
+.btn-gold{width:100%;background:var(--gold);color:#fff;border:none;
+  padding:0.8rem;font-family:'Zen Old Mincho',serif;font-size:1rem;
+  letter-spacing:0.15em;cursor:pointer;border-radius:8px;margin-top:0.3rem;
+  transition:background 0.2s;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 4px 12px rgba(184,134,11,0.2)}
+.btn-gold:active{background:var(--gold-light)}
+.err{font-size:0.78rem;color:#c04040;text-align:center;margin-top:0.5rem;min-height:1em}
 
 /* ===== ホーム画面 ===== */
-#homeScreen{background:var(--bg)}
-.home-header{
-  background:linear-gradient(135deg,#2a1c08 0%,#4a3210 100%);
-  padding:env(safe-area-inset-top,0) 1rem 1rem;
-  padding-top:calc(env(safe-area-inset-top,0) + 0.8rem)
-}
-.home-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem}
-.greeting{color:#f5ead8;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.1em}
-.header-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
-  color:#f5ead8;border-radius:20px;padding:0.35rem 0.9rem;font-size:0.78rem;cursor:pointer;
-  font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent}
+#scrHome{display:none;flex-direction:column;height:100vh}
+#scrHome.active{display:flex}
+
+/* ヘッダー */
+.hdr{background:linear-gradient(135deg,#2a1c08 0%,#4a3210 100%);
+  padding-top:calc(var(--safe-top) + 0.8rem);
+  padding-bottom:0.8rem;padding-left:1rem;padding-right:1rem}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem}
+.hdr-greeting{color:#f5ead8;font-family:'Zen Old Mincho',serif;font-size:0.95rem;letter-spacing:0.08em}
+.hdr-setting{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  color:#f5ead8;border-radius:16px;padding:0.3rem 0.8rem;font-size:0.75rem;
+  cursor:pointer;font-family:'Noto Serif JP',serif;-webkit-tap-highlight-color:transparent}
 
 /* 人物タブ */
-.person-tabs{display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:0.2rem;
+.ptabs{display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:2px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.person-tabs::-webkit-scrollbar{display:none}
-.person-tab{
-  flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0.3rem;
-  padding:0.5rem 0.6rem;border-radius:10px;cursor:pointer;
-  border:2px solid transparent;transition:all 0.2s;-webkit-tap-highlight-color:transparent
-}
-.person-tab.active{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4)}
-.person-tab-avatar{
-  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:1.1rem;font-family:'Zen Old Mincho',serif;font-weight:700
-}
-.person-tab-name{font-size:0.68rem;color:rgba(245,234,216,0.9);white-space:nowrap;letter-spacing:0.05em}
-.add-person-tab{
-  flex-shrink:0;width:44px;height:44px;border-radius:50%;
+.ptabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0.25rem;
+  padding:0.4rem 0.5rem;border-radius:8px;cursor:pointer;
+  border:2px solid transparent;transition:all 0.2s;
+  -webkit-tap-highlight-color:transparent}
+.ptab.active{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.4)}
+.ptab-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;font-family:'Zen Old Mincho',serif;font-weight:700}
+.ptab-name{font-size:0.65rem;color:rgba(245,234,216,0.9);white-space:nowrap}
+.ptab-add{width:42px;height:42px;border-radius:50%;flex-shrink:0;
   background:rgba(255,255,255,0.1);border:2px dashed rgba(255,255,255,0.3);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;color:rgba(255,255,255,0.5);cursor:pointer;margin-top:2px;
-  -webkit-tap-highlight-color:transparent
-}
+  font-size:1.3rem;color:rgba(255,255,255,0.5);cursor:pointer;margin-top:2px;
+  -webkit-tap-highlight-color:transparent}
 
 /* メインコンテンツ */
-.home-content{flex:1;overflow-y:auto;padding:1rem;-webkit-overflow-scrolling:touch}
-.today-card{
-  background:linear-gradient(135deg,#fff 0%,#fdf8f2 100%);
-  border:1px solid var(--border);border-radius:var(--r);
-  padding:1.2rem;margin-bottom:0.8rem;
-  box-shadow:0 2px 12px rgba(26,18,8,0.05)
-}
-.today-date{font-size:0.78rem;color:var(--ink3);letter-spacing:0.08em;margin-bottom:0.4rem}
-.today-unki{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem}
-.unki-badge{
-  padding:0.3rem 0.9rem;border-radius:20px;font-size:0.82rem;font-weight:700;
-  letter-spacing:0.1em;font-family:'Zen Old Mincho',serif
-}
-.today-daiun{font-size:0.82rem;color:var(--ink2);line-height:1.7}
-.today-advice{
-  background:var(--gold-pale);border-left:3px solid var(--gold);
-  padding:0.7rem 0.9rem;border-radius:0 8px 8px 0;margin-top:0.8rem;
-  font-size:0.85rem;color:var(--ink2);line-height:1.8
-}
+.hmain{flex:1;overflow-y:auto;padding:0.9rem;
+  -webkit-overflow-scrolling:touch;padding-bottom:calc(var(--safe-bottom) + 4.5rem)}
 
-/* クイックアクション */
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem}
-.quick-btn{
-  background:#fff;border:1px solid var(--border);border-radius:var(--r);
-  padding:1rem;display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.2s;
-  box-shadow:0 2px 8px rgba(26,18,8,0.04)
-}
-.quick-btn:active{transform:scale(0.97);background:var(--gold-pale)}
-.quick-btn-icon{font-size:1.6rem}
-.quick-btn-label{font-size:0.78rem;color:var(--ink2);letter-spacing:0.05em;font-family:'Zen Old Mincho',serif}
+/* 今日カード */
+.today-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:1.1rem;margin-bottom:0.8rem;
+  box-shadow:0 2px 12px rgba(26,18,8,0.05)}
+.today-date{font-size:0.72rem;color:var(--ink3);letter-spacing:0.06em;margin-bottom:0.5rem}
+.today-unki-label{font-size:0.68rem;color:var(--gold);letter-spacing:0.08em;
+  font-family:'Zen Old Mincho',serif;margin-bottom:0.3rem}
+.today-unki-row{display:flex;align-items:center;gap:0.7rem;margin-bottom:0.6rem}
+.unki-badge{padding:0.25rem 0.8rem;border-radius:16px;font-size:0.82rem;
+  font-weight:700;letter-spacing:0.08em;font-family:'Zen Old Mincho',serif}
+.today-ht{font-size:0.82rem;color:var(--ink2)}
+.today-advice{background:var(--gold-pale);border-left:3px solid var(--gold);
+  padding:0.6rem 0.8rem;border-radius:0 8px 8px 0;margin-top:0.6rem;
+  font-size:0.82rem;color:var(--ink2);line-height:1.8}
+.today-advice-label{font-size:0.68rem;color:var(--gold);
+  font-family:'Zen Old Mincho',serif;letter-spacing:0.1em;display:block;margin-bottom:0.2rem}
+
+/* クイックメニュー */
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem}
+.quick-btn{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:0.9rem;display:flex;flex-direction:column;align-items:center;gap:0.35rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s;
+  box-shadow:0 2px 8px rgba(26,18,8,0.04)}
+.quick-btn:active{transform:scale(0.96);background:var(--gold-pale)}
+.quick-icon{font-size:1.5rem}
+.quick-label{font-size:0.75rem;color:var(--ink2);letter-spacing:0.04em;
+  font-family:'Zen Old Mincho',serif}
 
 /* 命式カード */
-.meishiki-card{
-  background:#fff;border:1px solid var(--border);border-radius:var(--r);
-  padding:1.2rem;margin-bottom:0.8rem;box-shadow:0 2px 12px rgba(26,18,8,0.04)
-}
-.meishiki-card h3{font-family:'Zen Old Mincho',serif;font-size:0.9rem;color:var(--gold);
-  letter-spacing:0.15em;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.4rem}
-.ks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem}
-.ks-item{background:var(--bg2);border-radius:8px;padding:0.6rem;text-align:center}
-.ks-label{font-size:0.65rem;color:var(--ink3);margin-bottom:0.3rem;letter-spacing:0.05em}
-.ks-value{font-family:'Zen Old Mincho',serif;font-size:1rem;color:var(--ink);font-weight:700}
+.meishiki-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:1.1rem;margin-bottom:0.8rem;
+  box-shadow:0 2px 12px rgba(26,18,8,0.04)}
+.mc-title{font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:var(--gold);
+  letter-spacing:0.12em;margin-bottom:0.8rem;
+  display:flex;align-items:center;gap:0.4rem}
+.mc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem}
+.mc-item{background:var(--bg2);border-radius:8px;padding:0.55rem;text-align:center}
+.mc-lbl{font-size:0.62rem;color:var(--ink3);margin-bottom:0.25rem;letter-spacing:0.04em}
+.mc-val{font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:var(--ink);font-weight:700}
 
 /* ボトムナビ */
-.bottom-nav{
-  display:flex;background:#fff;
-  border-top:2px solid var(--border);
-  box-shadow:0 -4px 20px rgba(26,18,8,0.08);
-  padding:0.6rem 0 calc(env(safe-area-inset-bottom,0) + 0.6rem);
-  position:sticky;bottom:0;z-index:100
-}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;
-  padding:0.4rem;cursor:pointer;-webkit-tap-highlight-color:transparent;
+.bnav{display:flex;background:#fff;border-top:2px solid var(--border);
+  box-shadow:0 -4px 20px rgba(26,18,8,0.07);
+  padding-top:0.5rem;padding-bottom:calc(var(--safe-bottom) + 0.5rem);
+  position:fixed;bottom:0;left:0;right:0;z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+  padding:0.3rem;cursor:pointer;-webkit-tap-highlight-color:transparent;
   border:none;background:none;font-family:'Noto Serif JP',serif;
-  transition:transform 0.15s}
-.nav-btn:active{transform:scale(0.92)}
-.nav-btn-icon{font-size:1.5rem}
-.nav-btn-label{font-size:0.65rem;color:var(--ink3);letter-spacing:0.05em;font-weight:500}
-.nav-btn.active .nav-btn-label{color:var(--gold);font-weight:700}
-.nav-btn.active .nav-btn-icon{filter:sepia(1) saturate(3) hue-rotate(5deg)}
-.nav-btn.active{border-top:2px solid var(--gold);margin-top:-2px}
+  border-top:2px solid transparent;transition:all 0.15s}
+.nav-btn.active{border-top-color:var(--gold)}
+.nav-btn .ni{font-size:1.4rem}
+.nav-btn .nl{font-size:0.62rem;color:var(--ink3);letter-spacing:0.04em}
+.nav-btn.active .nl{color:var(--gold);font-weight:700}
 
-/* 人物登録モーダル */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(26,18,8,0.5);
+/* ===== チャット画面 ===== */
+#scrChat{display:none;flex-direction:column;height:100vh;background:var(--bg)}
+#scrChat.active{display:flex}
+.chat-hdr{background:linear-gradient(135deg,#2a1c08,#4a3210);
+  padding:calc(var(--safe-top) + 0.7rem) 1rem 0.7rem;
+  display:flex;align-items:center;gap:0.8rem}
+.chat-back{color:#f5ead8;background:none;border:none;font-size:1.2rem;
+  cursor:pointer;padding:0.2rem;-webkit-tap-highlight-color:transparent}
+.chat-title{font-family:'Zen Old Mincho',serif;color:#f5ead8;font-size:0.9rem;
+  letter-spacing:0.1em;flex:1}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem;
+  display:flex;flex-direction:column;gap:0.7rem}
+.bbl-ai{background:#fff;border:1px solid var(--border);
+  border-radius:12px 12px 12px 2px;padding:0.75rem 0.9rem;
+  font-size:0.85rem;color:var(--ink2);line-height:1.8;max-width:88%}
+.bbl-user{background:var(--gold);color:#fff;
+  border-radius:12px 12px 2px 12px;padding:0.75rem 0.9rem;
+  font-size:0.85rem;line-height:1.8;max-width:88%;align-self:flex-end}
+.chat-chips{display:flex;gap:0.4rem;overflow-x:auto;padding:0.5rem 1rem 0;
+  scrollbar-width:none}
+.chat-chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:0.3rem 0.75rem;font-size:0.73rem;color:var(--ink2);
+  cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;
+  font-family:'Noto Serif JP',serif}
+.chip:active{background:var(--gold-pale)}
+.chat-inp-area{padding:0.7rem 1rem calc(var(--safe-bottom) + 0.7rem);
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;gap:0.5rem;align-items:flex-end}
+.chat-inp{flex:1;background:var(--bg);border:1px solid var(--border);
+  border-radius:18px;padding:0.55rem 0.9rem;font-family:'Noto Serif JP',serif;
+  font-size:0.88rem;color:var(--ink);outline:none;resize:none;
+  max-height:100px;line-height:1.5}
+.chat-send{width:38px;height:38px;border-radius:50%;background:var(--gold);
+  border:none;color:#fff;font-size:0.9rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent}
+
+/* ===== 人物追加モーダル ===== */
+.modal-ov{position:fixed;inset:0;background:rgba(26,18,8,0.5);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  display:flex;align-items:flex-end;justify-content:center;
-  z-index:500;padding:0
-}
-.modal-sheet{
-  background:var(--bg);border-radius:20px 20px 0 0;
-  width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
-  padding:1.5rem 1.2rem calc(env(safe-area-inset-bottom,0) + 1.5rem)
-}
+  display:flex;align-items:flex-end;justify-content:center;z-index:500}
+.modal-sheet{background:var(--bg);border-radius:20px 20px 0 0;width:100%;
+  max-width:480px;max-height:88vh;overflow-y:auto;
+  padding:1.4rem 1.2rem calc(var(--safe-bottom) + 1.4rem)}
 .modal-handle{width:36px;height:4px;background:rgba(26,18,8,0.15);
-  border-radius:2px;margin:0 auto 1.2rem}
-.modal-title{font-family:'Zen Old Mincho',serif;font-size:1rem;color:var(--gold);
-  letter-spacing:0.15em;text-align:center;margin-bottom:1.2rem}
-.modal-actions{display:flex;gap:0.6rem;margin-top:1rem}
-.btn-sub{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--ink2);
-  padding:0.65rem;border-radius:8px;font-family:'Noto Serif JP',serif;font-size:0.88rem;
-  cursor:pointer;-webkit-tap-highlight-color:transparent}
+  border-radius:2px;margin:0 auto 1.1rem}
+.modal-title{font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:var(--gold);
+  letter-spacing:0.12em;text-align:center;margin-bottom:1.1rem}
+.modal-actions{display:flex;gap:0.6rem;margin-top:0.9rem}
+.btn-sub{flex:1;background:var(--bg2);border:1px solid var(--border);
+  color:var(--ink2);padding:0.6rem;border-radius:8px;
+  font-family:'Noto Serif JP',serif;font-size:0.85rem;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
 
 /* ローディング */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;gap:1rem;background:var(--bg)}
-.loading-flower{font-size:2.5rem;animation:spin 2s linear infinite}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.loading-text{font-family:'Zen Old Mincho',serif;font-size:0.9rem;color:var(--ink3);letter-spacing:0.15em}
-
-/* チャット */
-.chat-screen{display:none;flex-direction:column;height:100vh;background:var(--bg)}
-.chat-screen.active{display:flex}
-.chat-header{
-  background:linear-gradient(135deg,#2a1c08,#4a3210);
-  padding:calc(env(safe-area-inset-top,0) + 0.8rem) 1rem 0.8rem;
-  display:flex;align-items:center;gap:0.8rem
-}
-.chat-back{color:#f5ead8;background:none;border:none;font-size:1.2rem;cursor:pointer;padding:0.3rem}
-.chat-title{font-family:'Zen Old Mincho',serif;color:#f5ead8;font-size:0.95rem;letter-spacing:0.1em;flex:1}
-.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.8rem}
-.bubble-ai{background:#fff;border:1px solid var(--border);border-radius:12px 12px 12px 2px;
-  padding:0.8rem 1rem;font-size:0.88rem;color:var(--ink2);line-height:1.8;max-width:88%}
-.bubble-user{background:var(--gold);color:#fff;border-radius:12px 12px 2px 12px;
-  padding:0.8rem 1rem;font-size:0.88rem;line-height:1.8;max-width:88%;align-self:flex-end}
-.chat-input-area{
-  padding:0.8rem 1rem calc(env(safe-area-inset-bottom,0) + 0.8rem);
-  background:#fff;border-top:1px solid var(--border);display:flex;gap:0.5rem;align-items:flex-end
-}
-.chat-input{
-  flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;
-  padding:0.6rem 1rem;font-family:'Noto Serif JP',serif;font-size:0.9rem;
-  color:var(--ink);outline:none;resize:none;max-height:120px;line-height:1.6
-}
-.chat-send{
-  width:40px;height:40px;border-radius:50%;background:var(--gold);border:none;
-  color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;-webkit-tap-highlight-color:transparent
-}
-.chat-suggestions{display:flex;gap:0.4rem;overflow-x:auto;padding:0.5rem 1rem 0;
-  scrollbar-width:none}
-.chat-suggestions::-webkit-scrollbar{display:none}
-.suggestion-chip{
-  flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:20px;
-  padding:0.35rem 0.8rem;font-size:0.75rem;color:var(--ink2);cursor:pointer;white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;font-family:'Noto Serif JP',serif
-}
-.suggestion-chip:active{background:var(--gold-pale)}
+.loading-sc{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;gap:0.8rem;background:var(--bg)}
+.loading-flower{font-size:2.5rem;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.7}}
+.loading-text{font-family:'Zen Old Mincho',serif;font-size:0.85rem;color:var(--ink3);letter-spacing:0.2em}
 </style>
 </head>
 <body>
 
+<!-- エラー表示 -->
+<div id="errmsg"></div>
+
 <!-- ローディング -->
-<div id="loadingScreen" class="loading">
+<div id="scrLoading" class="loading-sc">
   <div class="loading-flower">🌸</div>
   <div class="loading-text">花人占術</div>
 </div>
-<!-- エラー表示 -->
-<div id="errmsg" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff0f0;border-bottom:2px solid #c04040;color:#900;padding:0.7rem 1rem;font-size:0.82rem;word-break:break-all"></div>
-<script>
-window.onerror=function(msg,src,line,col,err){
-  var el=document.getElementById('errmsg');
-  if(el){el.style.display='block';el.textContent='⚠ '+msg+' ['+line+':'+col+']';}
-  return false;
-};
-window.addEventListener('unhandledrejection',function(e){
-  var el=document.getElementById('errmsg');
-  if(el){el.style.display='block';el.textContent='⚠ '+String(e.reason);}
-});
-</script>
 
-<!-- ログイン・登録画面 -->
-<div id="loginScreen" class="screen">
-  <div class="login-box">
-    <div class="login-logo">
+<!-- 認証画面 -->
+<div id="scrAuth" class="screen">
+  <div class="auth-box">
+    <div class="auth-logo">
       <h1>花 人 占 術</h1>
       <p>宿命の羅針盤</p>
     </div>
-    <div class="card">
-      <div class="tab-btns">
-        <button class="tab-btn active" onclick="switchLoginTab('login',this)">ログイン</button>
-        <button class="tab-btn" onclick="switchLoginTab('register',this)">新規登録</button>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">ログイン</button>
+        <button class="auth-tab" id="tabReg" onclick="switchAuthTab('reg')">新規登録</button>
       </div>
 
-      <!-- ログインフォーム -->
-      <div id="loginForm">
+      <!-- ログイン -->
+      <div id="formLogin">
         <div class="field">
           <label>ニックネーム</label>
           <input type="text" id="loginName" placeholder="例：まこと" autocomplete="off">
@@ -260,18 +245,14 @@ window.addEventListener('unhandledrejection',function(e){
           <input type="password" id="loginPin" placeholder="••••" maxlength="4" inputmode="numeric">
         </div>
         <button class="btn-gold" onclick="doLogin()">ログイン</button>
-        <div class="err-msg" id="loginErr"></div>
+        <div class="err" id="loginErr"></div>
       </div>
 
-      <!-- 登録フォーム -->
-      <div id="registerForm" style="display:none">
+      <!-- 登録 -->
+      <div id="formReg" style="display:none">
         <div class="field">
           <label>ニックネーム</label>
           <input type="text" id="regName" placeholder="例：まこと" autocomplete="off">
-        </div>
-        <div class="field">
-          <label>PIN（4桁）</label>
-          <input type="password" id="regPin" placeholder="••••" maxlength="4" inputmode="numeric">
         </div>
         <div class="field">
           <label>生年月日</label>
@@ -284,562 +265,401 @@ window.addEventListener('unhandledrejection',function(e){
             <option value="female">女性</option>
           </select>
         </div>
+        <div class="field">
+          <label>PIN（4桁の数字）</label>
+          <input type="password" id="regPin" placeholder="••••" maxlength="4" inputmode="numeric">
+        </div>
         <button class="btn-gold" onclick="doRegister()">登録して始める</button>
-        <div class="err-msg" id="regErr"></div>
+        <div class="err" id="regErr"></div>
       </div>
     </div>
-    <p style="text-align:center;font-size:0.72rem;color:var(--ink3);line-height:1.8">
-      データはこのデバイスにのみ保存されます<br>機種変更時はデータが引き継がれません
+    <p style="text-align:center;font-size:0.7rem;color:var(--ink3);margin-top:1rem;line-height:1.8">
+      データはこのデバイスのみに保存されます
     </p>
   </div>
 </div>
 
 <!-- ホーム画面 -->
-<div id="homeScreen" class="screen" style="flex-direction:column">
-  <!-- ヘッダー -->
-  <div class="home-header">
-    <div class="home-header-top">
-      <div class="greeting" id="greetingText">おはようございます</div>
-      <button class="header-btn" onclick="openSettings()">⚙ 設定</button>
+<div id="scrHome" class="screen">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-greeting" id="hdrGreeting">おはようございます</div>
+      <button class="hdr-setting" onclick="openSettings()">設定</button>
     </div>
-    <!-- 人物タブ -->
-    <div class="person-tabs" id="personTabs"></div>
+    <div class="ptabs" id="ptabs"></div>
   </div>
-
-  <!-- メインコンテンツ -->
-  <div class="home-content" id="homeContent">
+  <div class="hmain" id="hmain">
     <!-- 今日のカード -->
-    <div class="today-card" id="todayCard">
+    <div class="today-card">
       <div class="today-date" id="todayDate"></div>
-      <div style="margin-bottom:0.6rem">
-        <div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.08em;margin-bottom:0.35rem">✦ 今日の運気</div>
-        <div class="today-unki">
-          <span class="unki-badge" id="todayUnkiBadge"></span>
-          <span id="todayUnkiName" style="font-size:0.82rem;color:var(--ink2)"></span>
-        </div>
+      <div class="today-unki-label">✦ 今日の運気</div>
+      <div class="today-unki-row">
+        <span class="unki-badge" id="unkiBadge"></span>
+        <span class="today-ht" id="todayHt"></span>
       </div>
-      <div class="today-daiun" id="todayDaiun"></div>
-      <div class="today-advice" id="todayAdvice">
-        <span style="font-size:0.75rem;color:var(--gold);font-family:'Zen Old Mincho',serif;letter-spacing:0.1em">✦ 今日のひとこと</span><br>
-        <span id="todayAdviceText">読み込み中...</span>
+      <div class="today-advice">
+        <span class="today-advice-label">✦ 今日のひとこと</span>
+        <span id="todayAdviceTxt">AIに相談してみましょう</span>
       </div>
     </div>
 
-    <!-- クイックアクション -->
-    <div class="quick-actions">
+    <!-- クイックメニュー -->
+    <div class="quick">
       <div class="quick-btn" onclick="openChat()">
-        <span class="quick-btn-icon">🔮</span>
-        <span class="quick-btn-label">AIに相談する</span>
+        <span class="quick-icon">🔮</span>
+        <span class="quick-label">AIに相談</span>
       </div>
-      <div class="quick-btn" onclick="goTo('index.html')">
-        <span class="quick-btn-icon">📿</span>
-        <span class="quick-btn-label">命式を詳しく見る</span>
+      <div class="quick-btn" onclick="navTo('index.html')">
+        <span class="quick-icon">📿</span>
+        <span class="quick-label">命式を見る</span>
       </div>
-      <div class="quick-btn" id="quickCompat" onclick="goToCompat()">
-        <span class="quick-btn-icon">❤</span>
-        <span class="quick-btn-label">相性を見る</span>
+      <div class="quick-btn" onclick="navTo('compat.html')">
+        <span class="quick-icon">❤</span>
+        <span class="quick-label">相性を見る</span>
       </div>
-      <div class="quick-btn" onclick="goTo('graph.html')">
-        <span class="quick-btn-icon">🕸</span>
-        <span class="quick-btn-label">相関図を見る</span>
+      <div class="quick-btn" onclick="navTo('graph.html')">
+        <span class="quick-icon">🕸</span>
+        <span class="quick-label">相関図</span>
       </div>
     </div>
 
     <!-- 命式カード -->
-    <div class="meishiki-card" id="meishikiCard">
-      <h3>◆ <span id="meishikiPersonName"></span>の命式</h3>
-      <div class="ks-grid" id="ksGrid"></div>
+    <div class="meishiki-card">
+      <div class="mc-title">◆ <span id="mcName"></span>の命式</div>
+      <div class="mc-grid" id="mcGrid"></div>
     </div>
   </div>
 
   <!-- ボトムナビ -->
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="navHome" onclick="navTo('home',this)">
-      <span class="nav-btn-icon">🏠</span>
-      <span class="nav-btn-label">ホーム</span>
+  <div class="bnav">
+    <button class="nav-btn active" id="navHome" onclick="switchNav('home',this)">
+      <span class="ni">🏠</span><span class="nl">ホーム</span>
     </button>
-    <button class="nav-btn" id="navChat" onclick="navTo('chat',this)">
-      <span class="nav-btn-icon">🔮</span>
-      <span class="nav-btn-label">相談</span>
+    <button class="nav-btn" id="navChat2" onclick="openChat()">
+      <span class="ni">🔮</span><span class="nl">相談</span>
     </button>
-    <button class="nav-btn" id="navMeishiki" onclick="goTo('index.html')">
-      <span class="nav-btn-icon">📿</span>
-      <span class="nav-btn-label">命式</span>
+    <button class="nav-btn" onclick="navTo('index.html')">
+      <span class="ni">📿</span><span class="nl">命式</span>
     </button>
-    <button class="nav-btn" id="navGraph" onclick="goTo('graph.html')">
-      <span class="nav-btn-icon">🕸</span>
-      <span class="nav-btn-label">相関図</span>
+    <button class="nav-btn" onclick="navTo('graph.html')">
+      <span class="ni">🕸</span><span class="nl">相関図</span>
     </button>
   </div>
 </div>
 
 <!-- チャット画面 -->
-<div id="chatScreen" class="chat-screen">
-  <div class="chat-header">
+<div id="scrChat" class="screen">
+  <div class="chat-hdr">
     <button class="chat-back" onclick="closeChat()">←</button>
-    <div class="chat-title" id="chatTitle">🌸 花人占術AI</div>
+    <div class="chat-title">🌸 花人占術AI</div>
   </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-suggestions" id="chatSuggestions"></div>
-  <div class="chat-input-area">
-    <textarea class="chat-input" id="chatInput" placeholder="相談したいことを入力..." rows="1"
-      oninput="autoResize(this)"></textarea>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-chips" id="chatChips"></div>
+  <div class="chat-inp-area">
+    <textarea class="chat-inp" id="chatInp" placeholder="相談したいことを…" rows="1"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button class="chat-send" onclick="sendChat()">▶</button>
   </div>
 </div>
 
 <!-- 人物追加モーダル -->
-<div class="modal-overlay" id="addPersonModal" style="display:none" onclick="closeAddPerson(event)">
-  <div class="modal-sheet" onclick="event.stopPropagation()">
+<div class="modal-ov" id="addModal" style="display:none" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">人物を登録する</div>
-    <div class="field">
-      <label>名前</label>
-      <input type="text" id="apName" placeholder="例：えいこ">
-    </div>
-    <div class="field">
-      <label>続柄・関係</label>
+    <div class="field"><label>名前</label><input type="text" id="apName" placeholder="例：えいこ"></div>
+    <div class="field"><label>続柄・関係</label>
       <select id="apRelation">
         <option value="恋人・パートナー">恋人・パートナー</option>
         <option value="配偶者">配偶者</option>
-        <option value="母">母</option>
-        <option value="父">父</option>
-        <option value="息子">息子</option>
-        <option value="娘">娘</option>
-        <option value="兄">兄</option>
-        <option value="姉">姉</option>
-        <option value="弟">弟</option>
-        <option value="妹">妹</option>
+        <option value="母">母</option><option value="父">父</option>
+        <option value="息子">息子</option><option value="娘">娘</option>
+        <option value="兄">兄</option><option value="姉">姉</option>
+        <option value="弟">弟</option><option value="妹">妹</option>
         <option value="友人">友人</option>
         <option value="職場の同僚">職場の同僚</option>
         <option value="上司・先輩">上司・先輩</option>
-        <option value="部下・後輩">部下・後輩</option>
       </select>
     </div>
-    <div class="field">
-      <label>生年月日</label>
-      <input type="date" id="apBirthday">
+    <div class="field"><label>生年月日</label><input type="date" id="apBirthday"></div>
+    <div class="field"><label>性別</label>
+      <select id="apGender"><option value="female">女性</option><option value="male">男性</option></select>
     </div>
-    <div class="field">
-      <label>性別</label>
-      <select id="apGender">
-        <option value="female">女性</option>
-        <option value="male">男性</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>メモ（任意）</label>
-      <input type="text" id="apMemo" placeholder="例：最近体調が悪い">
-    </div>
+    <div class="field"><label>メモ（任意）</label><input type="text" id="apMemo" placeholder="例：最近体調が悪い"></div>
     <div class="modal-actions">
-      <button class="btn-sub" onclick="closeAddPersonModal()">キャンセル</button>
+      <button class="btn-sub" onclick="closeAddModal()">キャンセル</button>
       <button class="btn-gold" style="flex:2" onclick="doAddPerson()">登録する</button>
     </div>
   </div>
 </div>
 
 <script>
+// ===== エラーハンドラ =====
+window.onerror=function(msg,src,line,col){
+  var el=document.getElementById('errmsg');
+  if(el){el.style.display='block';el.textContent='⚠ '+msg+' ['+line+':'+col+']';}
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  var el=document.getElementById('errmsg');
+  if(el){el.style.display='block';el.textContent='⚠ '+String(e.reason);}
+});
+
 // ===== Store =====
-const HB = {
+var HB={
   KEY:'hanabito_v1',
-  load(){try{return JSON.parse(localStorage.getItem(this.KEY))||null;}catch(e){return null;}},
-  save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d));return true;}catch(e){return false;}},
-  defaultData(account){return{account,people:[],chatHistory:[],insights:{hobbies:[],concerns:[],lastChecked:null}};},
-  register(nickname,pin,birthday,gender){
-    const id='u'+Date.now();
-    const account={id,nickname,pin,birthday,gender,hobby:[],job:'',memo:''};
-    this.save(this.defaultData(account));return account;
-  },
-  login(nickname,pin){
-    const d=this.load();
-    if(!d)return null;
-    if(d.account.nickname===nickname&&d.account.pin===pin)return d.account;
-    return null;
-  },
-  addPerson(name,relation,birthday,gender,memo){
-    const d=this.load();if(!d)return null;
-    const p={id:'p'+Date.now(),name,relation,birthday,gender,memo:memo||'',hobby:[]};
-    d.people.push(p);this.save(d);return p;
-  },
-  addChat(role,content){
-    const d=this.load();if(!d)return;
-    d.chatHistory.push({role,content,ts:Date.now()});
-    if(d.chatHistory.length>50)d.chatHistory=d.chatHistory.slice(-50);
-    this.save(d);
-  },
-  updateAccount(fields){const d=this.load();if(!d)return false;d.account=Object.assign(d.account,fields);this.save(d);return true;},
-  isLoggedIn(){const d=this.load();return !!(d&&d.account);}
+  load:function(){try{return JSON.parse(localStorage.getItem(this.KEY))||null;}catch(e){return null;}},
+  save:function(d){try{localStorage.setItem(this.KEY,JSON.stringify(d));}catch(e){}},
+  isLoggedIn:function(){var d=this.load();return !!(d&&d.account);}
 };
 
-// ===== 命式計算（index.htmlと同一ロジック） =====
-const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
-const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
-const HOSHI_BY_IDX=['天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人'];
-// 節入り（index.htmlと同一）
-const SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,957505740000,960198120000,962913780000,965636460000,968326020000,970974540000,973578000000,976134780000];
-const TROPICAL_YEAR_MS=365.24219879*86400000;
-function getSetsuDate(y,m){const b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
-// 日柱（index.htmlと同一）
-function getDayKS(y,m,d){const diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
-// 年柱（index.htmlと同一）
-function getYearKS(y,m,d){const bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
-// 六花人（日柱から計算 - index.htmlのgetHoshiTypeと同一）
+// ===== 命式計算（index.htmlと同一） =====
+var JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
+var JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
+var JUNI_KIKKYO={'豊穣':'大吉','穂分':'吉','発芽':'吉','青葉':'吉','開花':'中吉','平凪':'小吉','成天':'チャンス','引寒':'注意','内省':'苦難','狂咲':'試練','休眠':'変容','残雪':'変容'};
+var TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
+var JUNI_NAMES=['発芽','青葉','開花','成天','豊穣','穂分','平凪','内省','狂咲','引寒','休眠','残雪'];
+var HOSHI_BY_IDX=['天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人'];
+var SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,957505740000,960198120000,962913780000,965636460000,968326020000,970974540000,973578000000,976134780000];
+var TROPICAL_YEAR_MS=365.24219879*86400000;
+
+function getSetsuDate(y,m){var b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
+function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
+function getYearKS(y,m,d){var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
+function getMonthKS(y,m,d){
+  var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  var mo=m,yo=y;if(bd<sD){mo--;if(mo<1){mo=12;yo--;}}
+  var rs=getSetsuDate(yo,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());
+  var refY=new Date(yo,Math.max(0,mo-1),1)>=rsD?yo:yo-1;
+  var yk=ROKUJU[((refY-1984)%60+60)%60];
+  var mkBase=[2,4,6,8,0][JIKKAN.indexOf(yk[0])%5];
+  var mo2=(mo<=0?mo+12:mo)===1?11:(mo<=0?mo+12:mo)-2;
+  return JIKKAN[(mkBase+mo2)%10]+JUNISHI[(2+mo2)%12];
+}
 function getHoshi(y,m,d){
-  const dayKS=getDayKS(y,m,d);
-  const name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)];
-  const nenKS=getYearKS(y,m,d);
-  const num=ROKUJU.indexOf(nenKS)+1;
+  var dayKS=getDayKS(y,m,d);
+  var name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)]||'天花人';
+  var nenKS=getYearKS(y,m,d);
+  var num=ROKUJU.indexOf(nenKS)+1;
   return name+(num%2===1?'＋':'－');
 }
-
-function formatDate(dateStr){
-  if(!dateStr)return '';
-  const d=new Date(dateStr+'T00:00:00');
-  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
-}
-function today(){return new Date();}
-function todayStr(){const d=today();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-
-// 今年の運気（index.htmlのgetJuniUnkiと同一ロジック）
-const TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
-const JUNI_NAMES=['発芽','青葉','開花','成天','豊穣','穂分','平凪','内省','狂咲','引寒','休眠','残雪'];
 function getJuniUnki(ht,shi){
-  const base=TEISHI[ht];
+  var base=TEISHI[ht];
   if(base===undefined)return '平凪';
-  const shiIdx=JUNISHI.indexOf(shi);
+  var shiIdx=JUNISHI.indexOf(shi);
   if(shiIdx<0)return '平凪';
   return JUNI_NAMES[((shiIdx-base)%12+12)%12];
 }
+function getKikkyo(ju,ht){
+  if(ju==='引寒')return ht&&ht.indexOf('＋')>=0?'注意':'変容';
+  if(ju==='休眠'||ju==='残雪')return ht&&ht.indexOf('＋')>=0?'変容':'注意';
+  return JUNI_KIKKYO[ju]||'';
+}
+function getKikkyoColor(ju,ht){
+  var k=getKikkyo(ju,ht);
+  if(k==='大吉')return '#b8860b';
+  if(k==='吉')return '#2a8c4a';
+  if(k==='中吉')return '#4a7acc';
+  if(k==='小吉')return '#7a9c6a';
+  if(k==='チャンス')return '#c07a00';
+  if(k==='注意')return '#b8a000';
+  if(k==='苦難')return '#c04040';
+  if(k==='試練')return '#8b0000';
+  if(k==='変容')return '#7c3aed';
+  return '#888';
+}
 function getTodayYearShi(){
-  const y=today().getFullYear();
+  var y=new Date().getFullYear();
   return getYearKS(y,1,15).slice(1);
 }
-function getNenUnki(birthday,ht){
-  if(!birthday||!ht)return null;
-  const shi=getTodayYearShi();
-  return getJuniUnki(ht,shi);
+function calcPerson(bd){
+  var parts=bd.split('-');
+  var y=parseInt(parts[0]),m=parseInt(parts[1]),d=parseInt(parts[2]);
+  var ht=getHoshi(y,m,d);
+  var nenKS=getYearKS(y,m,d);
+  var tsuKS=getMonthKS(y,m,d);
+  var nichiKS=getDayKS(y,m,d);
+  var todayShi=getTodayYearShi();
+  var unki=getJuniUnki(ht,todayShi);
+  return {y:y,m:m,d:d,ht:ht,nenKS:nenKS,tsuKS:tsuKS,nichiKS:nichiKS,unki:unki};
 }
 
-// ===== アバター色 =====
-const ROKKA_COLORS={
-  '天花人＋':{bg:'#fce8e8',col:'#8b1a1a'},'天花人－':{bg:'#f5dada',col:'#7a1212'},
-  '白花人＋':{bg:'#e8e8fc',col:'#1a1a8b'},'白花人－':{bg:'#dadaf5',col:'#12127a'},
-  '離花人＋':{bg:'#fce8f4',col:'#8b1a6a'},'離花人－':{bg:'#f5daeE',col:'#7a1260'},
-  '風花人＋':{bg:'#e8fce8',col:'#1a8b1a'},'風花人－':{bg:'#daf5da',col:'#127a12'},
-  '仙花人＋':{bg:'#fce8fc',col:'#6a1a8b'},'仙花人－':{bg:'#f5daf5',col:'#601270'},
-  '水花人＋':{bg:'#e8f4fc',col:'#1a6a8b'},'水花人－':{bg:'#daeef5',col:'#12607a'},
+// ===== アバターカラー =====
+var AV_COLORS={
+  '天花人＋':{bg:'#fce8e8',col:'#8b1a1a'},
+  '天花人－':{bg:'#f5dada',col:'#7a1212'},
+  '白花人＋':{bg:'#e8e8fc',col:'#1a1a8b'},
+  '白花人－':{bg:'#dadaf5',col:'#12127a'},
+  '離花人＋':{bg:'#fce8f4',col:'#8b1a6a'},
+  '離花人－':{bg:'#f5daee',col:'#7a1260'},
+  '風花人＋':{bg:'#e8fce8',col:'#1a8b1a'},
+  '風花人－':{bg:'#daf5da',col:'#127a12'},
+  '仙花人＋':{bg:'#fce8fc',col:'#6a1a8b'},
+  '仙花人－':{bg:'#f5daf5',col:'#601270'},
+  '水花人＋':{bg:'#e8f4fc',col:'#1a6a8b'},
+  '水花人－':{bg:'#daeef5',col:'#12607a'},
 };
-function getAvatarStyle(ht){return ROKKA_COLORS[ht]||{bg:'#f0ead8',col:'#4a3c28'};}
-function getAvatarInitial(name){return name?name.slice(0,1):'';}
+function getAvStyle(ht){return AV_COLORS[ht]||{bg:'#f0ead8',col:'#4a3c28'};}
 
-// ===== UI制御 =====
-let currentPersonId = 'me'; // 'me' or person.id
-let chatHistory = [];
+// ===== 現在の人物ID =====
+var curPersonId='me';
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el)el.classList.add('active');
+// ===== 認証UI =====
+function switchAuthTab(tab){
+  document.getElementById('tabLogin').classList.toggle('active',tab==='login');
+  document.getElementById('tabReg').classList.toggle('active',tab==='reg');
+  document.getElementById('formLogin').style.display=tab==='login'?'block':'none';
+  document.getElementById('formReg').style.display=tab==='reg'?'block':'none';
 }
-
-function switchLoginTab(tab,btn){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
-  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
-}
-
 function doLogin(){
-  const name=document.getElementById('loginName').value.trim();
-  const pin=document.getElementById('loginPin').value.trim();
-  if(!name||!pin){document.getElementById('loginErr').textContent='入力してください';return;}
-  const acc=HB.login(name,pin);
-  if(!acc){document.getElementById('loginErr').textContent='ニックネームまたはPINが違います';return;}
+  var name=document.getElementById('loginName').value.trim();
+  var pin=document.getElementById('loginPin').value.trim();
+  var d=HB.load();
+  if(!d){document.getElementById('loginErr').textContent='登録がありません';return;}
+  if(d.account.nickname===name&&d.account.pin===pin){
+    initHome();
+  } else {
+    document.getElementById('loginErr').textContent='ニックネームまたはPINが違います';
+  }
+}
+function doRegister(){
+  var name=document.getElementById('regName').value.trim();
+  var bd=document.getElementById('regBirthday').value;
+  var gender=document.getElementById('regGender').value;
+  var pin=document.getElementById('regPin').value.trim();
+  if(!name||!bd){document.getElementById('regErr').textContent='名前と生年月日を入力してください';return;}
+  if(!/^\d{4}$/.test(pin)){document.getElementById('regErr').textContent='PINは4桁の数字で入力してください';return;}
+  var data={account:{id:'u'+Date.now(),nickname:name,birthday:bd,gender:gender,pin:pin,hobby:[],job:'',memo:''},people:[],chatHistory:[]};
+  HB.save(data);
   initHome();
 }
 
-function doRegister(){
-  const name=document.getElementById('regName').value.trim();
-  const pin=document.getElementById('regPin').value.trim();
-  const bd=document.getElementById('regBirthday').value;
-  const gender=document.getElementById('regGender').value;
-  if(!name||!pin||!bd){document.getElementById('regErr').textContent='すべて入力してください';return;}
-  if(pin.length!==4||!/^\d+$/.test(pin)){document.getElementById('regErr').textContent='PINは4桁の数字で入力してください';return;}
-  HB.register(name,pin,bd,gender);
-  initHome();
+// ===== ホーム画面 =====
+function showScreen(id){
+  ['scrLoading','scrAuth','scrHome','scrChat'].forEach(function(s){
+    var el=document.getElementById(s);
+    if(el){el.style.display='none';el.classList.remove('active');}
+  });
+  var el=document.getElementById(id);
+  if(el){el.style.display=id==='scrHome'||id==='scrChat'?'flex':'block';el.classList.add('active');}
 }
 
 function initHome(){
-  const data=HB.load();
-  if(!data)return;
-  currentPersonId='me';
-  buildPersonTabs(data);
-  renderHomeForPerson('me',data);
-  showScreen('homeScreen');
+  curPersonId='me';
+  renderHome();
+  showScreen('scrHome');
 }
 
-function buildPersonTabs(data){
-  const acc=data.account;
-  const ht=acc.birthday?getHoshi(...acc.birthday.split('-').map(Number)):null;
-  const avatarStyle=ht?getAvatarStyle(ht):{bg:'#f0ead8',col:'#4a3c28'};
-  let html=`<div class="person-tab active" onclick="switchPerson('me')" id="tab-me">
-    <div class="person-tab-avatar" style="background:${avatarStyle.bg};color:${avatarStyle.col}">
-      ${getAvatarInitial(acc.nickname)}
-    </div>
-    <div class="person-tab-name">${acc.nickname}</div>
-  </div>`;
-  data.people.forEach(p=>{
-    const pht=p.birthday?getHoshi(...p.birthday.split('-').map(Number)):null;
-    const ps=pht?getAvatarStyle(pht):{bg:'#f0ead8',col:'#4a3c28'};
-    html+=`<div class="person-tab" onclick="switchPerson('${p.id}')" id="tab-${p.id}">
-      <div class="person-tab-avatar" style="background:${ps.bg};color:${ps.col}">${getAvatarInitial(p.name)}</div>
-      <div class="person-tab-name">${p.name}</div>
-    </div>`;
+function renderHome(){
+  var data=HB.load();
+  if(!data)return;
+  var acc=data.account;
+  var h=new Date().getHours();
+  var gr=h<10?'おはようございます':h<17?'こんにちは':'こんばんは';
+  var isME=curPersonId==='me';
+  document.getElementById('hdrGreeting').textContent=isME?gr+'、'+acc.nickname+'さん':gr+'（'+getPerson().name+'さんを表示中）';
+
+  // 今日の日付
+  var now=new Date();
+  var dw=['日','月','火','水','木','金','土'];
+  document.getElementById('todayDate').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+dw[now.getDay()]+'）';
+
+  // 人物タブ
+  buildPtabs(data);
+
+  // 人物の命式
+  var person=isME?acc:data.people.find(function(p){return p.id===curPersonId;});
+  if(!person||!person.birthday)return;
+  var calc=calcPerson(person.birthday);
+  var ht=calc.ht;
+  var unki=calc.unki;
+
+  // 今日の運気バッジ
+  var badge=document.getElementById('unkiBadge');
+  badge.textContent=unki;
+  var kk=getKikkyo(unki,ht);
+  var kc=getKikkyoColor(unki,ht);
+  badge.style.background=kc+'22';badge.style.color=kc;
+
+  // 六花人
+  document.getElementById('todayHt').textContent=ht;
+
+  // アドバイス
+  document.getElementById('todayAdviceTxt').textContent=
+    '今日の運気は「'+unki+'」（'+kk+'）です。AIに詳しいアドバイスを聞いてみましょう。';
+
+  // 命式カード
+  var pname=isME?acc.nickname:person.name;
+  document.getElementById('mcName').textContent=pname;
+  document.getElementById('mcGrid').innerHTML=
+    '<div class="mc-item"><div class="mc-lbl">六花人</div><div class="mc-val" style="font-size:0.75rem">'+ht+'</div></div>'+
+    '<div class="mc-item"><div class="mc-lbl">年柱</div><div class="mc-val">'+calc.nenKS+'</div></div>'+
+    '<div class="mc-item"><div class="mc-lbl">月柱</div><div class="mc-val">'+calc.tsuKS+'</div></div>'+
+    '<div class="mc-item"><div class="mc-lbl">日柱</div><div class="mc-val">'+calc.nichiKS+'</div></div>'+
+    '<div class="mc-item"><div class="mc-lbl">今年の運気</div><div class="mc-val" style="font-size:0.75rem;color:'+kc+'">'+unki+'</div></div>'+
+    '<div class="mc-item"><div class="mc-lbl">吉凶</div><div class="mc-val" style="font-size:0.75rem;color:'+kc+'">'+kk+'</div></div>';
+}
+
+function buildPtabs(data){
+  var acc=data.account;
+  var htMe=acc.birthday?getHoshi.apply(null,acc.birthday.split('-').map(Number)):'';
+  var avMe=getAvStyle(htMe);
+  var html='<div class="ptab '+(curPersonId==='me'?'active':'')+'" id="ptab-me" onclick="switchPerson(\'me\')">'
+    +'<div class="ptab-av" style="background:'+avMe.bg+';color:'+avMe.col+'">'+(acc.nickname?acc.nickname[0]:'?')+'</div>'
+    +'<div class="ptab-name">'+acc.nickname+'</div></div>';
+  data.people.forEach(function(p){
+    var pht=p.birthday?getHoshi.apply(null,p.birthday.split('-').map(Number)):'';
+    var av=getAvStyle(pht);
+    html+='<div class="ptab '+(curPersonId===p.id?'active':'')+'" id="ptab-'+p.id+'" onclick="switchPerson(\''+p.id+'\')">'
+      +'<div class="ptab-av" style="background:'+av.bg+';color:'+av.col+'">'+(p.name?p.name[0]:'?')+'</div>'
+      +'<div class="ptab-name">'+p.name+'</div></div>';
   });
-  html+=`<div class="add-person-tab" onclick="openAddPerson()">＋</div>`;
-  document.getElementById('personTabs').innerHTML=html;
+  html+='<div class="ptab-add" onclick="openAddModal()">＋</div>';
+  document.getElementById('ptabs').innerHTML=html;
 }
 
 function switchPerson(id){
-  currentPersonId=id;
-  document.querySelectorAll('.person-tab').forEach(t=>t.classList.remove('active'));
-  const tab=document.getElementById('tab-'+id);
-  if(tab)tab.classList.add('active');
-  renderHomeForPerson(id,HB.load());
+  curPersonId=id;
+  renderHome();
 }
 
-function renderHomeForPerson(id,data){
-  const isMe=id==='me';
-  const person=isMe?data.account:data.people.find(p=>p.id===id);
-  if(!person)return;
-  const name=isMe?person.nickname:person.name;
-  const bd=person.birthday;
-
-  // 挨拶
-  const h=today().getHours();
-  const gr=h<10?'おはようございます':h<17?'こんにちは':'こんばんは';
-  document.getElementById('greetingText').textContent=`${gr}、${isMe?name+'さん':name+'さんを表示中'}`;
-
-  // 今日の情報
-  const dateStr=`${today().getFullYear()}年${today().getMonth()+1}月${today().getDate()}日（${['日','月','火','水','木','金','土'][today().getDay()]}）`;
-  document.getElementById('todayDate').textContent=dateStr;
-
-  if(bd){
-    const [y,m,d]=bd.split('-').map(Number);
-    const ht=getHoshi(y,m,d);
-    const unki=getNenUnki(bd,ht);
-    const w=JUNI_WAVE[unki]||0;
-    const badge=document.getElementById('todayUnkiBadge');
-    badge.textContent=unki||'-';
-    badge.style.background=w>=3?'rgba(184,134,11,0.15)':w>=0?'rgba(74,124,204,0.12)':'rgba(192,64,64,0.12)';
-    badge.style.color=w>=3?'#b8860b':w>=0?'#2a4a8b':'#c04040';
-    document.getElementById('todayUnkiName').textContent=ht;
-
-    // 命式表示
-    document.getElementById('meishikiPersonName').textContent=name;
-    const nenKS=getYearKS(y,m,d);
-    document.getElementById('ksGrid').innerHTML=`
-      <div class="ks-item"><div class="ks-label">六花人</div><div class="ks-value" style="font-size:0.82rem">${ht}</div></div>
-      <div class="ks-item"><div class="ks-label">年柱</div><div class="ks-value">${nenKS}</div></div>
-      <div class="ks-item"><div class="ks-label">今年の運気</div><div class="ks-value" style="font-size:0.82rem">${unki||'-'}</div></div>
-    `;
-    document.getElementById('todayDaiun').textContent='';
-    document.getElementById('todayAdviceText').textContent=`${name}さんの今日の運気は「${unki}」です。詳しい鑑定はAIに相談してください。`;
-  } else {
-    document.getElementById('todayUnkiBadge').textContent='-';
-    document.getElementById('todayUnkiName').textContent='';
-    document.getElementById('meishikiPersonName').textContent=name;
-    document.getElementById('ksGrid').innerHTML='<div class="ks-item" style="grid-column:1/-1"><div class="ks-label">生年月日が未登録です</div></div>';
-    document.getElementById('todayAdviceText').textContent='AIに相談する';
-  }
+function getPerson(){
+  var data=HB.load();
+  if(!data)return null;
+  if(curPersonId==='me')return data.account;
+  return data.people.find(function(p){return p.id===curPersonId;})||data.account;
 }
 
-// ===== 人物追加 =====
-function openAddPerson(){
-  document.getElementById('addPersonModal').style.display='flex';
-}
-function closeAddPersonModal(){
-  document.getElementById('addPersonModal').style.display='none';
-}
-function closeAddPerson(e){
-  if(e.target===document.getElementById('addPersonModal'))closeAddPersonModal();
-}
-function doAddPerson(){
-  const name=document.getElementById('apName').value.trim();
-  const relation=document.getElementById('apRelation').value;
-  const birthday=document.getElementById('apBirthday').value;
-  const gender=document.getElementById('apGender').value;
-  const memo=document.getElementById('apMemo').value.trim();
-  if(!name||!birthday){alert('名前と生年月日は必須です');return;}
-  HB.addPerson(name,relation,birthday,gender,memo);
-  closeAddPersonModal();
-  const data=HB.load();
-  buildPersonTabs(data);
-  // 追加した人物に切り替え
-  const newPerson=data.people[data.people.length-1];
-  switchPerson(newPerson.id);
+// ===== ナビゲーション =====
+function switchNav(tab,btn){
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
 }
 
-// ===== チャット =====
-function openChat(){
-  const data=HB.load();
-  if(!data)return;
-  chatHistory=data.chatHistory.slice(-10).map(c=>({role:c.role,content:c.content}));
-  // 初回メッセージ
-  const msgs=document.getElementById('chatMessages');
-  msgs.innerHTML='';
-  if(chatHistory.length===0){
-    const acc=data.account;
-    addBubble('ai',`${acc.nickname}さん、こんにちは🌸 何でも相談してください。今日の運気のこと、大切な人との関係、仕事や人生のことなど、どんなことでも。`);
-  } else {
-    chatHistory.forEach(c=>addBubble(c.role,c.content));
-  }
-  // サジェスト
-  buildSuggestions(data);
-  document.getElementById('chatScreen').classList.add('active');
-  document.getElementById('chatScreen').style.display='flex';
-}
-function closeChat(){
-  document.getElementById('chatScreen').classList.remove('active');
-  document.getElementById('chatScreen').style.display='none';
-}
-function addBubble(role,text){
-  const msgs=document.getElementById('chatMessages');
-  const div=document.createElement('div');
-  div.className=role==='ai'?'bubble-ai':'bubble-user';
-  div.textContent=text;
-  msgs.appendChild(div);
-  msgs.scrollTop=msgs.scrollHeight;
-}
-function buildSuggestions(data){
-  const acc=data.account;
-  const chips=['今日の運気は？','今の大運を教えて','私の強みは？','恋愛運はどう？','仕事のアドバイスを'];
-  // 登録した人がいれば相性の提案も
-  if(data.people.length>0){
-    chips.push(`${data.people[0].name}との相性は？`);
-  }
-  document.getElementById('chatSuggestions').innerHTML=chips.map(c=>
-    `<div class="suggestion-chip" onclick="useSuggestion('${c}')">${c}</div>`
-  ).join('');
-}
-function useSuggestion(text){
-  document.getElementById('chatInput').value=text;
-  sendChat();
-}
-async function sendChat(){
-  const input=document.getElementById('chatInput');
-  const q=input.value.trim();
-  if(!q)return;
-  input.value='';input.style.height='auto';
-  addBubble('user',q);
-  HB.addChat('user',q);
-  chatHistory.push({role:'user',content:q});
-
-  // ローディング
-  const loadDiv=document.createElement('div');
-  loadDiv.className='bubble-ai';loadDiv.id='chatLoading';
-  loadDiv.textContent='鑑定中...🌸';
-  document.getElementById('chatMessages').appendChild(loadDiv);
-
-  const data=HB.load();
-  const acc=data.account;
-  const bd=acc.birthday;
-  let context='';
-  if(bd){
-    const [y,m,d]=bd.split('-').map(Number);
-    const ht=getHoshi(y,m,d);
-    const nenKS=getYearKS(y,m,d);
-    const unki=getNenUnki(bd,ht);
-    context=`【${acc.nickname}さんの情報】六花人：${ht}、年柱：${nenKS}、今年の運気：${unki}、生年月日：${formatDate(bd)}`;
-    if(acc.hobby&&acc.hobby.length>0)context+=`、趣味：${acc.hobby.join('・')}`;
-    if(acc.job)context+=`、職業：${acc.job}`;
-  }
-  if(data.people.length>0){
-    context+='\n【登録した人】'+data.people.map(p=>{
-      if(p.birthday){
-        const [y,m,d]=p.birthday.split('-').map(Number);
-        const pht=getHoshi(y,m,d);
-        return `${p.name}（${p.relation}、${pht}、${formatDate(p.birthday)}）`;
-      }
-      return `${p.name}（${p.relation}）`;
-    }).join('、');
-  }
-
-  const systemPrompt=`あなたは花人占術の鑑定師AIです。以下の情報をもとに、親しみやすく温かい言葉でアドバイスしてください。
-${context}
-絶対にMarkdown記法（**太字**・#見出しなど）を使わず普通の文章のみ。甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に出さない。200〜400文字程度。`;
-
-  const messages=chatHistory.slice(-8);
-  try{
-    const res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({systemPrompt,messages})
-    });
-    const dat=await res.json();
-    let text=dat.content?dat.content.map(b=>b.text||'').join(''):'申し訳ありません。もう一度お試しください。';
-    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
-    document.getElementById('chatLoading')?.remove();
-    addBubble('ai',text);
-    HB.addChat('ai',text);
-    chatHistory.push({role:'assistant',content:text});
-  }catch(e){
-    document.getElementById('chatLoading')?.remove();
-    addBubble('ai','通信エラーが発生しました。もう一度お試しください。');
-  }
-}
-function autoResize(el){
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,120)+'px';
-}
-
-// ===== その他 =====
-function openSettings(){alert('設定機能は近日公開予定です');}
-function goToCompat(){
-  const data=HB.load();
-  if(!data)return;
-  const acc=data.account;
-  if(!acc.birthday){window.location.href='compat.html';return;}
-  const bd=acc.birthday.split('-');
-  let url='compat.html?y='+bd[0]+'&m='+bd[1]+'&d='+bd[2];
-  // 表示中が自分以外なら相手の情報も渡す
-  if(currentPersonId!=='me'){
-    const p=data.people.find(x=>x.id===currentPersonId);
-    if(p&&p.birthday){
-      const pb=p.birthday.split('-');
-      url+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2];
-    }
-  }
-  window.location.href=url;
-}
-function goTo(url){
-  const data=HB.load();
+function navTo(url){
+  var data=HB.load();
   if(!data){window.location.href=url;return;}
-  const isMe=currentPersonId==='me';
-  const myBd=data.account.birthday?data.account.birthday.split('-'):null;
-  if(!myBd){window.location.href=url;return;}
-  const myY=parseInt(myBd[0]),myM=parseInt(myBd[1]),myD=parseInt(myBd[2]);
-  let targetUrl='';
-  if(url.includes('compat.html')){
-    if(!isMe){
-      const p=data.people.find(x=>x.id===currentPersonId);
+  var acc=data.account;
+  if(!acc.birthday){window.location.href=url;return;}
+  var myBd=acc.birthday.split('-');
+  var myY=parseInt(myBd[0]),myM=parseInt(myBd[1]),myD=parseInt(myBd[2]);
+  var targetUrl='';
+  if(url.indexOf('compat.html')>=0){
+    targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
+    if(curPersonId!=='me'){
+      var p=data.people.find(function(x){return x.id===curPersonId;});
       if(p&&p.birthday){
-        const pb=p.birthday.split('-');
-        targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD
-          +'&y2='+parseInt(pb[0])+'&m2='+parseInt(pb[1])+'&d2='+parseInt(pb[2]);
-      } else {
-        targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
+        var pb=p.birthday.split('-');
+        targetUrl+='&y2='+parseInt(pb[0])+'&m2='+parseInt(pb[1])+'&d2='+parseInt(pb[2]);
       }
-    } else {
-      targetUrl='compat.html?y='+myY+'&m='+myM+'&d='+myD;
     }
-  } else {
-    // index.html - 表示中の人物の命式を開く
-    if(!isMe){
-      const p=data.people.find(x=>x.id===currentPersonId);
+  } else if(url.indexOf('index.html')>=0){
+    if(curPersonId!=='me'){
+      var p=data.people.find(function(x){return x.id===curPersonId;});
       if(p&&p.birthday){
-        const pb=p.birthday.split('-');
+        var pb=p.birthday.split('-');
         targetUrl='index.html?y='+parseInt(pb[0])+'&m='+parseInt(pb[1])+'&d='+parseInt(pb[2]);
       } else {
         targetUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
@@ -847,27 +667,133 @@ function goTo(url){
     } else {
       targetUrl='index.html?y='+myY+'&m='+myM+'&d='+myD;
     }
+  } else {
+    targetUrl=url+'?y='+myY+'&m='+myM+'&d='+myD;
   }
   window.location.href=targetUrl;
 }
-function goToCompat(){goTo('compat.html');}
 
-function navTo(tab,btn){
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(tab==='chat'){openChat();}
-  else if(tab==='home'){closeChat();}
+// ===== 人物追加 =====
+function openAddModal(){document.getElementById('addModal').style.display='flex';}
+function closeAddModal(){document.getElementById('addModal').style.display='none';}
+function doAddPerson(){
+  var name=document.getElementById('apName').value.trim();
+  var relation=document.getElementById('apRelation').value;
+  var bd=document.getElementById('apBirthday').value;
+  var gender=document.getElementById('apGender').value;
+  var memo=document.getElementById('apMemo').value.trim();
+  if(!name||!bd){alert('名前と生年月日は必須です');return;}
+  var data=HB.load();
+  if(!data)return;
+  var p={id:'p'+Date.now(),name:name,relation:relation,birthday:bd,gender:gender,memo:memo,hobby:[]};
+  data.people.push(p);
+  HB.save(data);
+  closeAddModal();
+  curPersonId=p.id;
+  renderHome();
 }
 
-// ===== 初期化 =====
+// ===== AIチャット =====
+var chatCtx=[];
+function openChat(){
+  var data=HB.load();
+  if(!data)return;
+  chatCtx=data.chatHistory?data.chatHistory.slice(-8).map(function(c){return{role:c.role,content:c.content};}):[]; 
+  var msgs=document.getElementById('chatMsgs');
+  msgs.innerHTML='';
+  if(chatCtx.length===0){
+    addBubble('ai','こんにちは🌸 命式と今日の運気はすべて把握しています。何でも相談してください。');
+  } else {
+    chatCtx.forEach(function(c){addBubble(c.role,c.content);});
+  }
+  buildChips(data);
+  showScreen('scrChat');
+}
+function closeChat(){showScreen('scrHome');}
+function addBubble(role,text){
+  var msgs=document.getElementById('chatMsgs');
+  var div=document.createElement('div');
+  div.className=role==='ai'?'bbl-ai':'bbl-user';
+  div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function buildChips(data){
+  var chips=['今日の運気は？','私の強みを教えて','今の大運について','仕事のアドバイスを','恋愛運はどう？'];
+  if(data.people.length>0)chips.push(data.people[0].name+'との相性は？');
+  document.getElementById('chatChips').innerHTML=chips.map(function(c){
+    return '<div class="chip" onclick="useChip(\''+c.replace(/'/g,'')+'\')">'+ c +'</div>';
+  }).join('');
+}
+function useChip(t){document.getElementById('chatInp').value=t;sendChat();}
+
+async function sendChat(){
+  var inp=document.getElementById('chatInp');
+  var q=inp.value.trim();
+  if(!q)return;
+  inp.value='';inp.style.height='auto';
+  addBubble('user',q);
+  chatCtx.push({role:'user',content:q});
+
+  var load=document.createElement('div');
+  load.className='bbl-ai';load.id='chatLoad';load.textContent='鑑定中...🌸';
+  document.getElementById('chatMsgs').appendChild(load);
+  document.getElementById('chatMsgs').scrollTop=9999;
+
+  var data=HB.load();
+  var acc=data?data.account:{};
+  var ctx='';
+  if(acc.birthday){
+    var calc=calcPerson(acc.birthday);
+    ctx='【'+acc.nickname+'さんの命式】六花人:'+calc.ht+'、年柱:'+calc.nenKS+'、月柱:'+calc.tsuKS+'、日柱:'+calc.nichiKS+'、今年の運気:'+calc.unki;
+    if(acc.hobby&&acc.hobby.length>0)ctx+='、趣味:'+acc.hobby.join('・');
+    if(acc.job)ctx+='、職業:'+acc.job;
+  }
+  if(data&&data.people.length>0){
+    ctx+='\n【登録した人】'+data.people.map(function(p){
+      if(p.birthday){var c=calcPerson(p.birthday);return p.name+'('+p.relation+','+c.ht+',今年:'+c.unki+')';}
+      return p.name+'('+p.relation+')';
+    }).join('、');
+  }
+
+  var systemPrompt='あなたは花人占術の鑑定師AIです。\n'+ctx+'\nMarkdown不可。甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に出さない。200〜400文字。温かく具体的に。';
+
+  try{
+    var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:systemPrompt,messages:chatCtx.slice(-8)})
+    });
+    var dat=await res.json();
+    var text=dat.content?dat.content.map(function(b){return b.text||'';}).join(''):'エラーが発生しました';
+    text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
+    document.getElementById('chatLoad')&&document.getElementById('chatLoad').remove();
+    addBubble('ai',text);
+    chatCtx.push({role:'assistant',content:text});
+    if(data){data.chatHistory=data.chatHistory||[];data.chatHistory.push({role:'user',content:q,ts:Date.now()},{role:'ai',content:text,ts:Date.now()});if(data.chatHistory.length>50)data.chatHistory=data.chatHistory.slice(-50);HB.save(data);}
+  }catch(e){
+    document.getElementById('chatLoad')&&document.getElementById('chatLoad').remove();
+    addBubble('ai','通信エラーが発生しました。もう一度お試しください。');
+  }
+}
+
+// ===== 設定 =====
+function openSettings(){
+  var data=HB.load();
+  if(!data)return;
+  if(confirm('ログアウトしますか？\n（データは保持されます）')){
+    showScreen('scrAuth');
+  }
+}
+
+// ===== 起動 =====
 window.addEventListener('DOMContentLoaded',function(){
   setTimeout(function(){
     if(HB.isLoggedIn()){
       initHome();
     } else {
-      showScreen('loginScreen');
+      showScreen('scrAuth');
     }
-  },800);
+  },600);
 });
 </script>
 </body>
