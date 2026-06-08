@@ -180,10 +180,10 @@ body.theme-dark .topbar-left button{color:var(--gold)}
 /* 大運表 */
 .daiun-table{width:100%;border-collapse:collapse;font-size:0.78rem}
 .daiun-table th{background:linear-gradient(135deg,rgba(212,163,115,0.15),rgba(254,197,187,0.2));
-  color:var(--gold2);font-weight:600;padding:0.55rem 0.4rem;text-align:center;
-  border-bottom:2px solid var(--border2);font-family:var(--serif);letter-spacing:0.05em;font-size:0.72rem}
-.daiun-row td{padding:0.6rem 0.4rem;text-align:center;border-bottom:1px solid var(--border);
-  vertical-align:middle}
+  color:var(--gold2);font-weight:600;padding:0.45rem 0.3rem;text-align:center;
+  border-bottom:2px solid var(--border2);font-family:var(--serif);letter-spacing:0.03em;font-size:0.65rem}
+.daiun-row td{padding:0.5rem 0.3rem;text-align:center;border-bottom:1px solid var(--border);
+  vertical-align:middle;font-size:0.75rem}
 .daiun-row:hover{background:rgba(254,197,187,0.05)}
 .daiun-row.current{background:rgba(254,197,187,0.12);border-left:3px solid var(--gold)}
 .daiun-row.current td:first-child{padding-left:0.2rem}
@@ -388,6 +388,9 @@ canvas#petalCanvas{position:fixed;top:0;left:0;width:100%;height:100%;
                 <th>年齢帯</th>
                 <th>開始年</th>
                 <th>大運干支</th>
+                <th>蔵干</th>
+                <th>通変星</th>
+                <th>十二従星</th>
                 <th>十二運気</th>
                 <th>運勢</th>
               </tr>
@@ -513,6 +516,27 @@ function getDaiunStartAge(y,m,d,isFwd){
   return Math.max(1,Math.round(Math.abs(days)/3));
 }
 
+// ===== index.htmlと同一の定数（蔵干・通変星・十二従星） =====
+var TSUHEN=[['比肩','劫財','食神','傷官','偏財','正財','偏官','正官','偏印','印綬'],['劫財','比肩','傷官','食神','正財','偏財','正官','偏官','印綬','偏印'],['偏印','印綬','比肩','劫財','食神','傷官','偏財','正財','偏官','正官'],['印綬','偏印','劫財','比肩','傷官','食神','正財','偏財','正官','偏官'],['偏官','正官','偏印','印綬','比肩','劫財','食神','傷官','偏財','正財'],['正官','偏官','印綬','偏印','劫財','比肩','傷官','食神','正財','偏財'],['偏財','正財','偏官','正官','偏印','印綬','比肩','劫財','食神','傷官'],['正財','偏財','正官','偏官','印綬','偏印','劫財','比肩','傷官','食神'],['食神','傷官','偏財','正財','偏官','正官','偏印','印綬','比肩','劫財'],['傷官','食神','正財','偏財','正官','偏官','印綬','偏印','劫財','比肩']];
+var JUSEI=[['天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星'],['天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星'],['天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星'],['天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星'],['天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星']];
+var ZOKAN_SHI=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子'];
+var ZOKAN_DATA=[[0,['戊','辛','庚','戊','丁','丙','戊','乙','甲','戊','癸','壬']],[9,['甲','辛','庚','壬','丁','丙','庚','乙','甲','丙','癸','壬']],[11,['甲','丁','庚','壬','乙','丙','庚','癸','甲','丙','辛','壬']],[12,['甲','丁','辛','壬','乙','己','庚','癸','乙','丙','辛','癸']],[14,['甲','戊','辛','壬','己','己','庚','戊','乙','丙','己','癸']],[16,['壬','戊','辛','庚','己','己','丙','戊','乙','甲','己','癸']]];
+var SATSKAI={'天花人':['戌','亥'],'白花人':['申','酉'],'離花人':['午','未'],'風花人':['辰','巳'],'仙花人':['寅','卯'],'水花人':['子','丑']};
+
+function getDaysFromSetsu(y,m,d){
+  var bd=new Date(y,m-1,d),s=setsu(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  if(bd>=sD)return Math.round((bd-sD)/86400000);
+  var pm=m-1,py=y;if(pm<1){pm=12;py--;}
+  var ps=setsu(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());
+  return Math.max(0,Math.round((bd-psD)/86400000));
+}
+function getZokan(shi,days){
+  var col=ZOKAN_SHI.indexOf(shi);if(col<0)return '—';
+  var k=ZOKAN_DATA[0][1][col];
+  for(var i=0;i<ZOKAN_DATA.length;i++){if(days>=ZOKAN_DATA[i][0])k=ZOKAN_DATA[i][1][col];}
+  return k;
+}
+
 // 五行
 var KAN_GOGYO={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
 var SHI_GOGYO={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
@@ -571,6 +595,11 @@ function doCalc(){
   var nenKS=yearKS(y,m,d);
   var tsuKS=monthKS(y,m,d);
   var nichiKS=dayKS(y,m,d);
+  var nichiKanIdx=JIKKAN.indexOf(nichiKS[0]);
+  var dfs=getDaysFromSetsu(y,m,d);
+  var T=TSUHEN[nichiKanIdx]||TSUHEN[0];
+  var hn=HOSHI[ROKUJU.indexOf(nichiKS)]||'天花人';
+  var sats=SATSKAI[hn]||[];
   var nenNum=ROKUJU.indexOf(nenKS)+1;
   var isFwd;
   // 性別は不明なのでデフォルトで＋なら男性フォワード、－なら女性フォワード
@@ -611,7 +640,7 @@ function doCalc(){
   }
   while(A2D.length<MAX_AGE){A2D.push(DL[DL.length-1]);A2K.push(A2K[A2K.length-1]);}
 
-  G={y:y,m:m,d:d,ht:ht,nenKS:nenKS,tsuKS:tsuKS,nichiKS:nichiKS,DL:DL,A2D:A2D,sa:sa,isFwd:isFwd};
+  G={y:y,m:m,d:d,ht:ht,nenKS:nenKS,tsuKS:tsuKS,nichiKS:nichiKS,DL:DL,A2D:A2D,sa:sa,isFwd:isFwd,nichiKanIdx:nichiKanIdx,dfs:dfs,T:T,sats:sats};
 
   renderResult();
   document.getElementById('result').className='show';
@@ -767,7 +796,8 @@ function renderLC(){
 // ===== 大運表 =====
 function renderDaiun(){
   if(!G)return;
-  var y=G.y,ht=G.ht,DL=G.DL,sa=G.sa,A2D=G.A2D;
+  var y=G.y,ht=G.ht,DL=G.DL,sa=G.sa;
+  var nichiKanIdx=G.nichiKanIdx,T=G.T,dfs=G.dfs,sats=G.sats;
   var now=new Date();var CY=now.getFullYear();
   var MAX_AGE=120;
   var html='';
@@ -780,10 +810,18 @@ function renderDaiun(){
     var col=kkColor(dju,ht);
     var syr=y+ap2;
     var isCurr=syr<=CY&&CY<syr+sp;
-    html+='<tr class="daiun-row'+(isCurr?' current':'')+'">'+
+    var isSk=sats.indexOf(dk.shi)>=0;
+    // index.htmlと同一：蔵干・通変星・十二従星
+    var dzo=getZokan(dk.shi,dfs);
+    var dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—';
+    var djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—';
+    html+='<tr class="daiun-row'+(isSk?' sk-row':isCurr?' current':'')+'">'+
       '<td class="daiun-age">'+(isCurr?'<span style="color:var(--gold);font-size:0.7rem">★</span>':'')+ap2+'〜'+(ap2+sp-1)+'歳</td>'+
       '<td style="font-size:0.78rem">'+syr+'年</td>'+
-      '<td class="daiun-ks">'+dk.ks+'</td>'+
+      '<td class="daiun-ks">'+dk.ks+(isSk?' ⚠':'')+'</td>'+
+      '<td style="font-size:0.78rem">'+dzo+'</td>'+
+      '<td style="font-size:0.78rem;color:#b05050;font-weight:600">'+dth+'</td>'+
+      '<td style="font-size:0.75rem;color:#8a6800;font-weight:600">'+djos+'</td>'+
       '<td class="daiun-juni" style="color:'+col+'">'+juniRuby(dju)+'</td>'+
       '<td style="font-size:0.75rem;font-weight:600;color:'+col+'">'+dkk+'</td>'+
       '</tr>';
