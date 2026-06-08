@@ -814,19 +814,22 @@ function renderDaiun(){
     var syr=y+ap2;
     var isCurr=syr<=CY&&CY<syr+sp;
     var isSk=sats.indexOf(dk.shi)>=0;
+    // index.htmlと同一：殺界行は紫背景
+    var rowStyle=isSk?'background:rgba(120,40,140,0.18);outline:1px solid rgba(120,40,140,0.4);':'';
+    var skCol=isSk?'color:#5a0080;':'';
     // index.htmlと同一：蔵干・通変星・十二従星
     var dzo=getZokan(dk.shi,dfs);
     var dth=(T||[])[JIKKAN.indexOf(dk.kan)]||'—';
     var djos=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—';
-    html+='<tr class="daiun-row'+(isSk?' sk-row':isCurr?' current':'')+'">'+
-      '<td class="daiun-age">'+(isCurr?'<span style="color:var(--gold);font-size:0.7rem">★</span>':'')+ap2+'〜'+(ap2+sp-1)+'歳</td>'+
-      '<td style="font-size:0.78rem">'+syr+'年</td>'+
-      '<td class="daiun-ks">'+dk.ks+(isSk?' ⚠':'')+'</td>'+
-      '<td style="font-size:0.78rem">'+dzo+'</td>'+
-      '<td style="font-size:0.78rem;color:#b05050;font-weight:600">'+dth+'</td>'+
-      '<td style="font-size:0.75rem;color:#8a6800;font-weight:600">'+djos+'</td>'+
-      '<td class="daiun-juni" style="color:'+col+'">'+juniRuby(dju)+'</td>'+
-      '<td style="font-size:0.75rem;font-weight:600;color:'+col+'">'+dkk+'</td>'+
+    html+='<tr class="daiun-row'+(isCurr?' current':'')+'" style="'+rowStyle+'">'+
+      '<td class="daiun-age" style="'+skCol+'">'+(isCurr?'<span style="color:var(--gold);font-size:0.7rem">★</span>':'')+ap2+'〜'+(ap2+sp-1)+'歳</td>'+
+      '<td style="font-size:0.78rem;'+skCol+'">'+syr+'年</td>'+
+      '<td class="daiun-ks" style="'+skCol+'">'+dk.ks+(isSk?' ⚠':'')+'</td>'+
+      '<td style="font-size:0.78rem;'+skCol+'">'+dzo+'</td>'+
+      '<td style="font-size:0.78rem;color:'+(isSk?'#5a0080':'#b05050')+';font-weight:600">'+dth+'</td>'+
+      '<td style="font-size:0.75rem;color:'+(isSk?'#5a0080':'#8a6800')+';font-weight:600">'+djos+'</td>'+
+      '<td class="daiun-juni" style="color:'+(isSk?'#5a0080':col)+'">'+juniRuby(dju)+'</td>'+
+      '<td style="font-size:0.75rem;font-weight:600;color:'+(isSk?'#5a0080':col)+'">'+dkk+'</td>'+
       '</tr>';
     ap2+=sp;
   }
