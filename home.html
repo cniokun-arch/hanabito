@@ -1203,7 +1203,7 @@ function renderDash(){
 
   var heroLabel=document.querySelector('.hero-label');
   if(heroLabel)heroLabel.textContent='✦ '+(isME?'あなたの今日の運勢':pname+'さんの今日の運勢');
-  document.getElementById('hName').textContent=pname+(isME?'':'さん');
+  document.getElementById('hName').textContent=pname+'さん';
   document.getElementById('hAge').textContent=age+'歳';
   var uEl=document.getElementById('hUnki');
   uEl.textContent=c.unki;uEl.style.color=kc;
