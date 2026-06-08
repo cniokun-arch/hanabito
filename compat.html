@@ -886,29 +886,31 @@ async function loadCompatKB(){
 loadCompatKB();
 
 document.addEventListener('DOMContentLoaded',function(){
-  // home.htmlからの遷移：URLパラメータで自動入力（Gemini方式）
+  // home.htmlからの遷移：URLパラメータで自動入力
   (function(){
     var p=new URLSearchParams(window.location.search);
     var y=p.get('y'),m=p.get('m'),d=p.get('d');
     var y2=p.get('y2'),m2=p.get('m2'),d2=p.get('d2');
+    if(!y||!m||!d) return;
     var myY=document.getElementById('myY'),myM=document.getElementById('myM'),myD=document.getElementById('myD');
     var thY=document.getElementById('theirY'),thM=document.getElementById('theirM'),thD=document.getElementById('theirD');
-    if(y&&m&&d&&myY&&myM&&myD){
-      myY.value=parseInt(y);
-      myM.value=parseInt(m);
-      myM.dispatchEvent(new Event('change'));
-      setTimeout(function(){myD.value=parseInt(d);},200);
-    }
-    if(y2&&m2&&d2&&thY&&thM&&thD){
-      thY.value=parseInt(y2);
-      thM.value=parseInt(m2);
-      thM.dispatchEvent(new Event('change'));
-      setTimeout(function(){thD.value=parseInt(d2);},200);
-    }
-    if(y&&m&&d&&y2&&m2&&d2){
+    // 自分の生年月日セット
+    if(myY){myY.value=parseInt(y);myY.dispatchEvent(new Event('change'));}
+    if(myM){myM.value=parseInt(m);myM.dispatchEvent(new Event('change'));}
+    setTimeout(function(){
+      if(myD)myD.value=parseInt(d);
+    },400);
+    // 相手の生年月日セット
+    if(y2&&m2&&d2){
+      if(thY){thY.value=parseInt(y2);thY.dispatchEvent(new Event('change'));}
+      if(thM){thM.value=parseInt(m2);thM.dispatchEvent(new Event('change'));}
       setTimeout(function(){
-        var btn=document.querySelector('.btn-calc');if(btn)btn.click();
-      },600);
+        if(thD)thD.value=parseInt(d2);
+        // 両方セット完了後に自動計算
+        setTimeout(function(){
+          var btn=document.querySelector('.btn-calc');if(btn)btn.click();
+        },300);
+      },400);
     }
   })();
   var cy=new Date().getFullYear();

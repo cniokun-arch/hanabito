@@ -2684,21 +2684,27 @@ async function speakText(text, btn){
 
 // 年・日のセレクトボックスを動的生成
 document.addEventListener('DOMContentLoaded', function(){
-  // home.htmlからの遷移：URLパラメータで自動入力（Gemini方式）
+  // home.htmlからの遷移：URLパラメータで自動入力
   (function(){
     var p=new URLSearchParams(window.location.search);
     var y=p.get('y'),m=p.get('m'),d=p.get('d');
-    if(y&&m&&d){
-      var yEl=document.getElementById('by'),mEl=document.getElementById('bm'),dEl=document.getElementById('bd');
-      if(yEl){yEl.value=parseInt(y);yEl.dispatchEvent(new Event('change'));}
-      if(mEl){mEl.value=parseInt(m);mEl.dispatchEvent(new Event('change'));}
+    if(!y||!m||!d) return;
+    // Step1: 年をセット→changeイベント発火→日の選択肢が年に合わせて更新される
+    var yEl=document.getElementById('by');
+    if(yEl){yEl.value=parseInt(y);yEl.dispatchEvent(new Event('change'));}
+    // Step2: 月をセット→changeイベント発火→日の選択肢が月に合わせて更新される
+    var mEl=document.getElementById('bm');
+    if(mEl){mEl.value=parseInt(m);mEl.dispatchEvent(new Event('change'));}
+    // Step3: 選択肢が再生成された後に日をセット
+    setTimeout(function(){
+      var dEl=document.getElementById('bd');
+      if(dEl)dEl.value=parseInt(d);
+      // Step4: さらに少し待ってから自動クリック
       setTimeout(function(){
-        if(dEl)dEl.value=parseInt(d);
-        setTimeout(function(){
-          var btn=document.querySelector('.btn');if(btn)btn.click();
-        },200);
+        var btn=document.querySelector('.btn');
+        if(btn)btn.click();
       },300);
-    }
+    },400);
   })();
   var byEl = document.getElementById('by');
   var bdEl = document.getElementById('bd');
