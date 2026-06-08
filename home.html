@@ -282,6 +282,10 @@ body.theme-dark .dsetting{background:rgba(230,198,135,0.15);border-color:rgba(23
 .tappable:active{transform:scale(0.99)}
 
 /* ヒーローカード */
+.utab{font-family:'Noto Serif JP',serif;font-size:0.72rem;padding:4px 10px;
+  border:1px solid rgba(255,255,255,0.6);border-radius:12px 0 0 12px;cursor:pointer}
+.utab-on{background:rgba(255,255,255,0.9);color:#4a3c28;font-weight:700}
+.utab-off{background:rgba(255,255,255,0.25);color:#fff;font-weight:400}
 .hero{background:linear-gradient(145deg,#ffffff 0%,#fffbfb 100%);border:1px solid var(--border);
   border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1.2rem;
   box-shadow:0 8px 24px rgba(254,197,187,0.15)}
@@ -560,6 +564,38 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
         <div class="snode"><span class="lbl">吉凶</span><span class="val hi" id="hKikkyo">--</span></div>
         <div class="snode"><span class="lbl">六花人</span><span class="val" id="hHt" style="font-size:0.75rem">--</span></div>
       </div>
+    </div>
+
+    <!-- 運気ウィジェット -->
+    <div class="sec" id="unkiWidget" style="padding:0;overflow:hidden;margin-bottom:1.2rem">
+      <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:var(--serif);color:#fff;font-size:0.9rem;letter-spacing:0.15em;">◆ あなたの運気</span>
+        <div style="display:flex;gap:0;">
+          <button id="unqi-tab-day" onclick="switchUnqiTab('day')" class="utab utab-on">今日</button>
+          <button id="unqi-tab-month" onclick="switchUnqiTab('month')" class="utab utab-off" style="border-left:none;border-right:none;border-radius:0">今月</button>
+          <button id="unqi-tab-year" onclick="switchUnqiTab('year')" class="utab utab-off" style="border-radius:0 12px 12px 0">今年</button>
+        </div>
+      </div>
+      <div id="unqi-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
+      <div style="border-top:1px solid rgba(184,134,11,0.15);">
+        <button onclick="document.getElementById('juni-about-overlay-h').style.display='block'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1.1rem;background:transparent;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;">
+          <span style="font-size:0.78rem;color:#7c3aed;font-weight:700;">🌸 12運気について</span>
+          <span style="font-size:0.75rem;color:#7c3aed;">▶</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ラッキーカラーウィジェット -->
+    <div class="sec" id="lcWidget" style="padding:0;overflow:hidden;margin-bottom:1.2rem">
+      <div style="background:linear-gradient(135deg,#3a2a00,#b8860b 60%,#d4a017);padding:0.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:var(--serif);color:#fff;font-size:0.9rem;letter-spacing:0.15em;">◆ ラッキーカラー</span>
+        <div style="display:flex;gap:0;">
+          <button id="lc-tab-omamori" onclick="switchLcTab('omamori')" class="utab utab-on">お守り</button>
+          <button id="lc-tab-today" onclick="switchLcTab('today')" class="utab utab-off" style="border-left:none;border-right:none;border-radius:0">今日</button>
+          <button id="lc-tab-gogyo" onclick="switchLcTab('gogyo')" class="utab utab-off" style="border-radius:0 12px 12px 0">五行</button>
+        </div>
+      </div>
+      <div id="lc-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
     </div>
 
     <!-- ブリッジ -->
@@ -868,6 +904,193 @@ function showPrivacy(){
 function showTerms(){
   closeHmenu();
   alert('利用規約\n\n本アプリは占術・エンターテイメント目的のサービスです。鑑定結果はあくまで参考情報としてご活用ください。医療・法律・投資等の専門的判断の代替としてはご利用いただけません。');
+}
+
+// ===== 運気・ラッキーカラーウィジェット関数 =====
+var JUNI_RUBY={'休眠':'きゅうみん','残雪':'ざんせつ','発芽':'はつが','青葉':'あおば','開花':'かいか','内省':'ないせい','成天':'せいてん','狂咲':'くるいざき','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん'};
+function juniRuby(n){var r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
+var JUNI_DESC={'休眠':'エネルギーが内側に向かう時期。無理に動かず、静かに充電するタイミング。焦らず自分を整えることが大切です。','残雪':'まだ動き出す時期ではありません。冬の終わりのように、もう少しだけ待つことが吉。準備を整えておきましょう。','発芽':'新しい芽吹きの始まり。小さな行動が大きな実りへとつながる種まきの時。チャレンジに向いています。','青葉':'エネルギーが伸びていく成長期。積極的に動くと良い結果につながりやすい。人との縁も広がります。','開花':'運気が満開を迎える最良の時期。何事も積極的に。チャンスをつかむ力が最も高まっています。','内省':'外向きの活動よりも、内側を見つめる時期。無理な拡大は避け、学びや準備に集中しましょう。','成天':'努力が実を結ぶ安定した時期。着実に積み重ねることで、確かな成果が生まれます。','狂咲':'エネルギーが過剰になりやすい不安定な時期。勢いで動かず、落ち着いて判断することが大切です。','豊穣':'努力の成果が実る収穫の時期。これまでの積み重ねが形となって現れます。感謝を忘れずに。','穂分':'実りを分かち合う時期。人とのつながりを大切にすることで、さらなる豊かさが生まれます。','平凪':'波風のない穏やかな時期。大きな動きより、日常を丁寧に積み上げることが吉。','引寒':'寒さが引いていく移行期。手放すことで次のステージへの準備が整います。執着を手放して。'};
+var JUNI_EMOJI={'休眠':'🌑','残雪':'❄️','発芽':'🌱','青葉':'🍃','開花':'🌸','内省':'🔮','成天':'⭐','狂咲':'🌪️','豊穣':'🌾','穂分':'🍂','平凪':'🌿','引寒':'🌬️'};
+function getJuniColor2(j){return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
+var SETSU_BASE_MS2=[978663000000,981210540000,983781120000,956191200000,957505740000,960198120000,962913780000,965636460000,968326020000,970974540000,973578000000,976134780000];
+var TROPICAL_YEAR_MS2=365.24219879*86400000;
+var SETSU_NAMES2=['小寒','立春','啓蟄','清明','立夏','芒種','小暑','立秋','白露','寒露','立冬','大雪'];
+function getSetsuDate2(y,m){var b=SETSU_BASE_MS2[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS2);}
+function fmtMD2(dt){return (dt.getMonth()+1)+'/'+dt.getDate();}
+function getMonthPeriodLabel2(y,m,d){
+  var bd=new Date(y,m-1,d),s=getSetsuDate2(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  var mo=m,yo=y;if(bd<sD){mo--;if(mo<1){mo=12;yo--;}}
+  var startS=getSetsuDate2(yo,mo),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  var nm=mo+1,ny=yo;if(nm>12){nm=1;ny++;}
+  var endS=getSetsuDate2(ny,nm),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  var endBefore=new Date(endD-86400000);
+  return fmtMD2(startD)+'('+SETSU_NAMES2[mo-1]+'頃)〜'+fmtMD2(endBefore)+'('+SETSU_NAMES2[nm-1]+'前日)';
+}
+function getYearPeriodLabel2(y,m,d){
+  var bd=new Date(y,m-1,d),rs=getSetsuDate2(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());
+  var refY=bd>=rsD?y:y-1;
+  var startS=getSetsuDate2(refY,2),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  var endS=getSetsuDate2(refY+1,2),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  var endBefore=new Date(endD-86400000);
+  return startD.getFullYear()+'/'+fmtMD2(startD)+'(立春)〜'+endBefore.getFullYear()+'/'+fmtMD2(endBefore)+'(立春前日)';
+}
+
+var KAN_GOGYO={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+var SHI_GOGYO={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+var GOGYO_COLOR={'木':{colors:['青','緑','ライトグリーン'],hex:['#4CAF50','#81C784','#A5D6A7'],emoji:'🌿'},'火':{colors:['赤','オレンジ','ピンク'],hex:['#F44336','#FF7043','#FF80AB'],emoji:'🔥'},'土':{colors:['黄','ベージュ','茶'],hex:['#FFC107','#D7CCC8','#8D6E63'],emoji:'🌍'},'金':{colors:['白','金','銀'],hex:['#E0E0E0','#FFD700','#C0C0C0'],emoji:'✨'},'水':{colors:['黒','紺','ネイビー'],hex:['#212121','#1A237E','#37474F'],emoji:'💧'}};
+
+function calcMeishikiGogyo2(nK,nS,nZ,tK,tS,tZ,niK,niS,niZ){
+  var elems=[nK,nS,nZ,tK,tS,tZ,niK,niS,niZ];
+  var count={'木':0,'火':0,'土':0,'金':0,'水':0};
+  elems.forEach(function(e){var g=KAN_GOGYO[e]||SHI_GOGYO[e];if(g)count[g]++;});
+  return count;
+}
+function getTodayGogyo2(){
+  var now=new Date(),y=now.getFullYear(),m=now.getMonth()+1,d=now.getDate();
+  var nKS=yearKS(y,m,d),tKS=monthKS(y,m,d),niKS=dayKS(y,m,d);
+  var elems=[nKS[0],nKS[1],tKS[0],tKS[1],niKS[0],niKS[1]];
+  var count={'木':0,'火':0,'土':0,'金':0,'水':0};
+  elems.forEach(function(e){var g=KAN_GOGYO[e]||SHI_GOGYO[e];if(g)count[g]++;});
+  return{count:count,nenKS:nKS,tsuKS:tKS,nichiKS:niKS};
+}
+function getLeastGogyo2(count){
+  var min=Math.min.apply(null,Object.values(count));
+  return Object.keys(count).filter(function(k){return count[k]===min;});
+}
+function makeSwatchHTML2(list){
+  var html='';
+  list.forEach(function(g){
+    var gc=GOGYO_COLOR[g];
+    gc.hex.forEach(function(h,i){
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px">'
+        +'<div style="width:38px;height:38px;border-radius:50%;background:'+h+';box-shadow:0 2px 8px rgba(0,0,0,0.2);border:2px solid rgba(255,255,255,0.9)"></div>'
+        +'<div style="font-size:0.62rem;color:var(--text2)">'+gc.colors[i]+'</div>'
+        +'</div>';
+    });
+  });
+  return html;
+}
+
+// 運気ウィジェット
+var currentUnqiTab='day';
+var _widgetBd=null;
+function buildUnqiHTML(tab){
+  if(!_widgetBd)return '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem">生年月日が未登録です</div>';
+  var bd=_widgetBd.split('-'),y=+bd[0],m=+bd[1],d=+bd[2];
+  var ht=hoshi(y,m,d);
+  var now=new Date(),ny=now.getFullYear(),nm=now.getMonth()+1,nd=now.getDate();
+  var shi,dateLabel;
+  if(tab==='day'){var ks=dayKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年'+nm+'月'+nd+'日（日干支：'+ks+'）';}
+  else if(tab==='month'){var ks=monthKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年'+nm+'月（月干支：'+ks+'）　'+getMonthPeriodLabel2(ny,nm,nd);}
+  else{var ks=yearKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年（年干支：'+ks+'）　'+getYearPeriodLabel2(ny,nm,nd);}
+  var juni=juniUnki(ht,shi);
+  var wave=JUNI_WAVE[juni]||0;
+  var color=getJuniColor2(juni);
+  var bars=Math.round((wave+4)/9*10);
+  var barHTML='<div style="display:flex;gap:2px;align-items:center;margin-top:4px;">'
+    +Array.from({length:10},function(_,i){return '<div style="width:16px;height:8px;border-radius:2px;background:'+(i<bars?color:'rgba(184,134,11,0.15)')+'"></div>';}).join('')
+    +'<span style="font-size:0.7rem;color:'+color+';margin-left:4px;font-weight:700;">'+(wave>=3?'好調':wave>=0?'普通':wave>=-2?'注意':'要注意')+'</span></div>';
+  return '<div style="display:flex;align-items:flex-start;gap:0.8rem;">'
+    +'<div style="font-size:2.2rem;line-height:1;flex-shrink:0;">'+(JUNI_EMOJI[juni]||'🌸')+'</div>'
+    +'<div style="flex:1;">'
+    +'<div style="font-size:0.7rem;color:var(--text2);margin-bottom:2px;">'+dateLabel+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:0.5rem;">'
+    +'<span style="font-family:var(--serif);font-size:1.4rem;font-weight:700;color:'+color+';">'+juniRuby(juni)+'</span>'
+    +'<span style="font-size:0.75rem;color:var(--text2);">（'+ht+'）</span>'
+    +'</div>'
+    +barHTML
+    +'<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin-top:0.5rem;">'+(JUNI_DESC[juni]||'')+'</p>'
+    +'</div></div>';
+}
+function switchUnqiTab(tab){
+  currentUnqiTab=tab;
+  ['day','month','year'].forEach(function(t){
+    var btn=document.getElementById('unqi-tab-'+t);if(!btn)return;
+    btn.className=t===tab?'utab utab-on':'utab utab-off';
+    if(t==='day')btn.style.borderRadius='12px 0 0 12px';
+    else if(t==='year')btn.style.borderRadius='0 12px 12px 0';
+    else btn.style.borderRadius='0';
+    if(t!=='day'){btn.style.borderLeft='none';}
+    if(t!=='year'){btn.style.borderRight='none';}
+  });
+  var body=document.getElementById('unqi-body');
+  if(body)body.innerHTML=buildUnqiHTML(tab);
+}
+
+// ラッキーカラーウィジェット
+var currentLcTab='omamori';
+var _lcData=null;
+function buildLcHTML(tab){
+  if(!_lcData)return '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem">生年月日が未登録です</div>';
+  var mc=_lcData.meishikiCount,bc=_lcData.baseColors,tc=_lcData.todayColors;
+  if(tab==='omamori'){
+    var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.6rem;">普段から自分を守ってくれるカラーです</div>';
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.6rem;">'+makeSwatchHTML2(bc)+'</div>';
+    var label=bc.map(function(g){return GOGYO_COLOR[g].emoji+g;}).join('・');
+    html+='<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin:0;">五行「<strong style="color:var(--gold2);">'+label+'</strong>」が少ない命式です。これらの色を身につけることでバランスが整います。</p>';
+    return html;
+  }
+  if(tab==='today'){
+    var now=new Date(),dStr=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+    var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.6rem;">'+dStr+'の運気を補うカラーです</div>';
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.6rem;">'+makeSwatchHTML2(tc)+'</div>';
+    var label=tc.map(function(g){return GOGYO_COLOR[g].emoji+g;}).join('・');
+    html+='<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin:0;">命式＋今日の干支を合わせて「<strong style="color:var(--gold2);">'+label+'</strong>」が最も少ない五行です。今日はこの色で運気を補いましょう。</p>';
+    return html;
+  }
+  if(tab==='gogyo'){
+    var total=Object.values(mc).reduce(function(a,b){return a+b;},0);
+    var sortedG=Object.entries(mc).sort(function(a,b){return b[1]-a[1];});
+    var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.5rem;">命式の五行分布（蔵干含む9要素）</div>';
+    sortedG.forEach(function(entry){
+      var g=entry[0],c=entry[1];
+      var pct=total>0?Math.round(c/total*100):0;
+      var gc=GOGYO_COLOR[g];
+      html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'
+        +'<div style="width:38px;text-align:right;font-size:0.72rem;color:var(--text);font-weight:700;">'+gc.emoji+g+'</div>'
+        +'<div style="flex:1;background:var(--bg2);border-radius:4px;height:13px;overflow:hidden;">'
+        +'<div style="width:'+pct+'%;height:100%;background:'+gc.hex[0]+';border-radius:4px;"></div>'
+        +'</div>'
+        +'<div style="width:28px;font-size:0.7rem;color:var(--text2);">'+c+'個</div>'
+        +'</div>';
+    });
+    return html;
+  }
+  return '';
+}
+function switchLcTab(tab){
+  currentLcTab=tab;
+  ['omamori','today','gogyo'].forEach(function(t){
+    var btn=document.getElementById('lc-tab-'+t);if(!btn)return;
+    btn.className=t===tab?'utab utab-on':'utab utab-off';
+    if(t==='omamori')btn.style.borderRadius='12px 0 0 12px';
+    else if(t==='gogyo')btn.style.borderRadius='0 12px 12px 0';
+    else btn.style.borderRadius='0';
+    if(t!=='omamori')btn.style.borderLeft='none';
+    if(t!=='gogyo')btn.style.borderRight='none';
+  });
+  var body=document.getElementById('lc-body');
+  if(body)body.innerHTML=buildLcHTML(tab);
+}
+function updateWidgets(bd){
+  _widgetBd=bd;
+  var parts=bd.split('-'),y=+parts[0],m=+parts[1],d=+parts[2];
+  var ht=hoshi(y,m,d);
+  // 蔵干取得（簡易：各支の本気）
+  var ZOKAN_MAIN={'子':'壬','丑':'己','寅':'甲','卯':'乙','辰':'戊','巳':'丙','午':'丁','未':'己','申':'庚','酉':'辛','戌':'戊','亥':'壬'};
+  var nKS=yearKS(y,m,d),tKS=monthKS(y,m,d),niKS=dayKS(y,m,d);
+  var nZ=ZOKAN_MAIN[nKS[1]]||nKS[0];
+  var tZ=ZOKAN_MAIN[tKS[1]]||tKS[0];
+  var niZ=ZOKAN_MAIN[niKS[1]]||niKS[0];
+  var mc=calcMeishikiGogyo2(nKS[0],nKS[1],nZ,tKS[0],tKS[1],tZ,niKS[0],niKS[1],niZ);
+  var bc=getLeastGogyo2(mc);
+  var todayData=getTodayGogyo2();
+  var totalCount=Object.assign({},mc);
+  Object.keys(todayData.count).forEach(function(k){totalCount[k]+=todayData.count[k];});
+  var tc=getLeastGogyo2(totalCount);
+  _lcData={meishikiCount:mc,baseColors:bc,todayColors:tc};
+  switchUnqiTab('day');
+  switchLcTab('omamori');
 }
 
 // ===== テーマ管理 =====
@@ -1204,6 +1427,8 @@ function renderDash(){
   var heroLabel=document.querySelector('.hero-label');
   if(heroLabel)heroLabel.textContent='✦ '+(isME?'あなたの今日の運勢':pname+'さんの今日の運勢');
   document.getElementById('hName').textContent=pname+'さん';
+  // ウィジェット更新
+  updateWidgets(person.birthday);
   document.getElementById('hAge').textContent=age+'歳';
   var uEl=document.getElementById('hUnki');
   uEl.textContent=c.unki;uEl.style.color=kc;
