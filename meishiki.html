@@ -491,17 +491,19 @@ function juniUnki(ht,shi){
   return JUNI[((idx-base)%12+12)%12];
 }
 function kikkyo(ju,ht){
-  if(ju==='引寒')return ht&&ht.indexOf('＋')>=0?'注意':'変容';
-  if(ju==='休眠'||ju==='残雪')return ht&&ht.indexOf('＋')>=0?'変容':'注意';
+  var isPlus=ht&&ht.indexOf('＋')>=0;
+  if(ju==='引寒')return isPlus?'注意':'変容';
+  if(ju==='休眠')return '変容';
+  if(ju==='残雪')return isPlus?'変容':'注意';
   return KIKKYO[ju]||'';
 }
 function kkColor(ju,ht){
   var k=kikkyo(ju,ht);
-  if(k==='大吉')return '#d4a373';if(k==='吉')return '#5ab87a';
-  if(k==='中吉')return '#7aabcc';if(k==='小吉')return '#9aaa7a';
-  if(k==='チャンス')return '#d4880a';if(k==='注意')return '#c8b020';
-  if(k==='苦難')return '#e05050';if(k==='試練')return '#c03030';
-  if(k==='変容')return '#a070d0';return '#888';
+  if(k==='大吉')return '#b8860b';if(k==='吉')return '#2a8c4a';
+  if(k==='中吉')return '#4a7acc';if(k==='小吉')return '#7a9c6a';
+  if(k==='チャンス')return '#c07a00';if(k==='注意')return '#b8a000';
+  if(k==='苦難')return '#c04040';if(k==='試練')return '#8b0000';
+  if(k==='変容')return '#7c3aed';return '#888';
 }
 function juniRuby(n){var r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
 
@@ -567,12 +569,12 @@ function initDateSel(){
     var op=document.createElement('option');op.value=dd;op.textContent=dd+'日';
     dEl.appendChild(op);
   }
-  // URLパラメータから設定
+  // URLパラメータから設定（parseInt でゼロ埋め除去）
   var p=new URLSearchParams(window.location.search);
   var py=p.get('y'),pm=p.get('m'),pd=p.get('d'),pg=p.get('g');
-  if(py)yEl.value=py;
-  if(pm)mEl.value=pm;
-  if(pd)dEl.value=pd;
+  if(py)yEl.value=parseInt(py,10);
+  if(pm)mEl.value=parseInt(pm,10);
+  if(pd)dEl.value=parseInt(pd,10);
   if(pg){var gEl=document.getElementById('byG');if(gEl)gEl.value=(pg==='男'?'male':pg==='女'?'female':pg);}
   if(py&&pm&&pd)doCalc();
   else{
