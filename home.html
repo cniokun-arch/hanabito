@@ -361,31 +361,32 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
       </div>
     </div>
 
-    <!-- 人物追加 -->
-    <div class="add-form" id="addFormArea">
-      <h3>🔮 大切な人を守護リストに加える</h3>
-      <input type="text" id="apName" placeholder="お名前">
-      <div class="date-grp" style="margin-bottom:0.6rem">
-        <select id="apBdY"></select>
-        <select id="apBdM"></select>
-        <select id="apBdD"></select>
+    <!-- 気になる人を占う -->
+    <div class="add-form" id="uranaiFormArea">
+      <h3>🔍 気になる人を占う</h3>
+      <p style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;line-height:1.7">登録不要・その場限りの占いです。1人で占う（命式鑑定）か、2人で占って相性を見ることができます。</p>
+      <div class="fld" style="margin-bottom:0.7rem">
+        <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">お相手の名前（任意）</label>
+        <input type="text" id="urName" placeholder="例：なーちゃん" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none;margin-bottom:0">
       </div>
-      <select id="apRel" style="margin-bottom:0.6rem">
-        <option value="恋人・パートナー">恋人・パートナー</option>
-        <option value="配偶者">配偶者</option>
-        <option value="母">母</option><option value="父">父</option>
-        <option value="息子">息子</option><option value="娘">娘</option>
-        <option value="兄">兄</option><option value="姉">姉</option>
-        <option value="弟">弟</option><option value="妹">妹</option>
-        <option value="友人">友人</option>
-        <option value="職場の同僚">職場の同僚</option>
-        <option value="上司・先輩">上司・先輩</option>
-      </select>
-      <select id="apGen" style="margin-bottom:0.6rem">
-        <option value="female">女性</option><option value="male">男性</option>
-      </select>
-      <input type="text" id="apHobby" placeholder="趣味・好きなこと（任意）">
-      <button class="btn-p" style="padding:0.75rem;font-size:0.9rem;margin-top:0.2rem" onclick="doAddPerson()">守護リストに登録する</button>
+      <div class="fld" style="margin-bottom:0.7rem">
+        <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">生年月日</label>
+        <div class="date-grp">
+          <select id="urBdY"></select>
+          <select id="urBdM"></select>
+          <select id="urBdD"></select>
+        </div>
+      </div>
+      <div class="fld" style="margin-bottom:0.7rem">
+        <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">性別</label>
+        <select id="urGen" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
+          <option value="female">女性</option><option value="male">男性</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.4rem">
+        <button class="btn-p" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em" onclick="uranaiOne()">🌸 この人を占う</button>
+        <button class="btn-p" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em;background:linear-gradient(135deg,#c9e4f5 0%,#a8d4ed 100%)" onclick="uranaiAisho()">💞 相性を見る</button>
+      </div>
     </div>
 
     <div class="foot">
@@ -393,11 +394,41 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
     </div>
   </div>
 
-  <div class="bnav">
-    <button class="nbtn on" id="nb0" onclick="switchNav(0)"><span class="ni">🏠</span><span class="nl">ホーム</span></button>
-    <button class="nbtn" id="nb1" onclick="openChatFocus()"><span class="ni">🔮</span><span class="nl">AI相談</span></button>
-    <button class="nbtn" id="nb2" onclick="navTo('meishiki.html')"><span class="ni">📿</span><span class="nl">命式</span></button>
-    <button class="nbtn" id="nb3" onclick="navTo('soukan.html')"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+</div>
+
+<!-- ボトムナビ（scrDash外・常時固定） -->
+<div class="bnav" id="mainBnav" style="display:none">
+  <button class="nbtn on" id="nb0" onclick="switchNav(0)"><span class="ni">🏠</span><span class="nl">ホーム</span></button>
+  <button class="nbtn" id="nb1" onclick="openChatFocus()"><span class="ni">🔮</span><span class="nl">AI相談</span></button>
+  <button class="nbtn" id="nb2" onclick="navTo('meishiki.html')"><span class="ni">📿</span><span class="nl">命式</span></button>
+  <button class="nbtn" id="nb3" onclick="navTo('soukan.html')"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+</div>
+
+<!-- 人物追加モーダル -->
+<div class="detail-ov" id="addPersonModal" onclick="if(event.target===this)closeAddPersonModal()">
+  <div class="detail-sh">
+    <div class="detail-handle"></div>
+    <button class="detail-close" onclick="closeAddPersonModal()">✕</button>
+    <div class="detail-ttl">大切な人を登録する</div>
+    <div class="fld"><label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">名前</label>
+      <input type="text" id="apName" placeholder="例：なーちゃん" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none"></div>
+    <div class="fld"><label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">生年月日</label>
+      <div class="date-grp"><select id="apBdY"></select><select id="apBdM"></select><select id="apBdD"></select></div></div>
+    <div class="fld"><label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">続柄・関係</label>
+      <select id="apRel" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
+        <option value="恋人・パートナー">恋人・パートナー</option><option value="配偶者">配偶者</option>
+        <option value="母">母</option><option value="父">父</option>
+        <option value="息子">息子</option><option value="娘">娘</option>
+        <option value="兄">兄</option><option value="姉">姉</option>
+        <option value="弟">弟</option><option value="妹">妹</option>
+        <option value="友人">友人</option><option value="職場の同僚">職場の同僚</option><option value="上司・先輩">上司・先輩</option>
+      </select></div>
+    <div class="fld"><label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">性別</label>
+      <select id="apGen" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
+        <option value="female">女性</option><option value="male">男性</option></select></div>
+    <div class="fld"><label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">趣味（任意）</label>
+      <input type="text" id="apHobby" placeholder="例：料理、音楽" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none"></div>
+    <button class="detail-btn" onclick="doAddPerson()">守護リストに登録する</button>
   </div>
 </div>
 
@@ -550,7 +581,12 @@ function doLogout(){if(confirm('ログアウトしますか？（データは保
 function doReset(){if(confirm('全データを初期化しますか？')){localStorage.removeItem(KEY);location.reload();}}
 
 // ダッシュボード
-function initDash(){curId='me';chatCtx=[];_curCalc=null;renderDash();showScr('scrDash');}
+function initDash(){
+  curId='me';chatCtx=[];_curCalc=null;
+  renderDash();
+  showScr('scrDash');
+  document.getElementById('mainBnav').style.display='flex';
+}
 
 function renderDash(){
   var data=S.load();if(!data)return;
@@ -628,10 +664,13 @@ function renderDash(){
 }
 
 function switchPerson(id){curId=id;renderDash();}
-function focusAdd(){
-  var el=document.getElementById('addFormArea');
-  if(el)el.scrollIntoView({behavior:'smooth'});
-  var ni=document.getElementById('apName');if(ni)setTimeout(function(){ni.focus();},400);
+function focusAdd(){openAddPersonModal();}
+function openAddPersonModal(){
+  initDateSel('apBdY','apBdM','apBdD');
+  document.getElementById('addPersonModal').classList.add('on');
+}
+function closeAddPersonModal(){
+  document.getElementById('addPersonModal').classList.remove('on');
 }
 
 // 詳細モーダル
@@ -752,6 +791,7 @@ function doAddPerson(){
   document.getElementById('apName').value='';
   document.getElementById('apHobby').value='';
   initDateSel('apBdY','apBdM','apBdD');
+  closeAddPersonModal();
   curId=p.id;renderDash();
 }
 
@@ -771,6 +811,24 @@ function buildChips(data){
   }).join('');
 }
 function useChip(t){document.getElementById('chatInp').value=t;sendChat();}
+
+function uranaiOne(){
+  var bd=getDateStr('urBdY','urBdM','urBdD');
+  if(!bd){alert('生年月日を選択してください');return;}
+  var p=new URLSearchParams(window.location.search);
+  window.location.href='meishiki.html?y='+bd.split('-')[0]+'&m='+parseInt(bd.split('-')[1])+'&d='+parseInt(bd.split('-')[2]);
+}
+function uranaiAisho(){
+  var bd=getDateStr('urBdY','urBdM','urBdD');
+  if(!bd){alert('お相手の生年月日を選択してください');return;}
+  var data=S.load();
+  var acc=data?data.account:null;
+  if(!acc||!acc.birthday){alert('あなたの生年月日が未登録です');return;}
+  var myBd=acc.birthday.split('-');
+  var thBd=bd.split('-');
+  window.location.href='aisho.html?y='+myBd[0]+'&m='+parseInt(myBd[1])+'&d='+parseInt(myBd[2])
+    +'&y2='+thBd[0]+'&m2='+parseInt(thBd[1])+'&d2='+parseInt(thBd[2]);
+}
 
 async function sendChat(){
   var inp=document.getElementById('chatInp');
@@ -828,7 +886,7 @@ async function sendChat(){
 // 起動
 window.addEventListener('DOMContentLoaded',function(){
   initDateSel('rBdY','rBdM','rBdD');
-  initDateSel('apBdY','apBdM','apBdD');
+  initDateSel('urBdY','urBdM','urBdD');
   setTimeout(function(){
     var d=S.load();
     document.getElementById('scrLoad').style.display='none';
