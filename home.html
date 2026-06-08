@@ -85,6 +85,7 @@ body.theme-dark .sec{background:var(--card)}
 body.theme-dark .uranai-form{background:var(--card)}
 body.theme-dark .uranai-form input,body.theme-dark .uranai-form select{background:var(--bg);color:var(--text)}
 body.theme-dark .setting-sec{background:var(--card)}
+body.theme-dark #aishoBtn{background:linear-gradient(135deg,rgba(100,160,210,0.3),rgba(70,130,180,0.4)) !important;color:var(--gold) !important;border:1px solid rgba(100,160,210,0.4)}
 
 /* 花びら：canvasで描画 */
 
@@ -198,8 +199,9 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
   padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;border-bottom:1px solid var(--border)}
 .dhead-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem}
 .dgreeting{font-family:var(--serif);font-size:1rem;color:var(--gold2);letter-spacing:0.08em;font-weight:600}
-.dsetting{background:rgba(255,255,255,0.6);border:1px solid var(--border);color:var(--text2);
+.dsetting{background:rgba(255,255,255,0.15);border:1px solid var(--border2);color:var(--text);
   border-radius:16px;padding:0.3rem 0.8rem;font-size:0.75rem;cursor:pointer;font-family:'Noto Serif JP',serif}
+body.theme-dark .dsetting{background:rgba(230,198,135,0.15);border-color:rgba(230,198,135,0.4);color:var(--gold)}
 
 /* メンバータブ */
 .mtabs{display:flex;gap:0.6rem;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -274,6 +276,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
   gap:0.7rem;border-left:3px solid var(--border2)}
 .rbadge{background:var(--gold-grad);color:var(--text);font-size:0.72rem;font-weight:600;
   padding:0.15rem 0.5rem;border-radius:6px;white-space:nowrap;margin-top:0.1rem;flex-shrink:0}
+body.theme-dark .rbadge{background:linear-gradient(135deg,rgba(230,198,135,0.25),rgba(184,145,70,0.35));color:var(--gold);border:1px solid rgba(230,198,135,0.3)}
 .rtxt{color:var(--text);line-height:1.5}
 
 /* AIチャット */
@@ -297,12 +300,13 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
   padding:0.4rem 0.9rem;font-size:0.82rem;color:var(--text);cursor:pointer;white-space:nowrap;
   font-family:'Noto Serif JP',serif;transition:0.2s}
 .chip:hover{background:var(--card2);border-color:var(--gold)}
-.chat-ctrl{display:flex;gap:0.5rem}
+.chat-ctrl{display:flex;gap:0.5rem;align-items:flex-end}
 .chat-inp{flex:1;padding:0.8rem 1rem;background:var(--card);border:1px solid var(--border);
   border-radius:var(--rm);color:var(--text);font-family:'Noto Serif JP',serif;
-  font-size:0.95rem;outline:none}
+  font-size:0.95rem;outline:none;min-height:48px}
 .chat-inp:focus{border-color:var(--gold)}
-.send-btn{background:var(--gold-grad);border:none;border-radius:var(--rm);width:52px;
+.send-btn{background:var(--gold-grad);border:none;border-radius:var(--rm);
+  width:48px;height:48px;min-width:48px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:transform 0.2s;flex-shrink:0;box-shadow:0 2px 6px rgba(254,197,187,0.4)}
 .send-btn:active{transform:scale(0.94)}
@@ -524,7 +528,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.4rem">
         <button class="btn-p" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em" onclick="uranaiOne()">🌸 この人を占う</button>
-        <button class="btn-p" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em;background:linear-gradient(135deg,#c9e4f5 0%,#a8d4ed 100%)" onclick="uranaiAisho()">💞 相性を見る</button>
+        <button class="btn-p" id="aishoBtn" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em;background:linear-gradient(135deg,#c9e4f5 0%,#a8d4ed 100%);color:#2a4a6a" onclick="uranaiAisho()">💞 相性を見る</button>
       </div>
     </div>
 
