@@ -61,6 +61,16 @@ body.theme-dark .detail-sh input,body.theme-dark .detail-sh select{background:rg
 body.theme-dark input[type="text"],body.theme-dark input[type="password"],body.theme-dark select{background:rgba(255,255,255,0.06);color:var(--text);border-color:rgba(230,198,135,0.2)}
 body.theme-dark input::placeholder{color:rgba(180,170,155,0.6)}
 body.theme-dark .blink{background:rgba(20,18,14,0.8)}
+body.theme-dark .mtab{background:rgba(255,255,255,0.04)}
+body.theme-dark .mtab.on{background:rgba(255,255,255,0.1);border-color:rgba(230,198,135,0.4)}
+body.theme-dark .mtab-add{background:rgba(255,255,255,0.06)}
+body.theme-dark .mtab-nm{color:var(--text2)}
+body.theme-dark .add-form input,body.theme-dark .add-form select,
+body.theme-dark .fld input,body.theme-dark .fld select,
+body.theme-dark .chat-inp{background:rgba(255,255,255,0.06);color:var(--text);border-color:rgba(230,198,135,0.2)}
+body.theme-dark input[type="text"],body.theme-dark input[type="password"],body.theme-dark select{background:rgba(255,255,255,0.06);color:var(--text);border-color:rgba(230,198,135,0.2)}
+body.theme-dark input::placeholder{color:rgba(180,170,155,0.5)}
+body.theme-dark select option{background:#1c1914;color:var(--text)}
 body.theme-dark .add-form{background:var(--card)}
 body.theme-dark .ai-room{background:linear-gradient(180deg,var(--card) 0%,#100f0b 100%)}
 body.theme-dark .bbl.ai .msg{background:var(--card2)}
@@ -168,7 +178,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
 .fld{margin-bottom:1.1rem}
 .fld label{display:block;font-size:0.78rem;font-weight:600;color:var(--gold2);margin-bottom:0.4rem;letter-spacing:0.05em}
 .fld input,.fld select{width:100%;padding:0.85rem 1rem;border:1px solid var(--border);border-radius:var(--rm);
-  background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.95rem;
+  background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.95rem;
   outline:none;transition:all 0.25s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.03)}
 .fld input:focus,.fld select:focus{border-color:var(--gold);box-shadow:0 0 10px var(--glow),inset 0 1px 3px rgba(0,0,0,0.03)}
 .fld select option{background:#fff;color:var(--text)}
@@ -196,13 +206,13 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
 .mtabs::-webkit-scrollbar{display:none}
 .mtab{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0.3rem;
   padding:0.5rem 0.7rem;border-radius:12px;cursor:pointer;border:2px solid transparent;
-  transition:all 0.2s;background:rgba(255,255,255,0.4)}
-.mtab.on{background:#fff;border-color:var(--border2);box-shadow:0 4px 10px rgba(254,197,187,0.2)}
+  transition:all 0.2s;background:rgba(255,255,255,0.08)}
+.mtab.on{background:var(--card);border-color:var(--border2);box-shadow:0 4px 10px rgba(254,197,187,0.2)}
 .mtab-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-size:1rem;font-family:var(--serif);font-weight:700;
   box-shadow:0 2px 6px rgba(0,0,0,0.05)}
 .mtab-nm{font-size:0.75rem;color:var(--text);white-space:nowrap;font-weight:500}
-.mtab-add{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:#fff;
+.mtab-add{width:42px;height:42px;border-radius:50%;flex-shrink:0;background:var(--card);
   border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;
   font-size:1.3rem;color:var(--gold2);cursor:pointer;margin-top:2px}
 
@@ -288,7 +298,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
   font-family:'Noto Serif JP',serif;transition:0.2s}
 .chip:hover{background:var(--card2);border-color:var(--gold)}
 .chat-ctrl{display:flex;gap:0.5rem}
-.chat-inp{flex:1;padding:0.8rem 1rem;background:#fff;border:1px solid var(--border);
+.chat-inp{flex:1;padding:0.8rem 1rem;background:var(--card);border:1px solid var(--border);
   border-radius:var(--rm);color:var(--text);font-family:'Noto Serif JP',serif;
   font-size:0.95rem;outline:none}
 .chat-inp:focus{border-color:var(--gold)}
@@ -302,7 +312,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
   padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 6px 18px rgba(254,197,187,0.1)}
 .add-form h3{font-family:var(--serif);color:var(--gold2);font-size:1.05rem;font-weight:600;margin-bottom:1rem}
 .add-form input,.add-form select{width:100%;padding:0.8rem 1rem;border:1px solid var(--border);
-  border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;
+  border-radius:var(--rm);background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;
   font-size:0.9rem;outline:none;margin-bottom:0.6rem}
 .add-form input:focus,.add-form select:focus{border-color:var(--gold)}
 .add-form select option{background:#fff;color:var(--text)}
@@ -496,7 +506,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
       <p style="font-size:0.8rem;color:var(--text2);margin-bottom:1rem;line-height:1.7">登録不要・その場限りの占いです。1人で占う（命式鑑定）か、2人で占って相性を見ることができます。</p>
       <div class="fld" style="margin-bottom:0.7rem">
         <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">お相手の名前（任意）</label>
-        <input type="text" id="urName" placeholder="例：なーちゃん" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none;margin-bottom:0">
+        <input type="text" id="urName" placeholder="例：なーちゃん" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none;margin-bottom:0">
       </div>
       <div class="fld" style="margin-bottom:0.7rem">
         <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">生年月日</label>
@@ -508,7 +518,7 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
       </div>
       <div class="fld" style="margin-bottom:0.7rem">
         <label style="font-size:0.75rem;color:var(--gold2);font-weight:600;display:block;margin-bottom:0.3rem">性別</label>
-        <select id="urGen" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:#fff;color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
+        <select id="urGen" style="width:100%;padding:0.75rem 0.9rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
           <option value="female">女性</option><option value="male">男性</option>
         </select>
       </div>
