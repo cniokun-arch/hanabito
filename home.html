@@ -289,8 +289,7 @@ body.theme-dark .dsetting{background:rgba(230,198,135,0.15);border-color:rgba(23
 .hero{background:linear-gradient(145deg,#ffffff 0%,#fffbfb 100%);border:1px solid var(--border);
   border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1.2rem;
   box-shadow:0 8px 24px rgba(254,197,187,0.15)}
-.hero-label{font-size:0.72rem;color:var(--gold2);letter-spacing:0.12em;
-  font-family:var(--serif);margin-bottom:0.8rem;font-weight:600}
+
 .hero-main-row{display:flex;align-items:center;gap:1rem}
 .hero-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:0.4rem;flex-shrink:0}
 .hero-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;
@@ -563,11 +562,10 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
 
     <!-- ヒーローカード -->
     <div class="hero tappable" onclick="showHeroDetail()">
-      <div class="hero-label" id="heroLabel">✦ あなたの命式カルテ</div>
       <div class="hero-main-row">
         <div class="hero-avatar-wrap">
-          <div class="hero-avatar" id="heroAvatar">?</div>
-          <div class="hero-ht-badge" id="heroHtBadge">--</div>
+          <div class="hero-avatar" id="heroAvatar"></div>
+          <div class="hero-ht-badge" id="heroHtBadge"></div>
         </div>
         <div class="hero-info">
           <div class="hero-name" id="hName">---</div>
@@ -1470,12 +1468,15 @@ function renderDash(){
   var kk=kikkyo(c.unki,c.ht);
   var kc=kkColor(c.unki,c.ht);
 
-  var heroLabel=document.querySelector('.hero-label');
-  if(heroLabel)heroLabel.textContent='✦ '+(isME?'あなたの今日の運勢':pname+'さんの今日の運勢');
   document.getElementById('hName').textContent=pname+'さん';
   // ウィジェット更新
   updateWidgets(person.birthday);
   document.getElementById('hAge').textContent=age+'歳';
+  var av=avc(c.ht);
+  var avEl=document.getElementById('heroAvatar');
+  if(avEl){avEl.textContent=pname?pname[0]:'';avEl.style.background=av.bg;avEl.style.color=av.col;}
+  var badgeEl=document.getElementById('heroHtBadge');
+  if(badgeEl)badgeEl.textContent=c.ht;
   // 運気・吉凶はウィジェットで表示
 
   document.getElementById('mcgrid').innerHTML=
