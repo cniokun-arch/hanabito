@@ -287,24 +287,21 @@ body.theme-dark .dsetting{background:rgba(230,198,135,0.15);border-color:rgba(23
 .utab-on{background:rgba(255,255,255,0.9);color:#4a3c28;font-weight:700}
 .utab-off{background:rgba(255,255,255,0.25);color:#fff;font-weight:400}
 .hero{background:linear-gradient(145deg,#ffffff 0%,#fffbfb 100%);border:1px solid var(--border);
-  border-radius:var(--r);padding:1.8rem 1.4rem;margin-bottom:1.2rem;
-  box-shadow:0 8px 24px rgba(254,197,187,0.15)}
+  border-radius:var(--r);padding:2rem 1.6rem;margin-bottom:1.2rem;
+  box-shadow:0 8px 24px rgba(254,197,187,0.15);text-align:center}
 
-.hero-main-row{display:flex;align-items:center;gap:1rem}
-.hero-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:0.4rem;flex-shrink:0}
-.hero-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-family:var(--serif);font-size:1.6rem;font-weight:700;
-  border:2px solid var(--border2);box-shadow:0 3px 10px rgba(0,0,0,0.07)}
-.hero-ht-badge{font-size:0.62rem;color:var(--gold2);font-weight:700;
-  background:var(--gold-pale);padding:0.1rem 0.5rem;border-radius:10px;
-  white-space:nowrap;font-family:var(--serif);letter-spacing:0.05em}
-.hero-info{flex:1;min-width:0}
-.hero-name{font-family:var(--serif);font-size:1.5rem;color:var(--gold2);
-  font-weight:600;margin-bottom:0.2rem}
-.hero-age{font-size:0.82rem;color:var(--text2);margin-bottom:0.5rem}
-.hero-tap-hint{font-size:0.72rem;color:var(--text2);letter-spacing:0.04em;
-  display:flex;align-items:center;gap:0.3rem}
-.hero-tap-hint::before{content:'👆';font-size:0.82rem}
+.hero-ht-title{font-family:var(--serif);font-size:2.2rem;font-weight:700;
+  text-align:center;margin-bottom:0.6rem;letter-spacing:0.08em;
+  background:linear-gradient(135deg,#c8a84b 0%,#f5e17a 40%,#b8860b 70%,#e6c96a 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 3px rgba(184,134,11,0.3))}
+.hero-name{font-family:var(--serif);font-size:1.3rem;color:var(--text);
+  font-weight:600;text-align:center;margin-bottom:0.2rem}
+.hero-age{font-size:0.88rem;color:var(--text2);text-align:center;margin-bottom:1rem}
+.hero-tap-btn{background:linear-gradient(135deg,#d4a843 0%,#b8860b 100%);
+  color:#fff;font-family:var(--serif);font-size:0.9rem;font-weight:600;
+  padding:0.7rem 1.8rem;border-radius:30px;text-align:center;letter-spacing:0.08em;
+  box-shadow:0 3px 12px rgba(184,134,11,0.3);margin:0 auto;width:fit-content;display:block}
 .hero-name{font-family:var(--serif);font-size:1.4rem;color:var(--gold2);font-weight:600;
   display:flex;align-items:center;gap:0.4rem}
 .hero-name-hint{font-size:0.78rem;color:var(--text2);font-weight:400;font-family:'Noto Serif JP',serif}
@@ -562,17 +559,10 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
 
     <!-- ヒーローカード -->
     <div class="hero tappable" onclick="showHeroDetail()">
-      <div class="hero-main-row">
-        <div class="hero-avatar-wrap">
-          <div class="hero-avatar" id="heroAvatar"></div>
-          <div class="hero-ht-badge" id="heroHtBadge"></div>
-        </div>
-        <div class="hero-info">
-          <div class="hero-name" id="hName">---</div>
-          <div class="hero-age" id="hAge"></div>
-          <div class="hero-tap-hint">タップで詳細鑑定 ›</div>
-        </div>
-      </div>
+      <div class="hero-ht-title" id="heroHtTitle">---</div>
+      <div class="hero-name" id="hName">---</div>
+      <div class="hero-age" id="hAge"></div>
+      <div class="hero-tap-btn">タップで詳細鑑定を見る　›</div>
     </div>
 
     <!-- 運気ウィジェット -->
@@ -1472,11 +1462,29 @@ function renderDash(){
   // ウィジェット更新
   updateWidgets(person.birthday);
   document.getElementById('hAge').textContent=age+'歳';
-  var av=avc(c.ht);
-  var avEl=document.getElementById('heroAvatar');
-  if(avEl){avEl.textContent=pname?pname[0]:'';avEl.style.background=av.bg;avEl.style.color=av.col;}
-  var badgeEl=document.getElementById('heroHtBadge');
-  if(badgeEl)badgeEl.textContent=c.ht;
+  var htTitleEl=document.getElementById('heroHtTitle');
+  if(htTitleEl){
+    htTitleEl.textContent=c.ht;
+    // 六花人ごとの特有カラーをインラインで設定
+    var htColorMap={
+      '天花人＋':'linear-gradient(135deg,#e85555 0%,#ff9999 40%,#c03030 100%)',
+      '天花人－':'linear-gradient(135deg,#cc4444 0%,#ff8888 40%,#aa2020 100%)',
+      '白花人＋':'linear-gradient(135deg,#5555cc 0%,#9999ff 40%,#3030aa 100%)',
+      '白花人－':'linear-gradient(135deg,#4444bb 0%,#8888ee 40%,#202099 100%)',
+      '離花人＋':'linear-gradient(135deg,#cc55aa 0%,#ff99dd 40%,#aa3088 100%)',
+      '離花人－':'linear-gradient(135deg,#bb4499 0%,#ee88cc 40%,#992077 100%)',
+      '風花人＋':'linear-gradient(135deg,#559955 0%,#99dd99 40%,#337733 100%)',
+      '風花人－':'linear-gradient(135deg,#448844 0%,#88cc88 40%,#226622 100%)',
+      '仙花人＋':'linear-gradient(135deg,#9955cc 0%,#cc99ff 40%,#7733aa 100%)',
+      '仙花人－':'linear-gradient(135deg,#8844bb 0%,#bb88ee 40%,#662299 100%)',
+      '水花人＋':'linear-gradient(135deg,#4488bb 0%,#88ccff 40%,#226699 100%)',
+      '水花人－':'linear-gradient(135deg,#3377aa 0%,#77bbee 40%,#115588 100%)'
+    };
+    var htGrad=htColorMap[c.ht]||'linear-gradient(135deg,#c8a84b 0%,#f5e17a 40%,#b8860b 100%)';
+    htTitleEl.style.background=htGrad;
+    htTitleEl.style.webkitBackgroundClip='text';
+    htTitleEl.style.webkitTextFillColor='transparent';
+  }
   // 運気・吉凶はウィジェットで表示
 
   document.getElementById('mcgrid').innerHTML=
