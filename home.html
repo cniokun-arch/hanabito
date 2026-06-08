@@ -114,7 +114,7 @@ body.theme-dark #aishoBtn{background:linear-gradient(135deg,rgba(100,160,210,0.3
 /* ===== 設定画面 ===== */
 #scrSetting{padding:0 0 calc(var(--safe-b) + 6rem)}
 .setting-head{background:linear-gradient(135deg,#fff0f2 0%,#ffe5e9 100%);
-  padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;
+  padding:calc(var(--safe-t) + 3.5rem) 1.2rem 1rem;
   border-bottom:1px solid var(--border)}
 body.theme-dark .setting-head{background:linear-gradient(135deg,#1c1810 0%,#110e0a 100%)}
 .setting-head h2{font-family:var(--serif);color:var(--gold2);font-size:1.1rem;
@@ -158,6 +158,55 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
 #errmsg{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
   background:rgba(230,100,100,0.95);color:#fff;padding:0.7rem 1rem;
   font-size:0.8rem;word-break:break-all}
+
+/* ===== トップバー ===== */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:500;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding-top:var(--safe-t);height:calc(var(--safe-t) + 48px);
+  display:none;align-items:flex-end;justify-content:space-between;
+  padding-left:1rem;padding-right:1rem;padding-bottom:0.5rem}
+body.theme-dark .topbar{background:rgba(17,14,10,0.92);border-bottom-color:rgba(230,198,135,0.15)}
+.topbar.show{display:flex}
+.topbar-left button{background:none;border:none;color:var(--text2);
+  font-family:'Noto Serif JP',serif;font-size:0.78rem;cursor:pointer;
+  padding:0;letter-spacing:0.04em}
+body.theme-dark .topbar-left button{color:var(--gold)}
+.topbar-logo{font-family:'Zen Old Mincho','Noto Serif JP',serif;
+  font-size:1rem;font-weight:600;letter-spacing:0.2em;
+  background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap}
+.topbar-right button{background:none;border:none;cursor:pointer;
+  padding:0.2rem;display:flex;align-items:center;justify-content:center}
+.topbar-hamburger{width:22px;height:16px;display:flex;flex-direction:column;
+  justify-content:space-between;cursor:pointer}
+.topbar-hamburger span{display:block;height:2px;border-radius:1px;
+  background:var(--gold2);transition:all 0.2s}
+body.theme-dark .topbar-hamburger span{background:var(--gold)}
+
+/* ハンバーガーメニュー */
+.hmenu-ov{display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(74,63,61,0.3);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.hmenu-ov.on{display:block}
+.hmenu-panel{position:fixed;top:0;right:0;bottom:0;width:75%;max-width:300px;
+  background:var(--card);box-shadow:-4px 0 20px rgba(0,0,0,0.12);
+  padding:calc(var(--safe-t) + 3.5rem) 1.4rem 2rem;overflow-y:auto;
+  transform:translateX(100%);transition:transform 0.3s ease;z-index:601}
+.hmenu-ov.on .hmenu-panel{transform:translateX(0)}
+body.theme-dark .hmenu-panel{background:var(--card);border-left:1px solid rgba(230,198,135,0.1)}
+.hmenu-close{position:absolute;top:calc(var(--safe-t) + 0.8rem);right:1rem;
+  background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text2)}
+.hmenu-ttl{font-family:'Zen Old Mincho',serif;color:var(--gold2);font-size:1rem;
+  letter-spacing:0.15em;margin-bottom:1.5rem;font-weight:600}
+.hmenu-item{display:flex;align-items:center;gap:0.7rem;padding:0.9rem 0;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  font-size:0.9rem;color:var(--text);font-family:'Noto Serif JP',serif;
+  transition:color 0.2s}
+.hmenu-item:hover{color:var(--gold2)}
+.hmenu-item:last-child{border-bottom:none}
+.hmenu-item-icon{font-size:1.1rem;width:24px;text-align:center;flex-shrink:0}
+.hmenu-ver{font-size:0.72rem;color:var(--text2);text-align:center;
+  margin-top:1.5rem;letter-spacing:0.06em}
 
 .scr{display:none;opacity:0;transform:translateY(8px);transition:opacity 0.35s ease,transform 0.35s ease}
 .scr.on{display:block;opacity:1;transform:translateY(0)}
@@ -375,6 +424,45 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
 <div id="errmsg"></div>
 
 <!-- 花びらコンテナ（常時） -->
+<!-- トップバー -->
+<div class="topbar" id="topbar">
+  <div class="topbar-left">
+    <button onclick="doLogout()">ログアウト</button>
+  </div>
+  <div class="topbar-logo">花人占術</div>
+  <div class="topbar-right">
+    <button onclick="openHmenu()" aria-label="メニュー">
+      <div class="topbar-hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- ハンバーガーメニュー -->
+<div class="hmenu-ov" id="hmenuOv" onclick="if(event.target===this)closeHmenu()">
+  <div class="hmenu-panel">
+    <button class="hmenu-close" onclick="closeHmenu()">✕</button>
+    <div class="hmenu-ttl">メニュー</div>
+    <div class="hmenu-item" onclick="showAbout()">
+      <span class="hmenu-item-icon">🌸</span>花人占術とは？
+    </div>
+    <div class="hmenu-item" onclick="showPrivacy()">
+      <span class="hmenu-item-icon">🔒</span>プライバシーポリシー
+    </div>
+    <div class="hmenu-item" onclick="showTerms()">
+      <span class="hmenu-item-icon">📋</span>利用規約
+    </div>
+    <div class="hmenu-item" onclick="closeHmenu();openSetting()">
+      <span class="hmenu-item-icon">⚙</span>設定
+    </div>
+    <div class="hmenu-item" onclick="closeHmenu();doLogout()">
+      <span class="hmenu-item-icon">🚪</span>ログアウト
+    </div>
+    <div class="hmenu-ver">花人占術 v1.0</div>
+  </div>
+</div>
+
 <canvas id="petalCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.75;display:none"></canvas>
 
 <!-- スプラッシュ画面 -->
@@ -443,7 +531,6 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
   <div class="dhead">
     <div class="dhead-top">
       <div class="dgreeting" id="dGreet">おはようございます</div>
-      <button class="dsetting" onclick="doLogout()">ログアウト</button>
     </div>
     <div class="mtabs" id="mtabs"></div>
   </div>
@@ -756,6 +843,22 @@ var curId='me';
 var chatCtx=[];
 var _curCalc=null;
 
+// ===== ハンバーガーメニュー =====
+function openHmenu(){document.getElementById('hmenuOv').classList.add('on');}
+function closeHmenu(){document.getElementById('hmenuOv').classList.remove('on');}
+function showAbout(){
+  closeHmenu();
+  alert('花人占術は、生年月日から導かれる命式（六花人・年柱・月柱・日柱）をもとに、その人の本質・才能・運気の流れを読み解く東洋占術です。AIと組み合わせることで、あなただけの鑑定と日々のサポートを提供します。');
+}
+function showPrivacy(){
+  closeHmenu();
+  alert('プライバシーポリシー\n\nこのアプリに入力された個人情報（名前・生年月日など）はすべてお使いのデバイス内にのみ保存されます。外部サーバーへの送信は、AIチャット機能のみに限られます（占術の鑑定のためのみに使用）。');
+}
+function showTerms(){
+  closeHmenu();
+  alert('利用規約\n\n本アプリは占術・エンターテイメント目的のサービスです。鑑定結果はあくまで参考情報としてご活用ください。医療・法律・投資等の専門的判断の代替としてはご利用いただけません。');
+}
+
 // ===== テーマ管理 =====
 var currentTheme='pink';
 function setTheme(t){
@@ -1052,6 +1155,7 @@ function initDash(){
   renderDash();
   showScr('scrDash');
   document.getElementById('mainBnav').style.display='flex';
+  document.getElementById('topbar').classList.add('show');
   switchNav(0);
 }
 
