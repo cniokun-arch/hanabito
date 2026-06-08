@@ -575,14 +575,12 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
           <button id="unqi-tab-year" onclick="switchUnqiTab('year')" class="utab utab-off" style="border-radius:0 12px 12px 0">年運</button>
         </div>
       </div>
-      <div style="position:relative;overflow:hidden">
-      <div id="unqi-slider" style="display:flex;transition:transform 0.3s ease;will-change:transform"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 1.1rem 0.7rem">
-        <button onclick="unqiNav(-1)" style="background:none;border:none;color:var(--gold2);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">‹ 前</button>
+      <div id="unqi-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 1.1rem 0.6rem;border-top:1px solid rgba(184,134,11,0.1)">
+        <button onclick="unqiNav(-1)" style="background:none;border:none;color:var(--gold2);font-size:1.1rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">‹ 前</button>
         <span id="unqi-date-label" style="font-size:0.72rem;color:var(--text2);font-family:var(--serif)"></span>
-        <button onclick="unqiNav(1)" style="background:none;border:none;color:var(--gold2);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">次 ›</button>
+        <button onclick="unqiNav(1)" style="background:none;border:none;color:var(--gold2);font-size:1.1rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">次 ›</button>
       </div>
-    </div>
       <div style="border-top:1px solid rgba(184,134,11,0.15);">
         <button onclick="document.getElementById('juni-about-overlay-h').style.display='block'" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1.1rem;background:transparent;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;">
           <span style="font-size:0.78rem;color:#7c3aed;font-weight:700;">🌸 12運気について</span>
@@ -601,14 +599,12 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
           <button id="lc-tab-gogyo" onclick="switchLcTab('gogyo')" class="utab utab-off" style="border-radius:0 12px 12px 0">五行</button>
         </div>
       </div>
-      <div style="position:relative;overflow:hidden">
-      <div id="lc-slider" style="display:flex;transition:transform 0.3s ease;will-change:transform"></div>
-      <div id="lc-nav" style="display:none;justify-content:space-between;align-items:center;padding:0.4rem 1.1rem 0.7rem">
-        <button onclick="slideLc(-1)" style="background:none;border:none;color:var(--gold2);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">‹ 前</button>
+      <div id="lc-body" style="padding:0.9rem 1.1rem;min-height:80px;"></div>
+      <div id="lc-nav" style="display:none;justify-content:space-between;align-items:center;padding:0.3rem 1.1rem 0.6rem;border-top:1px solid rgba(184,134,11,0.1)">
+        <button onclick="lcNav(-1)" style="background:none;border:none;color:var(--gold2);font-size:1.1rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">‹ 前</button>
         <span id="lc-date-label" style="font-size:0.72rem;color:var(--text2);font-family:var(--serif)"></span>
-        <button onclick="slideLc(1)" style="background:none;border:none;color:var(--gold2);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">次 ›</button>
+        <button onclick="lcNav(1)" style="background:none;border:none;color:var(--gold2);font-size:1.1rem;cursor:pointer;padding:0.3rem 0.6rem;font-family:var(--serif)">次 ›</button>
       </div>
-    </div>
     </div>
 
     <!-- ブリッジ -->
@@ -954,51 +950,6 @@ function showTerms(){
 }
 
 // ===== 運気・ラッキーカラーウィジェット関数 =====
-// オフセット（0=今日、+1=明日、-1=昨日 など）
-var unqiOffsetDay = 0;
-var unqiOffsetMonth = 0;
-var unqiOffsetYear = 0;
-var lcOffset = 0;
-
-function getOffsetDate(tab, offset) {
-  var now = new Date();
-  var y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
-  if(tab === 'day') {
-    var dt = new Date(y, m, d + offset);
-    return {y: dt.getFullYear(), m: dt.getMonth()+1, d: dt.getDate(), label: formatOffsetLabel('day', offset, dt)};
-  } else if(tab === 'month') {
-    var totalM = now.getMonth() + offset;
-    var ny = y + Math.floor(totalM / 12);
-    var nm = ((totalM % 12) + 12) % 12;
-    // 月の代表日は15日
-    return {y: ny, m: nm+1, d: 15, label: formatOffsetLabel('month', offset, new Date(ny, nm, 15))};
-  } else { // year
-    return {y: y + offset, m: m+1, d: d, label: formatOffsetLabel('year', offset, new Date(y + offset, m, d))};
-  }
-}
-
-function formatOffsetLabel(tab, offset, dt) {
-  var suffix = offset === 0 ? '（今日）' : offset === 1 ? '（明日）' : offset === -1 ? '（昨日）' : '';
-  if(tab === 'day') return dt.getFullYear()+'年'+(dt.getMonth()+1)+'月'+dt.getDate()+'日'+suffix;
-  // ← getMonth()は0-indexed注意
-  if(tab === 'month') {
-    var mSuffix = offset === 0 ? '（今月）' : offset === 1 ? '（来月）' : offset === -1 ? '（先月）' : '';
-    return dt.getFullYear()+'年'+(dt.getMonth()+1)+'月'+mSuffix;
-  }
-  var ySuffix = offset === 0 ? '（今年）' : offset > 0 ? offset+'年後' : Math.abs(offset)+'年前';
-  return dt.getFullYear()+'年　'+ySuffix;
-}
-
-function unqiNav(dir) {
-  if(currentUnqiTab==='day')unqiOffsetDay+=dir;
-  else if(currentUnqiTab==='month')unqiOffsetMonth+=dir;
-  else unqiOffsetYear+=dir;
-  switchUnqiTab(currentUnqiTab);
-}
-function lcNav(dir) {
-  lcOffset += dir;
-  switchLcTab('today');
-}
 var JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
 var JUNI_RUBY={'休眠':'きゅうみん','残雪':'ざんせつ','発芽':'はつが','青葉':'あおば','開花':'かいか','内省':'ないせい','成天':'せいてん','狂咲':'くるいざき','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん'};
 function juniRuby(n){var r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
@@ -1073,18 +1024,25 @@ function makeSwatchHTML2(list){
 
 // 運気ウィジェット
 var currentUnqiTab='day';
+var unqiOffsetDay=0,unqiOffsetMonth=0,unqiOffsetYear=0,lcOffset=0;
 var _widgetBd=null;
 function buildUnqiHTML(tab){
   if(!_widgetBd)return '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem">生年月日が未登録です</div>';
   var bd=_widgetBd.split('-'),y=+bd[0],m=+bd[1],d=+bd[2];
   var ht=hoshi(y,m,d);
-  var offset = tab==='day'?unqiOffsetDay:tab==='month'?unqiOffsetMonth:unqiOffsetYear;
-  var dtInfo = getOffsetDate(tab, offset);
-  var ny=dtInfo.y, nm=dtInfo.m, nd=dtInfo.d;
+  var now=new Date();
+  var baseY=now.getFullYear(),baseM=now.getMonth()+1,baseD=now.getDate();
+  var ny,nm,nd;
+  var offset=tab==='day'?unqiOffsetDay:tab==='month'?unqiOffsetMonth:unqiOffsetYear;
+  if(tab==='day'){var dt=new Date(baseY,baseM-1,baseD+offset);ny=dt.getFullYear();nm=dt.getMonth()+1;nd=dt.getDate();}
+  else if(tab==='month'){var totalM=(baseM-1)+offset;ny=baseY+Math.floor(totalM/12);nm=((totalM%12)+12)%12+1;nd=15;}
+  else{ny=baseY+offset;nm=baseM;nd=baseD;}
+  var labelEl=document.getElementById('unqi-date-label');
+  if(labelEl){var suf=offset===0?'（今日）':offset===1?'（明日）':offset===-1?'（昨日）':'';
+    if(tab==='day')labelEl.textContent=ny+'年'+nm+'月'+nd+'日'+suf;
+    else if(tab==='month')labelEl.textContent=ny+'年'+nm+'月'+(offset===0?'（今月）':offset===1?'（来月）':offset===-1?'（先月）':'');
+    else labelEl.textContent=ny+'年（'+(offset===0?'今年':offset>0?offset+'年後':Math.abs(offset)+'年前')+'）';}
   var shi,dateLabel;
-  // 日付ナビラベル更新
-  var navLabel = document.getElementById('unqi-date-label');
-  if(navLabel) navLabel.textContent = dtInfo.label;
   if(tab==='day'){var ks=dayKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年'+nm+'月'+nd+'日（日干支：'+ks+'）';}
   else if(tab==='month'){var ks=monthKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年'+nm+'月（月干支：'+ks+'）　'+getMonthPeriodLabel2(ny,nm,nd);}
   else{var ks=yearKS(ny,nm,nd);shi=ks[1];dateLabel=ny+'年（年干支：'+ks+'）　'+getYearPeriodLabel2(ny,nm,nd);}
@@ -1106,6 +1064,16 @@ function buildUnqiHTML(tab){
     +barHTML
     +'<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin-top:0.5rem;">'+(JUNI_DESC[juni]||'')+'</p>'
     +'</div></div>';
+}
+function unqiNav(dir){
+  if(currentUnqiTab==='day')unqiOffsetDay+=dir;
+  else if(currentUnqiTab==='month')unqiOffsetMonth+=dir;
+  else unqiOffsetYear+=dir;
+  switchUnqiTab(currentUnqiTab);
+}
+function lcNav(dir){
+  lcOffset+=dir;
+  switchLcTab('today');
 }
 function switchUnqiTab(tab){
   currentUnqiTab=tab;
@@ -1129,7 +1097,6 @@ function buildLcHTML(tab){
   if(!_lcData)return '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem">生年月日が未登録です</div>';
   var mc=_lcData.meishikiCount,bc=_lcData.baseColors,tc=_lcData.todayColors;
   if(tab==='omamori'){
-    var lcNavEl=document.getElementById('lc-nav');if(lcNavEl)lcNavEl.style.display='none';
     var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.6rem;">普段から自分を守ってくれるカラーです</div>';
     html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.6rem;">'+makeSwatchHTML2(bc)+'</div>';
     var label=bc.map(function(g){return GOGYO_COLOR[g].emoji+g;}).join('・');
@@ -1137,28 +1104,14 @@ function buildLcHTML(tab){
     return html;
   }
   if(tab==='today'){
-    // lcOffsetに応じた日付の五行を計算
-    var dtInfo2 = getOffsetDate('day', lcOffset);
-    var tny=dtInfo2.y, tnm=dtInfo2.m, tnd=dtInfo2.d;
-    var dStr=tny+'年'+tnm+'月'+tnd+'日';
-    // ナビ表示・ラベル更新
-    var lcNavEl=document.getElementById('lc-nav');
-    if(lcNavEl)lcNavEl.style.display='flex';
-    var lcDateLbl=document.getElementById('lc-date-label');
-    if(lcDateLbl)lcDateLbl.textContent=dtInfo2.label;
-    // その日の五行計算
-    var todayKS3=getTodayGogyoForDate(tny,tnm,tnd);
-    var totalCount3=Object.assign({},_lcData.meishikiCount);
-    Object.keys(todayKS3.count).forEach(function(k){totalCount3[k]+=todayKS3.count[k];});
-    var tc3=getLeastGogyo2(totalCount3);
+    var now=new Date(),dStr=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
     var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.6rem;">'+dStr+'の運気を補うカラーです</div>';
-    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.6rem;">'+makeSwatchHTML2(tc3)+'</div>';
-    var label=tc3.map(function(g){return GOGYO_COLOR[g].emoji+g;}).join('・');
-    html+='<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin:0;">命式＋'+dStr+'の干支を合わせて「<strong style="color:var(--gold2);">'+label+'</strong>」が最も少ない五行です。この色で運気を補いましょう。</p>';
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.6rem;">'+makeSwatchHTML2(tc)+'</div>';
+    var label=tc.map(function(g){return GOGYO_COLOR[g].emoji+g;}).join('・');
+    html+='<p style="font-size:0.78rem;color:var(--text);line-height:1.8;margin:0;">命式＋今日の干支を合わせて「<strong style="color:var(--gold2);">'+label+'</strong>」が最も少ない五行です。今日はこの色で運気を補いましょう。</p>';
     return html;
   }
   if(tab==='gogyo'){
-    var lcNavEl=document.getElementById('lc-nav');if(lcNavEl)lcNavEl.style.display='none';
     var total=Object.values(mc).reduce(function(a,b){return a+b;},0);
     var sortedG=Object.entries(mc).sort(function(a,b){return b[1]-a[1];});
     var html='<div style="font-size:0.72rem;color:var(--text2);margin-bottom:0.5rem;">命式の五行分布（蔵干含む9要素）</div>';
@@ -1193,9 +1146,8 @@ function switchLcTab(tab){
   if(body)body.innerHTML=buildLcHTML(tab);
 }
 function updateWidgets(bd){
-  unqiOffsetDay=0;unqiOffsetMonth=0;unqiOffsetYear=0;
-  lcOffset = 0;
   _widgetBd=bd;
+  unqiOffsetDay=0;unqiOffsetMonth=0;unqiOffsetYear=0;lcOffset=0;
   var parts=bd.split('-'),y=+parts[0],m=+parts[1],d=+parts[2];
   var ht=hoshi(y,m,d);
   // 蔵干取得（簡易：各支の本気）
