@@ -292,11 +292,17 @@ canvas#petalCanvas{position:fixed;top:0;left:0;width:100%;height:100%;
 
   <!-- 入力カード -->
   <div class="input-card" id="inputCard">
-    <div class="input-card-ttl">🌸 生年月日を入力</div>
+    <div class="input-card-ttl">🌸 生年月日・性別を入力</div>
     <div class="date-grp">
       <select id="byY"></select>
       <select id="byM"></select>
       <select id="byD"></select>
+    </div>
+    <div class="date-grp" style="margin-top:0.5rem">
+      <select id="byG" style="flex:1;padding:0.75rem 0.5rem;border:1px solid var(--border);border-radius:var(--rm);background:var(--card);color:var(--text);font-family:'Noto Serif JP',serif;font-size:0.9rem;outline:none">
+        <option value="男">男性</option>
+        <option value="女">女性</option>
+      </select>
     </div>
     <button class="calc-btn" onclick="doCalc()">精密命式を鑑定する</button>
     <div class="input-hint">年柱・月柱・日柱・大運を自動計算します</div>
@@ -563,10 +569,11 @@ function initDateSel(){
   }
   // URLパラメータから設定
   var p=new URLSearchParams(window.location.search);
-  var py=p.get('y'),pm=p.get('m'),pd=p.get('d');
+  var py=p.get('y'),pm=p.get('m'),pd=p.get('d'),pg=p.get('g');
   if(py)yEl.value=py;
   if(pm)mEl.value=pm;
   if(pd)dEl.value=pd;
+  if(pg){var gEl=document.getElementById('byG');if(gEl)gEl.value=pg;}
   if(py&&pm&&pd)doCalc();
   else{
     // localStorageから自分のデータを読む
@@ -574,6 +581,8 @@ function initDateSel(){
     if(data&&data.account&&data.account.birthday){
       var bd=data.account.birthday.split('-');
       yEl.value=+bd[0];mEl.value=+bd[1];dEl.value=+bd[2];
+      var gEl=document.getElementById('byG');
+      if(gEl&&data.account.gender)gEl.value=data.account.gender;
     }
   }
 }
@@ -602,23 +611,13 @@ function doCalc(){
   var sats=SATSKAI[hn]||[];
   var nenNum=ROKUJU.indexOf(nenKS)+1;
   var isFwd;
-  // 性別は不明なのでデフォルトで＋なら男性フォワード、－なら女性フォワード
+  // 性別：URLパラメータ &g= を最優先、なければ選択UIの値
   var data=S.load();
-  var gender='男';
-  if(data&&data.account&&data.account.gender){gender=data.account.gender;}
-  // URLにy,m,dが渡されている場合、対象者のデータを検索
   var p=new URLSearchParams(window.location.search);
-  var py=p.get('y');
-  if(py){
-    // 他人タブの場合、他人の性別を探す
-    if(data&&data.people){
-      var found=data.people.find(function(x){
-        if(!x.birthday)return false;
-        var bd=x.birthday.split('-');
-        return +bd[0]===y&&+bd[1]===m&&+bd[2]===d;
-      });
-      if(found&&found.gender)gender=found.gender;
-    }
+  var gender=p.get('g')||document.getElementById('byG').value||'男';
+  // gが'不明'の場合はnenNumから推定
+  if(gender==='不明'){
+    gender=nenNum%2===1?'男':'女';
   }
   isFwd=(nenNum%2===1&&gender==='男')||(nenNum%2===0&&gender==='女');
 

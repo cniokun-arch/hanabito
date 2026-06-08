@@ -1722,20 +1722,21 @@ function navTo(url){
   if(!acc.birthday){window.location.href=url;return;}
   var myBd=acc.birthday.split('-');
   var myY=+myBd[0],myM=+myBd[1],myD=+myBd[2];
+  var myG=acc.gender||'男';
   var finalUrl='';
   if(url.indexOf('aisho.html')>=0){
-    finalUrl='aisho.html?y='+myY+'&m='+myM+'&d='+myD;
+    finalUrl='aisho.html?y='+myY+'&m='+myM+'&d='+myD+'&g='+encodeURIComponent(myG);
     if(curId!=='me'){
       var p=data.people.find(function(x){return x.id===curId;});
-      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2];}
+      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl+='&y2='+pb[0]+'&m2='+pb[1]+'&d2='+pb[2]+'&g2='+encodeURIComponent(p.gender||'女');}
     }
   } else if(url.indexOf('meishiki.html')>=0){
     if(curId!=='me'){
       var p=data.people.find(function(x){return x.id===curId;});
-      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl='meishiki.html?y='+pb[0]+'&m='+pb[1]+'&d='+pb[2];}
-      else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD;
-    } else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD;
-  } else finalUrl=url+'?y='+myY+'&m='+myM+'&d='+myD;
+      if(p&&p.birthday){var pb=p.birthday.split('-');finalUrl='meishiki.html?y='+pb[0]+'&m='+pb[1]+'&d='+pb[2]+'&g='+encodeURIComponent(p.gender||'女');}
+      else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD+'&g='+encodeURIComponent(myG);
+    } else finalUrl='meishiki.html?y='+myY+'&m='+myM+'&d='+myD+'&g='+encodeURIComponent(myG);
+  } else finalUrl=url+'?y='+myY+'&m='+myM+'&d='+myD+'&g='+encodeURIComponent(myG);
   window.location.href=finalUrl;
 }
 
@@ -1777,8 +1778,8 @@ function useChip(t){document.getElementById('chatInp').value=t;sendChat();}
 function uranaiOne(){
   var bd=getDateStr('urBdY','urBdM','urBdD');
   if(!bd){alert('生年月日を選択してください');return;}
-  var p=new URLSearchParams(window.location.search);
-  window.location.href='meishiki.html?y='+bd.split('-')[0]+'&m='+parseInt(bd.split('-')[1])+'&d='+parseInt(bd.split('-')[2]);
+  var gen=document.getElementById('urGen')?document.getElementById('urGen').value:'不明';
+  window.location.href='meishiki.html?y='+bd.split('-')[0]+'&m='+parseInt(bd.split('-')[1])+'&d='+parseInt(bd.split('-')[2])+'&g='+encodeURIComponent(gen);
 }
 function uranaiAisho(){
   var bd=getDateStr('urBdY','urBdM','urBdD');
