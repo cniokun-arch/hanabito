@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>花人占術 - Life Partner AI -</title>
+<!-- v2.4 -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Noto+Serif+JP:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -310,6 +311,8 @@ body.theme-dark .rbadge{background:linear-gradient(135deg,rgba(230,198,135,0.25)
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:transform 0.2s;flex-shrink:0;box-shadow:0 2px 6px rgba(254,197,187,0.4)}
 .send-btn:active{transform:scale(0.94)}
+.btn-aisho{background:linear-gradient(135deg,#c9e4f5 0%,#a8d4ed 100%);color:#2a4a6a}
+body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5),rgba(40,80,140,0.6));color:#a0c8f0;border:1px solid rgba(100,160,220,0.4)}
 
 /* 人物追加フォーム */
 .add-form{background:#fff;border:1px solid var(--border);border-radius:var(--r);
@@ -528,7 +531,7 @@ body.theme-dark .rbadge{background:linear-gradient(135deg,rgba(230,198,135,0.25)
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.4rem">
         <button class="btn-p" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em" onclick="uranaiOne()">🌸 この人を占う</button>
-        <button class="btn-p" id="aishoBtn" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em;background:linear-gradient(135deg,#c9e4f5 0%,#a8d4ed 100%);color:#2a4a6a" onclick="uranaiAisho()">💞 相性を見る</button>
+        <button class="btn-p" id="aishoBtn" class="btn-aisho" style="padding:0.75rem;font-size:0.85rem;letter-spacing:0.05em" onclick="uranaiAisho()">💞 相性を見る</button>
       </div>
     </div>
 
