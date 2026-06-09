@@ -1234,6 +1234,69 @@ function renderDaiun(){
   document.getElementById('m-life-legend').innerHTML=legend.map(function(l){return '<div style="display:flex;align-items:center;gap:4px"><div style="width:16px;height:3px;background:'+l.col+';border-radius:2px"></div><span>'+l.label+'</span></div>';}).join('');
 }
 
+// ===== プロファイル自動蓄積（home.htmlと共有） =====
+function getProfileM(data,targetId){
+  if(!targetId||targetId==='me'){
+    if(!data.account._profile)data.account._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+    return{prof:data.account._profile,targetId:'me'};
+  }
+  var p=data.people.find(function(x){return x.id===targetId;});
+  if(!p)return{prof:null,targetId:null};
+  if(!p._profile)p._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+  return{prof:p._profile,targetId:targetId};
+}
+function buildProfileTextM(data){
+  var lines=[];
+  var myProf=data.account._profile||{};
+  if(myProf.personality&&myProf.personality.length)lines.push('【あなたの性格】'+myProf.personality.join('、'));
+  if(myProf.concerns&&myProf.concerns.length)lines.push('【最近の悩み】'+myProf.concerns.join('、'));
+  if(myProf.preferences&&myProf.preferences.length)lines.push('【好み・趣味傾向】'+myProf.preferences.join('、'));
+  if(myProf.lifestage)lines.push('【ライフステージ】'+myProf.lifestage);
+  if(myProf.history&&myProf.history.length){
+    lines.push('【相談履歴（過去→現在）】');
+    myProf.history.slice(-5).forEach(function(h){lines.push('  '+h.date+' '+h.summary+(h.keywords?' ['+h.keywords.join(',')+']':''));});
+  }
+  if(data.people&&data.people.length){
+    data.people.forEach(function(p){
+      var pf=p._profile||{};
+      var plines=[];
+      if(pf.personality&&pf.personality.length)plines.push('性格：'+pf.personality.join('、'));
+      if(pf.concerns&&pf.concerns.length)plines.push('最近の様子：'+pf.concerns.join('、'));
+      if(pf.lifestage)plines.push('状況：'+pf.lifestage);
+      if(pf.history&&pf.history.length)plines.push('相談履歴：'+pf.history.slice(-3).map(function(h){return h.date+'「'+h.summary+'」';}).join('→'));
+      if(plines.length||p.hobby)lines.push('【'+p.name+'（'+p.relation+'）】'+(p.hobby?'趣味:'+p.hobby+' ':'')+plines.join(' '));
+    });
+  }
+  return lines.join('\n');
+}
+async function updateProfileM(userMsg,aiReply){
+  var data=S.load();if(!data)return;
+  // meishikiは自分の鑑定ページなので自分のプロフィールを更新
+  var r=getProfileM(data,'me');var prof=r.prof;if(!prof)return;
+  try{
+    var prompt='以下のユーザーの発言とAIの回答から、ユーザーの特徴を抽出してJSON形式で返してください。\n'+
+      'ユーザー発言：'+userMsg+'\nAI回答：'+aiReply+'\n'+
+      '既存データ：'+JSON.stringify({personality:prof.personality,concerns:prof.concerns,preferences:prof.preferences,lifestage:prof.lifestage})+'\n'+
+      '以下のJSON形式のみで返答（他の文字は一切含めない）：\n'+
+      '{"personality":[],"concerns":[],"preferences":[],"lifestage":"","summary":"要約20字以内","keywords":[],"changed":true}\n'+
+      'changedは新情報があればtrue。なければfalse。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)return;
+    var dat=await res.json();
+    var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var ex=JSON.parse(txt);if(!ex.changed)return;
+    function mergeArr(existing,newItems,max){var merged=existing.slice();(newItems||[]).forEach(function(item){if(item&&merged.indexOf(item)<0)merged.push(item);});return merged.slice(-max);}
+    prof.personality=mergeArr(prof.personality,ex.personality,8);
+    prof.concerns=mergeArr(prof.concerns,ex.concerns,5);
+    prof.preferences=mergeArr(prof.preferences,ex.preferences,8);
+    if(ex.lifestage)prof.lifestage=ex.lifestage;
+    if(ex.summary){var today=new Date(),ds=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();prof.history=prof.history||[];prof.history.push({date:ds,summary:ex.summary,keywords:ex.keywords||[]});if(prof.history.length>20)prof.history=prof.history.slice(-20);}
+    S.save(data);
+  }catch(e){console.log('プロフィール更新エラー:',e);}
+}
+
 // ===== index.htmlと同一のAIシステム =====
 const WORKER_URL='https://polished-flower-2524.cniokun.workers.dev/api/chat';
 const WORKER_BASE='https://polished-flower-2524.cniokun.workers.dev';
@@ -1371,14 +1434,19 @@ function buildSystemPrompt(isPersonal){
   var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){var v=KB['十二運気'][k];return k+'：'+(v['説明']||'')+(v['独自解釈']?' '+v['独自解釈']:'');}).join('\n');
   var daiInfo=KB['転化天蛹']?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間のこと。命式の干支が転化天蛹の支でも転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||''):'';
 
+  var data2=S.load()||{account:{},people:[]};
+  var profileText=buildProfileTextM(data2);
+
   return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
     +'【知識ベース】\n'+starInfo+'\n\n'+junishiInfo+'\n\n【十二運気】\n'+juniInfo+'\n\n'+daiInfo+'\n\n'
     +userInfo
+    +(profileText?'\n【蓄積プロフィール・相談履歴】\n'+profileText+'\n':'')
     +'\n\n【三層構造の本質】\n'
     +'・日柱（魂の核・消せない本能）：本人が消すことも止めることもできない根源的な衝動・本能。\n'
     +'・月柱（社会の自分・調整の層）：日柱の衝動と年柱の刷り込みの板挟みの中で現実社会でどう振る舞うかを調整している層。\n'
     +'・年柱（育ちの刷り込み・無意識の作法）：幼少期から環境・親・文化によって無意識に刷り込まれた行動の作法・価値観。\n\n'
-    +'【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に一切出してはいけない。Markdown記法（**太字**・#見出し等）禁止。親しみやすい日本語で話す。単発の概念質問は200〜300文字。総合質問は400〜800文字。';
+    +'【過去→現在→未来の読み解き】相談履歴がある場合、「以前〇〇で悩んでいましたが、今は〜」という形で時系列の変化を踏まえてアドバイスする。\n\n'
+    +'【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に一切出してはいけない。Markdown記法（**太字**・#見出し等）禁止。親しみやすい日本語で話す。単発の概念質問は200〜300文字。総合質問は400〜800文字。転化天蛹は大運のみ・年運月運日運には絶対に使用しない。';
 }
 
 async function sendAiMsg(){
@@ -1409,6 +1477,8 @@ async function sendAiMsg(){
     addAiMsg('ai',reply);
     aiHistory.push({role:'assistant',content:reply});
     if(aiHistory.length>20)aiHistory=aiHistory.slice(-20);
+    // バックグラウンドでプロファイル更新
+    updateProfileM(q,reply).catch(function(){});
   }catch(e){
     loadingEl.remove();
     var msg=e.message.indexOf('Overloaded')>=0||e.message.indexOf('overloaded')>=0

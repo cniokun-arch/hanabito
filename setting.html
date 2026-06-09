@@ -79,6 +79,13 @@ body{background-image:var(--bg-grad);background-attachment:fixed}
 <div class="page">
   <div class="scnt">
 
+    <!-- 蓄積プロフィール -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">🧠 AIが蓄積したあなたのプロフィール</div>
+      <div id="myProfileView"></div>
+      <button class="setting-btn" style="margin-top:0.8rem;background:rgba(124,58,237,0.1);color:#7c3aed;box-shadow:none" onclick="clearMyProfile()">プロフィールをリセットする</button>
+    </div>
+
     <!-- プロフィール -->
     <div class="setting-sec">
       <div class="setting-sec-ttl">👤 あなたの登録情報</div>
@@ -193,6 +200,32 @@ function loadPetalSetting(){
 }
 
 // ===== 設定描画 =====
+function renderMyProfile(){
+  var data=S.load();if(!data||!data.account)return;
+  var pf=data.account._profile;
+  var el=document.getElementById('myProfileView');if(!el)return;
+  if(!pf||(!pf.personality.length&&!pf.concerns.length&&!pf.preferences.length&&!pf.lifestage&&!pf.history.length)){
+    el.innerHTML='<div style="font-size:0.83rem;color:var(--text2);padding:0.4rem 0">AIとの会話が蓄積されると、ここに表示されます。</div>';return;
+  }
+  var html='';
+  if(pf.personality&&pf.personality.length)html+='<div class="profile-row"><span class="profile-lbl">性格</span><span class="profile-val" style="font-size:0.82rem">'+pf.personality.join('、')+'</span></div>';
+  if(pf.concerns&&pf.concerns.length)html+='<div class="profile-row"><span class="profile-lbl">悩み傾向</span><span class="profile-val" style="font-size:0.82rem;color:#7c3aed">'+pf.concerns.join('、')+'</span></div>';
+  if(pf.preferences&&pf.preferences.length)html+='<div class="profile-row"><span class="profile-lbl">好み</span><span class="profile-val" style="font-size:0.82rem">'+pf.preferences.join('、')+'</span></div>';
+  if(pf.lifestage)html+='<div class="profile-row"><span class="profile-lbl">状況</span><span class="profile-val" style="font-size:0.82rem">'+pf.lifestage+'</span></div>';
+  if(pf.history&&pf.history.length){
+    html+='<div style="margin-top:0.6rem;font-size:0.75rem;color:var(--gold2);font-weight:600;margin-bottom:0.3rem">相談履歴</div>';
+    pf.history.slice(-10).forEach(function(h){
+      html+='<div style="font-size:0.75rem;color:var(--text2);padding:0.2rem 0;border-bottom:1px solid var(--border)">'+h.date+' '+h.summary+(h.keywords&&h.keywords.length?' ['+h.keywords.join(',')+']':'')+'</div>';
+    });
+  }
+  el.innerHTML=html;
+}
+function clearMyProfile(){
+  if(!confirm('AIが蓄積したプロフィール・相談履歴を削除しますか？'))return;
+  var data=S.load();if(!data)return;
+  data.account._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+  S.save(data);renderMyProfile();alert('リセットしました');
+}
 function renderSetting(){
   var data=S.load();if(!data||!data.account){window.location.href='home.html';return;}
   var acc=data.account;
@@ -213,14 +246,23 @@ function renderSetting(){
 
   var pl=document.getElementById('peopleList');
   if(!data.people||data.people.length===0){
-    pl.innerHTML='<div style="font-size:0.85rem;color:var(--text2);padding:0.5rem 0">まだ登録されていません</div>';
+    pl.innerHTML='<div style="font-size:0.85rem;color:var(--text2);padding:0.5rem 0">まだ登録されていません（最大5人）</div>';
   }else{
     pl.innerHTML=data.people.map(function(p){
       var bdStr='';if(p.birthday){var b=p.birthday.split('-');bdStr=b[0]+'年'+parseInt(b[1])+'月'+parseInt(b[2])+'日';}
-      return '<div class="profile-row"><span class="profile-lbl">'+p.name+'</span>'
-        +'<span class="profile-val" style="font-size:0.8rem;color:var(--text2)">'+p.relation+' / '+bdStr+'</span>'
-        +'<button class="profile-edit" onclick="deletePerson('+JSON.stringify(p.id)+')">削除</button></div>';
-    }).join('');
+      var profStr='';
+      if(p._profile){
+        var pf=p._profile;
+        if(pf.concerns&&pf.concerns.length)profStr+='<div style="font-size:0.72rem;color:#7c3aed;margin-top:2px">悩み：'+pf.concerns.join('、')+'</div>';
+        if(pf.history&&pf.history.length)profStr+='<div style="font-size:0.7rem;color:var(--text2);margin-top:2px">最終相談：'+pf.history[pf.history.length-1].summary+'</div>';
+      }
+      return '<div class="profile-row" style="flex-direction:column;align-items:flex-start;gap:0.2rem">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;width:100%">'+
+        '<span style="font-family:var(--serif);font-size:0.95rem;font-weight:600">'+p.name+'</span>'+
+        '<button class="profile-edit" onclick="deletePerson('+JSON.stringify(p.id)+')">削除</button></div>'+
+        '<div style="font-size:0.78rem;color:var(--text2)">'+p.relation+' / '+bdStr+'</div>'+
+        profStr+'</div>';
+    }).join('')+'<div style="font-size:0.72rem;color:var(--text2);margin-top:0.5rem">残り'+(5-data.people.length)+'人登録可能</div>';
   }
 }
 
@@ -264,6 +306,7 @@ window.addEventListener('DOMContentLoaded',function(){
   loadTheme();
   loadPetalSetting();
   renderSetting();
+  renderMyProfile();
 });
 </script>
 </body>
