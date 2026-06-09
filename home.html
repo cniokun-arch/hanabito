@@ -912,7 +912,7 @@ function kkColor(ju,ht){
   if(k==='苦難')return '#e05050';if(k==='試練')return '#c03030';
   if(k==='変容')return '#a070d0';return '#888';
 }
-function todayShi(){return yearKS(new Date().getFullYear(),1,15).slice(1);}
+function todayShi(){var n=new Date();return dayKS(n.getFullYear(),n.getMonth()+1,n.getDate())[1];}
 function calcP(bd){
   var p=bd.split('-'),y=+p[0],m=+p[1],d=+p[2];
   var ht=hoshi(y,m,d),nKS=yearKS(y,m,d),tKS=monthKS(y,m,d),niKS=dayKS(y,m,d);
