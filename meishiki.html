@@ -380,7 +380,10 @@ body.theme-dark .ai-input-row textarea{background:#1c1914;color:#f4f0ea;border-c
     <!-- 今日の運気セクション -->
     <div class="sec fade-in">
       <div class="sec-head">
-        <div class="sec-ttl">⭐ 今日の運気</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="sec-ttl">⭐ 今日の運気</div>
+          <button onclick="document.getElementById('setsu-about-overlay-m').style.display='block'" style="background:transparent;border:1px solid rgba(184,134,11,0.4);border-radius:14px;padding:0.25rem 0.7rem;font-family:'Noto Serif JP',serif;font-size:0.72rem;color:#b8860b;cursor:pointer;">📅 節気とは？</button>
+        </div>
       </div>
       <div class="sec-body">
         <div class="tab-wrap" id="unkiTabs">
@@ -437,7 +440,10 @@ body.theme-dark .ai-input-row textarea{background:#1c1914;color:#f4f0ea;border-c
     <!-- AIチャットセクション -->
     <div class="sec fade-in">
       <div class="sec-head">
-        <div class="sec-ttl">🌸 専属AIパートナーと対話</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="sec-ttl">🌸 専属AIパートナーと対話</div>
+          <button onclick="document.getElementById('ai-about-overlay-m').style.display='block'" style="background:transparent;border:1px solid rgba(124,58,237,0.4);border-radius:14px;padding:0.25rem 0.7rem;font-family:'Noto Serif JP',serif;font-size:0.72rem;color:#7c3aed;cursor:pointer;">🤖 AIとは？</button>
+        </div>
       </div>
       <div class="sec-body" style="padding:0.8rem 1rem">
         <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.8rem;line-height:1.6">
@@ -492,6 +498,78 @@ body.theme-dark .ai-input-row textarea{background:#1c1914;color:#f4f0ea;border-c
   <button class="nbtn" onclick="goAisho()"><span class="ni">💞</span><span class="nl">相性</span></button>
   <button class="nbtn" onclick="goSoukan()"><span class="ni">🕸</span><span class="nl">相関図</span></button>
   <button class="nbtn" onclick="goSetting()"><span class="ni">⚙</span><span class="nl">設定</span></button>
+</div>
+
+<!-- AIアドバイスとは？ -->
+<div id="ai-about-overlay-m" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;overflow-y:auto;">
+  <div style="background:linear-gradient(135deg,#1a0050,#7c3aed 60%,#4a3c28);padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;">
+    <span style="font-family:var(--serif);color:#fff;font-size:1rem;letter-spacing:0.15em;">AI アドバイスとは</span>
+    <button onclick="document.getElementById('ai-about-overlay-m').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.2rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:1.4rem 1.2rem 5rem;">
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text);line-height:1.9;margin:0;">花人占術アプリでは、<strong style="color:#7c3aed;">最新のAI（人工知能）</strong>が、あなたの命式・大運・月別運気をすべて読み込んだうえで、あなた専用のアドバイスをしてくれます。</p>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+      <h3 style="font-family:var(--serif);font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">🌸 どうやって使うの？</h3>
+      <p style="font-size:0.83rem;color:var(--text);line-height:2;">① 生年月日を入力して命式を鑑定する<br>② 画面右下の <strong style="color:#7c3aed;">🌸 マーク</strong> をタップ<br>③ チャット画面が開くので、聞きたいことを入力する</p>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+      <h3 style="font-family:var(--serif);font-size:0.88rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem;">💬 こんなことが聞けます</h3>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <div style="font-size:0.8rem;color:var(--text);background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「私はどんな性格ですか？」</div>
+        <div style="font-size:0.8rem;color:var(--text);background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「大運の転換期はいつですか？」</div>
+        <div style="font-size:0.8rem;color:var(--text);background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「今の大運をどう過ごせばいい？」</div>
+        <div style="font-size:0.8rem;color:var(--text);background:rgba(124,58,237,0.06);border-radius:6px;padding:0.4rem 0.8rem;">「転化天蛹の時期の過ごし方は？」</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;">
+      <h3 style="font-family:var(--serif);font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">⚠ ご利用について</h3>
+      <p style="font-size:0.8rem;color:var(--text);line-height:1.9;margin:0;"><strong style="color:#b8860b;">無料：1日10回まで</strong>ご利用いただけます。<br>有料プランは今後実装予定です。</p>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button onclick="document.getElementById('ai-about-overlay-m').style.display='none'" style="background:var(--gold-grad);color:var(--text);border:none;border-radius:8px;padding:0.75rem 2rem;font-family:var(--serif);font-size:0.9rem;cursor:pointer;letter-spacing:0.1em;">← 戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- 運気の切り替わりタイミング -->
+<div id="setsu-about-overlay-m" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;overflow-y:auto;">
+  <div style="background:linear-gradient(135deg,#3a2a00,#b8860b 60%,#7c3aed);padding:calc(var(--safe-t) + 1rem) 1.2rem 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;">
+    <span style="font-family:var(--serif);color:#fff;font-size:1rem;letter-spacing:0.15em;">運気の切り替わりタイミング</span>
+    <button onclick="document.getElementById('setsu-about-overlay-m').style.display='none'" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.2rem;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:1.4rem 1.2rem 5rem;">
+    <div style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(124,58,237,0.06));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text);line-height:1.9;margin:0;">花人占術では、運気の切り替わりは<strong style="color:#b8860b;">カレンダーの月初め・元旦ではなく</strong>、古来から使われてきた<strong style="color:#b8860b;">節気（せっき）の日</strong>を基準にしています。</p>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;">
+      <h3 style="font-family:var(--serif);font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">📅 年の運気の切り替わり</h3>
+      <p style="font-size:0.83rem;color:var(--text);line-height:1.9;margin:0;">年の運気は<strong style="color:#b8860b;">立春（りっしゅん）</strong>の日から切り替わります。毎年2月4日頃です。</p>
+      <p style="font-size:0.82rem;color:var(--text2);line-height:1.8;margin:0.5rem 0 0;">例：2026年の運気は <strong>2026年2月4日（立春）〜2027年2月3日</strong> まで続きます。</p>
+    </div>
+    <div style="background:var(--card);border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;">
+      <h3 style="font-family:var(--serif);font-size:0.88rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem;">🗓️ 月の運気の切り替わり</h3>
+      <p style="font-size:0.83rem;color:var(--text);line-height:1.9;margin:0 0 0.6rem;">月の運気は以下の<strong style="color:#b8860b;">12の節気</strong>の当日から切り替わります。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem 1rem;">
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立春</span>（2月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">啓蟄</span>（3月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">清明</span>（4月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立夏</span>（5月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">芒種</span>（6月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">小暑</span>（7月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立秋</span>（8月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">白露</span>（9月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">寒露</span>（10月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">立冬</span>（11月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">大雪</span>（12月初旬）</div>
+        <div style="font-size:0.8rem;color:var(--text);line-height:1.8;"><span style="color:#b8860b;font-weight:700;">小寒</span>（1月初旬）</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button onclick="document.getElementById('setsu-about-overlay-m').style.display='none'" style="background:var(--gold-grad);color:var(--text);border:none;border-radius:8px;padding:0.75rem 2rem;font-family:var(--serif);font-size:0.9rem;cursor:pointer;letter-spacing:0.1em;">← 戻る</button>
+    </div>
+  </div>
 </div>
 
 <script>
