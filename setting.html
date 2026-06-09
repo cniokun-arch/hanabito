@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>設定 - 花人占術</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Noto+Serif+JP:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#fff9f6;--bg-grad:linear-gradient(135deg,#fff5f2 0%,#feeef0 50%,#fdf0f7 100%);
+  --card:#ffffff;--card2:#fff5f6;
+  --gold:#d4a373;--gold2:#b58255;
+  --gold-grad:linear-gradient(135deg,#fae1dd 0%,#fec5bb 100%);
+  --glow:rgba(254,197,187,0.3);
+  --text:#4a3f3d;--text2:#8a7a77;
+  --border:rgba(254,197,187,0.4);--border2:rgba(212,163,115,0.5);
+  --r:22px;--rm:14px;
+  --serif:'Zen Old Mincho','Noto Serif JP',serif;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+body.theme-gold{--bg:#fdf8ef;--bg-grad:linear-gradient(135deg,#fdf6e8 0%,#f7e8c8 50%,#fdf3e0 100%);--card:#ffffff;--card2:#fdf6eb;--gold:#b8860b;--gold2:#8b6508;--gold-grad:linear-gradient(135deg,#f5e6b0 0%,#d4a017 100%);--glow:rgba(184,134,11,0.2);--text:#2a1c08;--text2:#7a6b52;--border:rgba(184,134,11,0.25);--border2:rgba(184,134,11,0.5)}
+body.theme-dark{--bg:#0b0a08;--bg-grad:linear-gradient(135deg,#110e08 0%,#1a1610 50%,#0f0c09 100%);--card:#14120e;--card2:#1c1914;--gold:#e6c687;--gold2:#b89146;--gold-grad:linear-gradient(135deg,#e6c687 0%,#b89146 100%);--glow:rgba(230,198,135,0.15);--text:#f4f0ea;--text2:#b5ae9f;--border:rgba(230,198,135,0.15);--border2:rgba(230,198,135,0.4)}
+body.theme-dark .setting-sec{background:var(--card)}
+body.theme-dark .topbar{background:rgba(17,14,10,0.92);border-bottom-color:rgba(230,198,135,0.15)}
+body.theme-dark .bnav{background:rgba(17,14,10,0.95);border-top-color:rgba(230,198,135,0.1)}
+body.theme-dark .nbtn{color:var(--text2)}
+body.theme-dark .nbtn.on{color:var(--gold)}
+
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;line-height:1.6}
+body{background-image:var(--bg-grad);background-attachment:fixed}
+
+/* トップバー */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding-top:var(--safe-t);height:calc(var(--safe-t) + 48px);display:flex;align-items:flex-end;padding-left:1rem;padding-right:1rem;padding-bottom:0.5rem}
+.topbar-logo{flex:1;text-align:center;font-family:var(--serif);font-size:1rem;font-weight:600;letter-spacing:0.2em;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;pointer-events:none}
+
+/* メイン */
+.page{padding:calc(var(--safe-t) + 56px) 0 calc(var(--safe-b) + 5rem)}
+.scnt{padding:1rem}
+
+/* 設定セクション */
+.setting-sec{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.2rem 0.6rem;margin-bottom:1rem;box-shadow:0 4px 14px rgba(254,197,187,0.1)}
+.setting-sec-ttl{font-family:var(--serif);color:var(--gold2);font-size:1rem;font-weight:600;letter-spacing:0.08em;border-left:3px solid var(--gold);padding-left:0.6rem;margin-bottom:1rem}
+.profile-row{display:flex;align-items:center;gap:0.8rem;padding:0.8rem 0;border-bottom:1px solid var(--border)}
+.profile-row:last-child{border-bottom:none}
+.profile-lbl{font-size:0.78rem;color:var(--text2);width:80px;flex-shrink:0}
+.profile-val{font-family:var(--serif);font-size:0.95rem;color:var(--text);font-weight:600;flex:1}
+.profile-edit{background:none;border:1px solid var(--border);color:var(--text2);padding:0.3rem 0.7rem;border-radius:8px;font-size:0.75rem;cursor:pointer;font-family:'Noto Serif JP',serif}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;margin-bottom:0.6rem}
+.theme-card{border:2px solid var(--border);border-radius:14px;padding:0.9rem 0.6rem;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--card)}
+.theme-card.on{border-color:var(--gold2);box-shadow:0 4px 12px var(--glow)}
+.theme-card:active{transform:scale(0.97)}
+.theme-preview{width:100%;height:40px;border-radius:8px;margin-bottom:0.5rem}
+.theme-name{font-size:0.75rem;color:var(--text);font-weight:600;font-family:var(--serif)}
+.setting-btn{width:100%;padding:0.8rem;background:var(--gold-grad);color:var(--text);border:none;border-radius:var(--rm);font-family:var(--serif);font-size:0.9rem;font-weight:600;cursor:pointer;letter-spacing:0.08em;margin-bottom:0.8rem;box-shadow:0 3px 10px var(--glow)}
+.setting-btn-danger{background:linear-gradient(135deg,#fde8e8 0%,#fcc8c8 100%);color:#c03030;box-shadow:none}
+.setting-item{padding:0.9rem 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.setting-item:last-child{border-bottom:none}
+.setting-item-lbl{font-size:0.88rem;color:var(--text)}
+.setting-item-val{font-size:0.8rem;color:var(--text2)}
+
+/* ボトムナビ */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);padding-bottom:var(--safe-b);display:flex}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.15rem;padding:0.5rem 0.2rem;background:none;border:none;cursor:pointer;font-family:'Noto Serif JP',serif;font-size:0.62rem;color:var(--text2);letter-spacing:0.03em;transition:color 0.2s}
+.nbtn.on{color:var(--gold2)}
+.ni{font-size:1.1rem;display:block}
+.nl{display:block;font-size:0.6rem}
+</style>
+</head>
+<body>
+
+<!-- トップバー -->
+<div class="topbar">
+  <div style="width:60px"></div>
+  <div class="topbar-logo">花人占術</div>
+  <div style="width:60px"></div>
+</div>
+
+<div class="page">
+  <div class="scnt">
+
+    <!-- プロフィール -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">👤 あなたの登録情報</div>
+      <div id="profileRows"></div>
+      <button class="setting-btn" onclick="editProfile()">プロフィールを編集する</button>
+    </div>
+
+    <!-- テーマ切り替え -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">🎨 テーマカラー</div>
+      <div class="theme-grid">
+        <div class="theme-card" id="tc-pink" onclick="setTheme('pink')">
+          <div class="theme-preview" style="background:linear-gradient(135deg,#fff5f2,#feeef0)"></div>
+          <div class="theme-name">桜ピンク</div>
+        </div>
+        <div class="theme-card" id="tc-gold" onclick="setTheme('gold')">
+          <div class="theme-preview" style="background:linear-gradient(135deg,#fdf6e8,#d4a017)"></div>
+          <div class="theme-name">金木犀</div>
+        </div>
+        <div class="theme-card" id="tc-dark" onclick="setTheme('dark')">
+          <div class="theme-preview" style="background:linear-gradient(135deg,#1c1810,#0b0a08)"></div>
+          <div class="theme-name">漆黒</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 花びら演出 -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">🌸 花びら演出</div>
+      <div class="setting-item">
+        <span class="setting-item-lbl">花びらアニメーション</span>
+        <button id="petalToggleBtn" class="profile-edit" onclick="togglePetals()">ON</button>
+      </div>
+    </div>
+
+    <!-- 登録した人 -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">👥 登録した人一覧</div>
+      <div id="peopleList"></div>
+    </div>
+
+    <!-- その他 -->
+    <div class="setting-sec">
+      <div class="setting-sec-ttl">🔧 その他</div>
+      <div class="setting-item">
+        <span class="setting-item-lbl">アプリバージョン</span>
+        <span class="setting-item-val">花人占術 v1.0</span>
+      </div>
+      <div class="setting-item">
+        <span class="setting-item-lbl">データ保存先</span>
+        <span class="setting-item-val">このデバイスのみ</span>
+      </div>
+      <div class="setting-item">
+        <span class="setting-item-lbl" style="cursor:pointer" onclick="window.location.href='terms.html'">利用規約・プライバシーポリシー</span>
+        <span class="setting-item-val">›</span>
+      </div>
+    </div>
+
+    <button class="setting-btn setting-btn-danger" onclick="doLogout()">ログアウト</button>
+    <button class="setting-btn setting-btn-danger" onclick="doReset()">全データを初期化する</button>
+    <div style="height:1rem"></div>
+  </div>
+</div>
+
+<!-- ボトムナビ -->
+<div class="bnav">
+  <button class="nbtn" onclick="window.location.href='home.html'"><span class="ni">🏠</span><span class="nl">ホーム</span></button>
+  <button class="nbtn" onclick="window.location.href='meishiki.html'"><span class="ni">📿</span><span class="nl">命式</span></button>
+  <button class="nbtn" onclick="window.location.href='aisho.html'"><span class="ni">💞</span><span class="nl">相性</span></button>
+  <button class="nbtn" onclick="window.location.href='soukan.html'"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+  <button class="nbtn on"><span class="ni">⚙</span><span class="nl">設定</span></button>
+</div>
+
+<script>
+var KEY='hanabito_v2';
+var S={
+  load:function(){try{return JSON.parse(localStorage.getItem(KEY))||null;}catch(e){return null;}},
+  save:function(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+};
+
+// ===== テーマ =====
+var currentTheme='pink';
+function setTheme(t){
+  currentTheme=t;
+  if(t==='pink')document.body.className='';
+  else document.body.className='theme-'+t;
+  ['pink','gold','dark'].forEach(function(n){
+    var el=document.getElementById('tc-'+n);
+    if(el)el.classList.toggle('on',n===t);
+  });
+  var data=S.load();if(data){data._theme=t;S.save(data);}
+}
+function loadTheme(){
+  var data=S.load();
+  if(data&&data._theme)setTheme(data._theme);
+  else setTheme('pink');
+}
+
+// ===== 花びら =====
+var petalOn=true;
+function togglePetals(){
+  petalOn=!petalOn;
+  var btn=document.getElementById('petalToggleBtn');
+  if(btn)btn.textContent=petalOn?'ON':'OFF';
+  var data=S.load();if(data){data._petals=petalOn;S.save(data);}
+}
+function loadPetalSetting(){
+  var data=S.load();
+  petalOn=!data||data._petals!==false;
+  var btn=document.getElementById('petalToggleBtn');
+  if(btn)btn.textContent=petalOn?'ON':'OFF';
+}
+
+// ===== 設定描画 =====
+function renderSetting(){
+  var data=S.load();if(!data||!data.account){window.location.href='home.html';return;}
+  var acc=data.account;
+  var rows='';
+  rows+='<div class="profile-row"><span class="profile-lbl">名前</span><span class="profile-val">'+acc.nickname+'</span></div>';
+  if(acc.birthday){
+    var bd=acc.birthday.split('-');
+    rows+='<div class="profile-row"><span class="profile-lbl">生年月日</span><span class="profile-val">'+bd[0]+'年'+parseInt(bd[1])+'月'+parseInt(bd[2])+'日</span></div>';
+  }
+  rows+='<div class="profile-row"><span class="profile-lbl">性別</span><span class="profile-val">'+(acc.gender==='male'?'男性':'女性')+'</span></div>';
+  rows+='<div class="profile-row"><span class="profile-lbl">趣味</span><span class="profile-val">'+(acc.hobby||'未登録')+'</span></div>';
+  document.getElementById('profileRows').innerHTML=rows;
+
+  ['pink','gold','dark'].forEach(function(n){
+    var el=document.getElementById('tc-'+n);
+    if(el)el.classList.toggle('on',n===currentTheme);
+  });
+
+  var pl=document.getElementById('peopleList');
+  if(!data.people||data.people.length===0){
+    pl.innerHTML='<div style="font-size:0.85rem;color:var(--text2);padding:0.5rem 0">まだ登録されていません</div>';
+  }else{
+    pl.innerHTML=data.people.map(function(p){
+      var bdStr='';if(p.birthday){var b=p.birthday.split('-');bdStr=b[0]+'年'+parseInt(b[1])+'月'+parseInt(b[2])+'日';}
+      return '<div class="profile-row"><span class="profile-lbl">'+p.name+'</span>'
+        +'<span class="profile-val" style="font-size:0.8rem;color:var(--text2)">'+p.relation+' / '+bdStr+'</span>'
+        +'<button class="profile-edit" onclick="deletePerson('+JSON.stringify(p.id)+')">削除</button></div>';
+    }).join('');
+  }
+}
+
+function editProfile(){
+  var data=S.load();if(!data)return;
+  var acc=data.account;
+  var newNick=prompt('ニックネームを入力してください',acc.nickname||'');
+  if(newNick===null)return;
+  var newHobby=prompt('趣味を入力してください（AIに記憶させる）',acc.hobby||'');
+  if(newHobby===null)return;
+  acc.nickname=newNick;
+  acc.hobby=newHobby;
+  S.save(data);
+  renderSetting();
+  alert('更新しました');
+}
+
+function deletePerson(id){
+  if(!confirm('この人物を削除しますか？'))return;
+  var data=S.load();if(!data)return;
+  data.people=data.people.filter(function(p){return p.id!==id;});
+  S.save(data);
+  renderSetting();
+}
+
+function doLogout(){
+  if(confirm('ログアウトしますか？（データは保持されます）')){
+    window.location.href='home.html';
+  }
+}
+
+function doReset(){
+  if(confirm('全データを初期化しますか？この操作は取り消せません。')){
+    localStorage.removeItem(KEY);
+    window.location.href='home.html';
+  }
+}
+
+// ===== 初期化 =====
+window.addEventListener('DOMContentLoaded',function(){
+  loadTheme();
+  loadPetalSetting();
+  renderSetting();
+});
+</script>
+</body>
+</html>
