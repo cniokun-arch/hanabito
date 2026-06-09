@@ -1047,6 +1047,7 @@ async function sendAiMsg(){
   var input=document.getElementById('aiInput');
   var q=input.value.trim();
   if(!q)return;
+  if(!G){addAiMsg('ai','先に生年月日を入力して「精密命式を鑑定する」を押してください🌸');return;}
   if(!kbReady){
     var waited=0;
     while(!kbReady&&waited<3000){await new Promise(function(r){setTimeout(r,100);});waited+=100;}
