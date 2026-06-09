@@ -491,6 +491,7 @@ body.theme-dark .ai-input-row textarea{background:#1c1914;color:#f4f0ea;border-c
   <button class="nbtn on"><span class="ni">📿</span><span class="nl">命式</span></button>
   <button class="nbtn" onclick="goAisho()"><span class="ni">💞</span><span class="nl">相性</span></button>
   <button class="nbtn" onclick="goSoukan()"><span class="ni">🕸</span><span class="nl">相関図</span></button>
+  <button class="nbtn" onclick="goSetting()"><span class="ni">⚙</span><span class="nl">設定</span></button>
 </div>
 
 <script>
@@ -1135,9 +1136,10 @@ setTimeout(function(){
 function goBack(){window.location.href='home.html';}
 function goAisho(){
   if(!G){window.location.href='aisho.html';return;}
-  window.location.href='aisho.html?y='+G.y+'&m='+G.m+'&d='+G.d;
+  window.location.href='aisho.html?y='+G.y+'&m='+G.m+'&d='+G.d+'&g='+(G.gender==='男性'?'male':'female');
 }
 function goSoukan(){window.location.href='soukan.html';}
+function goSetting(){window.location.href='home.html#setting';}
 
 function showErr(msg){
   var el=document.getElementById('errmsg');

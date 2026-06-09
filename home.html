@@ -2131,7 +2131,12 @@ window.addEventListener('DOMContentLoaded',function(){
     hideSplash(function(){
       var d=S.load();
       document.getElementById('scrLoad').style.display='none';
-      if(d&&d.account){initDash();}
+      if(d&&d.account){
+        initDash();
+        if(window.location.hash==='#setting'){
+          setTimeout(function(){openSetting();},100);
+        }
+      }
       else{showScr('scrAuth');}
     });
   },1800);
