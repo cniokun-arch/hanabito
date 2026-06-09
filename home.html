@@ -1793,6 +1793,22 @@ function uranaiAisho(){
     +'&y2='+thBd[0]+'&m2='+parseInt(thBd[1])+'&d2='+parseInt(thBd[2]);
 }
 
+function getDaiunStartAge(y,m,d,isFwd){
+  var bd=new Date(y,m-1,d);var days=0;
+  try{
+    if(isFwd){
+      var st=setsu(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());
+      if(bd<stD)days=Math.round((stD-bd)/86400000);
+      else{var nm=m+1,ny=y;if(nm>12){nm=1;ny++;}var ns=setsu(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}
+    }else{
+      var st=setsu(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());
+      if(bd>=stD)days=Math.round((bd-stD)/86400000);
+      else{var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=setsu(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}
+    }
+  }catch(e){days=15;}
+  return Math.max(1,Math.round(Math.abs(days)/3));
+}
+
 // ===== AIシステムに必要な定数・関数 =====
 var TSUHEN=[['比肩','劫財','食神','傷官','偏財','正財','偏官','正官','偏印','印綬'],['劫財','比肩','傷官','食神','正財','偏財','正官','偏官','印綬','偏印'],['偏印','印綬','比肩','劫財','食神','傷官','偏財','正財','偏官','正官'],['印綬','偏印','劫財','比肩','傷官','食神','正財','偏財','正官','偏官'],['偏官','正官','偏印','印綬','比肩','劫財','食神','傷官','偏財','正財'],['正官','偏官','印綬','偏印','劫財','比肩','傷官','食神','正財','偏財'],['偏財','正財','偏官','正官','偏印','印綬','比肩','劫財','食神','傷官'],['正財','偏財','正官','偏官','印綬','偏印','劫財','比肩','傷官','食神'],['食神','傷官','偏財','正財','偏官','正官','偏印','印綬','比肩','劫財'],['傷官','食神','正財','偏財','正官','偏官','印綬','偏印','劫財','比肩']];
 var ZOKAN_SHI2=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子'];
