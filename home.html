@@ -1533,11 +1533,48 @@ function renderDash(){
     '<div class="mcitem"><div class="mclbl">月柱</div><div class="mcval">'+c.tsuKS+'</div></div>'+
     '<div class="mcitem"><div class="mclbl">日柱</div><div class="mcval">'+c.nichiKS+'</div></div>';
 
-  var daiPool=['大樹の運気。これまで培ってきた知識や経験が幹となり、周囲を統率するポジションへとシフトする10年間。身内や大切な人との絆を強固にするのに最適な時期です。',
-    '太陽の運気。スポットライトが当たりやすく、あなたの才能が強く求められる10年。大きな環境の変化や新たなステージへのステップアップが人生をより豊かにします。',
-    '清流の運気。知性と精神性が研ぎ澄まされる10年間。内面を磨くことで驚くほど自然に物事がうまく回り始めます。',
-    '燈火の運気。内に秘めた情熱の炎が周囲を照らす10年間。職人的なこだわりや日々のルーティンが確実な果実を結びます。'];
-  document.getElementById('hDaiun').textContent=daiPool[c.y%4];
+  // 現在の大運を正確に計算して表示
+  (function(){
+    var bd=acc.birthday.split('-');
+    var cy=+bd[0],cm=+bd[1],cd2=+bd[2];
+    var gender=(acc.gender==='male'||acc.gender==='男')?'男':'女';
+    var nenNum=ROKUJU.indexOf(c.nenKS)+1;
+    var isYo=nenNum%2===1;
+    var isFwd=(isYo&&gender==='男')||(!isYo&&gender==='女');
+    var sa=getDaiunStartAge(cy,cm,cd2,isFwd);
+    var tsuKanIdx=JIKKAN.indexOf(c.tsuKS[0]);
+    var tsuShiIdx=JUNISHI.indexOf(c.tsuKS[1]);
+    var DL=[];
+    for(var i=0;i<=14;i++){
+      var ki,si;
+      if(isFwd){ki=(tsuKanIdx+i)%10;si=(tsuShiIdx+i)%12;}
+      else{ki=((tsuKanIdx-i)%10+10)%10;si=((tsuShiIdx-i)%12+12)%12;}
+      DL.push({ks:JIKKAN[ki]+JUNISHI[si],kan:JIKKAN[ki],shi:JUNISHI[si]});
+    }
+    var CY=new Date().getFullYear();
+    var age=CY-cy;
+    var ap=0,currDK=DL[0];
+    for(var di=0;di<DL.length&&ap<120;di++){
+      var sp=Math.min(di===0?sa:10,120-ap);
+      if(age>=ap&&age<ap+sp){currDK=DL[di];break;}
+      ap+=sp;
+    }
+    var dju=juniUnki(c.ht,currDK.shi);
+    var dkk=kikkyo(dju,c.ht);
+    var nichiKanIdx=JIKKAN.indexOf(c.nichiKS[0]);
+    var T=TSUHEN[nichiKanIdx]||TSUHEN[0];
+    var dth=(T||[])[JIKKAN.indexOf(currDK.kan)]||'—';
+    var hn=HOSHI[ROKUJU.indexOf(c.nichiKS)]||'天花人';
+    var sats=SATSKAI[hn]||[];
+    var isSk=sats.indexOf(currDK.shi)>=0;
+    var dkc=kkColor(dju,c.ht);
+    var txt=currDK.ks+'（'+dth+'）の大運。十二運気：'+dju+'（'+dkk+'）。'
+      +(isSk?'【転化天蛹の時期】内なる変容が始まる重要な転換期です。無理に動かず、内側を整えることで次のステージへの準備が整います。':'');
+    document.getElementById('hDaiun').textContent=txt;
+    // _curCalcに大運情報を保存（showDaiunDetailで使う）
+    _curCalc._daiunKS=currDK.ks;_curCalc._daiunJu=dju;_curCalc._daiunKk=dkk;
+    _curCalc._daiunTh=dth;_curCalc._daiunIsSk=isSk;_curCalc._daiunAge=ap;_curCalc._daiunSp=Math.min(ap===0?sa:10,120-ap);
+  })();
 
   var rPool=[
     [{b:'肉体精神',t:'高強度の筋トレ。限界まで肉体に負荷をかけることで脳内の雑念が消去され、最強のメンタルが宿ります。'},
@@ -1624,13 +1661,16 @@ function showMeishikiDetail(){
 function showDaiunDetail(){
   if(!_curCalc)return;
   var c=_curCalc;
-  var daiPool=['大樹の運気。これまで培ってきた知識や経験が幹となり、周囲を統率するポジションへとシフトする10年間。',
-    '太陽の運気。スポットライトが当たりやすく、あなたの才能が強く求められる10年。',
-    '清流の運気。知性と精神性が研ぎ澄まされる10年間。内面を磨くことで驚くほど自然に物事がうまく回り始めます。',
-    '燈火の運気。内に秘めた情熱の炎が周囲を照らす10年間。'];
+  var ks=c._daiunKS||'—';
+  var ju=c._daiunJu||'—';
+  var kk=c._daiunKk||'—';
+  var th=c._daiunTh||'—';
+  var isSk=c._daiunIsSk||false;
+  var kc=kkColor(ju,c.ht);
   var body='<div class="detail-item">'
     +'<div class="detail-item-lbl">現在の大運</div>'
-    +'<div class="detail-item-val">'+daiPool[c.y%4]+'</div>'
+    +'<div class="detail-item-val" style="color:'+kc+'">'+ks+'　'+ju+'（'+kk+'）</div>'
+    +'<div class="detail-item-txt">通変星：'+th+(isSk?'　【転化天蛹の時期】内なる変容が始まる重要な転換期。無理に動かず内側を整える10年間です。':'')+'</div>'
     +'</div>'
     +'<div class="detail-item">'
     +'<div class="detail-item-lbl">大運とは</div>'
