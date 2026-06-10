@@ -2476,7 +2476,8 @@ async function sendAiMsg(){
     if(aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
     // バックグラウンドでプロファイル更新
     if(typeof updateProfileFromChat === 'function'){
-      var q_for_profile = aiHistory.length>=2 ? aiHistory[aiHistory.length-2].content : '';
+      var q_for_profile = (typeof aiHistory !== 'undefined' && aiHistory && aiHistory.length >= 2)
+        ? aiHistory[aiHistory.length - 2].content : '';
       updateProfileFromChat(q_for_profile, reply, curId).catch(function(){});
     }
   }catch(e){
