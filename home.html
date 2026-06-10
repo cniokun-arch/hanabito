@@ -2425,25 +2425,7 @@ function buildSystemPrompt(isPersonal){
     + '・データベースの内容は忠実に反映する。配慮でデータを変えたり正反対に変換したりしない。\n'
     + '・データをそのままコピーせず会話として自然な言葉で伝える。'
     + (window.psychResult ? window.psychResult : '')
-    + (function(){
-        var data_p = S.load();
-        if(!data_p) return '';
-        var myProf = data_p.account._profile || {};
-        var lines = [];
-        if(myProf.personality && myProf.personality.length) lines.push('\n【蓄積プロフィール】性格: ' + myProf.personality.join('、'));
-        if(myProf.concerns && myProf.concerns.length) lines.push('悩み傾向: ' + myProf.concerns.join('、'));
-        if(myProf.lifestage) lines.push('状況: ' + myProf.lifestage);
-        if(myProf.history && myProf.history.length) {
-          lines.push('相談履歴: ' + myProf.history.slice(-5).map(function(h){return h.date+'「'+h.summary+'」';}).join('→'));
-        }
-        if(data_p.people && data_p.people.length) {
-          lines.push('登録した人: ' + data_p.people.map(function(p){
-            var pf = p._profile || {};
-            return p.name+'('+p.relation+(pf.concerns&&pf.concerns.length?',悩み:'+pf.concerns.slice(-1)[0]:'')+')';
-          }).join('、'));
-        }
-        return lines.length ? lines.join('\n') : '';
-      })();
+    + buildProfileText(S.load()||{account:{_profile:{}},people:[]}, curId);
 }
 
 async function sendAiMsg(){
