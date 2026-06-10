@@ -1281,7 +1281,7 @@ async function updateProfileM(userMsg,aiReply){
       '{"personality":[],"concerns":[],"preferences":[],"lifestage":"","summary":"要約20字以内","keywords":[],"changed":true}\n'+
       'changedは新情報があればtrue。なければfalse。';
     var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+      body:JSON.stringify({systemPrompt:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
     var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
@@ -1446,7 +1446,7 @@ function buildSystemPrompt(isPersonal){
     +'・月柱（社会の自分・調整の層）：日柱の衝動と年柱の刷り込みの板挟みの中で現実社会でどう振る舞うかを調整している層。\n'
     +'・年柱（育ちの刷り込み・無意識の作法）：幼少期から環境・親・文化によって無意識に刷り込まれた行動の作法・価値観。\n\n'
     +'【過去→現在→未来の読み解き】相談履歴がある場合、「以前〇〇で悩んでいましたが、今は〜」という形で時系列の変化を踏まえてアドバイスする。\n\n'
-    +'【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に一切出してはいけない。Markdown記法（**太字**・#見出し等）禁止。親しみやすい日本語で話す。単発の概念質問は200〜300文字。総合質問は400〜800文字。転化天蛹は大運のみ・年運月運日運には絶対に使用しない。';
+    +'【時間軸ルール・運気の読み方】\\n【時間軸の読み方・アドバイスの構造（大きな筆で小さな字）】\\n大運×年運×通変星→人生の方向性・テーマ（大きな筆）\\n月運→行動のタイミング\\n日運→今日の行動の質・気分の傾向（小さな字）\\n日運は今日この瞬間の状態でありすぐ切り替わる一時的なもの。高運気なら今日は○○の日、種まき行動決断に向いていますと背中を押す。低運気なら今日は少し気分が重くなりやすい日ですが全体の流れは合っています、焦らず近いうちの好運気の時に動きましょうと全体を安心させる。日運の低さを人生の大きな判断材料にしない。今日はサインしない・今日は重要な話し合いを避けるレベルの実用的行動アドバイスに使う。\\n全体低い場合は今は動く時期ではないと正直に伝えつつ嵐が過ぎれば好転する今は充電準備の時と伝える。月運だけ低い場合は方向性は正しい今月だけ待って来月から動こうと代替タイミングを示す。\\n開花は他の運気を強める。好運気と重なれば最高潮、低運気と重なるとその低さも増幅。開花×低運気は重要決断を避けるよう勧める。\\n低運気でも行動せざるを得ない時は橋渡しと伝える。今見つかったものは橋渡し、好運気になった時に本当に合ったものを選び直しましょう必ず好転しますと伝える。好運期は判断が正しくなりやすく低運期は悪い結果に繋がりやすい。\\n低運気の時は本来の自分と逆の動きをすることで被害を最小限にできる（自分を殺す法則）。行動派はあえて止まる、慎重な人は少し楽観的に、真面目な人は少し力を抜く。\\n人間関係の相談では相手の運気も考慮する。相手が低運気の時の言動は本心ではない可能性がある。\\n12運気の活かし方乗り切り方はKBから参照して具体的にアドバイスする。\\n\\n【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥の文字を回答に一切出してはいけない。Markdown記法（**太字**・#見出し等）禁止。親しみやすい日本語で話す。単発の概念質問は200〜300文字。総合質問は400〜800文字。転化天蛹は大運のみ・年運月運日運には絶対に使用しない。';
 }
 
 async function sendAiMsg(){
@@ -1468,7 +1468,7 @@ async function sendAiMsg(){
     var res=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system:buildSystemPrompt(isPersonal),messages:aiHistory})
+      body:JSON.stringify({systemPrompt:buildSystemPrompt(isPersonal),messages:aiHistory})
     });
     if(!res.ok){var err=await res.json().catch(function(){return{};});throw new Error(err.error||'エラーが発生しました');}
     var data=await res.json();
