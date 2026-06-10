@@ -2207,16 +2207,14 @@ function buildSystemPrompt(isPersonal){
   // home.html用: Gオブジェクトをhome.htmlのデータから構築
   var data_h = S.load();
   var acc_h = data_h ? data_h.account : {};
-  if(typeof G === 'undefined' || !G || !G.y) {
+  if(!window._homeG || !window._homeG.y) {
     var homeG = buildHomeG(acc_h, acc_h ? acc_h.gender : 'male');
-    if(homeG) {
-      // グローバルGとして一時セット
-      window._homeG = homeG;
-    }
+    if(homeG) window._homeG = homeG;
   }
-  var G = (typeof window._homeG !== 'undefined' && window._homeG) ? window._homeG : (typeof G !== 'undefined' ? G : null);
+  // グローバルスコープのGとして使えるよう代入
+  var G = window._homeG || null;
   let userInfo = '';
-  if(typeof G !== 'undefined' && G && G.y){
+  if(G && G.y){
     const CY = new Date().getFullYear();
     const age = CY - G.y;
     const currND = G.ND ? G.ND.find(r=>r.isCurr) : null;
@@ -2314,7 +2312,7 @@ function buildSystemPrompt(isPersonal){
   }
   // KBの星人キーを確認（星人または花人）
   const starKey = KB['星人'] ? '星人' : (KB['花人'] ? '花人' : null);
-  const htKey = (typeof G !== 'undefined' && G.ht) ? G.ht.replace(/[＋－]/g,'') : null;
+  const htKey = (G.ht) ? G.ht.replace(/[＋－]/g,'') : null;
   const starInfo = htKey && starKey && KB[starKey] && KB[starKey][htKey]
     ? '【' + htKey + 'の特徴】' + (KB[starKey][htKey]['説明']||'') + ' 性格：' + (KB[starKey][htKey]['性格']||'')
     : '';
