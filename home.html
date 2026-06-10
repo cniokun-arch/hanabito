@@ -647,20 +647,12 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
         <div class="sec-ttl" style="border:none;padding:0;margin:0">🔮 専属AIパートナーと対話</div>
         <button onclick="document.getElementById('ai-about-overlay-h').style.display='block'" style="background:transparent;border:1px solid rgba(124,58,237,0.4);border-radius:14px;padding:0.25rem 0.7rem;font-family:'Noto Serif JP',serif;font-size:0.72rem;color:#7c3aed;cursor:pointer;">🤖 AIとは？</button>
       </div>
-      <div class="chat-disp" id="chatDisp"></div>
-      <div class="chat-chips" id="chatChips"></div>
-      <div class="chat-ctrl">
-        <select id="homeTtsGender" style="font-size:0.68rem;padding:3px 5px;border:1px solid var(--border);background:var(--card);color:var(--text2);border-radius:6px;cursor:pointer;flex-shrink:0">
-          <option value="female">女声</option>
-          <option value="male">男声</option>
-        </select>
-        <input class="chat-inp" type="text" id="chatInp" placeholder="何でもお話しください..."
-          onkeydown="if(event.key==='Enter')sendChat()">
-        <button id="homeMicBtn" onclick="homeToggleMic()" style="display:none;padding:0 8px;height:36px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:1rem;color:var(--text2);flex-shrink:0" title="音声入力">🎤</button>
-        <button class="send-btn" onclick="sendChat()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4a3f3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+      <div style="font-size:0.82rem;color:var(--text2);line-height:1.7;margin-bottom:0.8rem">
+        画面右下の🌸ボタンから、専属AIパートナーにいつでも相談できます。
       </div>
+      <button onclick="toggleAiPanel()" style="width:100%;padding:0.9rem;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:var(--rm);font-family:var(--serif);font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:0.1em;box-shadow:0 3px 12px rgba(124,58,237,0.3)">
+        🌸 AIパートナーに相談する
+      </button>
     </div>
 
     <!-- 気になる人を占う -->
@@ -918,6 +910,39 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
   </div>
 </div>
 
+<!-- AI FAB -->
+<button class="ai-fab" onclick="toggleAiPanel()" title="花人占術AIに相談する">🌸</button>
+<div class="ai-fab-bubble" id="aiBubble">✨ AIに相談する</div>
+
+<!-- AI パネル（index.htmlと同一） -->
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-header">
+    <span>🌸 花人占術AI（無料）</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <select id="ttsGender" style="font-size:0.68rem;padding:2px 4px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:#fff;border-radius:4px;cursor:pointer">
+        <option value="female">女声</option>
+        <option value="male">男声</option>
+      </select>
+      <button onclick="toggleAiPanel()">✕</button>
+    </span>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg ai">こんにちは！花人占術AIです🌸<br>命式を鑑定した後に、花人・運気・大運など何でも聞いてください。</div>
+  </div>
+  <div class="ai-quick">
+    <button onclick="quickAsk('今年の運気について教えて')">今年の運気</button>
+    <button onclick="quickAsk('私の花人の特徴を教えて')">花人の特徴</button>
+    <button onclick="quickAsk('転化天蛹の過ごし方を教えて')">転化天蛹の過ごし方</button>
+    <button onclick="quickAsk('今の大運について教えて')">今の大運</button>
+    <button onclick="quickAsk('これからの転換期はいつ？')">転換期はいつ？</button>
+  </div>
+  <div class="ai-input-row">
+    <textarea id="aiInput" placeholder="質問を入力してください..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"></textarea>
+    <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="音声入力" style="display:none">🎤</button>
+    <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">➤</button>
+  </div>
+</div>
+
 <script>
 window.onerror=function(m,s,l,c){var e=document.getElementById('errmsg');if(e){e.style.display='block';e.textContent='⚠ '+m+' ['+l+':'+c+']';}return false;};
 window.addEventListener('unhandledrejection',function(e){var el=document.getElementById('errmsg');if(el){el.style.display='block';el.textContent='⚠ '+String(e.reason);}});
@@ -1023,7 +1048,6 @@ function avc(ht){return AVC[ht]||{bg:'#fff0f2',col:'#8a7a77'};}
 
 // 現在の人物
 var curId='me';
-var chatCtx=[];
 var _curCalc=null;
 
 // ===== ハンバーガーメニュー =====
@@ -1553,7 +1577,7 @@ function doReset(){if(confirm('全データを初期化しますか？')){localS
 
 // ダッシュボード
 function initDash(){
-  curId='me';chatCtx=[];_curCalc=null;
+  curId='me';_curCalc=null;
   // 既存データに_profileがない場合は初期化
   var data=S.load();
   if(data){
@@ -1693,11 +1717,13 @@ function renderDash(){
     rl.appendChild(li);
   });
 
-  var cd=document.getElementById('chatDisp');cd.innerHTML='';
-  chatCtx=[];
+  // AIパネルの履歴リセットとウェルカムメッセージ
+  aiHistory=[];
+  window._homeG=buildHomeG(acc,acc.gender);
   var kk2=kikkyo(c.unki,c.ht);
-  addBubble('ai','こんにちは🌸 '+pname+'さんの今日の運気【'+c.unki+'（'+kk2+'）】はすべて把握しています。'+(acc.hobby?'趣味（'+acc.hobby+'）も同期済み。':'')+'何でもお気軽に相談してください。');
-  buildChips(data);
+  var welcomeMsg='こんにちは🌸 '+pname+'さんの今日の運気【'+c.unki+'（'+kk2+'）】はすべて把握しています。'+(acc.hobby?'趣味（'+acc.hobby+'）も同期済み。':'')+'何でもお気軽に相談してください。';
+  var aiMsgs=document.getElementById('aiMessages');
+  if(aiMsgs){aiMsgs.innerHTML='<div class="ai-msg ai">'+welcomeMsg+'</div>';}
 }
 
 function switchPerson(id){curId=id;renderDash();}
@@ -1902,75 +1928,14 @@ function doAddPerson(){
 }
 
 // AIチャット
-function addBubble(role,text){
-  var cd=document.getElementById('chatDisp');
-  var wrap=document.createElement('div');wrap.className='bbl '+role;
-  wrap.innerHTML='<span class="slbl">'+(role==='ai'?'花人AIパートナー':'あなた')+'</span>'
-    +'<div class="msg">'+text+'</div>';
-  if(role==='ai'){
-    var btn=document.createElement('button');
-    btn.style.cssText='margin-top:4px;background:none;border:1px solid var(--border);color:var(--text2);padding:2px 8px;border-radius:10px;cursor:pointer;font-size:0.7rem;font-family:inherit';
-    btn.textContent='🔊 読み上げ';
-    var cleanText=text.replace(/[#*【】「」『』（）]/g,'');
-    [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],['転化天蛹','てんかてんよう'],['十二運気','じゅうにうんき'],['大運','たいうん'],['＋','ぷらす'],['－','まいなす']].forEach(function(p){while(cleanText.indexOf(p[0])>=0)cleanText=cleanText.replace(p[0],p[1]);});
-    btn.onclick=function(){homeSpeakText(cleanText.trim(),btn);};
-    wrap.appendChild(btn);
-  }
-  cd.appendChild(wrap);cd.scrollTop=cd.scrollHeight;
-}
 
 // ===== 音声入力 =====
-var homeRecognition=null,homeIsRecording=false;
 if('SpeechRecognition' in window||'webkitSpeechRecognition' in window){
   var mb=document.getElementById('homeMicBtn');if(mb)mb.style.display='';
   window.addEventListener('DOMContentLoaded',function(){var mb2=document.getElementById('homeMicBtn');if(mb2)mb2.style.display='inline-block';});
 }
-function homeToggleMic(){
-  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('お使いのブラウザは音声入力に対応していません。Chromeをお試しください。');return;}
-  if(homeIsRecording){homeStopMic();return;}
-  homeStartMic();
-}
-function homeStartMic(){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  homeRecognition=new SR();homeRecognition.lang='ja-JP';homeRecognition.continuous=false;homeRecognition.interimResults=false;
-  homeRecognition.onresult=function(e){document.getElementById('chatInp').value=e.results[0][0].transcript;homeStopMic();sendChat();};
-  homeRecognition.onerror=function(){homeStopMic();};
-  homeRecognition.onend=function(){homeStopMic();};
-  homeRecognition.start();homeIsRecording=true;
-  var btn=document.getElementById('homeMicBtn');if(btn){btn.textContent='⏹';btn.style.color='#e05050';}
-}
-function homeStopMic(){
-  if(homeRecognition){try{homeRecognition.stop();}catch(e){}}
-  homeIsRecording=false;
-  var btn=document.getElementById('homeMicBtn');if(btn){btn.textContent='🎤';btn.style.color='';}
-}
 
 // ===== TTS =====
-var homeCurrentAudio=null;
-async function homeSpeakText(text,btn){
-  if(homeCurrentAudio&&!homeCurrentAudio.paused){homeCurrentAudio.pause();homeCurrentAudio=null;if(btn)btn.textContent='🔊 読み上げ';return;}
-  if(btn){btn.textContent='⏳ 生成中...';btn.disabled=true;}
-  try{
-    var gender=document.getElementById('homeTtsGender')?document.getElementById('homeTtsGender').value:'female';
-    var res=await fetch(WORKER_BASE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,gender:gender})});
-    if(!res.ok)throw new Error('TTS失敗');
-    var data=await res.json();if(data.error)throw new Error(data.error);
-    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
-    homeCurrentAudio=audio;
-    audio.onplay=function(){if(btn){btn.textContent='⏹ 停止';btn.disabled=false;}};
-    audio.onended=function(){if(btn)btn.textContent='🔊 読み上げ';homeCurrentAudio=null;};
-    audio.onerror=function(){if(btn){btn.textContent='🔊 読み上げ';btn.disabled=false;}homeCurrentAudio=null;};
-    await audio.play();
-  }catch(e){if(btn){btn.textContent='🔊 読み上げ';btn.disabled=false;}console.error('TTS:',e);}
-}
-function buildChips(data){
-  var chips=['今日の運気を詳しく','私の強みは？','向いている仕事は？','今年の運勢を教えて'];
-  if(data&&data.people.length>0)chips.push(data.people[0].name+'との相性は？');
-  document.getElementById('chatChips').innerHTML=chips.map(function(c){
-    return '<div class="chip" onclick="useChip(\''+c.replace(/'/g,'')+'\')">' +c+'</div>';
-  }).join('');
-}
-function useChip(t){document.getElementById('chatInp').value=t;sendChat();}
 
 function uranaiOne(){
   var bd=getDateStr('urBdY','urBdM','urBdD');
@@ -2058,6 +2023,66 @@ function getZokan(shi,days){
   var k=ZOKAN_DATA2[0][1][col];
   for(var i=0;i<ZOKAN_DATA2.length;i++){if(days>=ZOKAN_DATA2[i][0])k=ZOKAN_DATA2[i][1][col];}
   return k;
+}
+
+// ===== プロファイル自動蓄積 =====
+function buildProfileText(data, targetId){
+  var lines=[];
+  var myProf=data.account&&data.account._profile?data.account._profile:{};
+  if(myProf.personality&&myProf.personality.length)lines.push('【あなたの性格】'+myProf.personality.join('、'));
+  if(myProf.concerns&&myProf.concerns.length)lines.push('【最近の悩み】'+myProf.concerns.join('、'));
+  if(myProf.preferences&&myProf.preferences.length)lines.push('【好み・趣味傾向】'+myProf.preferences.join('、'));
+  if(myProf.lifestage)lines.push('【ライフステージ】'+myProf.lifestage);
+  if(myProf.history&&myProf.history.length){
+    lines.push('【相談履歴（過去→現在）】');
+    myProf.history.slice(-5).forEach(function(h){lines.push('  '+h.date+' '+h.summary+(h.keywords?' ['+h.keywords.join(',')+']':''));});
+  }
+  if(data.people&&data.people.length){
+    data.people.forEach(function(p){
+      var pf=p._profile||{};
+      var plines=[];
+      if(pf.personality&&pf.personality.length)plines.push('性格：'+pf.personality.join('、'));
+      if(pf.concerns&&pf.concerns.length)plines.push('最近の様子：'+pf.concerns.join('、'));
+      if(pf.lifestage)plines.push('状況：'+pf.lifestage);
+      if(pf.history&&pf.history.length)plines.push('相談履歴：'+pf.history.slice(-3).map(function(h){return h.date+'「'+h.summary+'」';}).join('→'));
+      if(plines.length||p.hobby)lines.push('【'+p.name+'（'+p.relation+'）】'+(p.hobby?'趣味:'+p.hobby+' ':'')+plines.join(' '));
+    });
+  }
+  return lines.join('\n');
+}
+async function updateProfileFromChat(userMsg, aiReply, targetId){
+  var data=S.load();if(!data)return;
+  var prof;
+  if(!targetId||targetId==='me'){
+    if(!data.account._profile)data.account._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+    prof=data.account._profile;
+  }else{
+    var p=data.people.find(function(x){return x.id===targetId;});
+    if(!p)return;
+    if(!p._profile)p._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+    prof=p._profile;
+  }
+  try{
+    var prompt='以下のユーザーの発言とAIの回答から、ユーザーの特徴を抽出してJSON形式のみで返してください。\n'+
+      'ユーザー発言：'+userMsg+'\nAI回答：'+aiReply+'\n'+
+      '既存データ：'+JSON.stringify({personality:prof.personality,concerns:prof.concerns,preferences:prof.preferences,lifestage:prof.lifestage})+'\n'+
+      '{"personality":[],"concerns":[],"preferences":[],"lifestage":"","summary":"要約20字以内","keywords":[],"changed":true}\n'+
+      'changedは新情報があればtrue。なければfalse。JSONのみ返答。';
+    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({systemPrompt:'JSONのみ返答。他の文字列は一切含めない。',messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)return;
+    var dat=await res.json();
+    var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var ex=JSON.parse(txt);if(!ex.changed)return;
+    function mergeArr(existing,newItems,max){var merged=existing.slice();(newItems||[]).forEach(function(item){if(item&&merged.indexOf(item)<0)merged.push(item);});return merged.slice(-max);}
+    prof.personality=mergeArr(prof.personality,ex.personality,8);
+    prof.concerns=mergeArr(prof.concerns,ex.concerns,5);
+    prof.preferences=mergeArr(prof.preferences,ex.preferences,8);
+    if(ex.lifestage)prof.lifestage=ex.lifestage;
+    if(ex.summary){var today=new Date(),ds=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();prof.history=prof.history||[];prof.history.push({date:ds,summary:ex.summary,keywords:ex.keywords||[]});if(prof.history.length>20)prof.history=prof.history.slice(-20);}
+    S.save(data);
+  }catch(e){console.log('プロファイル更新エラー:',e);}
 }
 
 // ===== AIシステム（index.htmlから完全移植） =====
@@ -2425,6 +2450,17 @@ async function sendAiMsg(){
   const input = document.getElementById('aiInput');
   const q = input.value.trim();
   if(!q) return;
+  // home.html用: _homeGを最新データでセット
+  var data_ai = S.load();
+  if(data_ai && data_ai.account && data_ai.account.birthday){
+    if(curId && curId !== 'me' && data_ai.people){
+      var cp_ai = data_ai.people.find(function(x){return x.id===curId;});
+      if(cp_ai && cp_ai.birthday) window._homeG = buildHomeG(cp_ai, cp_ai.gender||'female');
+      else window._homeG = buildHomeG(data_ai.account, data_ai.account.gender);
+    } else {
+      window._homeG = buildHomeG(data_ai.account, data_ai.account.gender);
+    }
+  }
   // KBが読み込み完了するまで最大3秒待つ
   if(!kbReady) {
     let waited = 0;
@@ -2456,6 +2492,11 @@ async function sendAiMsg(){
     addAiMsg('ai', reply);
     aiHistory.push({role:'assistant', content: reply});
     if(aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+    // バックグラウンドでプロファイル更新
+    if(typeof updateProfileFromChat === 'function'){
+      var q_for_profile = aiHistory.length>=2 ? aiHistory[aiHistory.length-2].content : '';
+      updateProfileFromChat(q_for_profile, reply, curId).catch(function(){});
+    }
   }catch(e){
     loadingEl.remove();
     const msg = e.message.includes('Overloaded') || e.message.includes('overloaded')
@@ -2468,90 +2509,7 @@ async function sendAiMsg(){
 }
 
 // 起動
-// ===== home.html用: sendChat -> sendAiMsg の橋渡し =====
-function addBubble(role, text){
-  var cd = document.getElementById('chatDisp');
-  if(!cd) return;
-  var wrap = document.createElement('div');
-  wrap.className = 'bbl ' + role;
-  wrap.innerHTML = '<span class="slbl">' + (role==='ai'?'花人AIパートナー':'あなた') + '</span>';
-  var msg = document.createElement('div');
-  msg.className = 'msg';
-  msg.textContent = text;
-  wrap.appendChild(msg);
-  if(role === 'ai'){
-    var btn = document.createElement('button');
-    btn.style.cssText = 'margin-top:4px;background:none;border:1px solid var(--border);color:var(--text2);padding:2px 8px;border-radius:10px;cursor:pointer;font-size:0.7rem;font-family:inherit';
-    btn.textContent = '🔊 読み上げ';
-    var cleanText = text;
-    [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],['転化天蛹','てんかてんよう'],['十二運気','じゅうにうんき'],['大運','たいうん'],['＋','ぷらす'],['－','まいなす']].forEach(function(p){while(cleanText.indexOf(p[0])>=0)cleanText=cleanText.replace(p[0],p[1]);});
-    btn.onclick = function(){ homeSpeakText(cleanText.trim(), btn); };
-    wrap.appendChild(btn);
-  }
-  cd.appendChild(wrap);
-  cd.scrollTop = cd.scrollHeight;
-}
-async function sendChat(){
-  var inp = document.getElementById('chatInp');
-  var q = inp ? inp.value.trim() : '';
-  if(!q) return;
-  inp.value = '';
-  // chatDispに表示
-  addBubble('usr', q);
-  // ローディング
-  var cd = document.getElementById('chatDisp');
-  var ld = document.createElement('div'); ld.className='bbl ai'; ld.id='home-ld';
-  ld.innerHTML='<span class="slbl">花人AIパートナー</span><div class="msg" style="color:var(--text2)">鑑定中...</div>';
-  if(cd){cd.appendChild(ld); cd.scrollTop=9999;}
-  // KB待機
-  if(!kbReady){var waited=0;while(!kbReady&&waited<3000){await new Promise(function(r){setTimeout(r,100);});waited+=100;}}
-  // homeGをセット
-  var data_s = S.load();
-  if(data_s && data_s.account && data_s.account.birthday){
-    window._homeG = buildHomeG(data_s.account, data_s.account.gender);
-    // curIdが他人の場合は対象人物のGをセット
-    if(curId !== 'me' && data_s.people){
-      var cp = data_s.people.find(function(x){return x.id===curId;});
-      if(cp && cp.birthday) window._homeG = buildHomeG(cp, cp.gender||'female');
-    }
-  }
-  if(!window._homeG){
-    var ldEl=document.getElementById('home-ld');if(ldEl)ldEl.remove();
-    addBubble('ai','先に生年月日を登録してください🌸');
-    return;
-  }
-  // aiHistoryにpush
-  aiHistory = aiHistory || [];
-  aiHistory.push({role:'user', content:q});
-  try{
-    var isPersonal = /私|僕|俺|自分|どんな人|深層|本質|欲求|強み|弱み|性格|特徴を教えて|どう生き|人生|運命|向いて/.test(q);
-    var res = await fetch(WORKER_URL, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({systemPrompt:buildSystemPrompt(isPersonal), messages:aiHistory.slice(-20)})
-    });
-    if(!res.ok){var err=await res.text().catch(function(){return '';});throw new Error('HTTP '+res.status+': '+err.slice(0,100));}
-    var dat = await res.json();
-    var text = dat.content ? dat.content.map(function(b){return b.text||'';}).join('') : 'エラーが発生しました';
-    text = text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
-    var ldEl=document.getElementById('home-ld');if(ldEl)ldEl.remove();
-    addBubble('ai', text);
-    aiHistory.push({role:'assistant', content:text});
-    if(aiHistory.length>20) aiHistory=aiHistory.slice(-20);
-    // チャット履歴保存
-    if(data_s){
-      data_s.chatHistory=data_s.chatHistory||[];
-      data_s.chatHistory.push({role:'user',content:q,ts:Date.now()},{role:'ai',content:text,ts:Date.now()});
-      if(data_s.chatHistory.length>50)data_s.chatHistory=data_s.chatHistory.slice(-50);
-      S.save(data_s);
-    }
-    // バックグラウンドでプロファイル更新
-    updateProfileFromChat(q, text, curId).catch(function(){});
-  }catch(e){
-    var ldEl=document.getElementById('home-ld');if(ldEl)ldEl.remove();
-    addBubble('ai', '⚠ エラー: ' + e.message);
-    console.error('sendChat error:', e);
-  }
-}
+
 window.addEventListener('DOMContentLoaded',function(){
   initDateSel('rBdY','rBdM','rBdD');
   window.addEventListener('resize',function(){if(typeof resizeCanvas==='function')resizeCanvas();});
