@@ -1547,6 +1547,13 @@ function doReset(){if(confirm('全データを初期化しますか？')){localS
 // ダッシュボード
 function initDash(){
   curId='me';chatCtx=[];_curCalc=null;
+  // 既存データに_profileがない場合は初期化
+  var data=S.load();
+  if(data){
+    if(!data.account._profile)data.account._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};
+    if(data.people)data.people.forEach(function(p){if(!p._profile)p._profile={personality:[],concerns:[],preferences:[],lifestage:'',history:[]};});
+    S.save(data);
+  }
   renderDash();
   showScr('scrDash');
   document.getElementById('mainBnav').style.display='flex';
@@ -1880,12 +1887,6 @@ function doAddPerson(){
   if(data.people.length>=5){alert('登録できる人数は最大5人までです');return;}
   var p={id:'p'+Date.now(),name:name,relation:rel,birthday:bd,gender:gen,hobby:hobby||'',_profile:{personality:[],concerns:[],preferences:[],lifestage:'',history:[]}};
   data.people.push(p);S.save(data);
-  document.getElementById('apName').value='';
-  document.getElementById('apHobby').value='';
-  initDateSel('apBdY','apBdM','apBdD');
-  closeAddPersonModal();
-  curId=p.id;renderDash();
-}
   document.getElementById('apName').value='';
   document.getElementById('apHobby').value='';
   initDateSel('apBdY','apBdM','apBdD');
