@@ -2185,8 +2185,12 @@ function buildHomeSystemPrompt(c,acc,curPerson,data){
   var htKey=c.ht?c.ht.replace(/[＋－]/g,''):null;
   var starInfo=htKey&&starKey&&KB[starKey]&&KB[starKey][htKey]
     ?'【'+htKey+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||''):'';
-  var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){var v=KB['十二運気'][k];return k+'：'+(v['説明']||'')+(v['独自解釈']?' '+v['独自解釈']:'');}).join('\n');
-  var daiInfo=KB['転化天蛹']?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間のこと。命式の干支が転化天蛹の支でも転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||''):'';
+  var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){var v=KB['十二運気'][k];return k+'：'+(v['説明']||'')+(v['過ごし方']?' 過ごし方：'+v['過ごし方']:'')+(v['注意']?' 注意：'+v['注意']:'');}).join('\n');
+  // KBが空の場合は基本情報をハードコードで補完
+  if(!juniInfo){
+    juniInfo='発芽：種まきの時。新しいことを始めるのに最適。\n青葉：成長の時。今あるものを育てる。\n開花：花開く時。重要な決断に最適だが低運気との重なりに注意。他の運気を増幅させる。\n内省：弱点の運気。健康・体調に注意。\n成天：解放の時。やりたかったことに取り組む。\n狂咲：心が乱れる時。コントロールを意識する。\n豊穣：収穫の時。人生の大きな転機に最適。\n穂分：取捨選択の時。不要を手放す。\n平凪：安定の時。ゆったり過ごす。\n引寒：下降の始まり。新しいことは避ける。\n休眠：全てが止まる時。冬ごもりして春を待つ。\n残雪：春待ちの時。精算と準備をする。';
+  }
+  var daiInfo=KB['転化天蛹']?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間のこと。命式の干支が転化天蛹の支でも転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||''):'転化天蛹：大運がその人の対象支にあたる10年間。内なる変容が始まる重要な転換期。';
 
   // 今年・今日の運気
   var nowYearKS=yearKS(CY,new Date().getMonth()+1,new Date().getDate());
@@ -2262,6 +2266,10 @@ async function sendChat(){
 
   var sys;
   try{
+    // KBが空の場合は再取得を試みる
+    if(!KB||!KB['十二運気']){
+      try{var kbRes=await fetch(WORKER_BASE+'/api/kb');if(kbRes.ok)KB=await kbRes.json();}catch(e){}
+    }
     sys=buildHomeSystemPrompt(c,acc,curPerson,data);
   }catch(buildErr){
     var ldEl2=document.getElementById('ld');if(ldEl2)ldEl2.remove();
