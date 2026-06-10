@@ -439,6 +439,27 @@ body.theme-dark .btn-aisho{background:linear-gradient(135deg,rgba(60,100,160,0.5
   font-weight:700;cursor:pointer;letter-spacing:0.1em;margin-top:0.8rem;
   box-shadow:0 4px 12px rgba(254,197,187,0.4)}
 .detail-btn:active{transform:scale(0.98)}
+
+/* AI FAB・パネル */
+.ai-fab{position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#b8860b);border:none;color:#fff;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,0.4);z-index:998;display:flex;align-items:center;justify-content:center}
+.ai-fab-bubble{position:fixed;bottom:88px;right:84px;background:#fff;color:#4a3c28;font-size:0.82rem;font-weight:600;padding:8px 14px;border-radius:20px 20px 4px 20px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:997;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.6s ease}
+.ai-fab-bubble.show{opacity:1}
+.ai-panel{position:fixed;bottom:0;right:0;left:0;width:100%;height:85vh;background:#faf6ef;border-radius:16px 16px 0 0;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+.ai-panel.open{display:flex}
+.ai-header{background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:0.88rem;font-weight:600}
+.ai-header button{background:none;border:none;color:#fff;font-size:1rem;cursor:pointer}
+.ai-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.ai-msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:0.85rem;line-height:1.7;word-break:break-word;white-space:pre-wrap}
+.ai-msg.ai{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:4px 14px 14px 14px;align-self:flex-start;color:#3a2a00}
+.ai-msg.user{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;align-self:flex-end;border-radius:14px 4px 14px 14px}
+.ai-msg.loading{background:#f0ece4;border-radius:4px 14px 14px 14px;align-self:flex-start;color:#7a6b52}
+.ai-quick{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 6px;border-top:1px solid rgba(184,134,11,0.1)}
+.ai-quick button{font-size:0.68rem;padding:4px 10px;background:#fff;border:1px solid rgba(124,58,237,0.3);border-radius:12px;cursor:pointer;color:#7c3aed;font-family:'Noto Serif JP',serif}
+.ai-input-row{display:flex;gap:8px;align-items:flex-end;padding:8px 12px 12px;border-top:1px solid rgba(184,134,11,0.15)}
+.ai-input-row textarea{flex:1;padding:8px 12px;border:1px solid rgba(124,58,237,0.3);border-radius:10px;background:#fff;color:#3a2a00;font-family:'Noto Serif JP',serif;font-size:0.88rem;outline:none;resize:none;height:40px}
+.ai-send{padding:0 14px;height:40px;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1.1rem}
+.mic-btn{padding:0 10px;height:40px;background:none;border:1px solid rgba(124,58,237,0.35);color:#7c3aed;border-radius:8px;cursor:pointer;font-size:1rem}
+.speak-btn{background:none;border:1px solid rgba(124,58,237,0.35);color:#7c3aed;padding:3px 9px;border-radius:12px;cursor:pointer;font-size:0.72rem;font-family:'Noto Serif JP',serif;margin-top:4px;align-self:flex-start}
 </style>
 </head>
 <body>
@@ -2113,14 +2134,14 @@ const NAYIN_KB = {"海中金":{"読み":"かいちゅうきん","干支":["甲�
 var aiHistory = [];
 
 function toggleAiPanel(){
-  const panel = document.getElementById('aiPanel');
-  const fab = document.querySelector('.ai-fab');
-  if (panel.style.display === 'flex') {
-    panel.style.display = 'none';
-    if (fab) { fab.style.display = 'flex'; fab.style.visibility = 'visible'; }
-  } else {
-    panel.style.display = 'flex';
-    if (fab) { fab.style.display = 'none'; fab.style.visibility = 'hidden'; }
+  var panel=document.getElementById('aiPanel');
+  var fab=document.querySelector('.ai-fab');
+  if(panel.classList.contains('open')){
+    panel.classList.remove('open');
+    if(fab){fab.style.display='flex';}
+  }else{
+    panel.classList.add('open');
+    if(fab){fab.style.display='none';}
   }
 }
 
