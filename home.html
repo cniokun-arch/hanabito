@@ -2229,7 +2229,11 @@ async function sendChat(){
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({systemPrompt:sys,messages:chatCtx.slice(-20)})
     });
-    if(!res.ok){var err=await res.json().catch(function(){return{};});throw new Error(err.error||'エラーが発生しました');}
+    if(!res.ok){
+      var errBody=await res.text().catch(function(){return 'no body';});
+      console.error('Worker error:', res.status, res.statusText, errBody);
+      throw new Error('HTTP '+res.status+': '+errBody.slice(0,100));
+    }
     var dat=await res.json();
     var text=dat.content?dat.content.map(function(b){return b.text||'';}).join(''):'エラーが発生しました';
     text=text.replace(/^#{1,4}\s*/gm,'').replace(/\*{1,2}([^*]+)\*{1,2}/g,'$1').trim();
@@ -2247,8 +2251,9 @@ async function sendChat(){
     updateProfileFromChat(q,text,curId).catch(function(){});
   }catch(e){
     var ldEl=document.getElementById('ld');if(ldEl)ldEl.remove();
-    var msg=e.message.indexOf('Overloaded')>=0?'⚠ ただいまサーバーが混雑しています。しばらく待ってから再度お試しください。':'⚠ 通信エラーが発生しました。もう一度お試しください。';
+    var msg=e.message.indexOf('Overloaded')>=0?'⚠ ただいまサーバーが混雑しています。':'⚠ エラー: '+e.message;
     addBubble('ai',msg);
+    console.error('sendChat error:', e);
   }
 }
 
