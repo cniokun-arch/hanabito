@@ -563,18 +563,33 @@ function doLogout(){
   currentMemberIdx=0;aiHistory=[];
 }
 function startApp(data){
-  // Gが古いデータ（計算前保存）の場合、再計算
-  if(!data.account.G||!data.account.G.ht){
+  // Gが未計算または不正な場合、再計算
+  try{
     var b=data.account.birthday,g=data.account.gender;
-    data.account.G=doCalc(b.y,b.m,b.d,g);
-    S.save(data);
+    var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS){
+      if(!by||!bm||!bd){
+        // データ破損 → ログアウト状態に戻す
+        S.save(null);localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+      data.account.G=doCalc(by,bm,bd,g);
+      S.save(data);
+    }
+  }catch(e){
+    // データ破損時はリセット
+    localStorage.removeItem(STORAGE_KEY);
+    return;
   }
   // 登録メンバーも同様
   (data.people||[]).forEach(function(p,i){
-    if(!p.G||!p.G.ht){
+    try{
       var b=p.birthday;
-      data.people[i].G=doCalc(b.y,b.m,b.d,p.gender);
-    }
+      var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
+      if((!p.G||!p.G.ht||!p.G.nenKS)&&by&&bm&&bd){
+        data.people[i].G=doCalc(by,bm,bd,p.gender);
+      }
+    }catch(e){}
   });
   S.save(data);
   document.getElementById('screen-login').classList.remove('active');
@@ -1428,7 +1443,7 @@ function resetAllData(){
 
   // 既にログイン済みなら自動ログイン
   if(data&&data.account&&data.account.nickname){
-    startApp(data);
+    try{startApp(data);}catch(e){localStorage.removeItem(STORAGE_KEY);}
   }
 })();
 </script>
