@@ -1273,36 +1273,56 @@ async function sendAI(){
   var msg=inp.value.trim();
   if(!msg)return;
   inp.value='';
-  addAIMessage('user',msg);
-  aiHistory.push({role:'user',content:msg});
-  // ローディング
+
+  // メッセージをキャプチャしてからDOM操作
+  var userMsg=msg;
+  aiHistory.push({role:'user',content:userMsg});
+
+  // ローディング表示（IDで毎回取得）
+  function getMsgs(){return document.getElementById('ai-messages');}
+  var userDiv=document.createElement('div');
+  userDiv.className='ai-msg user';
+  userDiv.textContent=userMsg;
+  var m=getMsgs();if(m){m.appendChild(userDiv);m.scrollTop=m.scrollHeight;}
+
+  var loadId='load-'+Date.now();
   var loadDiv=document.createElement('div');
   loadDiv.className='ai-msg loading';
+  loadDiv.id=loadId;
   loadDiv.innerHTML='🌸 鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
-  var msgs=document.getElementById('ai-messages');
-  if(msgs){msgs.appendChild(loadDiv);msgs.scrollTop=msgs.scrollHeight;}
+  m=getMsgs();if(m){m.appendChild(loadDiv);m.scrollTop=m.scrollHeight;}
+
   try{
     var res=await fetch(WORKER_BASE+'/api/chat',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({system:AI_PAGE_SYS,messages:aiHistory.slice(-10)})
     });
+
+    // ローディング削除（IDで再取得）
+    var ld=document.getElementById(loadId);
+    if(ld&&ld.parentNode)ld.parentNode.removeChild(ld);
+
+    if(!res.ok){
+      var errBody=await res.text().catch(function(){return 'no body';});
+      addAIMessage('ai','⚠ サーバーエラー('+res.status+'): '+errBody.slice(0,100));
+      return;
+    }
     var data=await res.json();
     var text='';
     if(data.content)text=data.content.map(function(b){return b.text||'';}).join('');
-    if(loadDiv.parentNode)loadDiv.parentNode.removeChild(loadDiv);
+    if(!text&&data.error)text='⚠ Worker: '+data.error;
+    if(!text)text='⚠ 返答が空でした。('+JSON.stringify(data).slice(0,80)+')';
     addAIMessage('ai',text);
     aiHistory.push({role:'assistant',content:text});
-    // プロファイル更新（バックグラウンド）
-    updateProfileFromChat(msg,text);
+    updateProfileFromChat(userMsg,text);
     if(data.remaining!==undefined){
-      var cnt=document.createElement('div');
-      cnt.style.cssText='font-size:0.65rem;color:var(--ink3);text-align:right;padding:0 0.8rem 0.3rem';
-      cnt.textContent='残り'+data.remaining+'回';
-      if(msgs)msgs.appendChild(cnt);
+      var m2=getMsgs();
+      if(m2){var cnt=document.createElement('div');cnt.style.cssText='font-size:0.65rem;color:var(--ink3);text-align:right;padding:0 0.8rem 0.3rem';cnt.textContent='残り'+data.remaining+'回';m2.appendChild(cnt);}
     }
   }catch(e){
-    if(loadDiv.parentNode)loadDiv.parentNode.removeChild(loadDiv);
-    addAIMessage('ai','通信エラーが発生しました。もう一度試してください。');
+    var ld2=document.getElementById(loadId);
+    if(ld2&&ld2.parentNode)ld2.parentNode.removeChild(ld2);
+    addAIMessage('ai','⚠ 通信エラー: '+e.message);
   }
 }
 
