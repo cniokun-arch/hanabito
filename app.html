@@ -23,8 +23,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 /* ===== LOGIN ===== */
 #screen-login{
   background:linear-gradient(160deg,#1a0830 0%,#2a1a4a 40%,#3a2a00 100%);
-  display:flex;align-items:center;justify-content:center;padding:2rem 1rem;
-  position:fixed;inset:0;z-index:9000;overflow-y:auto
+  position:fixed;inset:0;z-index:9000;overflow-y:auto;
+  display:none;align-items:center;justify-content:center;padding:2rem 1rem
 }
 #screen-login.active{display:flex}
 .login-box{width:min(380px,100%);text-align:center}
@@ -237,7 +237,11 @@ body.theme-dark .modal-box{background:#2a1c08}
       <div id="login-form">
         <div class="login-field">
           <label>ニックネーム</label>
-          <input type="text" id="login-nick" placeholder="登録したニックネーム">
+          <input type="text" id="login-nick" placeholder="登録したニックネーム" autocomplete="username">
+        </div>
+        <div class="login-field">
+          <label>PINコード（4桁）</label>
+          <input type="password" id="login-pin" placeholder="0000〜9999" maxlength="4" inputmode="numeric" autocomplete="current-password">
         </div>
         <button class="btn-login" onclick="doLogin()">ログイン</button>
       </div>
@@ -246,7 +250,11 @@ body.theme-dark .modal-box{background:#2a1c08}
       <div id="register-form" style="display:none">
         <div class="login-field">
           <label>ニックネーム</label>
-          <input type="text" id="reg-nick" placeholder="あなたの呼び名">
+          <input type="text" id="reg-nick" placeholder="あなたの呼び名" autocomplete="username">
+        </div>
+        <div class="login-field">
+          <label>PINコード（4桁）</label>
+          <input type="password" id="reg-pin" placeholder="4桁の数字を設定" maxlength="4" inputmode="numeric" autocomplete="new-password">
         </div>
         <div class="login-field">
           <label>生年月日</label>
@@ -538,23 +546,29 @@ function switchLoginTab(tab,btn){
 }
 function doLogin(){
   var nick=document.getElementById('login-nick').value.trim();
+  var pin=document.getElementById('login-pin').value.trim();
   var data=S.load();
   var err=document.getElementById('login-err');
   if(!nick){err.textContent='ニックネームを入力してください';err.style.display='block';return;}
+  if(!pin){err.textContent='PINコードを入力してください';err.style.display='block';return;}
   if(!data||!data.account){err.textContent='登録が見つかりません。新規登録してください。';err.style.display='block';return;}
   if(data.account.nickname!==nick){err.textContent='ニックネームが一致しません。';err.style.display='block';return;}
+  if(data.account.pin&&data.account.pin!==pin){err.textContent='PINコードが違います。';err.style.display='block';return;}
   startApp(data);
 }
 function doRegister(){
   var nick=document.getElementById('reg-nick').value.trim();
+  var pin=document.getElementById('reg-pin').value.trim();
   var y=+document.getElementById('reg-y').value;
   var m=+document.getElementById('reg-m').value;
   var d=+document.getElementById('reg-d').value;
   var gender=document.getElementById('reg-gender').value;
   var err=document.getElementById('login-err');
   if(!nick){err.textContent='ニックネームを入力してください';err.style.display='block';return;}
+  if(!pin||pin.length!==4||!/^\d{4}$/.test(pin)){err.textContent='PINコードは4桁の数字で設定してください';err.style.display='block';return;}
   if(!y||!m||!d){err.textContent='生年月日を入力してください';err.style.display='block';return;}
   var data=initData(nick,y,m,d,gender);
+  data.account.pin=pin;
   S.save(data);
   startApp(data);
 }
@@ -1601,8 +1615,9 @@ function resetAllData(){
     document.body.className='theme-dark';
   }
 
-  // 既にログイン済みなら自動ログイン
-  if(data&&data.account&&data.account.nickname){
+  // PINがある場合は必ずログイン画面を表示（自動ログイン無効）
+  // PINなし（旧データ）の場合のみ自動ログイン
+  if(data&&data.account&&data.account.nickname&&!data.account.pin){
     try{startApp(data);}catch(e){localStorage.removeItem(STORAGE_KEY);}
   }
 })();
