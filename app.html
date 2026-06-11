@@ -17,13 +17,14 @@
 html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;color:var(--ink)}
 
 /* ===== SCREENS ===== */
-.screen{display:none;min-height:100vh}
+.screen{display:none}
 .screen.active{display:block}
 
 /* ===== LOGIN ===== */
 #screen-login{
   background:linear-gradient(160deg,#1a0830 0%,#2a1a4a 40%,#3a2a00 100%);
-  display:flex;align-items:center;justify-content:center;padding:2rem 1rem
+  display:flex;align-items:center;justify-content:center;padding:2rem 1rem;
+  position:fixed;inset:0;z-index:9000;overflow-y:auto
 }
 #screen-login.active{display:flex}
 .login-box{width:min(380px,100%);text-align:center}
@@ -1064,20 +1065,31 @@ function buildCompatResult(G1,G2,n1,n2){
     +'</div>'
     +'</div>';
 
-  // 固定相性（一生）
-  html+='<div style="font-size:0.8rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem">固定の相性（一生通じて変わらない）</div>';
-  html+='<div class="compat-fixed-row">';
-  function cfItem(lbl,ju){
-    var c=getJuniColor(ju),w=JUNI_WAVE[ju]||0;
-    return '<div class="compat-fixed-item"><div class="cfi-lbl">'+lbl+'</div><div class="cfi-val" style="color:'+c+'">'+ju+'</div></div>';
+  // 固定相性（左右対称・年/月/日を行で揃える）
+  function cfRow(lbl, ju1, n1label, ju2, n2label){
+    function chip(n,ju){
+      var c=getJuniColor(ju);
+      return '<div style="flex:1;background:var(--bg2);border-radius:8px;padding:0.55rem 0.5rem;text-align:center">'
+        +'<div style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.2rem">'+n+'</div>'
+        +'<div style="font-size:1rem;font-weight:700;color:'+c+'">'+ju+'</div>'
+        +'</div>';
+    }
+    var rowBg=lbl==='年支'?'rgba(184,134,11,0.06)':lbl==='月支'?'rgba(42,92,168,0.04)':'rgba(30,120,60,0.04)';
+    var rowLabel=lbl==='年支'?'年支（本質の相性）':lbl==='月支'?'月支（日常の相性）':'日支（熱中・衝突時）';
+    return '<div style="margin-bottom:0.5rem;background:'+rowBg+';border-radius:10px;padding:0.5rem 0.6rem">'
+      +'<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.4rem;font-weight:700">'+rowLabel+'</div>'
+      +'<div style="display:flex;gap:0.4rem">'
+      +chip(n2label+'→'+n1label,ju1)
+      +chip(n1label+'→'+n2label,ju2)
+      +'</div></div>';
   }
-  html+=cfItem(n2+'の年支→'+n1+'へ',fc1.nen);
-  html+=cfItem(n2+'の月支→'+n1+'へ',fc1.tsu);
-  html+=cfItem(n2+'の日支→'+n1+'へ',fc1.nichi);
-  html+=cfItem(n1+'の年支→'+n2+'へ',fc2.nen);
-  html+=cfItem(n1+'の月支→'+n2+'へ',fc2.tsu);
-  html+=cfItem(n1+'の日支→'+n2+'へ',fc2.nichi);
-  html+='</div>';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.6rem">◆ 固定の相性（一生変わらない）</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);margin-bottom:0.6rem;background:rgba(184,134,11,0.06);border-radius:6px;padding:0.4rem 0.6rem">'
+    +'年支＝本質の相性　月支＝日常の付き合い　日支＝熱中・衝突した時'
+    +'</div>';
+  html+=cfRow('年支',fc1.nen,n1,fc2.nen,n2);
+  html+=cfRow('月支',fc1.tsu,n1,fc2.tsu,n2);
+  html+=cfRow('日支',fc1.nichi,n1,fc2.nichi,n2);
 
   // 今の変動運気
   html+='<div class="compat-now-section">'
@@ -1125,6 +1137,11 @@ async function runCompatAI(){
   var now=new Date(),cy=now.getFullYear(),cm=now.getMonth()+1;
   var prompt=
     '【2人の相性鑑定依頼】\n\n'
+    +'【年月日支の読み方（必ず守ること）】\n'
+    +'・年支の相性＝本質・根源的な相性。ここが悪いと根本的に合わない。一方通行または双方向に悪影響が出る。最も重要。\n'
+    +'・月支の相性＝普段の日常的な付き合いの中で出る相性。\n'
+    +'・日支の相性＝何かに熱中した時・話し合い・喧嘩した時に出てくる相性。\n'
+    +'必ず年支→月支→日支の順に重みをつけて解説すること。データに忠実に、良い面も悪い面も正直に伝えること。\n\n'
     +'1人目: '+compatN1+'（'+compatG1.ht+'・'+compatG1.y+'年生）\n'
     +'2人目: '+compatN2+'（'+compatG2.ht+'・'+compatG2.y+'年生）\n\n'
     +fixedText(compatG1,compatG2,compatN1,compatN2)+'\n\n'
@@ -1173,13 +1190,32 @@ function buildSystemPromptFull(G){
   if(jNen&&jNen['組合せ法則'])junishiInfo+='【年支×月支の組合せ】'+jNen['組合せ法則']+'\n';
   // 現在運気
   var u=getCurrentUnki(G);
-  // KB花人情報
+  // indexと同じKB処理（新規追加キーも自動対応）
+  var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
   var htKey=G.ht.replace(/[＋－]/g,'');
-  var starInfo=(KB['花人']&&KB['花人'][htKey])?'【'+htKey+'の特徴】'+(KB['花人'][htKey]['説明']||'')+' 性格：'+(KB['花人'][htKey]['性格']||''):'';
-  // 納音
+  var starInfo=htKey&&starKey&&KB[starKey]&&KB[starKey][htKey]
+    ?'【'+htKey+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||'')
+    :'';
+  var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){
+    var v=KB['十二運気'][k];
+    return k+'：'+(v['説明']||'')+(v['独自解釈']?' '+v['独自解釈']:'');
+  }).join('\n');
+  var standardKeys=['_meta','星人','花人','十二運気','転化天蛹','十二大従星','大運','使い方ガイド'];
+  var customInfo=Object.keys(KB).filter(function(k){return standardKeys.indexOf(k)<0;}).map(function(k){
+    var v=KB[k];
+    if(typeof v!=='object')return '【'+k+'】'+v;
+    var items=Object.keys(v).map(function(name){
+      var data=v[name];
+      if(typeof data==='object')return name+'('+Object.keys(data).map(function(fk){return fk+':'+data[fk];}).join(',')+')';
+      return name+':'+data;
+    }).join(' / ');
+    return '【'+k+'】'+items;
+  }).join('\n');
+  var daiInfo=KB['転化天蛹']
+    ?'【転化天蛹とは】大運干支（10年ごとに変わる運気の柱）がその人の転化天蛹の対象支にあたる10年間のことを指す。命式の干支が転化天蛹の支であっても転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||'')
+    :'';
   var nenN=getNayin(G.nenKS),tsuN=getNayin(G.tsuKS),nichiN=getNayin(G.nichiKS);
   var nayinInfo='【命式の納音】\n・年柱 '+G.nenKS+'→納音:'+nenN+'('+getNayinYinYang(G.nenKS)+')\n・月柱 '+G.tsuKS+'→納音:'+tsuN+'('+getNayinYinYang(G.tsuKS)+')\n・日柱 '+G.nichiKS+'→納音:'+nichiN+'('+getNayinYinYang(G.nichiKS)+')\n';
-  // 転化天蛹
   var skInfo='';
   if(G.sats&&G.sats.length>0){
     var skRows=daiunRows.filter(function(r){return G.sats.indexOf(r.shi)>=0;});
@@ -1194,7 +1230,8 @@ function buildSystemPromptFull(G){
     +skInfo+daiunText+'\n'
     +junishiInfo+'\n'+nayinInfo;
   return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
-    +'【知識ベース】\n'+starInfo+'\n\n'+junishiInfo+'\n\n'
+    +'【知識ベース】\n'+starInfo+'\n\n'+junishiInfo+'\n\n【十二運気】\n'+juniInfo+'\n\n'+daiInfo+'\n\n'
+    +(customInfo?'【追加知識】\n'+customInfo+'\n\n':'')
     +userInfo+'\n\n'
     +'【三層構造の本質】\n'
     +'・日柱（魂の核・消せない本能）：本人が消すことも止めることもできない根源的な衝動・本能。\n'
@@ -1217,15 +1254,24 @@ function buildAIPage(){
   var htBase=G.ht.replace(/[＋－]/g,'');
   var html='<div class="page active" style="padding:0">';
   html+='<div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));padding:0.8rem 1rem;border-bottom:1px solid rgba(184,134,11,0.12)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between">'
+    +'<div>'
     +'<div style="font-size:0.8rem;color:var(--ink2)">'+name+'の命式を読み込んだAIに相談できます</div>'
     +'<div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.3rem">'
     +'<span style="font-size:0.72rem;color:var(--purple)">六花人：</span>'
     +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.7rem">'+G.ht+'</span>'
+    +'</div></div>'
+    +'<div style="display:flex;gap:0.4rem;align-items:center">'
+    +'<select id="ai-voice-gender" style="font-size:0.72rem;padding:3px 6px;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:var(--bg);color:var(--ink2)">'
+    +'<option value="female">女性の声</option>'
+    +'<option value="male">男性の声</option>'
+    +'</select>'
     +'</div>'
-    +'</div>';
+    +'</div></div>';
   html+='<div id="ai-messages" class="ai-messages"></div>';
   html+='<div class="ai-quick" id="ai-quick"></div>';
   html+='<div class="ai-input-area">'
+    +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:6px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0" title="音声入力">🎤</button>'
     +'<textarea id="ai-input" placeholder="何でも聞いてみてください…" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>'
     +'<button class="ai-send-btn" onclick="sendAI()">→</button>'
     +'</div>';
@@ -1257,14 +1303,108 @@ function initAIPage(){
   }
 }
 
-function addAIMessage(role,text){
+
+// ============================================================
+// TTS / MIC / VOICE
+// ============================================================
+var currentAudio=null;
+var recognition=null;
+var micActive=false;
+
+function getVoiceGender(){
+  var sel=document.getElementById('ai-voice-gender');
+  return sel?sel.value:'female';
+}
+
+async function speakText(text,btn){
+  // 再生中なら停止
+  if(currentAudio&&!currentAudio.paused){
+    currentAudio.pause();currentAudio=null;
+    if(btn)btn.textContent='🔊';
+    return;
+  }
+  if(!text)return;
+  // 干支漢字を読み仮名に
+  var t=text;
+  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
+   ['開花','かいか'],['豊穣','ほうじょう'],['青葉','あおば'],['発芽','はつが'],['穂分','ほわけ'],['平凪','ひらなぎ'],
+   ['成天','せいてん'],['内省','ないせい'],['狂咲','くるいざき'],['引寒','いんかん'],['休眠','きゅうみん'],['残雪','ざんせつ'],
+   ['転化天蛹','てんかてんよう'],['大運','だいうん'],['命式','めいしき'],['六花人','ろっかじん'],['納音','ないん']
+  ].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  if(btn){btn.textContent='⏳';btn.disabled=true;}
+  try{
+    var res=await fetch(WORKER_BASE+'/api/tts',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:t,gender:getVoiceGender()})
+    });
+    var data=await res.json();
+    if(!data.audioContent)throw new Error('音声データなし');
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
+    currentAudio=audio;
+    audio.onplay=function(){if(btn){btn.textContent='⏹';btn.disabled=false;}};
+    audio.onended=function(){if(btn)btn.textContent='🔊';currentAudio=null;};
+    audio.onerror=function(){if(btn){btn.textContent='🔊';btn.disabled=false;}currentAudio=null;};
+    await audio.play();
+  }catch(e){
+    if(btn){btn.textContent='🔊';btn.disabled=false;}
+  }
+}
+
+function addAIMessageWithSpeak(role,text){
   var msgs=document.getElementById('ai-messages');
   if(!msgs)return;
+  var wrap=document.createElement('div');
   var div=document.createElement('div');
   div.className='ai-msg '+role;
   div.textContent=text;
-  msgs.appendChild(div);
+  wrap.appendChild(div);
+  if(role==='ai'){
+    var speakBtn=document.createElement('button');
+    speakBtn.textContent='🔊';
+    speakBtn.style.cssText='font-size:0.7rem;padding:2px 8px;background:var(--bg2);border:1px solid rgba(184,134,11,0.3);border-radius:10px;cursor:pointer;color:var(--ink3);margin-top:3px;display:block';
+    speakBtn.onclick=function(){speakText(text,speakBtn);};
+    wrap.appendChild(speakBtn);
+  }
+  msgs.appendChild(wrap);
   msgs.scrollTop=msgs.scrollHeight;
+}
+
+function toggleMic(){
+  var btn=document.getElementById('ai-mic-btn');
+  if(micActive){
+    if(recognition)recognition.stop();
+    micActive=false;
+    if(btn){btn.textContent='🎤';btn.style.color='var(--gold)';}
+    return;
+  }
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('このブラウザは音声入力に対応していません');return;}
+  recognition=new SR();
+  recognition.lang='ja-JP';
+  recognition.interimResults=false;
+  recognition.onresult=function(e){
+    var transcript=e.results[0][0].transcript;
+    var inp=document.getElementById('ai-input');
+    if(inp)inp.value=transcript;
+    micActive=false;
+    if(btn){btn.textContent='🎤';btn.style.color='var(--gold)';}
+    sendAI();
+  };
+  recognition.onerror=function(){
+    micActive=false;
+    if(btn){btn.textContent='🎤';btn.style.color='var(--gold)';}
+  };
+  recognition.onend=function(){
+    micActive=false;
+    if(btn){btn.textContent='🎤';btn.style.color='var(--gold)';}
+  };
+  recognition.start();
+  micActive=true;
+  if(btn){btn.textContent='🔴';btn.style.color='#c0392b';}
+}
+
+function addAIMessage(role,text){
+  addAIMessageWithSpeak(role,text);
 }
 
 async function sendAI(){
