@@ -1135,7 +1135,7 @@ async function runCompatAI(){
 
   var sysPrompt='あなたは花人占術AIです。2人の命式データを使って相性鑑定を行います。干支の漢字を回答に出さないこと。Markdown禁止。親しみやすい日本語で。';
   try{
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemPrompt:sysPrompt,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sysPrompt,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
     var text='';
     if(data.content)text=data.content.map(function(b){return b.text||'';}).join('');
@@ -1284,7 +1284,7 @@ async function sendAI(){
   try{
     var res=await fetch(WORKER_BASE+'/api/chat',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({systemPrompt:AI_PAGE_SYS,messages:aiHistory.slice(-10)})
+      body:JSON.stringify({system:AI_PAGE_SYS,messages:aiHistory.slice(-10)})
     });
     var data=await res.json();
     var text='';
@@ -1321,7 +1321,7 @@ async function updateProfileFromChat(userMsg,aiReply){
   }
   try{
     var prompt='以下の会話からユーザーの特徴をJSON形式のみで返してください。\nユーザー:'+userMsg+'\nAI:'+aiReply.slice(0,200)+'\n既存:'+JSON.stringify({personality:prof.personality,concerns:prof.concerns,lifestage:prof.lifestage})+'\n{"personality":[],"concerns":[],"preferences":[],"lifestage":"","summary":"20字以内","keywords":[],"changed":true}\nchangedは新情報があればtrue。JSONのみ返答。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemPrompt:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
     var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
