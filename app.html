@@ -920,9 +920,9 @@ function buildMeishikiPage(){
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
-  html+=msCol('年　柱',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi));
-  html+=msCol('月　柱',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi));
-  html+=msCol('日　柱（本人）',G.nichiKan,G.nichiShi,G.niZ,'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi));
+  html+=msCol('年　柱',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi));
+  html+=msCol('月　柱',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi));
+  html+=msCol('日　柱（本人）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi));
   html+='</div>';
   // 納音情報
   html+='<div style="font-size:0.72rem;color:var(--ink3);line-height:2;margin-top:0.5rem">'
@@ -959,10 +959,13 @@ function buildMeishikiPage(){
   return html;
 }
 
-function msCol(lbl,kan,shi,zo,th,jos,ju){
+function msCol(lbl,kan,shi,zo,th,thZo,jos,ju){
   var color=getJuniColor(ju);
-  var kk=getKikkyo(ju,'');
-  var kkc=getKikkyoColor(ju,'');
+  // 通変星：干の通変星・蔵干の通変星
+  var thDisplay='';
+  if(th&&th!=='—'&&thZo&&thZo!=='—')thDisplay=th+'・'+thZo;
+  else if(th&&th!=='—')thDisplay=th;
+  else if(thZo&&thZo!=='—')thDisplay='—・'+thZo;
   return '<div class="ms-col">'
     +'<div class="ms-lbl">'+lbl+'</div>'
     +'<div style="display:flex;align-items:flex-end;justify-content:center;margin:0.3rem 0">'
@@ -972,7 +975,7 @@ function msCol(lbl,kan,shi,zo,th,jos,ju){
     +gogyoBadge(shi)
     +'</div>'
     +'<div class="ms-zo" style="font-size:0.65rem">蔵干：'+zo+'</div>'
-    +(th&&th!=='—'?'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+th+'</div>':'')
+    +(thDisplay?'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+thDisplay+'</div>':'')
     +(jos&&jos!=='—'?'<div style="font-size:0.7rem;color:var(--gold);margin-top:0.15rem">'+jos+'</div>':'')
     +'<div class="ms-ju" style="color:'+color+'">'+juniRuby(ju)+'</div>'
     +'</div>';
