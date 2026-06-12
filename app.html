@@ -208,14 +208,45 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 }
 
 /* ===== THEMES ===== */
-body.theme-dark{--bg:#1a1208;--bg2:#2a1c08;--bg3:#3a2a10;--ink:#f0e8d0;--ink2:#d4c8a0;--ink3:#9a8a60}
-body.theme-dark .card,body.theme-dark .setting-section,body.theme-dark .compat-result{background:#2a1c08}
-body.theme-dark .ai-msg.ai{background:#2a1c08;color:var(--ink)}
-body.theme-dark .bottom-nav{background:#2a1c08}
-body.theme-dark .modal-box{background:#2a1c08}
+/* ゴールドテーマ */
+body.theme-gold{
+  --bg:#fdf8ef;--bg2:#fdf0d8;--bg3:#f5e6c0;
+  --ink:#2a1c08;--ink2:#7a6b52;--ink3:#9a8a6a;
+  --gold:#b8860b;--gold2:#d4a017;--gold-light:rgba(184,134,11,0.15);
+  --purple:#7c3aed
+}
+body.theme-gold .card,body.theme-gold .setting-section,body.theme-gold .compat-result{background:#fffdf5}
+body.theme-gold .bottom-nav{background:#fffdf5}
+body.theme-gold .modal-box{background:#fdf8ef}
+body.theme-gold .top-header{background:linear-gradient(135deg,#5a3800,#b8860b 55%,#d4a017)}
+/* ダークテーマ */
+body.theme-dark{
+  --bg:#0b0a08;--bg2:#14120e;--bg3:#1c1914;
+  --ink:#f4f0ea;--ink2:#b5ae9f;--ink3:#7a7060;
+  --gold:#e6c687;--gold2:#b89146;--gold-light:rgba(230,198,135,0.15);
+  --purple:#a78bfa
+}
+body.theme-dark .card,body.theme-dark .setting-section,body.theme-dark .compat-result{background:#14120e}
+body.theme-dark .ai-msg.ai{background:#14120e;color:var(--ink)}
+body.theme-dark .bottom-nav{background:#14120e;border-top-color:rgba(230,198,135,0.15)}
+body.theme-dark .modal-box{background:#14120e}
+body.theme-dark .top-header{background:linear-gradient(135deg,#0b0a08,#1c1914 55%,#2a2010)}
+body.theme-dark input,body.theme-dark select,body.theme-dark textarea{background:rgba(255,255,255,0.06)!important;color:var(--ink)!important;border-color:rgba(230,198,135,0.2)!important}
+body.theme-dark .login-card{background:rgba(255,255,255,0.04)}
+body.theme-dark .ai-input-area{background:#1c1914}
+
+/* ===== 花びら演出 ===== */
+#petals-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;overflow:hidden}
+.petal{position:absolute;top:-30px;font-size:1.1rem;opacity:0.7;animation:petalFall linear infinite;user-select:none;pointer-events:none}
+@keyframes petalFall{
+  0%{transform:translateY(0) rotate(0deg) translateX(0);opacity:0.8}
+  50%{transform:translateY(50vh) rotate(180deg) translateX(20px);opacity:0.6}
+  100%{transform:translateY(110vh) rotate(360deg) translateX(-10px);opacity:0}
+}
 </style>
 </head>
 <body>
+<div id="petals-canvas"></div>
 
 <!-- ===== GLOBAL ERROR ===== -->
 <div id="errmsg" style="display:none;position:fixed;top:0;left:0;right:0;background:#fff0f0;border-bottom:2px solid #c00;color:#900;padding:0.7rem 1rem;font-size:0.82rem;z-index:9999;word-break:break-all"></div>
@@ -574,6 +605,7 @@ function doRegister(){
 function doLogout(){
   document.getElementById('screen-main').classList.remove('active');
   document.getElementById('screen-login').classList.add('active');
+  stopPetals();
   currentMemberIdx=0;aiHistory=[];
 }
 function startApp(data){
@@ -609,6 +641,7 @@ function startApp(data){
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-main').classList.add('active');
   document.getElementById('header-name').textContent=data.account.nickname;
+  if(!data.settings||data.settings.petals!==false)startPetals();
   currentMemberIdx=0;
   loadKB();
   renderMemberTabs();
@@ -775,10 +808,13 @@ function buildHomePage(){
     +'<div id="unki-body-home" class="unki-body"></div>'
     +'</div>';
 
-  // 情報チップ
-  html+='<div class="info-3grid">'
+  // 大運の通変星（干から計算）
+  var daiTh=(G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—';
+  // 情報チップ（4つ）
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem">'
     +'<div class="info-chip"><div class="ic-lbl">年　齢</div><div class="ic-val">'+u.age+'歳</div></div>'
     +'<div class="info-chip"><div class="ic-lbl">現在の大運</div><div class="ic-val">'+u.currDaiun.ks+'</div></div>'
+    +'<div class="info-chip"><div class="ic-lbl">大運の通変星</div><div class="ic-val" style="color:var(--purple)">'+daiTh+'</div></div>'
     +'<div class="info-chip"><div class="ic-lbl">大運の運気</div><div class="ic-val" style="color:'+getJuniColor(u.daiJu)+'">'+u.daiJu+'</div></div>'
     +'</div>';
 
@@ -1606,12 +1642,20 @@ function buildSettingPage(){
     +'</div>';
 
   // テーマ
-  html+='<div class="setting-section"><h3>テーマ</h3>'
+  var petalsOn=(data.settings&&data.settings.petals!==false);
+  html+='<div class="setting-section"><h3>テーマ・演出</h3>'
     +'<div class="setting-row"><label>カラーモード</label>'
     +'<div class="theme-btns">'
     +'<button class="theme-btn'+(theme==='default'?' active':'')+'" onclick="setTheme(\'default\')">通常</button>'
+    +'<button class="theme-btn'+(theme==='gold'?' active':'')+'" onclick="setTheme(\'gold\')">ゴールド</button>'
     +'<button class="theme-btn'+(theme==='dark'?' active':'')+'" onclick="setTheme(\'dark\')">ダーク</button>'
-    +'</div></div></div>';
+    +'</div></div>'
+    +'<div class="setting-row"><label>花びら演出</label>'
+    +'<div class="theme-btns">'
+    +'<button class="theme-btn'+(petalsOn?' active':'')+'" onclick="setPetals(true)">オン</button>'
+    +'<button class="theme-btn'+(!petalsOn?' active':'')+'" onclick="setPetals(false)">オフ</button>'
+    +'</div></div>'
+    +'</div>';
 
   // AI会話履歴
   html+='<div class="setting-section"><h3>AI会話の記録（'+data.account.nickname+'）</h3>';
@@ -1656,7 +1700,18 @@ function setTheme(theme){
   if(!data.settings)data.settings={};
   data.settings.theme=theme;
   S.save(data);
-  document.body.className=theme==='dark'?'theme-dark':'';
+  applyTheme(theme);
+  renderCurrentPage();
+}
+function applyTheme(theme){
+  document.body.className=theme==='dark'?'theme-dark':theme==='gold'?'theme-gold':'';
+}
+function setPetals(on){
+  var data=S.load();if(!data)return;
+  if(!data.settings)data.settings={};
+  data.settings.petals=on;
+  S.save(data);
+  if(on)startPetals();else stopPetals();
   renderCurrentPage();
 }
 function clearHistory(){
@@ -1673,6 +1728,35 @@ function resetAllData(){
 }
 </script>
 <script>
+
+// ============================================================
+// 花びら演出
+// ============================================================
+var petalInterval=null;
+var PETALS=['🌸','🌺','🌼','✿','❀'];
+function startPetals(){
+  stopPetals();
+  var canvas=document.getElementById('petals-canvas');
+  if(!canvas)return;
+  petalInterval=setInterval(function(){
+    var p=document.createElement('div');
+    p.className='petal';
+    p.textContent=PETALS[Math.floor(Math.random()*PETALS.length)];
+    p.style.left=Math.random()*100+'vw';
+    p.style.fontSize=(0.8+Math.random()*0.8)+'rem';
+    p.style.opacity=(0.4+Math.random()*0.5).toString();
+    var dur=(6+Math.random()*8).toFixed(1)+'s';
+    var delay=(Math.random()*3).toFixed(1)+'s';
+    p.style.animation='petalFall '+dur+' '+delay+' linear forwards';
+    canvas.appendChild(p);
+    setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p);},14000);
+  },800);
+}
+function stopPetals(){
+  if(petalInterval){clearInterval(petalInterval);petalInterval=null;}
+  var canvas=document.getElementById('petals-canvas');
+  if(canvas)canvas.innerHTML='';
+}
 // ============================================================
 // INIT
 // ============================================================
@@ -1687,8 +1771,8 @@ function resetAllData(){
 
   // テーマ適用
   var data=S.load();
-  if(data&&data.settings&&data.settings.theme==='dark'){
-    document.body.className='theme-dark';
+  if(data&&data.settings&&data.settings.theme){
+    applyTheme(data.settings.theme);
   }
 
   // PINがある場合は必ずログイン画面を表示（自動ログイン無効）

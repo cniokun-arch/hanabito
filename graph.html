@@ -95,6 +95,10 @@ body{background:#f5f0e8;color:#1a1208;min-height:100vh}
 .error-msg{color:#c0392b;font-size:0.85rem;padding:0.5rem 0.8rem;background:#fff5f5;border-radius:6px;margin-top:0.5rem}
 .hidden{display:none}
 ruby rt{font-size:0.55em}
+
+/* app.htmlテーマ引き継ぎ */
+body.theme-dark{filter:brightness(0.9) saturate(0.8)}
+body.theme-gold{filter:sepia(0.15) saturate(1.1)}
 </style>
 </head>
 <body>
@@ -105,7 +109,7 @@ ruby rt{font-size:0.55em}
     <p>人物を登録して、花人占術の相性を相関図で見る</p>
   </div>
 
-  <a href="index.html" class="back-link">← 花人占術に戻る</a>
+  <a href="app.html" class="back-link">← 花人占術に戻る</a>
 
   <!-- グループタブ -->
   <div class="group-tab-bar" id="groupTabBar"></div>
@@ -1355,6 +1359,17 @@ async function sendAdviceChat(){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
+
+  // app.htmlのテーマ設定を引き継ぐ
+  try{
+    var appData=localStorage.getItem('hanabito_v2');
+    if(appData){
+      var appSettings=JSON.parse(appData);
+      var theme=appSettings&&appSettings.settings&&appSettings.settings.theme;
+      if(theme==='dark')document.body.classList.add('theme-dark');
+      else if(theme==='gold')document.body.classList.add('theme-gold');
+    }
+  }catch(e){}
   // app.htmlから登録データを受け取って自動入力（追加のみ・既存ロジック無変更）
   try{
     var preload=localStorage.getItem('hanabito_graph_preload');
