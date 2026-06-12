@@ -48,7 +48,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .login-err{background:rgba(180,40,40,0.2);border:1px solid rgba(180,40,40,0.5);color:#ffaaaa;border-radius:6px;padding:0.6rem 0.9rem;font-size:0.82rem;margin-bottom:0.8rem;display:none}
 
 /* ===== MAIN LAYOUT ===== */
-#screen-main{padding-bottom:70px}
+#screen-main{padding-bottom:70px;min-height:100vh}
 #screen-main.active{display:block}
 
 /* ===== TOP HEADER ===== */
@@ -227,7 +227,6 @@ body.theme-dark{
   --purple:#a78bfa;
   background:#0b0a08;min-height:100vh
 }
-html{background:#0b0a08}
 body.theme-dark .card,body.theme-dark .setting-section,body.theme-dark .compat-result{background:#14120e}
 body.theme-dark .ai-msg.ai{background:#14120e;color:var(--ink)}
 body.theme-dark .bottom-nav{background:#14120e;border-top-color:rgba(230,198,135,0.15)}
@@ -500,7 +499,8 @@ function getDaiunRows(G){
     var isCurr=now>=startY&&now<=endY;
     var isSk=G.sats.indexOf(dk.shi)>=0;
     var dzo=getZokan(dk.shi,G.dfs);
-    var djos=(JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—';
+    var niIdx=G.nichiKanIdx!==undefined?G.nichiKanIdx:JIKKAN.indexOf(G.nichiKan);
+    var djos=(JUSEI[niIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—';
     var kk=getKikkyo(ju,G.ht);
     rows.push({age:ap,sp:sp2,ks:dk.ks,kan:dk.kan,shi:dk.shi,ju,startY,endY,isCurr,isSk,th:(G.T||[])[JIKKAN.indexOf(dk.kan)]||'—',zo:dzo,jos:djos,kk});
     ap+=sp2;
@@ -623,7 +623,7 @@ function startApp(data){
   try{
     var b=data.account.birthday,g=data.account.gender;
     var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS){
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined){
       if(!by||!bm||!bd){
         // データ破損 → ログアウト状態に戻す
         S.save(null);localStorage.removeItem(STORAGE_KEY);
@@ -934,7 +934,7 @@ function buildMeishikiPage(){
   // 大運表
   html+='<div class="card"><div class="card-title">◆ 大運の流れ</div>';
   html+='<div style="overflow-x:auto"><table class="daiun-table"><thead><tr>'
-    +'<th>歳</th><th>年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二大従星</th><th>十二運気</th><th>吉凶</th><th>転化</th>'
+    +'<th>歳</th><th>開始年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二大従星</th><th>十二運気</th><th>吉凶</th>'
     +'</tr></thead><tbody>';
   getDaiunRows(G).forEach(function(r){
     var cls=(r.isCurr?'current':'')+' '+(r.isSk?'sk':'');
@@ -948,7 +948,7 @@ function buildMeishikiPage(){
       +'<td style="font-size:0.68rem;color:var(--gold)">'+r.jos+'</td>'
       +'<td style="color:'+getJuniColor(r.ju)+';font-size:0.7rem;font-weight:700">'+juniRuby(r.ju)+'</td>'
       +'<td style="color:'+kkc+';font-size:0.7rem;font-weight:600">'+r.kk+'</td>'
-      +'<td style="color:#7c3aed;font-size:0.7rem">'+(r.isSk?'●':'')+'</td>'
+
       +'</tr>';
   });
   html+='</tbody></table></div>';
@@ -972,8 +972,8 @@ function msCol(lbl,kan,shi,zo,th,jos,ju){
     +gogyoBadge(shi)
     +'</div>'
     +'<div class="ms-zo" style="font-size:0.65rem">蔵干：'+zo+'</div>'
-    +'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+th+'</div>'
-    +'<div style="font-size:0.7rem;color:var(--gold);margin-top:0.15rem">'+jos+'</div>'
+    +(th&&th!=='—'?'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+th+'</div>':'')
+    +(jos&&jos!=='—'?'<div style="font-size:0.7rem;color:var(--gold);margin-top:0.15rem">'+jos+'</div>':'')
     +'<div class="ms-ju" style="color:'+color+'">'+juniRuby(ju)+'</div>'
     +'</div>';
 }
