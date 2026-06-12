@@ -1056,8 +1056,8 @@ function buildCompatResult(G1,G2,n1,n2){
     return {mark:'▲',label:'要注意',bg:'rgba(192,57,43,0.1)',col:'#c0392b'};
   }
 
-  // fc1 = G2（n2）の命式 → G1（n1）に与える運気
-  // fc2 = G1（n1）の命式 → G2（n2）に与える運気
+  // fc1 = G2（n2）の支 → G1（n1）に与える運気
+  // fc2 = G1（n1）の支 → G2（n2）に与える運気
   var fc1=fixedCompat(G1,G2);
   var fc2=fixedCompat(G2,G1);
   var s1=totalScore(fc1),s2=totalScore(fc2);
@@ -1066,78 +1066,74 @@ function buildCompatResult(G1,G2,n1,n2){
   var u1=getCurrentUnki(G1),u2=getCurrentUnki(G2);
   var ht1=G1.ht,ht2=G2.ht;
 
+  function markSym(w){return w>=4?'◎':w>=2?'○':w>=-2?'△':'▲';}
+  function markCol(w){return w>=4?'#1a6b3a':w>=2?'#2a5ca8':w>=-2?'#8a6800':'#c0392b';}
+
   var html='<div class="compat-result">';
 
-  // ===== ヘッダー：名前と六花人 =====
-  html+='<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;margin-bottom:1rem">'
-    +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.7rem 0.5rem">'
-    +'<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">'+n1+'</div>'
-    +'<div style="font-size:0.72rem;color:var(--purple);margin-top:0.2rem">'+ht1+'</div>'
+  // ===== ヘッダー：名前・六花人・総合 =====
+  html+='<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;margin-bottom:1.2rem">'
+    +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.8rem 0.5rem">'
+    +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+n1+'</div>'
+    +'<div style="font-size:0.75rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht1+'</div>'
+    +'<div style="font-size:0.65rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
     +'</div>'
-    +'<div style="text-align:center">'
-    +'<div style="font-size:0.72rem;color:var(--ink3)">総合</div>'
-    +'<div style="font-size:1.6rem;color:'+overall.col+'">'+overall.mark+'</div>'
+    +'<div style="text-align:center;padding:0 0.3rem">'
+    +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.3rem">総合</div>'
+    +'<div style="font-size:1.8rem;color:'+overall.col+'">'+overall.mark+'</div>'
     +'<div style="font-size:0.65rem;color:'+overall.col+'">'+overall.label+'</div>'
     +'</div>'
-    +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.7rem 0.5rem">'
-    +'<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">'+n2+'</div>'
-    +'<div style="font-size:0.72rem;color:var(--purple);margin-top:0.2rem">'+ht2+'</div>'
+    +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.8rem 0.5rem">'
+    +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+n2+'</div>'
+    +'<div style="font-size:0.75rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht2+'</div>'
+    +'<div style="font-size:0.65rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
     +'</div>'
     +'</div>';
 
-  // ===== 固定相性：矢印レイアウト =====
+  // ===== 固定相性ラベル =====
   html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.3rem">◆ 固定の相性（一生変わらない）</div>';
-  html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:0.8rem;line-height:1.6">'
-    +'年支＝本質 ／ 月支＝日常 ／ 日支＝熱中・衝突時'
+  html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:0.8rem">'
+    +'年支＝本質　月支＝日常　日支＝熱中・衝突時'
     +'</div>';
 
-  function arrowRow(rowLabel, rowKey, ju_n2ton1, ju_n1ton2){
-    // ju_n2ton1: n2の支がn1（左）に与える運気
-    // ju_n1ton2: n1の支がn2（右）に与える運気
-    var c1=getJuniColor(ju_n2ton1), c2=getJuniColor(ju_n1ton2);
-    var w1=JUNI_WAVE[ju_n2ton1]||0, w2=JUNI_WAVE[ju_n1ton2]||0;
-    function mark(w){return w>=4?'◎':w>=2?'○':w>=-2?'△':'▲';}
-    function markColor(w){return w>=4?'#1a6b3a':w>=2?'#2a5ca8':w>=-2?'#8a6800':'#c0392b';}
-    var rowBg=rowKey==='年'?'rgba(184,134,11,0.07)':rowKey==='月'?'rgba(42,92,168,0.05)':'rgba(30,120,60,0.05)';
-    var rowBorder=rowKey==='年'?'rgba(184,134,11,0.3)':rowKey==='月'?'rgba(42,92,168,0.2)':'rgba(30,120,60,0.2)';
-    return '<div style="background:'+rowBg+';border:1px solid '+rowBorder+';border-radius:10px;padding:0.6rem 0.7rem;margin-bottom:0.5rem">'
-      +'<div style="font-size:0.68rem;color:var(--ink3);font-weight:700;margin-bottom:0.5rem">'+rowLabel+'</div>'
-      // n2→n1方向
-      +'<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:0.3rem;margin-bottom:0.35rem">'
-      +'<div style="text-align:center;background:#fff;border-radius:8px;padding:0.45rem 0.3rem;border:1px solid rgba(0,0,0,0.06)">'
-      +'<div style="font-size:0.62rem;color:var(--ink3)">'+n2+'から'+n1+'へ</div>'
-      +'<div style="font-size:1.05rem;font-weight:700;color:'+c1+'">'+ju_n2ton1+'</div>'
+  // ===== 1行：左の運気 ／ 矢印2本 ／ 右の運気 =====
+  // fc1.xxx = n2の支がn1に与える運気 → 左側に表示
+  // fc2.xxx = n1の支がn2に与える運気 → 右側に表示
+  function compatRow(rowLabel, juLeft, juRight){
+    var wL=JUNI_WAVE[juLeft]||0, wR=JUNI_WAVE[juRight]||0;
+    var cL=getJuniColor(juLeft), cR=getJuniColor(juRight);
+    var mL=markSym(wL), mR=markSym(wR);
+    var mcL=markCol(wL), mcR=markCol(wR);
+    return '<div style="display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;gap:0.3rem;margin-bottom:0.6rem;padding:0.6rem 0.5rem;background:var(--bg2);border-radius:10px">'
+      // 左：n1が受け取る運気
+      +'<div style="text-align:center">'
+      +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.2rem">'+rowLabel+'</div>'
+      +'<div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;font-weight:700;color:'+cL+'">'+juLeft+'</div>'
       +'</div>'
-      +'<div style="text-align:center;min-width:36px">'
-      +'<div style="font-size:1rem;color:'+markColor(w1)+'">'+mark(w1)+'</div>'
-      +'<div style="font-size:0.7rem;color:var(--ink3)">←</div>'
+      // 中央：矢印2本
+      +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
+      // 上の矢印（n2→n1、左向き）
+      +'<div style="display:flex;align-items:center;gap:0;width:100%">'
+      +'<svg width="28" height="18" viewBox="0 0 28 18"><line x1="2" y1="9" x2="22" y2="9" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="22,5 28,9 22,13" fill="'+mcL+'"/></svg>'
+      +'<div style="font-size:0.9rem;color:'+mcL+';margin-left:-4px;font-weight:700;line-height:1">'+mL+'</div>'
       +'</div>'
-      +'<div style="text-align:center;background:rgba(255,255,255,0.5);border-radius:8px;padding:0.45rem 0.3rem;border:1px dashed rgba(0,0,0,0.08)">'
-      +'<div style="font-size:0.62rem;color:var(--ink3)">'+n2+'の'+rowKey+'支</div>'
-      +'<div style="font-size:0.82rem;color:var(--ink3)">命式の影響</div>'
+      // 下の矢印（n1→n2、右向き）
+      +'<div style="display:flex;align-items:center;gap:0;width:100%;flex-direction:row-reverse">'
+      +'<svg width="28" height="18" viewBox="0 0 28 18"><line x1="26" y1="9" x2="6" y2="9" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="6,5 0,9 6,13" fill="'+mcR+'"/></svg>'
+      +'<div style="font-size:0.9rem;color:'+mcR+';margin-right:-4px;font-weight:700;line-height:1">'+mR+'</div>'
       +'</div>'
       +'</div>'
-      // n1→n2方向
-      +'<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:0.3rem">'
-      +'<div style="text-align:center;background:rgba(255,255,255,0.5);border-radius:8px;padding:0.45rem 0.3rem;border:1px dashed rgba(0,0,0,0.08)">'
-      +'<div style="font-size:0.62rem;color:var(--ink3)">'+n1+'の'+rowKey+'支</div>'
-      +'<div style="font-size:0.82rem;color:var(--ink3)">命式の影響</div>'
-      +'</div>'
-      +'<div style="text-align:center;min-width:36px">'
-      +'<div style="font-size:0.7rem;color:var(--ink3)">→</div>'
-      +'<div style="font-size:1rem;color:'+markColor(w2)+'">'+mark(w2)+'</div>'
-      +'</div>'
-      +'<div style="text-align:center;background:#fff;border-radius:8px;padding:0.45rem 0.3rem;border:1px solid rgba(0,0,0,0.06)">'
-      +'<div style="font-size:0.62rem;color:var(--ink3)">'+n1+'から'+n2+'へ</div>'
-      +'<div style="font-size:1.05rem;font-weight:700;color:'+c2+'">'+ju_n1ton2+'</div>'
-      +'</div>'
+      // 右：n2が受け取る運気
+      +'<div style="text-align:center">'
+      +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.2rem">'+rowLabel+'</div>'
+      +'<div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;font-weight:700;color:'+cR+'">'+juRight+'</div>'
       +'</div>'
       +'</div>';
   }
 
-  html+=arrowRow('年支（本質の相性）','年', fc1.nen, fc2.nen);
-  html+=arrowRow('月支（日常の相性）','月', fc1.tsu, fc2.tsu);
-  html+=arrowRow('日支（熱中・衝突時）','日', fc1.nichi, fc2.nichi);
+  html+=compatRow('年支（本質）', fc1.nen, fc2.nen);
+  html+=compatRow('月支（日常）', fc1.tsu, fc2.tsu);
+  html+=compatRow('日支（衝突時）', fc1.nichi, fc2.nichi);
 
   // ===== 今の変動運気 =====
   html+='<div class="compat-now-section">'
