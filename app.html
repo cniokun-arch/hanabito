@@ -1399,6 +1399,27 @@ var AI_PAGE_G=null;
 var AI_PAGE_SYS='';
 var AI_ENGINE='gemini'; // 'claude' or 'gemini'
 
+// 会話履歴をlocalStorageに保存・読み込み
+function saveChatHistory(){
+  var data=S.load();if(!data)return;
+  var key=currentMemberIdx===0?'self':'p'+(currentMemberIdx-1);
+  if(!data.chatHistory)data.chatHistory={};
+  data.chatHistory[key]=aiHistory.slice(-30); // 直近30件
+  S.save(data);
+}
+function loadChatHistory(){
+  var data=S.load();if(!data)return [];
+  var key=currentMemberIdx===0?'self':'p'+(currentMemberIdx-1);
+  return (data.chatHistory&&data.chatHistory[key])||[];
+}
+function clearChatHistory(){
+  var data=S.load();if(!data)return;
+  var key=currentMemberIdx===0?'self':'p'+(currentMemberIdx-1);
+  if(data.chatHistory)data.chatHistory[key]=[];
+  S.save(data);
+  aiHistory=[];
+}
+
 function buildAIPage(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
@@ -1421,12 +1442,15 @@ function buildAIPage(){
     +'<option value="male">男性の声</option>'
     +'</select>'
     +'<div style="display:flex;border:1px solid rgba(184,134,11,0.3);border-radius:6px;overflow:hidden">'
-    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.68rem;padding:3px 8px;background:var(--gold);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
-    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.68rem;padding:3px 8px;background:var(--bg2);color:var(--ink3);border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
+    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.68rem;padding:3px 8px;background:var(--bg2);color:var(--ink3);border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
+    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.68rem;padding:3px 8px;background:#4285f4;color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
     +'</div>'
     +'</div>'
     +'</div></div>';
   html+='<div id="ai-messages" class="ai-messages"></div>';
+  html+='<div style="display:flex;justify-content:flex-end;padding:4px 8px 0;background:var(--bg)">'
+    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.68rem;padding:2px 10px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer">履歴を削除</button>'
+    +'</div>';
   html+='<div class="ai-quick" id="ai-quick"></div>';
   html+='<div class="ai-input-area">'
     +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:6px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0" title="音声入力">🎤</button>'
@@ -1455,11 +1479,29 @@ function initAIPage(){
       qDiv.appendChild(btn);
     });
   }
-  // 初回メッセージ
+  // 保存済み会話履歴を読み込む
+  var saved=loadChatHistory();
+  aiHistory=saved.length>0?saved.slice():[]; // 履歴を復元
   var msgs=document.getElementById('ai-messages');
-  if(msgs&&msgs.children.length===0){
+  if(msgs){
+    msgs.innerHTML='';
     var name=getCurrentTargetName();
-    addAIMessage('ai','こんにちは！'+name+'さんの命式をしっかり読み込みました。今の運気、性格、恋愛、仕事…何でも聞いてください🌸');
+    if(saved.length>0){
+      // 過去の会話を表示
+      saved.forEach(function(msg){
+        addAIMessage(msg.role==='user'?'user':'ai', msg.content);
+      });
+      // 続きからの案内
+      var contMsg=document.createElement('div');
+      contMsg.style.cssText='text-align:center;font-size:0.7rem;color:var(--ink3);padding:0.4rem;border-top:1px dashed rgba(184,134,11,0.2);margin:0.4rem 0';
+      contMsg.textContent='↑ 前回の会話　ここから続けられます';
+      msgs.appendChild(contMsg);
+      msgs.scrollTop=msgs.scrollHeight;
+    } else {
+      // 初回メッセージ
+      var initMsg=AI_ENGINE==='gemini'?'こんにちは！'+name+'さんの命式を読み込みました。Geminiが鑑定します。何でも聞いてください ✨':'こんにちは！'+name+'さんの命式をしっかり読み込みました。今の運気、性格、恋愛、仕事…何でも聞いてください🌸';
+      addAIMessage('ai',initMsg);
+    }
   }
 }
 
@@ -1627,6 +1669,7 @@ async function sendAI(){
     if(!text)text='⚠ 返答が空でした。('+JSON.stringify(data).slice(0,80)+')';
     addAIMessage('ai',text);
     aiHistory.push({role:'assistant',content:text});
+    saveChatHistory(); // 会話を保存
     updateProfileFromChat(userMsg,text);
     if(data.remaining!==undefined){
       var m2=getMsgs();
@@ -1762,10 +1805,12 @@ function setPetals(on){
   renderCurrentPage();
 }
 function clearHistory(){
-  if(!confirm('会話の記録を削除しますか？'))return;
+  if(!confirm('会話の記録をすべて削除しますか？'))return;
   var data=S.load();if(!data)return;
   if(data.account._profile)data.account._profile.history=[];
+  data.chatHistory={};
   S.save(data);
+  aiHistory=[];
   renderCurrentPage();
 }
 function resetAllData(){
