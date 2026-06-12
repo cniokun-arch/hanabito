@@ -1397,6 +1397,7 @@ function buildSystemPromptFull(G){
 
 var AI_PAGE_G=null;
 var AI_PAGE_SYS='';
+var AI_ENGINE='claude'; // 'claude' or 'gemini'
 
 function buildAIPage(){
   var G=getCurrentTargetG();
@@ -1419,6 +1420,10 @@ function buildAIPage(){
     +'<option value="female">女性の声</option>'
     +'<option value="male">男性の声</option>'
     +'</select>'
+    +'<div style="display:flex;border:1px solid rgba(184,134,11,0.3);border-radius:6px;overflow:hidden">'
+    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.68rem;padding:3px 8px;background:var(--gold);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
+    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.68rem;padding:3px 8px;background:var(--bg2);color:var(--ink3);border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
+    +'</div>'
     +'</div>'
     +'</div></div>';
   html+='<div id="ai-messages" class="ai-messages"></div>';
@@ -1522,6 +1527,20 @@ function addAIMessageWithSpeak(role,text){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
+function switchEngine(engine){
+  AI_ENGINE=engine;
+  var cb=document.getElementById('engine-claude');
+  var gb=document.getElementById('engine-gemini');
+  if(cb&&gb){
+    cb.style.background=engine==='claude'?'var(--gold)':'var(--bg2)';
+    cb.style.color=engine==='claude'?'#fff':'var(--ink3)';
+    gb.style.background=engine==='gemini'?'#4285f4':'var(--bg2)';
+    gb.style.color=engine==='gemini'?'#fff':'var(--ink3)';
+  }
+  // エンジン切り替え時にシステムプロンプトを再構築
+  if(AI_PAGE_G)AI_PAGE_SYS=buildSystemPromptFull(AI_PAGE_G);
+  addAIMessage('ai',engine==='gemini'?'Geminiに切り替えました。同じ命式データで鑑定します ✨':'Claudeに切り替えました 🌸');
+}
 function toggleMic(){
   var btn=document.getElementById('ai-mic-btn');
   if(micActive){
@@ -1588,7 +1607,7 @@ async function sendAI(){
   try{
     var res=await fetch(WORKER_BASE+'/api/chat',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({system:AI_PAGE_SYS,messages:aiHistory.slice(-10)})
+      body:JSON.stringify({system:AI_PAGE_SYS,messages:aiHistory.slice(-10),engine:AI_ENGINE})
     });
 
     // ローディング削除（IDで再取得）
