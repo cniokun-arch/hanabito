@@ -1099,41 +1099,64 @@ function buildCompatResult(G1,G2,n1,n2){
   // ===== 1行：左の運気 ／ 矢印2本 ／ 右の運気 =====
   // fc1.xxx = n2の支がn1に与える運気 → 左側に表示
   // fc2.xxx = n1の支がn2に与える運気 → 右側に表示
-  function compatRow(rowLabel, juLeft, juRight){
+  // SVGで矢印中央にマークを乗せる関数
+  // rightArrow: 左から右（→）、マークを中央に
+  function svgArrow(toRight, markStr, markColor){
+    var w=64,h=24,mx=w/2,my=h/2;
+    var arrowColor='#bbb';
+    var markFontSize=11;
+    if(toRight){
+      // →矢印、マーク中央上に
+      return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'
+        +'<line x1="4" y1="'+my+'" x2="'+(w-10)+'" y2="'+my+'" stroke="'+arrowColor+'" stroke-width="1.5" stroke-dasharray="4,3"/>'
+        +'<polygon points="'+(w-10)+','+(my-4)+' '+w+','+my+' '+(w-10)+','+(my+4)+'" fill="'+markColor+'"/>'
+        +'<text x="'+mx+'" y="'+(my-2)+'" text-anchor="middle" dominant-baseline="auto" font-size="'+markFontSize+'" font-weight="bold" fill="'+markColor+'">'+markStr+'</text>'
+        +'</svg>';
+    } else {
+      // ←矢印、マーク中央上に
+      return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">'
+        +'<line x1="10" y1="'+my+'" x2="'+(w-4)+'" y2="'+my+'" stroke="'+arrowColor+'" stroke-width="1.5" stroke-dasharray="4,3"/>'
+        +'<polygon points="10,'+(my-4)+' 0,'+my+' 10,'+(my+4)+'" fill="'+markColor+'"/>'
+        +'<text x="'+mx+'" y="'+(my-2)+'" text-anchor="middle" dominant-baseline="auto" font-size="'+markFontSize+'" font-weight="bold" fill="'+markColor+'">'+markStr+'</text>'
+        +'</svg>';
+    }
+  }
+
+  // juLeft = n1が受け取る運気（n2の支→n1）
+  // juRight = n2が受け取る運気（n1の支→n2）
+  function compatRow(rowLabel, juLeft, juRight, isFirst){
     var wL=JUNI_WAVE[juLeft]||0, wR=JUNI_WAVE[juRight]||0;
     var cL=getJuniColor(juLeft), cR=getJuniColor(juRight);
     var mL=markSym(wL), mR=markSym(wR);
     var mcL=markCol(wL), mcR=markCol(wR);
-    return '<div style="display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;gap:0.3rem;margin-bottom:0.6rem;padding:0.6rem 0.5rem;background:var(--bg2);border-radius:10px">'
+    var rowBg=rowLabel.indexOf('本質')>=0?'rgba(184,134,11,0.06)':rowLabel.indexOf('日常')>=0?'rgba(42,92,168,0.04)':'rgba(30,120,60,0.04)';
+    // 上段：n2→n1（右向き→、まことが受け取る）
+    // 下段：n1→n2（左向き←、えいこが受け取る）
+    return '<div style="background:'+rowBg+';border-radius:10px;padding:0.7rem 0.6rem;margin-bottom:0.5rem">'
+      +'<div style="font-size:0.68rem;color:var(--ink3);text-align:center;margin-bottom:0.5rem;font-weight:600">'+rowLabel+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 68px 1fr;align-items:center;gap:0.2rem">'
       // 左：n1が受け取る運気
       +'<div style="text-align:center">'
-      +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.2rem">'+rowLabel+'</div>'
-      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;color:'+cL+'">'+juLeft+'</div>'
+      +(isFirst?'<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
+      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.35rem;font-weight:700;color:'+cL+'">'+juLeft+'</div>'
       +'</div>'
-      // 中央：矢印2本
-      +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'
-      // 上の矢印（n2→n1、左向き）
-      +'<div style="display:flex;align-items:center;gap:0;width:100%">'
-      +'<svg width="28" height="18" viewBox="0 0 28 18"><line x1="2" y1="9" x2="22" y2="9" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="22,5 28,9 22,13" fill="'+mcL+'"/></svg>'
-      +'<div style="font-size:0.9rem;color:'+mcL+';margin-left:-4px;font-weight:700;line-height:1">'+mL+'</div>'
-      +'</div>'
-      // 下の矢印（n1→n2、右向き）
-      +'<div style="display:flex;align-items:center;gap:0;width:100%;flex-direction:row-reverse">'
-      +'<svg width="28" height="18" viewBox="0 0 28 18"><line x1="26" y1="9" x2="6" y2="9" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="6,5 0,9 6,13" fill="'+mcR+'"/></svg>'
-      +'<div style="font-size:0.9rem;color:'+mcR+';margin-right:-4px;font-weight:700;line-height:1">'+mR+'</div>'
-      +'</div>'
+      // 中央：矢印2本（上→、下←）
+      +'<div style="display:flex;flex-direction:column;align-items:center;gap:1px">'
+      +svgArrow(true, mL, mcL)
+      +svgArrow(false, mR, mcR)
       +'</div>'
       // 右：n2が受け取る運気
       +'<div style="text-align:center">'
-      +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.2rem">'+rowLabel+'</div>'
-      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;color:'+cR+'">'+juRight+'</div>'
+      +(isFirst?'<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
+      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.35rem;font-weight:700;color:'+cR+'">'+juRight+'</div>'
+      +'</div>'
       +'</div>'
       +'</div>';
   }
 
-  html+=compatRow('年支（本質）', fc1.nen, fc2.nen);
-  html+=compatRow('月支（日常）', fc1.tsu, fc2.tsu);
-  html+=compatRow('日支（衝突時）', fc1.nichi, fc2.nichi);
+  html+=compatRow('年支（本質）', fc1.nen, fc2.nen, true);
+  html+=compatRow('月支（日常）', fc1.tsu, fc2.tsu, false);
+  html+=compatRow('日支（衝突時）', fc1.nichi, fc2.nichi, false);
 
   // ===== 今の変動運気 =====
   html+='<div class="compat-now-section">'
