@@ -224,8 +224,10 @@ body.theme-dark{
   --bg:#0b0a08;--bg2:#14120e;--bg3:#1c1914;
   --ink:#f4f0ea;--ink2:#b5ae9f;--ink3:#7a7060;
   --gold:#e6c687;--gold2:#b89146;--gold-light:rgba(230,198,135,0.15);
-  --purple:#a78bfa
+  --purple:#a78bfa;
+  background:#0b0a08;min-height:100vh
 }
+html{background:#0b0a08}
 body.theme-dark .card,body.theme-dark .setting-section,body.theme-dark .compat-result{background:#14120e}
 body.theme-dark .ai-msg.ai{background:#14120e;color:var(--ink)}
 body.theme-dark .bottom-nav{background:#14120e;border-top-color:rgba(230,198,135,0.15)}
@@ -406,6 +408,14 @@ window.addEventListener('unhandledrejection',function(e){
 // ============================================================
 // CORE CALC ENGINE (index.htmlと同じロジック — 改変禁止)
 // ============================================================
+const GOGYO={'甲':{'行':'木','陰陽':'＋'},'乙':{'行':'木','陰陽':'－'},'丙':{'行':'火','陰陽':'＋'},'丁':{'行':'火','陰陽':'－'},'戊':{'行':'土','陰陽':'＋'},'己':{'行':'土','陰陽':'－'},'庚':{'行':'金','陰陽':'＋'},'辛':{'行':'金','陰陽':'－'},'壬':{'行':'水','陰陽':'＋'},'癸':{'行':'水','陰陽':'－'},'子':{'行':'水','陰陽':'＋'},'丑':{'行':'土','陰陽':'－'},'寅':{'行':'木','陰陽':'＋'},'卯':{'行':'木','陰陽':'－'},'辰':{'行':'土','陰陽':'＋'},'巳':{'行':'火','陰陽':'－'},'午':{'行':'火','陰陽':'＋'},'未':{'行':'土','陰陽':'－'},'申':{'行':'金','陰陽':'＋'},'酉':{'行':'金','陰陽':'－'},'戌':{'行':'土','陰陽':'＋'},'亥':{'行':'水','陰陽':'－'}};
+function gogyoBadge(char){var g=GOGYO[char];if(!g)return '';var col=g['行']==='木'?'#2d7a3a':g['行']==='火'?'#c0392b':g['行']==='土'?'#b8860b':g['行']==='金'?'#7a6b52':'#1a5a8a';return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-left:3px;line-height:1.2"><span style="font-size:0.55rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px">'+g['行']+'</span><span style="font-size:0.52rem;color:'+col+';margin-top:1px">'+g['陰陽']+'</span></div>';}
+const JUSEI=[['天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星'],['天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星'],['天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星'],['天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星'],['天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星']];
+const JUNI_KIKKYO={'豊穣':'大吉','穂分':'吉','発芽':'吉','青葉':'吉','開花':'中吉','平凪':'小吉','成天':'チャンス','引寒':'注意','内省':'苦難','狂咲':'試練','休眠':'変容','残雪':'変容'};
+function isHtPlus(ht){return ht&&ht.indexOf('＋')>=0;}
+function getKikkyo(ju,ht){if(ju==='引寒')return isHtPlus(ht)?'注意':'変容';if(ju==='休眠')return '変容';if(ju==='残雪')return isHtPlus(ht)?'変容':'注意';return JUNI_KIKKYO[ju]||'';}
+function getKikkyoColor(ju,ht){var k=getKikkyo(ju,ht);if(k==='大吉')return '#b8860b';if(k==='吉')return '#2a8c4a';if(k==='中吉')return '#4a7acc';if(k==='小吉')return '#7a9c6a';if(k==='チャンス')return '#c07a00';if(k==='注意')return '#b8a000';if(k==='苦難')return '#c04040';if(k==='試練')return '#8b0000';if(k==='変容')return '#7c3aed';return '#888';}
+function juniRuby(n){var r=JUNI_RUBY[n];return r?'<ruby>'+n+'<rt>'+r+'</rt></ruby>':n;}
 const JIKKAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const JUNISHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'];
@@ -456,7 +466,10 @@ function doCalc(y,m,d,gender){
   var A2D=[],A2K=[];var ap=0;
   for(var di=0;di<DL.length&&ap<MAX_AGE;di++){var sp=Math.min(di===0?sa:10,MAX_AGE-ap);for(var a=0;a<sp;a++,ap++){A2D.push(DL[di]);A2K.push(di);}}
   while(A2D.length<MAX_AGE){A2D.push(DL[DL.length-1]);A2K.push(A2K[A2K.length-1]);}
-  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nZ,tZ,niZ,T,DL,A2D,sa,sats,isFwd,dfs};
+  var nJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(nenShi)]||'—';
+  var tJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(tsuShi)]||'—';
+  var niJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(nichiShi)]||'—';
+  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs};
 }
 
 // 今日・今月・今年・大運の十二運気
@@ -486,7 +499,10 @@ function getDaiunRows(G){
     var startY=G.y+ap,endY=G.y+ap+sp2-1;
     var isCurr=now>=startY&&now<=endY;
     var isSk=G.sats.indexOf(dk.shi)>=0;
-    rows.push({age:ap,sp:sp2,ks:dk.ks,shi:dk.shi,ju,startY,endY,isCurr,isSk,th:(G.T||[])[JIKKAN.indexOf(dk.kan)]||'—'});
+    var dzo=getZokan(dk.shi,G.dfs);
+    var djos=(JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(dk.shi)]||'—';
+    var kk=getKikkyo(ju,G.ht);
+    rows.push({age:ap,sp:sp2,ks:dk.ks,kan:dk.kan,shi:dk.shi,ju,startY,endY,isCurr,isSk,th:(G.T||[])[JIKKAN.indexOf(dk.kan)]||'—',zo:dzo,jos:djos,kk});
     ap+=sp2;
   }
   return rows;
@@ -804,6 +820,7 @@ function buildHomePage(){
 
   // 大運の通変星（干から計算）
   var daiTh=(G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—';
+  var daiJos=G.nichiKanIdx!==undefined?(JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(u.currDaiun.shi)]||'—':'—';
   // 情報チップ（4つ）
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem">'
     +'<div class="info-chip"><div class="ic-lbl">年　齢</div><div class="ic-val">'+u.age+'歳</div></div>'
@@ -903,9 +920,9 @@ function buildMeishikiPage(){
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
-  html+=msCol('年　柱',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',getJuniUnki(G.ht,G.nenShi));
-  html+=msCol('月　柱',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',getJuniUnki(G.ht,G.tsuShi));
-  html+=msCol('日　柱',G.nichiKan,G.nichiShi,G.niZ,'—',getJuniUnki(G.ht,G.nichiShi));
+  html+=msCol('年　柱',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi));
+  html+=msCol('月　柱',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi));
+  html+=msCol('日　柱（本人）',G.nichiKan,G.nichiShi,G.niZ,'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi));
   html+='</div>';
   // 納音情報
   html+='<div style="font-size:0.72rem;color:var(--ink3);line-height:2;margin-top:0.5rem">'
@@ -917,36 +934,47 @@ function buildMeishikiPage(){
   // 大運表
   html+='<div class="card"><div class="card-title">◆ 大運の流れ</div>';
   html+='<div style="overflow-x:auto"><table class="daiun-table"><thead><tr>'
-    +'<th>歳</th><th>年</th><th>大運</th><th>通変</th><th>十二運気</th><th>転化</th>'
+    +'<th>歳</th><th>年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二大従星</th><th>十二運気</th><th>吉凶</th><th>転化</th>'
     +'</tr></thead><tbody>';
   getDaiunRows(G).forEach(function(r){
     var cls=(r.isCurr?'current':'')+' '+(r.isSk?'sk':'');
+    var kkc=getKikkyoColor(r.ju,G.ht);
     html+='<tr class="'+cls.trim()+'">'
-      +'<td class="td-age">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
-      +'<td style="font-size:0.65rem;color:var(--ink3)">'+r.startY+'〜'+r.endY+'</td>'
-      +'<td class="td-ks">'+(r.isCurr?'★':'')+r.ks+'</td>'
-      +'<td class="td-th" style="font-size:0.7rem">'+r.th+'</td>'
-      +'<td style="color:'+getJuniColor(r.ju)+';font-size:0.72rem;font-weight:700">'+r.ju+'</td>'
+      +'<td class="td-age" style="font-size:0.68rem">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
+      +'<td style="font-size:0.62rem;color:var(--ink3)">'+r.startY+'</td>'
+      +'<td class="td-ks" style="font-weight:700">'+(r.isCurr?'★':'')+r.ks+'</td>'
+      +'<td style="font-size:0.68rem;color:var(--ink3)">'+r.zo+'</td>'
+      +'<td class="td-th" style="font-size:0.7rem;color:#7a1a1a">'+r.th+'</td>'
+      +'<td style="font-size:0.68rem;color:var(--gold)">'+r.jos+'</td>'
+      +'<td style="color:'+getJuniColor(r.ju)+';font-size:0.7rem;font-weight:700">'+juniRuby(r.ju)+'</td>'
+      +'<td style="color:'+kkc+';font-size:0.7rem;font-weight:600">'+r.kk+'</td>'
       +'<td style="color:#7c3aed;font-size:0.7rem">'+(r.isSk?'●':'')+'</td>'
       +'</tr>';
   });
   html+='</tbody></table></div>';
-  // 転化天蛹の説明
-  html+='<div style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">紫●＝転化天蛹期間（人生の変容期）　★＝現在の大運</div>';
+  html+='<div style="font-size:0.68rem;color:var(--ink3);margin-top:0.5rem">紫●＝転化天蛹期間　★＝現在の大運</div>';
   html+='</div>';
 
   html+='</div>';
   return html;
 }
 
-function msCol(lbl,kan,shi,zo,th,ju){
+function msCol(lbl,kan,shi,zo,th,jos,ju){
   var color=getJuniColor(ju);
+  var kk=getKikkyo(ju,'');
+  var kkc=getKikkyoColor(ju,'');
   return '<div class="ms-col">'
     +'<div class="ms-lbl">'+lbl+'</div>'
-    +'<div class="ms-ks"><span style="color:var(--ink)">'+kan+'</span><span style="color:var(--ink2)">'+shi+'</span></div>'
-    +'<div class="ms-zo">蔵干：'+zo+'</div>'
-    +'<div class="ms-th">'+th+'</div>'
-    +'<div class="ms-ju" style="color:'+color+'">'+ju+'</div>'
+    +'<div style="display:flex;align-items:flex-end;justify-content:center;margin:0.3rem 0">'
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:var(--ink)">'+kan+'</span>'
+    +gogyoBadge(kan)
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:var(--ink2)">'+shi+'</span>'
+    +gogyoBadge(shi)
+    +'</div>'
+    +'<div class="ms-zo" style="font-size:0.65rem">蔵干：'+zo+'</div>'
+    +'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+th+'</div>'
+    +'<div style="font-size:0.7rem;color:var(--gold);margin-top:0.15rem">'+jos+'</div>'
+    +'<div class="ms-ju" style="color:'+color+'">'+juniRuby(ju)+'</div>'
     +'</div>';
 }
 </script>
@@ -1345,8 +1373,10 @@ function buildSystemPromptFull(G){
     +'・生年月日: '+G.y+'年'+G.m+'月'+G.d+'日 / 性別: '+(G.gender||'不明')+'\n'
     +'・花人: '+G.ht+' / 現在年齢: '+age+'歳（'+CY+'年）\n'
     +'・年柱: '+G.nenKS+' / 月柱: '+G.tsuKS+' / 日柱: '+G.nichiKS+'\n'
+    +'・命式の通変星 年柱:'+((G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—')+' 月柱:'+((G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—')+'\n'
+    +'・命式の十二大従星 年柱:'+(G.nJus||'—')+' 月柱:'+(G.tJus||'—')+' 日柱:'+(G.niJus||'—')+'\n'
     +'・今年の十二運気: '+u.yrJu+'\n・今月の十二運気: '+u.monJu+'\n・今日の十二運気: '+u.dayJu+'\n'
-    +'・現在の大運の十二運気: '+u.daiJu+'\n'
+    +'・現在の大運: '+u.currDaiun.ks+' 通変星:'+((G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—')+' 十二大従星:'+((JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(u.currDaiun.shi)]||'—')+' 十二運気:'+u.daiJu+'\n'
     +skInfo+daiunText+'\n'
     +junishiInfo+'\n'+nayinInfo;
   return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
