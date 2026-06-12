@@ -455,7 +455,7 @@ function doCalc(y,m,d,gender){
   var nichiKS=getDayKS(y,m,d),nichiKan=nichiKS[0],nichiShi=nichiKS[1],nichiKanIdx=JIKKAN.indexOf(nichiKan);
   var dfs=getDaysFromSetsu(y,m,d);
   var T=TSUHEN[nichiKanIdx]||TSUHEN[0];
-  var nZ=getZokan(nenShi,dfs),tZ=getZokan(tsuShi,dfs),niZ=getZokan(nichiShi,0);
+  var nZ=getZokan(nenShi,dfs),tZ=getZokan(tsuShi,dfs),niZ=getZokan(nichiShi,dfs);
   var ht=getHoshiType(y,m,d),hn=getHoshiName(y,m,d),sats=SATSKAI[hn]||[];
   var nJu=getJuniUnki(ht,nenShi),tJu=getJuniUnki(ht,tsuShi),niJu=getJuniUnki(ht,nichiShi);
   var nenNum=ROKUJU.indexOf(nenKS)+1,isYo=nenNum%2===1,isFwd=(isYo&&gender==='男')||(!isYo&&gender==='女');
