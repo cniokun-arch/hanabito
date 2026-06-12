@@ -1397,7 +1397,7 @@ function buildSystemPromptFull(G){
 
 var AI_PAGE_G=null;
 var AI_PAGE_SYS='';
-var AI_ENGINE='claude'; // 'claude' or 'gemini'
+var AI_ENGINE='gemini'; // 'claude' or 'gemini'
 
 function buildAIPage(){
   var G=getCurrentTargetG();
@@ -1441,6 +1441,8 @@ function initAIPage(){
   AI_PAGE_G=getCurrentTargetG();
   if(!AI_PAGE_G)return;
   AI_PAGE_SYS=buildSystemPromptFull(AI_PAGE_G);
+  // 初期エンジン状態をボタンに反映
+  setTimeout(function(){switchEngine(AI_ENGINE, true);},10);
   // クイックボタン
   var quick=['今の運気を教えて','今年の運勢は？','性格・強みを教えて','転化天蛹について','恋愛・人間関係のアドバイス'];
   var qDiv=document.getElementById('ai-quick');
@@ -1527,7 +1529,7 @@ function addAIMessageWithSpeak(role,text){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
-function switchEngine(engine){
+function switchEngine(engine, silent){
   AI_ENGINE=engine;
   var cb=document.getElementById('engine-claude');
   var gb=document.getElementById('engine-gemini');
@@ -1537,9 +1539,8 @@ function switchEngine(engine){
     gb.style.background=engine==='gemini'?'#4285f4':'var(--bg2)';
     gb.style.color=engine==='gemini'?'#fff':'var(--ink3)';
   }
-  // エンジン切り替え時にシステムプロンプトを再構築
   if(AI_PAGE_G)AI_PAGE_SYS=buildSystemPromptFull(AI_PAGE_G);
-  addAIMessage('ai',engine==='gemini'?'Geminiに切り替えました。同じ命式データで鑑定します ✨':'Claudeに切り替えました 🌸');
+  if(!silent)addAIMessage('ai',engine==='gemini'?'Geminiに切り替えました。同じ命式データで鑑定します ✨':'Claudeに切り替えました 🌸');
 }
 function toggleMic(){
   var btn=document.getElementById('ai-mic-btn');
