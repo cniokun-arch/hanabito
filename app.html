@@ -126,16 +126,36 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-compat-area{border-top:1px solid rgba(184,134,11,0.15);padding-top:0.8rem}
 
 /* ===== AI CHAT ===== */
-/* ページ全体をflexコンテナにしてチャットエリアを伸ばす */
-.ai-page-wrap{display:flex;flex-direction:column;height:calc(100vh - 56px);padding:0;overflow:hidden}
-.ai-header-bar{flex-shrink:0;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));padding:0.6rem 0.8rem;border-bottom:1px solid rgba(184,134,11,0.12)}
+/* AIページはposition:fixedで画面全体を占有 */
+.ai-page-wrap{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  display:flex;
+  flex-direction:column;
+  z-index:150; /* ボトムナビより上 */
+  background:var(--bg);
+  overflow:hidden;
+}
+.ai-header-bar{
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(184,134,11,0.08));
+  padding:0.5rem 0.8rem;
+  border-bottom:1px solid rgba(184,134,11,0.15);
+  /* トップヘッダー＋メンバータブの高さ分を上部に確保 */
+  padding-top:max(0.5rem, env(safe-area-inset-top));
+}
 .ai-messages{
   flex:1;
-  display:flex;flex-direction:column;gap:0;
+  display:flex;
+  flex-direction:column;
+  gap:0;
   padding:0.6rem 0.8rem;
   overflow-y:auto;
+  overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   background:var(--bg);
+  /* iOSでゴムバンド効果を許可しながら内部スクロール */
 }
 .ai-messages::-webkit-scrollbar{width:3px}
 .ai-messages::-webkit-scrollbar-thumb{background:rgba(184,134,11,0.25);border-radius:2px}
@@ -154,7 +174,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-bubble-meta{font-size:0.58rem;color:var(--ink3);margin-top:2px;flex-shrink:0;align-self:flex-end;padding-bottom:2px}
 .ai-speak-btn{font-size:0.65rem;padding:2px 8px;background:var(--bg2);border:1px solid rgba(184,134,11,0.25);border-radius:10px;cursor:pointer;color:var(--ink3);margin-top:3px;display:block}
 /* 底部エリア */
-.ai-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(184,134,11,0.15)}
+.ai-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(184,134,11,0.15);padding-bottom:env(safe-area-inset-bottom,0px)}
 .ai-quick{padding:4px 8px;display:flex;flex-wrap:wrap;gap:4px;background:var(--bg)}
 .ai-quick button{font-size:0.68rem;padding:3px 8px;background:#fff;border:1px solid rgba(124,58,237,0.3);border-radius:12px;cursor:pointer;color:var(--purple);font-family:'Noto Serif JP',serif}
 .ai-input-area{display:flex;gap:6px;padding:0.6rem 0.7rem;background:var(--bg2)}
@@ -1006,11 +1026,32 @@ function switchNav(nav,btn){
 }
 function renderCurrentPage(){
   var ca=document.getElementById('content-area');
-  if(currentNav==='home')ca.innerHTML=buildHomePage();
-  else if(currentNav==='meishiki'){ca.innerHTML=buildMeishikiPage();initDaiunChart();}
-  else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
-  else if(currentNav==='ai'){ca.innerHTML=buildAIPage();initAIPage();}
-  else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
+  // AIページは position:fixed のフルスクリーンオーバーレイなので別扱い
+  // 既存のAIオーバーレイを削除
+  var existAI=document.getElementById('ai-overlay');
+  if(existAI)existAI.parentNode.removeChild(existAI);
+  // ボディスクロール復元
+  document.body.style.overflow='';
+  document.getElementById('screen-main').style.overflow='';
+
+  if(currentNav==='ai'){
+    // AIページはbody直下にfixedオーバーレイとして挿入
+    var overlay=document.createElement('div');
+    overlay.id='ai-overlay';
+    overlay.innerHTML=buildAIPage();
+    // .ai-page-wrap をオーバーレイdivで包む
+    document.body.appendChild(overlay);
+    // ボディのスクロールを止める（チャットエリアだけスクロールさせる）
+    document.body.style.overflow='hidden';
+    document.getElementById('screen-main').style.overflow='hidden';
+    initAIPage();
+    ca.innerHTML=''; // content-areaは空に
+  } else {
+    if(currentNav==='home')ca.innerHTML=buildHomePage();
+    else if(currentNav==='meishiki'){ca.innerHTML=buildMeishikiPage();initDaiunChart();}
+    else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
+    else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
+  }
 }
 
 // 大運タブ切り替え
@@ -1821,45 +1862,57 @@ function buildAIPage(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
   AI_PAGE_G=G;
-  if(!G)return '<div class="page active ai-page-wrap"><p style="color:var(--ink3);padding:2rem;text-align:center">データがありません</p></div>';
+  if(!G)return '<div class="ai-page-wrap"><p style="color:var(--ink3);padding:2rem;text-align:center;flex:1">データがありません</p></div>';
 
   var htBase=G.ht.replace(/[＋－]/g,'');
-  var html='<div class="page active ai-page-wrap">';
+  var html='<div class="ai-page-wrap">';
 
-  // ヘッダー
-  html+='<div class="ai-header-bar">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">'
-    +'<div style="display:flex;align-items:center;gap:0.5rem;min-width:0">'
-    +'<div style="font-size:0.78rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+name+'の命式を読み込んだAIに相談できます</div>'
-    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.65rem;flex-shrink:0">'+G.ht+'</span>'
+  // トップバー（アプリのトップヘッダーと同じデザイン）
+  html+='<div style="background:linear-gradient(135deg,#1a0830,var(--purple) 55%,var(--gold));padding:0.75rem 1rem 0.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#fff;letter-spacing:0.2em">花 人 占 術</div>'
+    +'<div style="display:flex;align-items:center;gap:0.5rem">'
+    +'<div style="display:flex;border:1px solid rgba(255,255,255,0.4);border-radius:6px;overflow:hidden">'
+    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.65rem;padding:3px 7px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
+    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.65rem;padding:3px 7px;background:rgba(66,133,244,0.8);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
     +'</div>'
-    +'<div style="display:flex;gap:0.4rem;align-items:center;flex-shrink:0">'
-    +'<select id="ai-voice-gender" style="font-size:0.7rem;padding:2px 5px;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:var(--bg);color:var(--ink2)">'
-    +'<option value="female">女性の声</option>'
-    +'<option value="male">男性の声</option>'
+    +'<select id="ai-voice-gender" style="font-size:0.68rem;padding:2px 5px;border:1px solid rgba(255,255,255,0.4);border-radius:6px;background:rgba(255,255,255,0.15);color:#fff">'
+    +'<option value="female" style="color:#000">女性の声</option>'
+    +'<option value="male" style="color:#000">男性の声</option>'
     +'</select>'
-    +'<div style="display:flex;border:1px solid rgba(184,134,11,0.3);border-radius:6px;overflow:hidden">'
-    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.65rem;padding:3px 7px;background:var(--bg2);color:var(--ink3);border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
-    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.65rem;padding:3px 7px;background:#4285f4;color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
-    +'</div>'
-    +'</div>'
     +'</div>'
     +'</div>';
 
-  // チャットエリア（flex:1で画面いっぱい）
+  // サブヘッダー（六花人情報）
+  html+='<div class="ai-header-bar">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="display:flex;align-items:center;gap:0.5rem;min-width:0">'
+    +'<div style="font-size:0.75rem;color:var(--ink2)">'+name+'の命式を読み込んだAIに相談</div>'
+    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.65rem;flex-shrink:0">'+G.ht+'</span>'
+    +'</div>'
+    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.62rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;white-space:nowrap;flex-shrink:0">履歴を削除</button>'
+    +'</div>'
+    +'</div>';
+
+  // チャットエリア
   html+='<div id="ai-messages" class="ai-messages"></div>';
 
-  // 底部（クイック＋入力）
+  // クイックボタン＋入力
   html+='<div class="ai-bottom">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 8px 0;background:var(--bg)">'
-    +'<div class="ai-quick" id="ai-quick" style="border-top:none;padding:3px 0;flex:1"></div>'
-    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.62rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;flex-shrink:0;white-space:nowrap">履歴を削除</button>'
-    +'</div>'
+    +'<div class="ai-quick" id="ai-quick"></div>'
     +'<div class="ai-input-area">'
-    +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:10px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0" title="音声入力">🎤</button>'
+    +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:10px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0">🎤</button>'
     +'<textarea id="ai-input" placeholder="何でも聞いてみてください…" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>'
     +'<button class="ai-send-btn" onclick="sendAI()">→</button>'
     +'</div>'
+    +'</div>';
+
+  // ボトムナビ（AIページ内に自前で持つ）
+  html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
+    +'<button class="nav-btn" onclick="switchNav(\'home\',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💗</span><span class="nav-lbl">相性</span></button>'
+    +'<button class="nav-btn active" onclick="switchNav(\'ai\',this)"><span class="nav-icon">🌸</span><span class="nav-lbl">AI相談</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'setting\',this)"><span class="nav-icon">⚙️</span><span class="nav-lbl">設定</span></button>'
     +'</div>';
 
   html+='</div>';
