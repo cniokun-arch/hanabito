@@ -1784,35 +1784,120 @@ function buildSystemPromptFull(G){
   if(!G||!G.y)return 'あなたは花人占術AIです。';
   var CY=new Date().getFullYear(),cm=new Date().getMonth()+1,cd=new Date().getDate();
   var age=CY-G.y;
-  // 大運テーブルテキスト化
-  var daiunRows=getDaiunRows(G);
-  var daiunText='【大運表】\n';
-  daiunRows.forEach(function(r){
-    daiunText+=(r.isCurr?'★現在▶':'　　　　')+r.age+'〜'+(r.age+r.sp-1)+'歳（'+r.startY+'〜'+r.endY+'年）大運:'+r.ks+' 通変:'+r.th+' 十二運気:'+r.ju+(r.isSk?'【転化天蛹】':'')+'\n';
-  });
-  // 十二支KB
-  var jNen=JUNISHI_KB[G.nenShi],jTsu=JUNISHI_KB[G.tsuShi],jNichi=JUNISHI_KB[G.nichiShi];
-  var junishiInfo='';
-  if(jNen)junishiInfo+='【年支「'+G.nenShi+'」＝内面・本能】'+jNen['内面本能']+'\n';
-  if(jTsu)junishiInfo+='【月支「'+G.tsuShi+'」＝表面・社会的な顔】'+jTsu['社会的顔']+'\n';
-  if(jNichi)junishiInfo+='【日支「'+G.nichiShi+'」＝哲学・方向性・結論】'+jNichi['哲学方向性']+'\n';
-  if(jNen&&jNen['組合せ法則'])junishiInfo+='【年支×月支の組合せ】'+jNen['組合せ法則']+'\n';
-  // 現在運気
   var u=getCurrentUnki(G);
-  // indexと同じKB処理（新規追加キーも自動対応）
-  var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
+  var daiunRows=getDaiunRows(G);
+
+  // ── ヘルパー ──
   var htKey=G.ht.replace(/[＋－]/g,'');
-  var starInfo=htKey&&starKey&&KB[starKey]&&KB[starKey][htKey]
-    ?'【'+htKey+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||'')
+  var TSUHEN_DESC=KB['通変星']||{};
+  var JUSEI_DESC=KB['十二大従星']||{};
+  var JIKKAN_DESC=KB['十干']||{};
+  var JUNISHI_DESC=KB['十二支']||{};
+  var NAYIN_DESC=KB['納音']||{};
+  var yoKan=['甲','丙','戊','庚','壬'];
+  function nayinDir(ks){return yoKan.indexOf(ks[0])>=0?'外向き':'内向き';}
+  function nayinData(ks){
+    var name=getNayin(ks);
+    var dir=nayinDir(ks);
+    var nd=NAYIN_DESC[name];
+    if(!nd)return name+'（'+dir+'）';
+    var txt=name+'（'+dir+'）\n';
+    txt+='  共通の本質：'+(nd['共通の本質']||'')+'\n';
+    txt+='  '+(dir==='外向き'?nd['外向きの発現']:nd['内向きの発現'])||'';
+    return txt;
+  }
+  function kanDesc(kan){var d=JIKKAN_DESC[kan];return d?kan+'：'+(d['説明']||'').slice(0,80):'';} 
+  function thDesc(th){var d=TSUHEN_DESC[th];return d?th+'（'+(d['説明']||'').slice(0,60)+'）':'';} 
+  function josDesc(jos){var d=JUSEI_DESC[jos];return d?jos+'（'+(d['説明']||'').slice(0,60)+'）':'';} 
+  function juDesc(ju){var d=(KB['十二運気']||{})[ju];return d?ju+'：'+(d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:''):'';} 
+
+  // ── 地運（一生変わらない本質） ──
+  // 通変星
+  var nenTh=(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—';
+  var tsuTh=(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—';
+  // 日支の通変星は蔵干から
+  var nichiThZo=(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—';
+
+  // 各柱の十二運気（六花人で見た運気）
+  var nenJu=getJuniUnki(G.ht,G.nenShi);
+  var tsuJu=getJuniUnki(G.ht,G.tsuShi);
+  var nichiJu=getJuniUnki(G.ht,G.nichiShi);
+
+  // 地運：納音×十二運気の解釈
+  function chiUnDesc(ks, ju, pillar){
+    var name=getNayin(ks);
+    var dir=nayinDir(ks);
+    var wave=JUNI_WAVE[ju]||0;
+    var kikkyo=JUNI_KIKKYO[ju]||'';
+    var juD=(KB['十二運気']||{})[ju];
+    var juTxt=juD?(juD['説明']||'')+(juD['独自解釈']?' '+juD['独自解釈']:''):'';
+    var tone=wave>=3?'この性質がプラスに発揮されやすく、'
+      :wave>=0?'この性質が穏やかに作用し、'
+      :'この性質が自家中毒になりやすく（自分の性格がトラブルを呼ぶ）、';
+    return pillar+'の納音「'+name+'（'+dir+'）」は、'+G.ht+'では「'+ju+'（'+kikkyo+'）」の運気に当たる。'
+      +juTxt+' → '+tone+'「'+name+'の性質」が'+pillar+'として一生涯作用する。';
+  }
+
+  var chiun='【地運（一生変わらない本質）】\n\n'
+    +'◎ 心理学的三層構造（月柱×年柱→日柱の順で読む）\n'
+    +'・月柱（エゴ）「'+G.tsuKS+'」：普段の社会的な自分・仮面。人と接する時に見せる顔。解釈の起点。\n'
+    +'  干：'+kanDesc(G.tsuKan)+'\n'
+    +'  支：'+(JUNISHI_KB[G.tsuShi]?JUNISHI_KB[G.tsuShi]['社会的顔']:'')+'\n'
+    +'  通変星：'+thDesc(tsuTh)+'\n'
+    +'  十二大従星：'+josDesc(G.tJus||'—')+'\n'
+    +'  納音：'+nayinData(G.tsuKS)+'\n\n'
+    +'・年柱（スーパーエゴ）「'+G.nenKS+'」：月柱の仮面の下に隠れた内面の欲求・本能。\n'
+    +'  干：'+kanDesc(G.nenKan)+'\n'
+    +'  支：'+(JUNISHI_KB[G.nenShi]?JUNISHI_KB[G.nenShi]['内面本能']:'')+'\n'
+    +'  通変星：'+thDesc(nenTh)+'\n'
+    +'  十二大従星：'+josDesc(G.nJus||'—')+'\n'
+    +'  納音：'+nayinData(G.nenKS)+'\n\n'
+    +'・日柱（イド）「'+G.nichiKS+'」：熱中・喧嘩・喜び・結論を出す時に出るコントロール不能の本質。\n'
+    +'  干：'+kanDesc(G.nichiKan)+'\n'
+    +'  支：'+(JUNISHI_KB[G.nichiShi]?JUNISHI_KB[G.nichiShi]['哲学方向性']:'')+'\n'
+    +'  蔵干の通変星：'+thDesc(nichiThZo)+'\n'
+    +'  十二大従星：'+josDesc(G.niJus||'—')+'\n'
+    +'  納音：'+nayinData(G.nichiKS)+'\n\n'
+    +'◎ 月柱×年柱の組み合わせ：'+(JUNISHI_KB[G.nenShi]?JUNISHI_KB[G.nenShi]['組合せ法則']:'')+'\n\n'
+    +'◎ 納音×六花人の十二運気（地運の運気質）\n'
+    +chiUnDesc(G.tsuKS,tsuJu,'月柱')+'\n'
+    +chiUnDesc(G.nenKS,nenJu,'年柱')+'\n'
+    +chiUnDesc(G.nichiKS,nichiJu,'日柱')+'\n';
+
+  // ── 天運（変わり続ける運気） ──
+  var skInfo='';
+  if(G.sats&&G.sats.length>0){
+    var skRows=daiunRows.filter(function(r){return G.sats.indexOf(r.shi)>=0;});
+    if(skRows.length>0)skInfo='転化天蛹の対象支:'+G.sats.join('・')+'\n期間:'+skRows.map(function(r){return r.startY+'年('+r.age+'歳)〜'+r.endY+'年('+(r.age+r.sp-1)+'歳) '+r.ks;}).join(' / ')+'\n';
+  }
+  var daiunText='';
+  daiunRows.forEach(function(r){
+    daiunText+=(r.isCurr?'★現在▶':'　　　　')+r.age+'〜'+(r.age+r.sp-1)+'歳('+r.startY+'〜'+r.endY+'年) 大運:'+r.ks+' 通変:'+r.th+' 十二大従星:'+r.jos+' 十二運気:'+r.ju+(r.isSk?'【転化天蛹】':'')+'\n';
+  });
+  var tenun='【天運（変わり続ける運気）】\n'
+    +'・現在の大運（10年運）: '+u.currDaiun.ks+' 通変星:'+thDesc((G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—')+' 十二運気:'+u.daiJu+(G.sats&&G.sats.indexOf(u.currDaiun.shi)>=0?' 【転化天蛹中】':'')+'\n'
+    +'・今年の十二運気: '+juDesc(u.yrJu)+'\n'
+    +'・今月の十二運気: '+juDesc(u.monJu)+'\n'
+    +'・今日の十二運気: '+juDesc(u.dayJu)+'\n'
+    +skInfo+'\n'
+    +daiunText;
+
+  // ── 六花人の特徴 ──
+  var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
+  var starInfo=starKey&&KB[starKey]&&KB[starKey][htKey]
+    ?'【'+G.ht+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||'')
     :'';
-  var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){
-    var v=KB['十二運気'][k];
-    return k+'：'+(v['説明']||'')+(v['独自解釈']?' '+v['独自解釈']:'');
-  }).join('\n');
-  var standardKeys=['_meta','星人','花人','十二運気','転化天蛹','十二大従星','大運','使い方ガイド'];
+
+  // ── 転化天蛹 ──
+  var daiInfo=KB['転化天蛹']
+    ?'【転化天蛹】大運干支がその人の転化天蛹の対象支にあたる10年間のみ適用（命式の干支は関係ない）。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||'')
+    :'';
+
+  // ── 追加知識（standardKeys以外のKBキーを自動反映） ──
+  var standardKeys=['_meta','星人','花人','十二運気','転化天蛹','十二大従星','大運','使い方ガイド',
+    '十干','十二支','通変星','五行','相性十二運気','納音','地運解釈ガイド'];
   var customInfo=Object.keys(KB).filter(function(k){return standardKeys.indexOf(k)<0;}).map(function(k){
-    var v=KB[k];
-    if(typeof v!=='object')return '【'+k+'】'+v;
+    var v=KB[k];if(typeof v!=='object')return '【'+k+'】'+v;
     var items=Object.keys(v).map(function(name){
       var data=v[name];
       if(typeof data==='object')return name+'('+Object.keys(data).map(function(fk){return fk+':'+data[fk];}).join(',')+')';
@@ -1820,36 +1905,25 @@ function buildSystemPromptFull(G){
     }).join(' / ');
     return '【'+k+'】'+items;
   }).join('\n');
-  var daiInfo=KB['転化天蛹']
-    ?'【転化天蛹とは】大運干支（10年ごとに変わる運気の柱）がその人の転化天蛹の対象支にあたる10年間のことを指す。命式の干支が転化天蛹の支であっても転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||'')
-    :'';
-  var nenN=getNayin(G.nenKS),tsuN=getNayin(G.tsuKS),nichiN=getNayin(G.nichiKS);
-  var nayinInfo='【命式の納音】\n・年柱 '+G.nenKS+'→納音:'+nenN+'('+getNayinYinYang(G.nenKS)+')\n・月柱 '+G.tsuKS+'→納音:'+tsuN+'('+getNayinYinYang(G.tsuKS)+')\n・日柱 '+G.nichiKS+'→納音:'+nichiN+'('+getNayinYinYang(G.nichiKS)+')\n';
-  var skInfo='';
-  if(G.sats&&G.sats.length>0){
-    var skRows=daiunRows.filter(function(r){return G.sats.indexOf(r.shi)>=0;});
-    if(skRows.length>0)skInfo='・転化天蛹の対象支: '+G.sats.join('・')+'\n・期間: '+skRows.map(function(r){return r.startY+'年（'+r.age+'歳）〜'+r.endY+'年（'+(r.age+r.sp-1)+'歳）'+r.ks;}).join(' / ')+'\n・転化天蛹は大運のみ適用\n';
-  }
-  var userInfo='【相談者の命式情報】\n'
-    +'・生年月日: '+G.y+'年'+G.m+'月'+G.d+'日 / 性別: '+(G.gender||'不明')+'\n'
-    +'・花人: '+G.ht+' / 現在年齢: '+age+'歳（'+CY+'年）\n'
-    +'・年柱: '+G.nenKS+' / 月柱: '+G.tsuKS+' / 日柱: '+G.nichiKS+'\n'
-    +'・命式の通変星 年柱:'+((G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—')+' 月柱:'+((G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—')+'\n'
-    +'・命式の十二大従星 年柱:'+(G.nJus||'—')+' 月柱:'+(G.tJus||'—')+' 日柱:'+(G.niJus||'—')+'\n'
-    +'・今年の十二運気: '+u.yrJu+'\n・今月の十二運気: '+u.monJu+'\n・今日の十二運気: '+u.dayJu+'\n'
-    +'・現在の大運: '+u.currDaiun.ks+' 通変星:'+((G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—')+' 十二大従星:'+((JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(u.currDaiun.shi)]||'—')+' 十二運気:'+u.daiJu+'\n'
-    +skInfo+daiunText+'\n'
-    +junishiInfo+'\n'+nayinInfo;
-  return 'あなたは花人占術AIです。花人占術の専門家として相談者の運命を丁寧に解説してください。\n\n'
-    +'【知識ベース】\n'+starInfo+'\n\n'+junishiInfo+'\n\n【十二運気】\n'+juniInfo+'\n\n'+daiInfo+'\n\n'
+
+  // ── システムプロンプト組み立て ──
+  return 'あなたは花人占術AIです。以下のロジックと命式データに基づいて鑑定してください。\n\n'
+    +'【花人占術の鑑定ロジック】\n'
+    +'地運（一生変わらない本質）と天運（今の運気）の二軸で読む。\n'
+    +'地運：①心理学的三層（月柱エゴ×年柱スーパーエゴ→日柱イド）②納音×六花人の十二運気（各柱の性質が好運気か自家中毒か）\n'
+    +'天運：大運×年運×月運×日運の組み合わせ。大運が最も重く、日運は参考程度。\n'
+    +'アドバイスの形：地運で本質を見て、天運で「今はこうだからこうすると良い」を伝える。\n\n'
+    +'【解釈の順序（必ず守ること）】\n'
+    +'1. まず月柱×年柱の重なりから性格・性質を分析する（これが表に出る人物像）\n'
+    +'2. そこから踏み込んだ時（熱中・喧嘩・喜び・結論）に日柱の本質が顔を出すと語る\n'
+    +'3. 各柱の十干・十二支・通変星・十二大従星・納音を複合的に読む\n'
+    +'4. 地運の性質を踏まえた上で、天運で今のアドバイスを伝える\n\n'
+    +starInfo+'\n\n'
+    +chiun+'\n'
+    +tenun+'\n'
+    +daiInfo+'\n\n'
     +(customInfo?'【追加知識】\n'+customInfo+'\n\n':'')
-    +userInfo+'\n\n'
-    +'【三層構造の本質】\n'
-    +'・日柱（魂の核・消せない本能）：本人が消すことも止めることもできない根源的な衝動・本能。\n'
-    +'・月柱（社会の自分・調整の層）：日柱の衝動と年柱の刷り込みの板挟みの中で現実社会でどう振る舞うかを調整している層。\n'
-    +'・年柱（育ちの刷り込み・無意識の作法）：幼少期から環境・親・文化によって無意識に刷り込まれた行動の作法・価値観。\n\n'
-    +'【時間軸ルール】大運×年運×通変星→方向性（大きな筆）。月運→タイミング。日運→今日の行動の質（小さな字）。\n'
-    +'日運の低さを人生の判断材料にしない。低運気でも動かざるを得ない時は橋渡しと伝える。\n\n'
+    +'【時間軸ルール】大運×年運→方向性（大きな筆）。月運→タイミング。日運→今日の質（小さな字）。日運の低さを人生の判断材料にしない。\n\n'
     +'【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥を回答に出さない。Markdown禁止。親しみやすい日本語。単発200〜300文字。総合400〜800文字。転化天蛹は大運のみ。';
 }
 
