@@ -717,54 +717,61 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
 }
 function buildBlockRows(ND,A2D,BLK,currIdx,startAge,endAge,ht){
   var blockND=ND.slice(startAge,endAge+1);
-  var blockA2D=A2D.slice(startAge,endAge+1);
   var blockCount=blockND.length;
   var blockBLK=[];
   for(var bi=0;bi<BLK.length;bi++){var b=BLK[bi],bs=b.sa,be=b.sa+b.sp-1;if(be<startAge||bs>endAge)continue;var cs_=Math.max(bs,startAge),ce_=Math.min(be,endAge);blockBLK.push(Object.assign({},b,{sa:cs_-startAge,sp:ce_-cs_+1}));}
-  var graphH=100,totalW=blockCount*28;
+
+  // 横スクロールと同じ定数
+  var CW_=28,LBL_=60,totalW=blockCount*CW_,graphH=110;
   var rawVals=blockND.map(function(r){return r.w;});
   var smooth=catmullRom(rawVals,8),ns=smooth.length;
-  var pT=5,pB=5,gH=graphH-pT-pB,minV=-4.5,maxV=6;
+  var pT=6,pB=6,gH=graphH-pT-pB,minV=-4.5,maxV=6;
   var pxR=function(i){return blockCount>1?i/(blockCount-1)*totalW:totalW/2;};
   var pxS=function(i){return ns>1?i/(ns-1)*totalW:totalW/2;};
   var py=function(v){return pT+gH*(1-(Math.max(minV,Math.min(maxV,v))-minV)/(maxV-minV));};
   var mid=py(0),uid='b'+Math.random().toString(36).slice(2,6);
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 '+totalW+' '+graphH+'" preserveAspectRatio="none" style="display:block;height:'+graphH+'px">';
-  svg+='<defs><linearGradient id="gp'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a8c4a" stop-opacity="0.28"/><stop offset="100%" stop-color="#2a8c4a" stop-opacity="0.04"/></linearGradient><linearGradient id="gn'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#882222" stop-opacity="0.04"/><stop offset="100%" stop-color="#882222" stop-opacity="0.22"/></linearGradient></defs>';
-  svg+='<line x1="0" y1="'+mid+'" x2="'+totalW+'" y2="'+mid+'" stroke="rgba(0,0,0,0.12)" stroke-width="0.5"/>';
-  var fp=buildFillPaths(rawVals,pxR,py,mid);
-  if(fp.posPath)svg+='<path d="'+fp.posPath+'" fill="url(#gp'+uid+')" />';
-  if(fp.negPath)svg+='<path d="'+fp.negPath+'" fill="url(#gn'+uid+')" />';
-  var pc=null,pd='';
-  for(var i=0;i<ns;i++){var v=i<ns-1?(smooth[i]+smooth[i+1])/2:smooth[i],col=getWaveColor(v);if(col!==pc){if(pd&&pc)svg+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';pd='M'+pxS(i)+','+py(smooth[i]);pc=col;}else pd+=' L'+pxS(i)+','+py(smooth[i]);}
-  if(pd&&pc)svg+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-  svg+='</svg>';
-  var ci=currIdx-startAge;
-  var starOverlay='';
-  if(ci>=0&&ci<blockCount){
-    var cx_=pxR(ci),cy_=py(rawVals[ci]);
-    var pctX=(cx_/totalW*100).toFixed(3),pctY=(cy_/graphH*100).toFixed(3);
-    starOverlay='<div style="position:absolute;inset:0;pointer-events:none;z-index:2">'
-      +'<div style="position:absolute;left:'+pctX+'%;top:0;bottom:0;width:1.2px;background:repeating-linear-gradient(to bottom,rgba(160,60,160,0.6) 0,rgba(160,60,160,0.6) 4px,transparent 4px,transparent 7px);transform:translateX(-50%)"></div>'
-      +'<div style="position:absolute;left:'+pctX+'%;top:'+pctY+'%;transform:translate(-50%,-50%);font-size:20px;line-height:1;pointer-events:none">🌟</div>'
-      +'</div>';
-  }
+
+  // SVG（横スクロールと同じmakeInlineSvgを流用）
+  var svgW=totalW;
+  var svgStr=makeInlineSvg(blockND,currIdx-startAge,svgW,graphH);
+
   function cst(r){var cs=getJuniCellStyle(r.ju,r.isCurr);var st=cs.bg?'background:'+cs.bg+';':'';if(cs.ol)st+='outline:'+cs.ol+';';return st;}
   function tc(r,fb){if(r.isCurr)return'#6a0080';var cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
-  function bHb(fn){return blockBLK.map(function(b){return'<div class="ub-blk'+(b.isSk?' sk':'')+'" style="flex:'+b.sp+' 0 0;min-width:0"><div>'+fn(b)+'</div></div>';}).join('');}
-  var cells=function(hpx,fn){return blockND.map(function(r,i){return'<div style="'+cst(r)+'flex:1 0 0;height:'+hpx+'px;min-width:0;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);overflow:hidden">'+fn(r)+'</div>';}).join('');};
-  return '<div class="ub-wrap">'
-    +'<div class="ub-header">'+startAge+'〜'+endAge+'歳</div>'
-    +'<div class="ub-row"><div class="ub-lbl">年齢</div><div class="ub-cells">'+cells(18,function(r){return'<span style="font-size:0.6rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">'+cells(40,function(r){return'<span style="font-size:0.46rem;color:'+tc(r,'#4a3c28')+';line-height:1.15;text-align:center">'+String(r.yr).split('').join('<br>')+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">'+cells(24,function(r){return'<span style="font-family:\'Zen Old Mincho\',serif;font-size:0.86rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl">十二<br>運気</div><div class="ub-cells">'+cells(46,function(r){return'<span style="writing-mode:vertical-rl;font-size:0.66rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</span>';})+'</div></div>'
-    +'<div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.66rem;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.67rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.67rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.67rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="flex:1;overflow:visible;height:'+graphH+'px;min-height:'+graphH+'px;position:relative">'+svg+starOverlay+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl ub-dl">吉凶</div><div class="ub-blks">'+bHb(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.6rem')+';font-weight:700;color:'+kc+'">'+kk+'</span>';})+'</div></div>'
-    +'<div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:\'Zen Old Mincho\',serif;font-size:'+(b.sp<=3?'0.52rem':'0.75rem')+';color:'+(ds.col||'#1a1208')+'">'+b.ks+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.42rem':b.sp<=6?'0.52rem':'0.62rem')+';color:'+(ds.col||'#7a1a1a')+';white-space:nowrap">'+b.th+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl ub-dl">十二<br>従星</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.38rem':b.sp<=6?'0.48rem':'0.56rem')+';color:'+(ds.col||'#8a6800')+';white-space:nowrap">'+b.jos+'</span>';})+'</div></div>'
-    +'</div>';
+  // セル：横スクロールと同じ固定幅28px
+  function cell(r,hpx,inner){return'<div style="'+cst(r)+'width:'+CW_+'px;min-width:'+CW_+'px;height:'+hpx+'px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);flex-shrink:0">'+inner+'</div>';}
+  function blkCell(b,hpx,inner){return'<div class="ub-blk'+(b.isSk?' sk':'')+'" style="width:'+(b.sp*CW_)+'px;min-width:'+(b.sp*CW_)+'px;height:'+hpx+'px;flex-shrink:0"><div>'+inner+'</div></div>';}
+
+  // ラベル
+  function lbl(txt,extra){return'<div class="ub-lbl"'+(extra?' style="'+extra+'"':'')+'>'+txt+'</div>';}
+  function lblDl(txt){return'<div class="ub-lbl ub-dl">'+txt+'</div>';}
+
+  var innerW=totalW+LBL_;
+  var h='<div class="ub-wrap"><div class="ub-header">'+startAge+'〜'+endAge+'歳</div>';
+  // 横スクロールラッパー
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div style="width:'+innerW+'px">';
+
+  // 年齢行
+  h+='<div class="ub-row">'+lbl('年齢')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,20,'<span style="font-size:0.86rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</span>');}).join('')+'</div></div>';
+  // 西暦行
+  h+='<div class="ub-row">'+lbl('西暦')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,42,'<span style="font-size:0.66rem;color:'+tc(r,'#4a3c28')+';line-height:1.15;text-align:center">'+String(r.yr).split('').join('<br>')+'</span>');}).join('')+'</div></div>';
+  // 年支行
+  h+='<div class="ub-row">'+lbl('年支')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,28,'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>');}).join('')+'</div></div>';
+  // 十二運気行
+  h+='<div class="ub-row">'+lbl('十二<br>運気')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,52,'<span style="writing-mode:vertical-rl;font-size:1rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</span>');}).join('')+'</div></div>';
+  // グラフ行
+  h+='<div class="ub-graph-row"><div class="ub-lbl" style="height:'+graphH+'px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.7rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.7rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.7rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div>'
+    +'<div style="width:'+totalW+'px;min-width:'+totalW+'px;height:'+graphH+'px;flex-shrink:0;overflow:hidden">'+svgStr+'</div></div>';
+  // 吉凶行
+  h+='<div class="ub-row">'+lblDl('吉凶')+'<div style="display:flex">'+blockBLK.map(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return blkCell(b,26,'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.86rem;font-weight:700;color:'+kc+'">'+kk+'</span>');}).join('')+'</div></div>';
+  // 大運干支行
+  h+='<div class="ub-row ub-sep">'+lblDl('大運干支')+'<div style="display:flex">'+blockBLK.map(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return blkCell(b,30,'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+(ds.col||'#1a1208')+'">'+b.ks+'</span>');}).join('')+'</div></div>';
+  // 通変星行
+  h+='<div class="ub-row">'+lblDl('通変星')+'<div style="display:flex">'+blockBLK.map(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return blkCell(b,26,'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.86rem;color:'+(ds.col||'#7a1a1a')+';white-space:nowrap">'+b.th+'</span>');}).join('')+'</div></div>';
+  // 十二従星行
+  h+='<div class="ub-row">'+lblDl('十二<br>従星')+'<div style="display:flex">'+blockBLK.map(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return blkCell(b,26,'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:0.86rem;color:'+(ds.col||'#8a6800')+';white-space:nowrap">'+b.jos+'</span>');}).join('')+'</div></div>';
+
+  h+='</div></div></div>';
+  return h;
 }
 
 // ============================================================
