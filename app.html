@@ -15,6 +15,7 @@
   --bg:#faf6ef;--bg2:#f2ead8;--bg3:#e8dcc4;
   --green:#1a6b3a;--red:#8b1a1a;
 }
+html{font-size:18px}
 html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;color:var(--ink)}
 
 /* ===== SCREENS ===== */
@@ -30,23 +31,23 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 #screen-login.active{display:flex}
 .login-box{width:min(380px,100%);text-align:center}
 .login-logo{font-family:'Zen Old Mincho',serif;font-size:2.2rem;letter-spacing:0.4em;color:#e8d9b0;font-weight:700;margin-bottom:0.3rem}
-.login-sub{font-size:0.82rem;color:rgba(232,217,176,0.6);letter-spacing:0.25em;margin-bottom:2.5rem}
+.login-sub{font-size:1rem;color:rgba(232,217,176,0.6);letter-spacing:0.25em;margin-bottom:2.5rem}
 .login-card{background:rgba(255,255,255,0.06);border:1px solid rgba(184,134,11,0.35);border-radius:16px;padding:2rem 1.8rem;backdrop-filter:blur(8px)}
 .login-tabs{display:flex;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:1.5rem}
-.login-tab{flex:1;padding:0.6rem;font-family:'Noto Serif JP',serif;font-size:0.88rem;color:rgba(232,217,176,0.55);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none}
+.login-tab{flex:1;padding:0.6rem;font-family:'Noto Serif JP',serif;font-size:0.97rem;color:rgba(232,217,176,0.55);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none}
 .login-tab.active{color:#e8d9b0;border-bottom-color:var(--gold)}
 .login-field{margin-bottom:1rem;text-align:left}
-.login-field label{display:block;font-size:0.75rem;color:rgba(232,217,176,0.6);margin-bottom:0.4rem;letter-spacing:0.1em}
-.login-field input,.login-field select{width:100%;padding:0.65rem 0.9rem;background:rgba(255,255,255,0.08);border:1px solid rgba(184,134,11,0.4);border-radius:8px;color:#e8d9b0;font-family:'Noto Serif JP',serif;font-size:0.95rem;outline:none}
+.login-field label{display:block;font-size:0.86rem;color:rgba(232,217,176,0.6);margin-bottom:0.4rem;letter-spacing:0.1em}
+.login-field input,.login-field select{width:100%;padding:0.65rem 0.9rem;background:rgba(255,255,255,0.08);border:1px solid rgba(184,134,11,0.4);border-radius:8px;color:#e8d9b0;font-family:'Noto Serif JP',serif;font-size:1rem;outline:none}
 .login-field input:focus,.login-field select:focus{border-color:var(--gold)}
 .login-field input::placeholder{color:rgba(232,217,176,0.3)}
 .login-field select option{background:#2a1a4a;color:#e8d9b0}
 .login-date-row{display:flex;gap:0.4rem}
-.login-date-row select{flex:1;font-size:0.82rem;padding:0.55rem 0.3rem}
+.login-date-row select{flex:1;font-size:1rem;padding:0.55rem 0.3rem}
 .btn-login{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:10px;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.2em;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s}
 .btn-login:hover{opacity:0.88}
-.login-note{font-size:0.72rem;color:rgba(232,217,176,0.4);margin-top:1rem;line-height:1.8}
-.login-err{background:rgba(180,40,40,0.2);border:1px solid rgba(180,40,40,0.5);color:#ffaaaa;border-radius:6px;padding:0.6rem 0.9rem;font-size:0.82rem;margin-bottom:0.8rem;display:none}
+.login-note{font-size:0.94rem;color:rgba(232,217,176,0.4);margin-top:1rem;line-height:1.8}
+.login-err{background:rgba(180,40,40,0.2);border:1px solid rgba(180,40,40,0.5);color:#ffaaaa;border-radius:6px;padding:0.6rem 0.9rem;font-size:1rem;margin-bottom:0.8rem;display:none}
 
 /* ===== MAIN LAYOUT ===== */
 #screen-main{padding-bottom:70px;min-height:100vh}
@@ -61,15 +62,15 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 }
 .top-header-title{font-family:'Zen Old Mincho',serif;font-size:1rem;color:#fff;letter-spacing:0.2em}
 .top-header-right{display:flex;align-items:center;gap:0.6rem}
-.top-header-name{font-size:0.8rem;color:rgba(255,255,255,0.8)}
-.btn-logout{font-size:0.72rem;padding:4px 10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:10px;color:#fff;cursor:pointer}
+.top-header-name{font-size:1rem;color:rgba(255,255,255,0.8)}
+.btn-logout{font-size:0.94rem;padding:4px 10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:10px;color:#fff;cursor:pointer}
 
 /* ===== MEMBER TABS ===== */
 .member-tab-bar{background:var(--bg2);border-bottom:2px solid var(--gold-light);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 0.5rem}
 .member-tab-bar::-webkit-scrollbar{height:2px}
-.member-tab{flex-shrink:0;padding:0.6rem 0.9rem;font-size:0.78rem;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Noto Serif JP',serif}
+.member-tab{flex-shrink:0;padding:0.6rem 0.9rem;font-size:0.97rem;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Noto Serif JP',serif}
 .member-tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
-.member-tab-add{flex-shrink:0;padding:0.6rem 0.8rem;font-size:0.78rem;color:var(--purple);cursor:pointer;white-space:nowrap;background:none;border:none;font-family:'Noto Serif JP',serif}
+.member-tab-add{flex-shrink:0;padding:0.6rem 0.8rem;font-size:0.97rem;color:var(--purple);cursor:pointer;white-space:nowrap;background:none;border:none;font-family:'Noto Serif JP',serif}
 
 /* ===== PAGE SECTIONS ===== */
 .page{display:none;padding:1rem 1rem 1.5rem}
@@ -77,11 +78,11 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 
 /* ===== CARDS ===== */
 .card{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:1.1rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
-.card-title{font-family:'Zen Old Mincho',serif;font-size:0.88rem;letter-spacing:0.15em;color:var(--gold);border-bottom:1px solid var(--gold-light);padding-bottom:0.4rem;margin-bottom:0.8rem}
+.card-title{font-family:'Zen Old Mincho',serif;font-size:0.97rem;letter-spacing:0.15em;color:var(--gold);border-bottom:1px solid var(--gold-light);padding-bottom:0.4rem;margin-bottom:0.8rem}
 
 /* ===== TODAY UNKI WIDGET ===== */
 .unki-tabs{display:flex;gap:0;margin-bottom:0.8rem;border-radius:8px;overflow:hidden;border:1.5px solid rgba(184,134,11,0.4)}
-.unki-tab{flex:1;padding:8px 0;text-align:center;font-size:0.82rem;font-weight:600;border:none;background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all 0.2s;border-right:1px solid rgba(184,134,11,0.3);font-family:'Noto Serif JP',serif}
+.unki-tab{flex:1;padding:8px 0;text-align:center;font-size:1rem;font-weight:600;border:none;background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all 0.2s;border-right:1px solid rgba(184,134,11,0.3);font-family:'Noto Serif JP',serif}
 .unki-tab:last-child{border-right:none}
 .unki-tab.active{background:var(--gold);color:#fff;font-weight:700}
 .unki-tab:not(.active):hover{background:var(--bg3)}
@@ -93,26 +94,26 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 /* ===== MEISHIKI ===== */
 .meishiki-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(184,134,11,0.2);border:1px solid rgba(184,134,11,0.2);border-radius:4px;overflow:hidden;margin-bottom:0.8rem}
 .ms-col{background:var(--bg);padding:0.7rem 0.4rem;text-align:center}
-.ms-lbl{font-size:0.65rem;color:var(--ink3);margin-bottom:0.4rem}
+.ms-lbl{font-size:0.77rem;color:var(--ink3);margin-bottom:0.4rem}
 .ms-ks{font-family:'Zen Old Mincho',serif;font-size:1.6rem}
-.ms-zo{font-size:0.68rem;color:var(--ink2);margin-top:0.25rem}
-.ms-th{font-size:0.75rem;color:#7a1a1a;margin-top:0.2rem}
-.ms-ju{font-size:0.75rem;margin-top:0.15rem}
+.ms-zo{font-size:1rem;color:var(--ink2);margin-top:0.25rem}
+.ms-th{font-size:0.86rem;color:#7a1a1a;margin-top:0.2rem}
+.ms-ju{font-size:0.86rem;margin-top:0.15rem}
 
 /* ===== DAIUN TABLE ===== */
-.daiun-table{width:100%;border-collapse:collapse;font-size:0.75rem}
-.daiun-table th{background:var(--bg3);color:var(--ink2);padding:0.4rem 0.3rem;border:1px solid rgba(184,134,11,0.2);font-weight:500;font-size:0.68rem;text-align:center}
+.daiun-table{width:100%;border-collapse:collapse;font-size:0.86rem}
+.daiun-table th{background:var(--bg3);color:var(--ink2);padding:0.4rem 0.3rem;border:1px solid rgba(184,134,11,0.2);font-weight:500;font-size:1rem;text-align:center}
 .daiun-table td{text-align:center;padding:0.38rem 0.25rem;border:1px solid rgba(184,134,11,0.12)}
 .daiun-table tr.current td{background:rgba(184,134,11,0.1)!important}
 .daiun-table tr.sk td{background:rgba(124,58,237,0.06)!important}
 
 /* ===== COMPAT PAGE ===== */
 .compat-person-card{background:var(--bg2);border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:0.9rem;margin-bottom:0.8rem}
-.compat-person-card .cpc-label{font-size:0.72rem;color:var(--ink3);letter-spacing:0.1em;margin-bottom:0.5rem;font-weight:700}
+.compat-person-card .cpc-label{font-size:0.94rem;color:var(--ink3);letter-spacing:0.1em;margin-bottom:0.5rem;font-weight:700}
 .compat-select-row{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
-.compat-select-row select,.compat-select-row input{font-size:0.85rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:#fff;color:var(--ink);outline:none;font-family:'Noto Serif JP',serif}
+.compat-select-row select,.compat-select-row input{font-size:1rem;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:#fff;color:var(--ink);outline:none;font-family:'Noto Serif JP',serif}
 .compat-date-row{display:flex;gap:0.3rem;margin-top:0.5rem}
-.compat-date-row select{flex:1;font-size:0.8rem;padding:0.5rem 0.25rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:#fff;color:var(--ink);outline:none}
+.compat-date-row select{flex:1;font-size:1rem;padding:0.5rem 0.25rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;background:#fff;color:var(--ink);outline:none}
 .compat-result{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:1.1rem;margin-top:0.8rem}
 .compat-score-row{display:flex;gap:0.8rem;margin-bottom:1rem}
 .compat-score-card{flex:1;text-align:center;padding:0.8rem 0.5rem;border-radius:8px}
@@ -120,8 +121,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .compat-score-card .cs-label{font-size:0.7rem;color:var(--ink3);margin-top:0.3rem}
 .compat-fixed-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.8rem}
 .compat-fixed-item{background:var(--bg2);border-radius:8px;padding:0.6rem;text-align:center}
-.cfi-lbl{font-size:0.65rem;color:var(--ink3);margin-bottom:0.3rem}
-.cfi-val{font-size:0.95rem;font-weight:700}
+.cfi-lbl{font-size:0.77rem;color:var(--ink3);margin-bottom:0.3rem}
+.cfi-val{font-size:1rem;font-weight:700}
 .compat-now-section{background:var(--bg2);border-radius:8px;padding:0.8rem;margin-bottom:0.8rem}
 .ai-compat-area{border-top:1px solid rgba(184,134,11,0.15);padding-top:0.8rem}
 
@@ -161,7 +162,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-messages::-webkit-scrollbar-thumb{background:rgba(184,134,11,0.25);border-radius:2px}
 /* 日付区切り */
 .ai-date-sep{text-align:center;margin:0.8rem 0 0.4rem;position:relative}
-.ai-date-sep span{font-size:0.75rem;color:var(--ink3);background:var(--bg2);padding:2px 10px;border-radius:10px;border:1px solid rgba(184,134,11,0.15)}
+.ai-date-sep span{font-size:0.86rem;color:var(--ink3);background:var(--bg2);padding:2px 10px;border-radius:10px;border:1px solid rgba(184,134,11,0.15)}
 /* メッセージバブル（LINEスタイル） */
 .ai-bubble-row{display:flex;margin-bottom:12px;align-items:flex-end;gap:8px}
 .ai-bubble-row.user{flex-direction:row-reverse}
@@ -171,28 +172,28 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-bubble-row.user .ai-bubble{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;border-bottom-right-radius:3px}
 .ai-bubble-row.ai .ai-bubble{background:#fff;border:1px solid rgba(184,134,11,0.18);color:var(--ink);border-bottom-left-radius:3px}
 .ai-bubble-row.loading .ai-bubble{color:var(--ink3);font-style:italic;border:1px solid rgba(184,134,11,0.12);background:var(--bg2)}
-.ai-bubble-meta{font-size:0.72rem;color:var(--ink3);margin-top:3px;flex-shrink:0;align-self:flex-end;padding-bottom:2px}
-.ai-speak-btn{font-size:0.75rem;padding:3px 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.25);border-radius:10px;cursor:pointer;color:var(--ink3);margin-top:4px;display:block}
+.ai-bubble-meta{font-size:0.94rem;color:var(--ink3);margin-top:3px;flex-shrink:0;align-self:flex-end;padding-bottom:2px}
+.ai-speak-btn{font-size:0.86rem;padding:3px 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.25);border-radius:10px;cursor:pointer;color:var(--ink3);margin-top:4px;display:block}
 /* 底部エリア */
 .ai-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(184,134,11,0.15);padding-bottom:env(safe-area-inset-bottom,0px)}
 .ai-quick{padding:5px 8px;display:flex;flex-wrap:wrap;gap:5px;background:var(--bg)}
-.ai-quick button{font-size:0.8rem;padding:4px 10px;background:#fff;border:1px solid rgba(124,58,237,0.3);border-radius:12px;cursor:pointer;color:var(--purple);font-family:'Noto Serif JP',serif}
+.ai-quick button{font-size:1rem;padding:4px 10px;background:#fff;border:1px solid rgba(124,58,237,0.3);border-radius:12px;cursor:pointer;color:var(--purple);font-family:'Noto Serif JP',serif}
 .ai-input-area{display:flex;gap:6px;padding:0.6rem 0.7rem;background:var(--bg2)}
 .ai-input-area textarea{flex:1;font-size:1rem;padding:8px 12px;border:1px solid rgba(184,134,11,0.3);border-radius:12px;resize:none;height:52px;font-family:'Noto Serif JP',serif;background:#fff;color:var(--ink);outline:none}
 .ai-send-btn{padding:0 16px;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:1.2rem;flex-shrink:0}
 
 /* ===== SETTINGS ===== */
 .setting-section{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:1.1rem;margin-bottom:1rem}
-.setting-section h3{font-family:'Zen Old Mincho',serif;font-size:0.88rem;color:var(--gold);margin-bottom:0.8rem}
+.setting-section h3{font-family:'Zen Old Mincho',serif;font-size:0.97rem;color:var(--gold);margin-bottom:0.8rem}
 .setting-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid rgba(184,134,11,0.1)}
 .setting-row:last-child{border-bottom:none}
-.setting-row label{font-size:0.85rem;color:var(--ink2)}
+.setting-row label{font-size:1rem;color:var(--ink2)}
 .theme-btns{display:flex;gap:0.4rem}
-.theme-btn{padding:4px 12px;border-radius:6px;font-size:0.78rem;cursor:pointer;border:1px solid rgba(184,134,11,0.35);font-family:'Noto Serif JP',serif;background:var(--bg2);color:var(--ink2)}
+.theme-btn{padding:4px 12px;border-radius:6px;font-size:0.97rem;cursor:pointer;border:1px solid rgba(184,134,11,0.35);font-family:'Noto Serif JP',serif;background:var(--bg2);color:var(--ink2)}
 .theme-btn.active{background:var(--gold);color:#fff;border-color:var(--gold)}
 .history-list{display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto}
-.history-item{background:var(--bg2);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.78rem;color:var(--ink2);line-height:1.6}
-.history-item .hi-date{font-size:0.68rem;color:var(--ink3);margin-bottom:0.2rem}
+.history-item{background:var(--bg2);border-radius:6px;padding:0.6rem 0.8rem;font-size:0.97rem;color:var(--ink2);line-height:1.6}
+.history-item .hi-date{font-size:1rem;color:var(--ink3);margin-bottom:0.2rem}
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav{
@@ -203,7 +204,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 }
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:0.45rem 0.3rem 0.5rem;cursor:pointer;transition:all 0.15s;background:none;border:none;font-family:'Noto Serif JP',serif}
 .nav-btn .nav-icon{font-size:1.25rem;line-height:1}
-.nav-btn .nav-lbl{font-size:0.58rem;color:var(--ink3);margin-top:2px;letter-spacing:0.05em}
+.nav-btn .nav-lbl{font-size:0.94rem;color:var(--ink3);margin-top:2px;letter-spacing:0.05em}
 .nav-btn.active .nav-lbl{color:var(--gold);font-weight:700}
 .nav-btn.active .nav-icon{filter:none}
 
@@ -213,16 +214,16 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .modal-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 1.2rem}
 .modal-title{font-family:'Zen Old Mincho',serif;font-size:1rem;color:var(--gold);margin-bottom:1rem}
 .modal-field{margin-bottom:0.8rem}
-.modal-field label{display:block;font-size:0.75rem;color:var(--ink3);margin-bottom:0.35rem}
-.modal-field input,.modal-field select{width:100%;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.35);border-radius:8px;font-family:'Noto Serif JP',serif;font-size:0.92rem;color:var(--ink);background:#fff;outline:none}
+.modal-field label{display:block;font-size:0.86rem;color:var(--ink3);margin-bottom:0.35rem}
+.modal-field input,.modal-field select{width:100%;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.35);border-radius:8px;font-family:'Noto Serif JP',serif;font-size:1rem;color:var(--ink);background:#fff;outline:none}
 .modal-date-row{display:flex;gap:0.35rem}
-.modal-date-row select{flex:1;font-size:0.82rem;padding:0.55rem 0.25rem}
-.btn-primary{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:10px;font-family:'Zen Old Mincho',serif;font-size:0.95rem;letter-spacing:0.15em;cursor:pointer;margin-top:0.5rem}
-.btn-secondary{width:100%;padding:0.75rem;background:var(--bg2);color:var(--ink2);border:1px solid rgba(184,134,11,0.3);border-radius:10px;font-family:'Noto Serif JP',serif;font-size:0.88rem;cursor:pointer;margin-top:0.5rem}
+.modal-date-row select{flex:1;font-size:1rem;padding:0.55rem 0.25rem}
+.btn-primary{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:10px;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.15em;cursor:pointer;margin-top:0.5rem}
+.btn-secondary{width:100%;padding:0.75rem;background:var(--bg2);color:var(--ink2);border:1px solid rgba(184,134,11,0.3);border-radius:10px;font-family:'Noto Serif JP',serif;font-size:0.97rem;cursor:pointer;margin-top:0.5rem}
 .btn-danger{background:#fff0f0;color:#c0392b;border:1px solid rgba(192,57,43,0.3)}
 
 /* ===== ROKKA COLORS ===== */
-.rokka-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:700}
+.rokka-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.86rem;font-weight:700}
 .rokka-天花人{background:#e8f0e4;color:#2d5a1b;border:1px solid #5a8c3a}
 .rokka-白花人{background:#ebebf5;color:#2b2b7a;border:1px solid #6b6bbf}
 .rokka-離花人{background:#f5e8e8;color:#7a1a1a;border:1px solid #c04040}
@@ -237,14 +238,14 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 @keyframes dot{0%,80%,100%{opacity:0.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
 
 /* ===== GRAPH LINK BUTTON ===== */
-.graph-link-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.8rem 1rem;background:#fff;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Zen Old Mincho',serif;font-size:0.88rem;cursor:pointer;text-decoration:none;margin-top:0.5rem}
+.graph-link-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.8rem 1rem;background:#fff;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Zen Old Mincho',serif;font-size:0.97rem;cursor:pointer;text-decoration:none;margin-top:0.5rem}
 .graph-link-btn:hover{background:rgba(184,134,11,0.06)}
 
 /* ===== INFO ROW ===== */
 .info-3grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:0.8rem}
 .info-chip{background:var(--bg2);border:1px solid rgba(184,134,11,0.25);border-radius:8px;padding:0.6rem 0.5rem;text-align:center}
-.info-chip .ic-lbl{font-size:0.65rem;color:var(--ink3);margin-bottom:0.25rem}
-.info-chip .ic-val{font-size:0.95rem;color:var(--ink);font-weight:500}
+.info-chip .ic-lbl{font-size:0.77rem;color:var(--ink3);margin-bottom:0.25rem}
+.info-chip .ic-val{font-size:1rem;color:var(--ink);font-weight:500}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:480px){
@@ -302,27 +303,27 @@ body.theme-dark .ai-input-area{background:#1c1914}
 .u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%;overflow:visible}
 .u-lbl{flex:0 0 60px;font-size:0.6rem;color:var(--ink3);padding:0 5px;border-right:2px solid rgba(184,134,11,0.35);background:var(--bg2);white-space:nowrap;display:flex;align-items:center;font-weight:500;position:sticky;left:0;z-index:3;box-shadow:2px 0 5px rgba(0,0,0,0.08);align-self:stretch}
 .u-lbl.dl{background:var(--bg3);color:var(--ink2);border-top:2px solid rgba(184,134,11,0.4)}
-.u-lbl.graph-lbl{background:var(--bg);color:var(--ink3);font-size:0.55rem}
+.u-lbl.graph-lbl{background:var(--bg);color:var(--ink3);font-size:0.7rem}
 .u-cells{display:flex;align-items:stretch}
-.u-cell{flex:0 0 28px;width:28px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.58rem;align-self:stretch}
+.u-cell{flex:0 0 28px;width:28px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.94rem;align-self:stretch}
 .u-cell.db{border-left:2px solid rgba(184,134,11,0.5)!important}
 .u-blks{display:flex;align-items:stretch}
 .u-blk{position:relative;border-right:2px solid rgba(184,134,11,0.45);overflow:hidden;align-self:stretch;min-height:0}
 .u-blk>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
 .u-blk.sk{background:rgba(139,26,26,0.06)}.u-blk:last-child{border-right:none}
-.r-age{min-height:20px}.r-age .u-cell{font-size:0.62rem;font-weight:700}
-.r-yr{min-height:42px}.r-yr .u-cell{font-size:0.5rem}
-.r-shi{min-height:28px}.r-shi .u-cell{font-family:'Zen Old Mincho',serif;font-size:0.82rem}
-.r-ju{min-height:52px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:0.54rem;font-weight:500;white-space:nowrap}
+.r-age{min-height:20px}.r-age .u-cell{font-size:0.86rem;font-weight:700}
+.r-yr{min-height:42px}.r-yr .u-cell{font-size:0.66rem}
+.r-shi{min-height:28px}.r-shi .u-cell{font-family:'Zen Old Mincho',serif;font-size:1rem}
+.r-ju{min-height:52px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:1rem;font-weight:500;white-space:nowrap}
 .r-sep{border-top:2px solid rgba(184,134,11,0.35)}
 .r-dks{min-height:30px}.r-th{min-height:26px}.r-jos{min-height:26px}.r-ku{min-height:22px}
 /* 20年ブロック */
 .ub-wrap{background:var(--bg);border:1px solid rgba(184,134,11,0.22);border-radius:4px;margin-bottom:0.6rem}
-.ub-header{background:var(--bg3);font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:var(--ink2);padding:3px 8px;border-bottom:1px solid rgba(184,134,11,0.3)}
+.ub-header{background:var(--bg3);font-family:'Zen Old Mincho',serif;font-size:0.97rem;color:var(--ink2);padding:3px 8px;border-bottom:1px solid rgba(184,134,11,0.3)}
 .ub-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.1);align-items:stretch}
 .ub-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch}
 .ub-sep{border-top:2px solid rgba(184,134,11,0.35)}
-.ub-lbl{flex:0 0 60px;font-size:0.58rem;color:var(--ink3);padding:0 5px;border-right:2px solid rgba(184,134,11,0.35);background:var(--bg2);white-space:nowrap;display:flex;align-items:center;font-weight:500;align-self:stretch}
+.ub-lbl{flex:0 0 60px;font-size:0.94rem;color:var(--ink3);padding:0 5px;border-right:2px solid rgba(184,134,11,0.35);background:var(--bg2);white-space:nowrap;display:flex;align-items:center;font-weight:500;align-self:stretch}
 .ub-dl{background:var(--bg3)!important;color:var(--ink2)!important}
 .ub-cells{display:flex;flex:1;overflow:hidden;align-items:stretch}
 .ub-blks{display:flex;flex:1;overflow:hidden;align-items:stretch}
@@ -337,7 +338,7 @@ body.theme-dark .ai-input-area{background:#1c1914}
 <canvas id="petalCanvas"></canvas>
 
 <!-- ===== GLOBAL ERROR ===== -->
-<div id="errmsg" style="display:none;position:fixed;top:0;left:0;right:0;background:#fff0f0;border-bottom:2px solid #c00;color:#900;padding:0.7rem 1rem;font-size:0.82rem;z-index:9999;word-break:break-all"></div>
+<div id="errmsg" style="display:none;position:fixed;top:0;left:0;right:0;background:#fff0f0;border-bottom:2px solid #c00;color:#900;padding:0.7rem 1rem;font-size:1rem;z-index:9999;word-break:break-all"></div>
 
 <!-- ===== LOGIN SCREEN ===== -->
 <div id="screen-login" class="screen active">
@@ -478,7 +479,7 @@ body.theme-dark .ai-input-area{background:#1c1914}
         <option value="女">女（陰）</option>
       </select>
     </div>
-    <div id="mm-err" style="font-size:0.78rem;color:#c0392b;margin-top:0.5rem;display:none"></div>
+    <div id="mm-err" style="font-size:0.97rem;color:#c0392b;margin-top:0.5rem;display:none"></div>
     <button class="btn-primary" onclick="saveMember()">登録する</button>
     <button class="btn-secondary" onclick="closeMemberModal()">キャンセル</button>
     <button class="btn-secondary btn-danger" id="mm-del-btn" onclick="deleteMember()" style="display:none">この人物を削除</button>
@@ -501,7 +502,7 @@ window.addEventListener('unhandledrejection',function(e){
 // CORE CALC ENGINE (index.htmlと同じロジック — 改変禁止)
 // ============================================================
 const GOGYO={'甲':{'行':'木','陰陽':'＋'},'乙':{'行':'木','陰陽':'－'},'丙':{'行':'火','陰陽':'＋'},'丁':{'行':'火','陰陽':'－'},'戊':{'行':'土','陰陽':'＋'},'己':{'行':'土','陰陽':'－'},'庚':{'行':'金','陰陽':'＋'},'辛':{'行':'金','陰陽':'－'},'壬':{'行':'水','陰陽':'＋'},'癸':{'行':'水','陰陽':'－'},'子':{'行':'水','陰陽':'＋'},'丑':{'行':'土','陰陽':'－'},'寅':{'行':'木','陰陽':'＋'},'卯':{'行':'木','陰陽':'－'},'辰':{'行':'土','陰陽':'＋'},'巳':{'行':'火','陰陽':'－'},'午':{'行':'火','陰陽':'＋'},'未':{'行':'土','陰陽':'－'},'申':{'行':'金','陰陽':'＋'},'酉':{'行':'金','陰陽':'－'},'戌':{'行':'土','陰陽':'＋'},'亥':{'行':'水','陰陽':'－'}};
-function gogyoBadge(char){var g=GOGYO[char];if(!g)return '';var col=g['行']==='木'?'#2d7a3a':g['行']==='火'?'#c0392b':g['行']==='土'?'#b8860b':g['行']==='金'?'#7a6b52':'#1a5a8a';return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-left:3px;line-height:1.2"><span style="font-size:0.55rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px">'+g['行']+'</span><span style="font-size:0.52rem;color:'+col+';margin-top:1px">'+g['陰陽']+'</span></div>';}
+function gogyoBadge(char){var g=GOGYO[char];if(!g)return '';var col=g['行']==='木'?'#2d7a3a':g['行']==='火'?'#c0392b':g['行']==='土'?'#b8860b':g['行']==='金'?'#7a6b52':'#1a5a8a';return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-left:3px;line-height:1.2"><span style="font-size:0.7rem;color:'+col+';font-weight:700;border:1px solid '+col+';border-radius:2px;padding:0 2px">'+g['行']+'</span><span style="font-size:0.67rem;color:'+col+';margin-top:1px">'+g['陰陽']+'</span></div>';}
 const JUSEI=[['天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星'],['天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星','天極星','天庫星','天馳星'],['天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星','天貴星','天印星','天報星'],['天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星','天将星','天堂星','天胡星'],['天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星','天禄星','天南星','天恍星'],['天将星','天堂星','天胡星','天極星','天庫星','天馳星','天報星','天印星','天貴星','天恍星','天南星','天禄星'],['天禄星','天南星','天恍星','天貴星','天印星','天報星','天馳星','天庫星','天極星','天胡星','天堂星','天将星']];
 const JUNI_KIKKYO={'豊穣':'大吉','穂分':'吉','発芽':'吉','青葉':'吉','開花':'中吉','平凪':'小吉','成天':'チャンス','引寒':'注意','内省':'苦難','狂咲':'試練','休眠':'変容','残雪':'変容'};
 function isHtPlus(ht){return ht&&ht.indexOf('＋')>=0;}
@@ -686,15 +687,15 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   function bH(fn){return BLK.map(function(b){return'<div class="u-blk'+(b.isSk?' sk':'')+'" style="width:'+(b.sp*CW_)+'px;min-width:'+(b.sp*CW_)+'px"><div>'+fn(b)+'</div></div>';}).join('');}
   var h='<div style="width:'+(totalW+lblW)+'px">';
   // 年齢行
-  h+='<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-size:0.62rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</div>';}).join('')+'</div></div>';
+  h+='<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-size:0.86rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</div>';}).join('')+'</div></div>';
   // 西暦行
   h+='<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.48rem;color:'+tc(r,'#4a3c28')+';line-height:1.1;text-align:center">'+String(r.yr).split('').join('<br>')+'</span></div>';}).join('')+'</div></div>';
   // 年支行
-  h+='<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-family:\'Zen Old Mincho\',serif;font-size:0.82rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</div>';}).join('')+'</div></div>';
+  h+='<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</div>';}).join('')+'</div></div>';
   // 十二運気行
-  h+='<div class="u-row r-ju"><div class="u-lbl">十二<br>運気</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;writing-mode:vertical-rl;font-size:0.54rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</div>';}).join('')+'</div></div>';
+  h+='<div class="u-row r-ju"><div class="u-lbl">十二<br>運気</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;writing-mode:vertical-rl;font-size:1rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</div>';}).join('')+'</div></div>';
   // グラフ行
-  h+='<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:'+graphH+'px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.55rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.55rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.55rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="width:'+totalW+'px;min-width:'+totalW+'px;height:'+graphH+'px;flex-shrink:0;overflow:hidden">'+makeInlineSvg(ND,currIdx,totalW,graphH)+'</div></div>';
+  h+='<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:'+graphH+'px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.7rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.7rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.7rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="width:'+totalW+'px;min-width:'+totalW+'px;height:'+graphH+'px;flex-shrink:0;overflow:hidden">'+makeInlineSvg(ND,currIdx,totalW,graphH)+'</div></div>';
   // 吉凶行
   h+='<div class="u-row r-ku"><div class="u-lbl dl">吉凶</div><div class="u-blks">'+bH(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=2?'0.48rem':b.sp<=4?'0.58rem':'0.66rem')+';font-weight:700;color:'+kc+'">'+kk+'</span>';})+'</div></div>';
   // 大運干支行
@@ -748,9 +749,9 @@ function buildBlockRows(ND,A2D,BLK,currIdx,startAge,endAge,ht){
     +'<div class="ub-header">'+startAge+'〜'+endAge+'歳</div>'
     +'<div class="ub-row"><div class="ub-lbl">年齢</div><div class="ub-cells">'+cells(18,function(r){return'<span style="font-size:0.6rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</span>';})+'</div></div>'
     +'<div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">'+cells(40,function(r){return'<span style="font-size:0.46rem;color:'+tc(r,'#4a3c28')+';line-height:1.15;text-align:center">'+String(r.yr).split('').join('<br>')+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">'+cells(24,function(r){return'<span style="font-family:\'Zen Old Mincho\',serif;font-size:0.75rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>';})+'</div></div>'
-    +'<div class="ub-row"><div class="ub-lbl">十二<br>運気</div><div class="ub-cells">'+cells(46,function(r){return'<span style="writing-mode:vertical-rl;font-size:0.5rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</span>';})+'</div></div>'
-    +'<div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.5rem;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.52rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.52rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.52rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="flex:1;overflow:visible;height:'+graphH+'px;min-height:'+graphH+'px;position:relative">'+svg+starOverlay+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">'+cells(24,function(r){return'<span style="font-family:\'Zen Old Mincho\',serif;font-size:0.86rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl">十二<br>運気</div><div class="ub-cells">'+cells(46,function(r){return'<span style="writing-mode:vertical-rl;font-size:0.66rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</span>';})+'</div></div>'
+    +'<div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.66rem;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.67rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.67rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.67rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="flex:1;overflow:visible;height:'+graphH+'px;min-height:'+graphH+'px;position:relative">'+svg+starOverlay+'</div></div>'
     +'<div class="ub-row"><div class="ub-lbl ub-dl">吉凶</div><div class="ub-blks">'+bHb(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.6rem')+';font-weight:700;color:'+kc+'">'+kk+'</span>';})+'</div></div>'
     +'<div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:\'Zen Old Mincho\',serif;font-size:'+(b.sp<=3?'0.52rem':'0.75rem')+';color:'+(ds.col||'#1a1208')+'">'+b.ks+'</span>';})+'</div></div>'
     +'<div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.42rem':b.sp<=6?'0.52rem':'0.62rem')+';color:'+(ds.col||'#7a1a1a')+';white-space:nowrap">'+b.th+'</span>';})+'</div></div>'
@@ -1197,9 +1198,9 @@ function buildHomePage(){
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
-    +'<div style="font-size:0.75rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'の六花人</div>'
+    +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'の六花人</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htBase+'</div>'
-    +'<div style="font-size:0.82rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+G.ht.replace(/[＋－]/g,'')+(G.ht.includes('＋')?'＋（陽）':'－（陰）')+'</div>'
+    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+G.ht.replace(/[＋－]/g,'')+(G.ht.includes('＋')?'＋（陽）':'－（陰）')+'</div>'
     +'</div>';
 
   // 運気タブウィジェット
@@ -1276,14 +1277,14 @@ function renderUnkiBody(tab){
   var bars=Math.round((wave+4)/9*10);
   var barsHtml='<div style="display:flex;gap:2px;margin-top:4px">';
   for(var i=0;i<10;i++)barsHtml+='<div class="unki-bar" style="background:'+(i<bars?color:'rgba(184,134,11,0.15)')+'"></div>';
-  barsHtml+='<span style="font-size:0.68rem;color:'+color+';margin-left:4px;font-weight:700">'+(wave>=3?'好調':wave>=0?'普通':'要注意')+'</span></div>';
+  barsHtml+='<span style="font-size:1rem;color:'+color+';margin-left:4px;font-weight:700">'+(wave>=3?'好調':wave>=0?'普通':'要注意')+'</span></div>';
   body.innerHTML='<div style="display:flex;align-items:flex-start;gap:0.8rem">'
     +'<div style="font-size:2rem;flex-shrink:0">'+(JUNI_EMOJI[juni]||'🌸')+'</div>'
     +'<div style="flex:1">'
-    +'<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:2px">'+label+'</div>'
+    +'<div style="font-size:1rem;color:var(--ink3);margin-bottom:2px">'+label+'</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:'+color+'">'+juni+'</div>'
     +barsHtml
-    +'<p style="font-size:0.78rem;color:var(--ink2);line-height:1.7;margin-top:0.4rem">'+(JUNI_DESC[juni]||'')+'</p>'
+    +'<p style="font-size:0.97rem;color:var(--ink2);line-height:1.7;margin-top:0.4rem">'+(JUNI_DESC[juni]||'')+'</p>'
     +'</div></div>';
 }
 
@@ -1321,7 +1322,7 @@ function buildMeishikiPage(){
   html+=msCol('日　柱（本人）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi));
   html+='</div>';
   // 納音情報
-  html+='<div style="font-size:0.72rem;color:var(--ink3);line-height:2;margin-top:0.5rem">'
+  html+='<div style="font-size:0.94rem;color:var(--ink3);line-height:2;margin-top:0.5rem">'
     +'年柱の納音：'+getNayin(G.nenKS)+'（'+getNayinYinYang(G.nenKS)+'）　'
     +'月柱の納音：'+getNayin(G.tsuKS)+'（'+getNayinYinYang(G.tsuKS)+'）　'
     +'日柱の納音：'+getNayin(G.nichiKS)+'（'+getNayinYinYang(G.nichiKS)+'）'
@@ -1343,7 +1344,7 @@ function buildMeishikiPage(){
 
   // タブ1: 大運表
   html+='<div class="daiun-tab-pane active" id="dtab-table" role="tabpanel">';
-  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">紫●＝転化天蛹期間　★＝現在の大運</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">紫●＝転化天蛹期間　★＝現在の大運</p>';
   html+='<div style="overflow-x:auto"><table class="daiun-table"><thead><tr>'
     +'<th>歳</th><th>開始年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二従星</th><th>十二運気</th><th>吉凶</th>'
     +'</tr></thead><tbody>';
@@ -1351,12 +1352,12 @@ function buildMeishikiPage(){
     var cls=(r.isCurr?'current':'')+' '+(r.isSk?'sk':'');
     var kkc=getKikkyoColor(r.ju,G.ht);
     html+='<tr class="'+cls.trim()+'">'
-      +'<td style="font-size:0.68rem">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
-      +'<td style="font-size:0.62rem;color:var(--ink3)">'+r.startY+'</td>'
+      +'<td style="font-size:1rem">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
+      +'<td style="font-size:0.86rem;color:var(--ink3)">'+r.startY+'</td>'
       +'<td style="font-weight:700">'+(r.isCurr?'★':'')+r.ks+'</td>'
-      +'<td style="font-size:0.68rem;color:var(--ink3)">'+r.zo+'</td>'
+      +'<td style="font-size:1rem;color:var(--ink3)">'+r.zo+'</td>'
       +'<td style="font-size:0.7rem;color:#7a1a1a">'+r.th+'</td>'
-      +'<td style="font-size:0.68rem;color:var(--gold)">'+r.jos+'</td>'
+      +'<td style="font-size:1rem;color:var(--gold)">'+r.jos+'</td>'
       +'<td style="color:'+getJuniColor(r.ju)+';font-size:0.7rem;font-weight:700">'+juniRuby(r.ju)+'</td>'
       +'<td style="color:'+kkc+';font-size:0.7rem;font-weight:600">'+r.kk+'</td>'
       +'</tr>';
@@ -1366,7 +1367,7 @@ function buildMeishikiPage(){
 
   // タブ2: 横スクロール
   html+='<div class="daiun-tab-pane" id="dtab-scroll" role="tabpanel">';
-  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">毎年の運気の流れ・10年ごとの大運を一覧。左右にスクロールできます。🌟＝現在年</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">毎年の運気の流れ・10年ごとの大運を一覧。左右にスクロールできます。🌟＝現在年</p>';
   (function(){
     var CY=new Date().getFullYear();
     var currIdx=G.ND.findIndex(function(r){return r.isCurr;});
@@ -1376,7 +1377,7 @@ function buildMeishikiPage(){
 
   // タブ3: 20年ブロック
   html+='<div class="daiun-tab-pane" id="dtab-block" role="tabpanel">';
-  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を20年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を20年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
   (function(){
     var currIdx=G.ND.findIndex(function(r){return r.isCurr;});
     var blocks=[[0,19],[20,39],[40,59],[60,79],[80,99],[100,119]];
@@ -1386,7 +1387,7 @@ function buildMeishikiPage(){
 
   // タブ4: 大運グラフ
   html+='<div class="daiun-tab-pane" id="dtab-graph" role="tabpanel">';
-  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝転化天蛹。</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝転化天蛹。</p>';
   html+='<div class="chart-wrap-inner"><canvas id="daiunLifeChart"></canvas></div>';
   html+='<div id="daiun-legend" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;font-size:0.7rem;color:var(--ink3)"></div>';
   html+='</div>';
@@ -1412,8 +1413,8 @@ function msCol(lbl,kan,shi,zo,th,thZo,jos,ju){
     +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:var(--ink2)">'+shi+'</span>'
     +gogyoBadge(shi)
     +'</div>'
-    +'<div class="ms-zo" style="font-size:0.65rem">蔵干：'+zo+'</div>'
-    +(thDisplay?'<div class="ms-th" style="font-size:0.72rem;color:#7a1a1a;font-weight:700">'+thDisplay+'</div>':'')
+    +'<div class="ms-zo" style="font-size:0.77rem">蔵干：'+zo+'</div>'
+    +(thDisplay?'<div class="ms-th" style="font-size:0.94rem;color:#7a1a1a;font-weight:700">'+thDisplay+'</div>':'')
     +(jos&&jos!=='—'?'<div style="font-size:0.7rem;color:var(--gold);margin-top:0.15rem">'+jos+'</div>':'')
     +'<div class="ms-ju" style="color:'+color+'">'+juniRuby(ju)+'</div>'
     +'</div>';
@@ -1444,13 +1445,13 @@ function buildCompatPage(){
   html+='<option value="new">新たに入力する</option>'
     +'</select></div>'
     +'<div id="cp1-new" style="display:none;margin-top:0.5rem">'
-    +'<input id="cp1-nick" type="text" placeholder="名前（任意）" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-family:\'Noto Serif JP\',serif;font-size:0.88rem;margin-bottom:0.4rem">'
+    +'<input id="cp1-nick" type="text" placeholder="名前（任意）" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-family:\'Noto Serif JP\',serif;font-size:0.97rem;margin-bottom:0.4rem">'
     +'<div class="compat-date-row">'
     +'<select id="cp1-y"><option value="">年</option></select>'
     +'<select id="cp1-m"><option value="">月</option></select>'
     +'<select id="cp1-d"><option value="">日</option></select>'
     +'</div>'
-    +'<select id="cp1-gender" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;margin-top:0.4rem;font-family:\'Noto Serif JP\',serif;font-size:0.88rem"><option value="男">男（陽）</option><option value="女">女（陰）</option></select>'
+    +'<select id="cp1-gender" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;margin-top:0.4rem;font-family:\'Noto Serif JP\',serif;font-size:0.97rem"><option value="男">男（陽）</option><option value="女">女（陰）</option></select>'
     +'</div></div>';
 
   // 人物2
@@ -1466,13 +1467,13 @@ function buildCompatPage(){
   html+='<option value="new">新たに入力する</option>'
     +'</select></div>'
     +'<div id="cp2-new" style="display:none;margin-top:0.5rem">'
-    +'<input id="cp2-nick" type="text" placeholder="名前（任意）" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-family:\'Noto Serif JP\',serif;font-size:0.88rem;margin-bottom:0.4rem">'
+    +'<input id="cp2-nick" type="text" placeholder="名前（任意）" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-family:\'Noto Serif JP\',serif;font-size:0.97rem;margin-bottom:0.4rem">'
     +'<div class="compat-date-row">'
     +'<select id="cp2-y"><option value="">年</option></select>'
     +'<select id="cp2-m"><option value="">月</option></select>'
     +'<select id="cp2-d"><option value="">日</option></select>'
     +'</div>'
-    +'<select id="cp2-gender" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;margin-top:0.4rem;font-family:\'Noto Serif JP\',serif;font-size:0.88rem"><option value="男">男（陽）</option><option value="女">女（陰）</option></select>'
+    +'<select id="cp2-gender" style="width:100%;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;margin-top:0.4rem;font-family:\'Noto Serif JP\',serif;font-size:0.97rem"><option value="男">男（陽）</option><option value="女">女（陰）</option></select>'
     +'</div></div>';
 
   html+='<button class="btn-primary" style="margin-top:0.8rem" onclick="calcCompat()">🌸 相性を鑑定する</button>';
@@ -1573,24 +1574,24 @@ function buildCompatResult(G1,G2,n1,n2){
   // ===== ヘッダー：名前・六花人・総合 =====
   html+='<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;margin-bottom:1.2rem">'
     +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.8rem 0.5rem">'
-    +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+n1+'</div>'
-    +'<div style="font-size:0.75rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht1+'</div>'
-    +'<div style="font-size:0.65rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
+    +'<div style="font-size:1rem;font-weight:700;color:var(--ink)">'+n1+'</div>'
+    +'<div style="font-size:0.86rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht1+'</div>'
+    +'<div style="font-size:0.77rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
     +'</div>'
     +'<div style="text-align:center;padding:0 0.3rem">'
-    +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.3rem">総合</div>'
+    +'<div style="font-size:0.77rem;color:var(--ink3);margin-bottom:0.3rem">総合</div>'
     +'<div style="font-size:1.8rem;color:'+overall.col+'">'+overall.mark+'</div>'
-    +'<div style="font-size:0.65rem;color:'+overall.col+'">'+overall.label+'</div>'
+    +'<div style="font-size:0.77rem;color:'+overall.col+'">'+overall.label+'</div>'
     +'</div>'
     +'<div style="text-align:center;background:var(--bg2);border-radius:10px;padding:0.8rem 0.5rem">'
-    +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+n2+'</div>'
-    +'<div style="font-size:0.75rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht2+'</div>'
-    +'<div style="font-size:0.65rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
+    +'<div style="font-size:1rem;font-weight:700;color:var(--ink)">'+n2+'</div>'
+    +'<div style="font-size:0.86rem;color:var(--purple);margin-top:0.3rem;font-weight:600">'+ht2+'</div>'
+    +'<div style="font-size:0.77rem;color:var(--ink3);margin-top:0.2rem">自分にとっての<br>相手の運気</div>'
     +'</div>'
     +'</div>';
 
   // ===== 固定相性ラベル =====
-  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.3rem">◆ 固定の相性（一生変わらない）</div>';
+  html+='<div style="font-size:1rem;font-weight:700;color:var(--ink2);margin-bottom:0.3rem">◆ 固定の相性（一生変わらない）</div>';
   html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:0.8rem">'
     +'年支＝本質　月支＝日常　日支＝熱中・衝突時'
     +'</div>';
@@ -1632,11 +1633,11 @@ function buildCompatResult(G1,G2,n1,n2){
     // 上段：n2→n1（右向き→、まことが受け取る）
     // 下段：n1→n2（左向き←、えいこが受け取る）
     return '<div style="background:'+rowBg+';border-radius:10px;padding:0.7rem 0.6rem;margin-bottom:0.5rem">'
-      +'<div style="font-size:0.68rem;color:var(--ink3);text-align:center;margin-bottom:0.5rem;font-weight:600">'+rowLabel+'</div>'
+      +'<div style="font-size:1rem;color:var(--ink3);text-align:center;margin-bottom:0.5rem;font-weight:600">'+rowLabel+'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 68px 1fr;align-items:center;gap:0.2rem">'
       // 左：n1が受け取る運気
       +'<div style="text-align:center">'
-      +(isFirst?'<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
+      +(isFirst?'<div style="font-size:0.86rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
       +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.35rem;font-weight:700;color:'+cL+'">'+juLeft+'</div>'
       +'</div>'
       // 中央：矢印2本（上→、下←）
@@ -1646,7 +1647,7 @@ function buildCompatResult(G1,G2,n1,n2){
       +'</div>'
       // 右：n2が受け取る運気
       +'<div style="text-align:center">'
-      +(isFirst?'<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
+      +(isFirst?'<div style="font-size:0.86rem;color:var(--ink3);margin-bottom:0.25rem">自分にとっての<br>相手の運気</div>':'')
       +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.35rem;font-weight:700;color:'+cR+'">'+juRight+'</div>'
       +'</div>'
       +'</div>'
@@ -1659,7 +1660,7 @@ function buildCompatResult(G1,G2,n1,n2){
 
   // ===== 今の変動運気 =====
   html+='<div class="compat-now-section">'
-    +'<div style="font-size:0.8rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem">今の運気状況（変動）</div>'
+    +'<div style="font-size:1rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem">今の運気状況（変動）</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">'
     +nowChip(n1,u1)
     +nowChip(n2,u2)
@@ -1667,8 +1668,8 @@ function buildCompatResult(G1,G2,n1,n2){
 
   // AI鑑定ボタン
   html+='<div class="ai-compat-area">'
-    +'<div id="compat-ai-loading" style="display:none;font-style:italic;font-size:0.82rem;color:var(--ink3);padding:0.5rem">🌸 鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>'
-    +'<div id="compat-ai-result" style="font-size:0.82rem;line-height:1.8;color:var(--ink2);white-space:pre-wrap"></div>'
+    +'<div id="compat-ai-loading" style="display:none;font-style:italic;font-size:1rem;color:var(--ink3);padding:0.5rem">🌸 鑑定中<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>'
+    +'<div id="compat-ai-result" style="font-size:1rem;line-height:1.8;color:var(--ink2);white-space:pre-wrap"></div>'
     +'<button class="btn-primary" id="compat-ai-btn" style="margin-top:0.5rem">🔮 AIに詳しく鑑定してもらう</button>'
     +'</div>';
 
@@ -1679,9 +1680,9 @@ function buildCompatResult(G1,G2,n1,n2){
 function nowChip(name,u){
   var c=getJuniColor(u.dayJu);
   return '<div style="background:#fff;border-radius:6px;padding:0.5rem 0.6rem;border:1px solid rgba(184,134,11,0.15)">'
-    +'<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:0.2rem">'+name+'</div>'
-    +'<div style="font-size:0.72rem;color:var(--ink2)">今年 <span style="color:'+getJuniColor(u.yrJu)+';font-weight:700">'+u.yrJu+'</span></div>'
-    +'<div style="font-size:0.72rem;color:var(--ink2)">大運 <span style="color:'+getJuniColor(u.daiJu)+';font-weight:700">'+u.daiJu+'</span>（'+u.currDaiun.ks+'）</div>'
+    +'<div style="font-size:0.77rem;color:var(--ink3);margin-bottom:0.2rem">'+name+'</div>'
+    +'<div style="font-size:0.94rem;color:var(--ink2)">今年 <span style="color:'+getJuniColor(u.yrJu)+';font-weight:700">'+u.yrJu+'</span></div>'
+    +'<div style="font-size:0.94rem;color:var(--ink2)">大運 <span style="color:'+getJuniColor(u.daiJu)+';font-weight:700">'+u.daiJu+'</span>（'+u.currDaiun.ks+'）</div>'
     +'</div>';
 }
 
@@ -1869,13 +1870,13 @@ function buildAIPage(){
 
   // トップバー（アプリのトップヘッダーと同じデザイン）
   html+='<div style="background:linear-gradient(135deg,#1a0830,var(--purple) 55%,var(--gold));padding:0.75rem 1rem 0.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
-    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#fff;letter-spacing:0.2em">花 人 占 術</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:#fff;letter-spacing:0.2em">花 人 占 術</div>'
     +'<div style="display:flex;align-items:center;gap:0.5rem">'
     +'<div style="display:flex;border:1px solid rgba(255,255,255,0.4);border-radius:6px;overflow:hidden">'
-    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.65rem;padding:3px 7px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
-    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.65rem;padding:3px 7px;background:rgba(66,133,244,0.8);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
+    +'<button id="engine-claude" onclick="switchEngine(\'claude\')" style="font-size:0.77rem;padding:3px 7px;background:rgba(255,255,255,0.15);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">🌸Claude</button>'
+    +'<button id="engine-gemini" onclick="switchEngine(\'gemini\')" style="font-size:0.77rem;padding:3px 7px;background:rgba(66,133,244,0.8);color:#fff;border:none;cursor:pointer;font-family:\'Noto Serif JP\',serif">✨Gemini</button>'
     +'</div>'
-    +'<select id="ai-voice-gender" style="font-size:0.68rem;padding:2px 5px;border:1px solid rgba(255,255,255,0.4);border-radius:6px;background:rgba(255,255,255,0.15);color:#fff">'
+    +'<select id="ai-voice-gender" style="font-size:1rem;padding:2px 5px;border:1px solid rgba(255,255,255,0.4);border-radius:6px;background:rgba(255,255,255,0.15);color:#fff">'
     +'<option value="female" style="color:#000">女性の声</option>'
     +'<option value="male" style="color:#000">男性の声</option>'
     +'</select>'
@@ -1886,10 +1887,10 @@ function buildAIPage(){
   html+='<div class="ai-header-bar">'
     +'<div style="display:flex;align-items:center;justify-content:space-between">'
     +'<div style="display:flex;align-items:center;gap:0.5rem;min-width:0">'
-    +'<div style="font-size:0.75rem;color:var(--ink2)">'+name+'の命式を読み込んだAIに相談</div>'
-    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.65rem;flex-shrink:0">'+G.ht+'</span>'
+    +'<div style="font-size:0.86rem;color:var(--ink2)">'+name+'の命式を読み込んだAIに相談</div>'
+    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.77rem;flex-shrink:0">'+G.ht+'</span>'
     +'</div>'
-    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.62rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;white-space:nowrap;flex-shrink:0">履歴を削除</button>'
+    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.86rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;white-space:nowrap;flex-shrink:0">履歴を削除</button>'
     +'</div>'
     +'</div>';
 
@@ -2085,7 +2086,7 @@ function renderBubble(container, role, text, ts, doScroll){
 
   if(role==='user'){
     var av2=document.createElement('div');
-    av2.style.cssText='width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--gold));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.85rem;align-self:flex-end';
+    av2.style.cssText='width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--gold));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;align-self:flex-end';
     av2.textContent='👤';
     row.appendChild(av2);
   }
@@ -2224,7 +2225,7 @@ async function sendAI(){
     updateProfileFromChat(userMsg,text);
     if(data.remaining!==undefined){
       var m2=getMsgs();
-      if(m2){var cnt=document.createElement('div');cnt.style.cssText='font-size:0.62rem;color:var(--ink3);text-align:right;padding:0 0.5rem 0.3rem';cnt.textContent='残り'+data.remaining+'回';m2.appendChild(cnt);}
+      if(m2){var cnt=document.createElement('div');cnt.style.cssText='font-size:0.86rem;color:var(--ink3);text-align:right;padding:0 0.5rem 0.3rem';cnt.textContent='残り'+data.remaining+'回';m2.appendChild(cnt);}
     }
   }catch(e){
     var ld2=document.getElementById(loadId);
@@ -2277,9 +2278,9 @@ function buildSettingPage(){
 
   // アカウント情報
   html+='<div class="setting-section"><h3>アカウント</h3>'
-    +'<div class="setting-row"><label>ニックネーム</label><span style="font-size:0.88rem;color:var(--ink2)">'+data.account.nickname+'</span></div>'
-    +'<div class="setting-row"><label>生年月日</label><span style="font-size:0.88rem;color:var(--ink2)">'+data.account.birthday.y+'年'+data.account.birthday.m+'月'+data.account.birthday.d+'日</span></div>'
-    +'<div class="setting-row"><label>性別</label><span style="font-size:0.88rem;color:var(--ink2)">'+data.account.gender+'</span></div>'
+    +'<div class="setting-row"><label>ニックネーム</label><span style="font-size:0.97rem;color:var(--ink2)">'+data.account.nickname+'</span></div>'
+    +'<div class="setting-row"><label>生年月日</label><span style="font-size:0.97rem;color:var(--ink2)">'+data.account.birthday.y+'年'+data.account.birthday.m+'月'+data.account.birthday.d+'日</span></div>'
+    +'<div class="setting-row"><label>性別</label><span style="font-size:0.97rem;color:var(--ink2)">'+data.account.gender+'</span></div>'
     +'</div>';
 
   // テーマ
@@ -2302,7 +2303,7 @@ function buildSettingPage(){
   html+='<div class="setting-section"><h3>AI会話の記録（'+data.account.nickname+'）</h3>';
   var hist=(prof.history||[]).slice().reverse();
   if(hist.length===0){
-    html+='<p style="font-size:0.8rem;color:var(--ink3)">まだ会話の記録がありません</p>';
+    html+='<p style="font-size:1rem;color:var(--ink3)">まだ会話の記録がありません</p>';
   } else {
     html+='<div class="history-list">';
     hist.forEach(function(h){
@@ -2311,7 +2312,7 @@ function buildSettingPage(){
     html+='</div>';
   }
   if(hist.length>0){
-    html+='<button class="btn-secondary btn-danger" style="margin-top:0.8rem;width:auto;padding:5px 14px;font-size:0.78rem" onclick="clearHistory()">履歴を削除</button>';
+    html+='<button class="btn-secondary btn-danger" style="margin-top:0.8rem;width:auto;padding:5px 14px;font-size:0.97rem" onclick="clearHistory()">履歴を削除</button>';
   }
   html+='</div>';
 
@@ -2320,7 +2321,7 @@ function buildSettingPage(){
     html+='<div class="setting-section"><h3>登録メンバー</h3>';
     data.people.forEach(function(p,i){
       html+='<div class="setting-row"><label>'+p.nickname+'（'+p.relation+'）</label>'
-        +'<button style="font-size:0.72rem;padding:3px 10px;border:1px solid rgba(184,134,11,0.3);border-radius:8px;background:var(--bg2);cursor:pointer" onclick="openMemberModal('+(i+1)+')">編集</button>'
+        +'<button style="font-size:0.94rem;padding:3px 10px;border:1px solid rgba(184,134,11,0.3);border-radius:8px;background:var(--bg2);cursor:pointer" onclick="openMemberModal('+(i+1)+')">編集</button>'
         +'</div>';
     });
     html+='</div>';
@@ -2328,8 +2329,8 @@ function buildSettingPage(){
 
   // データリセット
   html+='<div class="setting-section"><h3>データ管理</h3>'
-    +'<button class="btn-secondary btn-danger" style="width:auto;padding:6px 16px;font-size:0.82rem" onclick="resetAllData()">すべてのデータを削除</button>'
-    +'<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">削除後は再登録が必要です</p>'
+    +'<button class="btn-secondary btn-danger" style="width:auto;padding:6px 16px;font-size:1rem" onclick="resetAllData()">すべてのデータを削除</button>'
+    +'<p style="font-size:0.94rem;color:var(--ink3);margin-top:0.5rem">削除後は再登録が必要です</p>'
     +'</div>';
 
   html+='</div>';
