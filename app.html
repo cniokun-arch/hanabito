@@ -1377,10 +1377,10 @@ function buildMeishikiPage(){
 
   // タブ3: 20年ブロック
   html+='<div class="daiun-tab-pane" id="dtab-block" role="tabpanel">';
-  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を20年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を10年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
   (function(){
     var currIdx=G.ND.findIndex(function(r){return r.isCurr;});
-    var blocks=[[0,19],[20,39],[40,59],[60,79],[80,99],[100,119]];
+    var blocks=[[0,9],[10,19],[20,29],[30,39],[40,49],[50,59],[60,69],[70,79],[80,89],[90,99],[100,109],[110,119]];
     blocks.forEach(function(b){html+=buildBlockRows(G.ND,G.A2D,G.BLK,currIdx,b[0],b[1],G.ht);});
   })();
   html+='</div>';
@@ -1897,9 +1897,8 @@ function buildAIPage(){
   // チャットエリア
   html+='<div id="ai-messages" class="ai-messages"></div>';
 
-  // クイックボタン＋入力
+  // 入力エリア
   html+='<div class="ai-bottom">'
-    +'<div class="ai-quick" id="ai-quick"></div>'
     +'<div class="ai-input-area">'
     +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:10px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0">🎤</button>'
     +'<textarea id="ai-input" placeholder="何でも聞いてみてください…" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>'
@@ -1925,19 +1924,6 @@ function initAIPage(){
   if(!AI_PAGE_G)return;
   AI_PAGE_SYS=buildSystemPromptFull(AI_PAGE_G);
   setTimeout(function(){switchEngine(AI_ENGINE, true);},10);
-
-  // クイックボタン
-  var quick=['今の運気を教えて','今年の運勢は？','性格・強みを教えて','転化天蛹について','恋愛・人間関係のアドバイス'];
-  var qDiv=document.getElementById('ai-quick');
-  if(qDiv){
-    qDiv.innerHTML='';
-    quick.forEach(function(q){
-      var btn=document.createElement('button');
-      btn.textContent=q;
-      btn.onclick=function(){var inp=document.getElementById('ai-input');if(inp)inp.value=q;sendAI();};
-      qDiv.appendChild(btn);
-    });
-  }
 
   // 保存済み会話履歴を復元
   var saved=loadChatHistory();
