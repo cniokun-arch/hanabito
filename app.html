@@ -317,7 +317,7 @@ body.theme-dark .ai-input-area{background:#1c1914}
 .r-ju{min-height:52px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:1rem;font-weight:500;white-space:nowrap}
 .r-sep{border-top:2px solid rgba(184,134,11,0.35)}
 .r-dks{min-height:30px}.r-th{min-height:26px}.r-jos{min-height:26px}.r-ku{min-height:22px}
-/* 20年ブロック */
+/* 10年ブロック */
 .ub-wrap{background:var(--bg);border:1px solid rgba(184,134,11,0.22);border-radius:4px;margin-bottom:0.6rem}
 .ub-header{background:var(--bg3);font-family:'Zen Old Mincho',serif;font-size:0.97rem;color:var(--ink2);padding:3px 8px;border-bottom:1px solid rgba(184,134,11,0.3)}
 .ub-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.1);align-items:stretch}
@@ -458,9 +458,17 @@ body.theme-dark .ai-input-area{background:#1c1914}
         <option value="恋人・パートナー">恋人・パートナー</option>
         <option value="配偶者">配偶者</option>
         <option value="気になる人">気になる人</option>
+        <option value="父">父</option>
+        <option value="母">母</option>
+        <option value="子">子</option>
+        <option value="兄">兄</option>
+        <option value="姉">姉</option>
+        <option value="弟">弟</option>
+        <option value="妹">妹</option>
         <option value="友人">友人</option>
-        <option value="家族">家族</option>
-        <option value="職場">職場の人</option>
+        <option value="職場の同僚">職場の同僚</option>
+        <option value="上司・先輩">上司・先輩</option>
+        <option value="部下・後輩">部下・後輩</option>
         <option value="その他">その他</option>
       </select>
     </div>
@@ -1337,7 +1345,7 @@ function buildMeishikiPage(){
     +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'scroll\',this)">'
     +'<span class="tab-icon">↔️</span>横スクロール</button>'
     +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'block\',this)">'
-    +'<span class="tab-icon">🔲</span>20年ブロック</button>'
+    +'<span class="tab-icon">🔲</span>10年ブロック</button>'
     +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'graph\',this)">'
     +'<span class="tab-icon">📈</span>大運グラフ</button>'
     +'</div>';
@@ -1375,7 +1383,7 @@ function buildMeishikiPage(){
   })();
   html+='</div>';
 
-  // タブ3: 20年ブロック
+  // タブ3: 10年ブロック
   html+='<div class="daiun-tab-pane" id="dtab-block" role="tabpanel">';
   html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を10年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
   (function(){
@@ -1424,7 +1432,7 @@ function msCol(lbl,kan,shi,zo,th,thZo,jos,ju){
 // ============================================================
 // COMPAT PAGE
 // ============================================================
-var compatG1=null,compatG2=null,compatN1='',compatN2='';
+var compatG1=null,compatG2=null,compatN1='',compatN2='',compatRel='';
 var compatResult=null;
 
 function buildCompatPage(){
@@ -1500,9 +1508,9 @@ function onCompat2Change(){
 function getCompatPersonG(prefix){
   var sel=document.getElementById(prefix+'-sel').value;
   var data=S.load();
-  var G=null,name='';
-  if(sel==='me'){G=data.account.G;name=data.account.nickname;}
-  else if(sel.indexOf('p')===0){var idx=+sel.slice(1);G=data.people[idx].G;name=data.people[idx].nickname;}
+  var G=null,name='',relation='';
+  if(sel==='me'){G=data.account.G;name=data.account.nickname;relation='本人';}
+  else if(sel.indexOf('p')===0){var idx=+sel.slice(1);G=data.people[idx].G;name=data.people[idx].nickname;relation=data.people[idx].relation||'その他';}
   else if(sel==='new'){
     var y=+document.getElementById(prefix+'-y').value;
     var m=+document.getElementById(prefix+'-m').value;
@@ -1510,16 +1518,16 @@ function getCompatPersonG(prefix){
     var gender=document.getElementById(prefix+'-gender').value;
     var nick=document.getElementById(prefix+'-nick').value.trim()||'相手';
     if(!y||!m||!d)return null;
-    G=doCalc(y,m,d,gender);name=nick;
+    G=doCalc(y,m,d,gender);name=nick;relation='その他';
   }
-  return G?{G,name}:null;
+  return G?{G,name,relation}:null;
 }
 
 function calcCompat(){
   var r1=getCompatPersonG('cp1'),r2=getCompatPersonG('cp2');
   if(!r1){alert('1人目を選択または入力してください');return;}
   if(!r2){alert('2人目を選択または入力してください');return;}
-  compatG1=r1.G;compatG2=r2.G;compatN1=r1.name;compatN2=r2.name;
+  compatG1=r1.G;compatG2=r2.G;compatN1=r1.name;compatN2=r2.name;compatRel=r2.relation||'その他';
   var result=buildCompatResult(compatG1,compatG2,compatN1,compatN2);
   document.getElementById('compat-result-area').innerHTML=result;
   // AI鑑定ボタンのイベント
@@ -1701,9 +1709,18 @@ async function runCompatAI(){
       +'相手月支→自分：'+getJuniUnki(myG.ht,theirG.tsuShi)+' （社会的・日常的影響）\n'
       +'相手日支→自分：'+getJuniUnki(myG.ht,theirG.nichiShi)+' （深層・本能的影響）';
   }
-  var now=new Date(),cy=now.getFullYear(),cm=now.getMonth()+1;
+  var LOVE_RELS=['恋人・パートナー','配偶者','気になる人'];
+  var isLove=LOVE_RELS.indexOf(compatRel)>=0;
+  var FAMILY_RELS=['父','母','子','兄','姉','弟','妹'];
+  var isFamily=FAMILY_RELS.indexOf(compatRel)>=0;
+  var advice3=isLove
+    ?'③今後の恋愛・関係の展望と最適なタイミング'
+    :isFamily
+    ?'③家族としてより良い関係を築くためのアドバイス'
+    :'③この関係をより良くするための具体的なアドバイス';
   var prompt=
     '【2人の相性鑑定依頼】\n\n'
+    +'【続柄・関係】'+compatN1+'にとって'+compatN2+'は「'+compatRel+'」です。この関係性を踏まえた鑑定をしてください。\n\n'
     +'【年月日支の読み方（必ず守ること）】\n'
     +'・年支の相性＝本質・根源的な相性。ここが悪いと根本的に合わない。一方通行または双方向に悪影響が出る。最も重要。\n'
     +'・月支の相性＝普段の日常的な付き合いの中で出る相性。\n'
@@ -1715,7 +1732,7 @@ async function runCompatAI(){
     +fixedText(compatG2,compatG1,compatN2,compatN1)+'\n\n'
     +'【'+compatN1+'の今の状態】年運:'+u1.yrJu+' 大運:'+u1.daiJu+'（'+u1.currDaiun.ks+'） 今日:'+u1.dayJu+'\n'
     +'【'+compatN2+'の今の状態】年運:'+u2.yrJu+' 大運:'+u2.daiJu+'（'+u2.currDaiun.ks+'） 今日:'+u2.dayJu+'\n\n'
-    +'上記を踏まえて: ①一生通じての2人の相性の本質 ②今この時期に2人がどう向き合うべきか ③もし恋愛・結婚を考えるなら最適なタイミング をアドバイスしてください。Markdown禁止。親しみやすい日本語で400〜600文字。';
+    +'上記を踏まえて: ①一生通じての2人の相性の本質 ②今この時期に2人がどう向き合うべきか '+advice3+' をアドバイスしてください。Markdown禁止。親しみやすい日本語で400〜600文字。';
 
   // 通常AIと同じKBを使ってシステムプロンプトを構築
   var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
@@ -1887,7 +1904,7 @@ function buildAIPage(){
   html+='<div class="ai-header-bar">'
     +'<div style="display:flex;align-items:center;justify-content:space-between">'
     +'<div style="display:flex;align-items:center;gap:0.5rem;min-width:0">'
-    +'<div style="font-size:0.86rem;color:var(--ink2)">'+name+'の命式を読み込んだAIに相談</div>'
+    +'<div style="font-size:0.86rem;color:var(--ink2)">'+name+'をAIに相談</div>'
     +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.77rem;flex-shrink:0">'+G.ht+'</span>'
     +'</div>'
     +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.86rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;white-space:nowrap;flex-shrink:0">履歴を削除</button>'
@@ -1986,7 +2003,7 @@ async function speakText(text,btn){
   // 再生中なら停止
   if(currentAudio&&!currentAudio.paused){
     currentAudio.pause();currentAudio=null;
-    if(btn)btn.textContent='🔊';
+    if(btn)btn.textContent='▶ 読み上げ';
     return;
   }
   if(!text)return;
@@ -1997,7 +2014,7 @@ async function speakText(text,btn){
    ['成天','せいてん'],['内省','ないせい'],['狂咲','くるいざき'],['引寒','いんかん'],['休眠','きゅうみん'],['残雪','ざんせつ'],
    ['転化天蛹','てんかてんよう'],['大運','だいうん'],['命式','めいしき'],['六花人','ろっかじん'],['納音','ないん']
   ].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
-  if(btn){btn.textContent='⏳';btn.disabled=true;}
+  if(btn){btn.textContent='⏳ 読込中';btn.disabled=true;}
   try{
     var res=await fetch(WORKER_BASE+'/api/tts',{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -2007,12 +2024,12 @@ async function speakText(text,btn){
     if(!data.audioContent)throw new Error('音声データなし');
     var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
     currentAudio=audio;
-    audio.onplay=function(){if(btn){btn.textContent='⏹';btn.disabled=false;}};
-    audio.onended=function(){if(btn)btn.textContent='🔊';currentAudio=null;};
-    audio.onerror=function(){if(btn){btn.textContent='🔊';btn.disabled=false;}currentAudio=null;};
+    audio.onplay=function(){if(btn){btn.textContent='⏹ 停止';btn.disabled=false;}};
+    audio.onended=function(){if(btn)btn.textContent='▶ 読み上げ';currentAudio=null;};
+    audio.onerror=function(){if(btn){btn.textContent='▶ 読み上げ';btn.disabled=false;}currentAudio=null;};
     await audio.play();
   }catch(e){
-    if(btn){btn.textContent='🔊';btn.disabled=false;}
+    if(btn){btn.textContent='▶ 読み上げ';btn.disabled=false;}
   }
 }
 
@@ -2063,7 +2080,7 @@ function renderBubble(container, role, text, ts, doScroll){
   if(role==='ai'){
     var speakBtn=document.createElement('button');
     speakBtn.className='ai-speak-btn';
-    speakBtn.textContent='🔊 読み上げ';
+    speakBtn.textContent='▶ 読み上げ';
     speakBtn.onclick=(function(t){return function(){speakText(t,speakBtn);};})(text);
     col.appendChild(speakBtn);
   }
