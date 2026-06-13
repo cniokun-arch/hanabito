@@ -6,6 +6,7 @@
 <title>花人占術 — マイページ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -238,6 +239,54 @@ body.theme-dark .ai-input-area{background:#1c1914}
 
 /* ===== 花びら演出 ===== */
 #petalCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;display:none}
+
+/* ===== 大運タブ ===== */
+.daiun-tab-header{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--gold);overflow:hidden;border-radius:8px 8px 0 0}
+.daiun-tab-btn{flex:1;padding:0.55rem 0.2rem;background:var(--bg2);border:1px solid rgba(184,134,11,0.3);border-bottom:none;font-family:'Noto Serif JP',serif;font-size:0.7rem;color:var(--ink3);cursor:pointer;text-align:center;line-height:1.4;transition:background 0.15s,color 0.15s;border-right:none}
+.daiun-tab-btn:first-child{border-radius:8px 0 0 0}
+.daiun-tab-btn:last-child{border-right:1px solid rgba(184,134,11,0.3);border-radius:0 8px 0 0}
+.daiun-tab-btn.active{background:var(--gold);color:#fff;font-weight:700}
+.daiun-tab-btn .tab-icon{display:block;font-size:1rem;margin-bottom:1px}
+.daiun-tab-pane{display:none;border:1px solid rgba(184,134,11,0.25);border-top:none;background:var(--bg);padding:0.8rem 0.6rem;border-radius:0 0 8px 8px}
+.daiun-tab-pane.active{display:block}
+/* 横スクロール表 */
+.unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:4px;overflow:hidden}
+.unsei-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
+.unsei-inner::-webkit-scrollbar{height:4px}
+.unsei-inner::-webkit-scrollbar-thumb{background:rgba(184,134,11,0.4);border-radius:2px}
+.u-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.12);align-items:stretch;width:max-content;min-width:100%}
+.u-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch;width:max-content;min-width:100%;overflow:visible}
+.u-lbl{flex:0 0 60px;font-size:0.6rem;color:var(--ink3);padding:0 5px;border-right:2px solid rgba(184,134,11,0.35);background:var(--bg2);white-space:nowrap;display:flex;align-items:center;font-weight:500;position:sticky;left:0;z-index:3;box-shadow:2px 0 5px rgba(0,0,0,0.08);align-self:stretch}
+.u-lbl.dl{background:var(--bg3);color:var(--ink2);border-top:2px solid rgba(184,134,11,0.4)}
+.u-lbl.graph-lbl{background:var(--bg);color:var(--ink3);font-size:0.55rem}
+.u-cells{display:flex;align-items:stretch}
+.u-cell{flex:0 0 28px;width:28px;text-align:center;border-right:1px solid rgba(184,134,11,0.08);display:flex;align-items:center;justify-content:center;font-size:0.58rem;align-self:stretch}
+.u-cell.db{border-left:2px solid rgba(184,134,11,0.5)!important}
+.u-blks{display:flex;align-items:stretch}
+.u-blk{position:relative;border-right:2px solid rgba(184,134,11,0.45);overflow:hidden;align-self:stretch;min-height:0}
+.u-blk>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.u-blk.sk{background:rgba(139,26,26,0.06)}.u-blk:last-child{border-right:none}
+.r-age{min-height:20px}.r-age .u-cell{font-size:0.62rem;font-weight:700}
+.r-yr{min-height:42px}.r-yr .u-cell{font-size:0.5rem}
+.r-shi{min-height:28px}.r-shi .u-cell{font-family:'Zen Old Mincho',serif;font-size:0.82rem}
+.r-ju{min-height:52px}.r-ju .u-cell{writing-mode:vertical-rl;font-size:0.54rem;font-weight:500;white-space:nowrap}
+.r-sep{border-top:2px solid rgba(184,134,11,0.35)}
+.r-dks{min-height:30px}.r-th{min-height:26px}.r-jos{min-height:26px}.r-ku{min-height:22px}
+/* 20年ブロック */
+.ub-wrap{background:var(--bg);border:1px solid rgba(184,134,11,0.22);border-radius:4px;margin-bottom:0.6rem}
+.ub-header{background:var(--bg3);font-family:'Zen Old Mincho',serif;font-size:0.78rem;color:var(--ink2);padding:3px 8px;border-bottom:1px solid rgba(184,134,11,0.3)}
+.ub-row{display:flex;border-bottom:1px solid rgba(184,134,11,0.1);align-items:stretch}
+.ub-graph-row{display:flex;border-bottom:2px solid rgba(184,134,11,0.3);align-items:stretch}
+.ub-sep{border-top:2px solid rgba(184,134,11,0.35)}
+.ub-lbl{flex:0 0 60px;font-size:0.58rem;color:var(--ink3);padding:0 5px;border-right:2px solid rgba(184,134,11,0.35);background:var(--bg2);white-space:nowrap;display:flex;align-items:center;font-weight:500;align-self:stretch}
+.ub-dl{background:var(--bg3)!important;color:var(--ink2)!important}
+.ub-cells{display:flex;flex:1;overflow:hidden;align-items:stretch}
+.ub-blks{display:flex;flex:1;overflow:hidden;align-items:stretch}
+.ub-blk{display:block;position:relative;border-right:2px solid rgba(184,134,11,0.4);overflow:hidden;align-self:stretch;min-height:0}
+.ub-blk>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
+/* グラフ */
+.chart-wrap-inner{position:relative;width:100%;height:220px}
 </style>
 </head>
 <body>
@@ -468,7 +517,16 @@ function doCalc(y,m,d,gender){
   var nJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(nenShi)]||'—';
   var tJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(tsuShi)]||'—';
   var niJus=(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(nichiShi)]||'—';
-  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs};
+
+  // ND (年ごとデータ) & BLK (大運ブロック)
+  var CY_=new Date().getFullYear();
+  var KN_=['初句','1句','2句','3句','4句','5句','6句','7句','8句','9句','10句','11句','12句'];
+  var BLK_=[]; var bi_=0;
+  while(bi_<MAX_AGE){var dk_=A2D[bi_];var end_=bi_;while(end_+1<MAX_AGE&&A2D[end_+1].ks===dk_.ks)end_++;var sp_=end_-bi_+1;BLK_.push({sa:bi_,sp:sp_,ks:dk_.ks,kan:dk_.kan,shi:dk_.shi,th:(T||[])[JIKKAN.indexOf(dk_.kan)]||'—',jos:(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk_.shi)]||'—',ku:KN_[A2K[bi_]]||'',isSk:sats.indexOf(dk_.shi)>=0});bi_=end_+1;}
+  var ND_=[];
+  for(var a_=0;a_<MAX_AGE;a_++){var yr_=y+a_,yrShi_=JUNISHI[((yr_-1984)%12+12)%12],ju_=getJuniUnki(ht,yrShi_);ND_.push({yr:yr_,age:a_,yrShi:yrShi_,ju:ju_,w:JUNI_WAVE[ju_]||0,isSk:sats.indexOf(yrShi_)>=0,isCurr:yr_===CY_});}
+
+  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs,BLK:BLK_,ND:ND_};
 }
 
 // 今日・今月・今年・大運の十二運気
@@ -509,6 +567,153 @@ function getDaiunRows(G){
 }
 </script>
 <script>
+// ============================================================
+// DAIUN VISUALIZATION HELPERS (index.htmlより移植)
+// ============================================================
+function getWaveColor(w){return w>=4.5?'#1a6b3a':w>=3?'#3a9a5a':w>=1?'#5aaa7a':w>=-1?'#cc8833':w>=-2.5?'#bb4422':'#660000';}
+function getJuniCellStyle(ju,isCurr){
+  if(isCurr)return{bg:'rgba(180,80,180,0.25)',ol:'1px solid rgba(160,60,160,0.45)',col:'#6a0080'};
+  switch(ju){
+    case '内省':return{bg:'rgba(100,149,237,0.18)',ol:'',col:'#1a3a7a'};
+    case '狂咲':return{bg:'rgba(210,120,30,0.2)',ol:'',col:'#7a3800'};
+    case '引寒':case '休眠':case '残雪':return{bg:'rgba(40,30,20,0.2)',ol:'',col:'#8a7a6a'};
+    default:return{bg:'',ol:'',col:''};
+  }
+}
+function getDaiunBlkStyle(ju,isSk){
+  if(isSk)return{bg:'rgba(120,40,140,0.18)',ol:'1px solid rgba(120,40,140,0.4)',col:'#5a0080'};
+  switch(ju){
+    case '内省':return{bg:'rgba(100,149,237,0.15)',ol:'',col:'#1a3a7a'};
+    case '狂咲':return{bg:'rgba(210,120,30,0.17)',ol:'',col:'#7a3800'};
+    case '引寒':case '休眠':case '残雪':return{bg:'rgba(40,30,20,0.18)',ol:'',col:'#8a7a6a'};
+    default:return{bg:'',ol:'',col:''};
+  }
+}
+function catmullRom(vals,spp){
+  var pts=[],n=vals.length;
+  for(var i=0;i<n;i++){
+    var p0=vals[Math.max(0,i-1)],p1=vals[i],p2=vals[Math.min(n-1,i+1)],p3=vals[Math.min(n-1,i+2)];
+    var steps=i<n-1?spp:1;
+    for(var s=0;s<steps;s++){var t=s/steps,t2=t*t,t3=t2*t;pts.push(0.5*((2*p1)+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3));}
+  }
+  pts.push(vals[n-1]);return pts;
+}
+function buildFillPaths(rawVals,pxFn,pyFn,mid){
+  var pts=[],n=rawVals.length;
+  for(var i=0;i<n;i++){
+    var x=pxFn(i),v=rawVals[i];
+    if(i>0){var pv=rawVals[i-1],px0=pxFn(i-1);if((pv>=0&&v<0)||(pv<0&&v>=0)){var t=pv/(pv-v);pts.push({x:px0+t*(x-px0),y:mid,v:0});}}
+    pts.push({x:x,y:pyFn(v),v:v});
+  }
+  var pos='',inP=false;
+  for(var pi=0;pi<pts.length;pi++){var p=pts[pi];if(p.v>=0){pos+=inP?' L'+p.x+','+p.y:'M'+p.x+','+mid+' L'+p.x+','+p.y;inP=true;}else if(inP){pos+=' L'+p.x+','+mid+' Z';inP=false;}}
+  if(inP)pos+=' L'+pts[pts.length-1].x+','+mid+' Z';
+  var neg='',inN=false;
+  for(var ni=0;ni<pts.length;ni++){var p=pts[ni];if(p.v<=0){neg+=inN?' L'+p.x+','+p.y:'M'+p.x+','+mid+' L'+p.x+','+p.y;inN=true;}else if(inN){neg+=' L'+p.x+','+mid+' Z';inN=false;}}
+  if(inN)neg+=' L'+pts[pts.length-1].x+','+mid+' Z';
+  return{posPath:pos,negPath:neg};
+}
+function makeInlineSvg(nenData,currIdx,totalW,graphH){
+  var n=nenData.length,rawVals=nenData.map(function(r){return r.w;});
+  var smooth=catmullRom(rawVals,8),ns=smooth.length;
+  var pT=6,pB=6,gH=graphH-pT-pB,minV=-4.5,maxV=6;
+  var CW_=28;
+  var pxR=function(i){return i/(n-1)*(totalW-CW_)+CW_/2;};
+  var pxS=function(i){return i/(ns-1)*(totalW-CW_)+CW_/2;};
+  var py=function(v){return pT+gH*(1-(Math.max(minV,Math.min(maxV,v))-minV)/(maxV-minV));};
+  var mid=py(0),uid='g'+Math.random().toString(36).slice(2,6);
+  var s='<svg xmlns="http://www.w3.org/2000/svg" width="'+totalW+'" height="'+graphH+'" viewBox="0 0 '+totalW+' '+graphH+'" preserveAspectRatio="none" style="display:block;overflow:visible">';
+  s+='<defs><linearGradient id="gp'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a8c4a" stop-opacity="0.28"/><stop offset="100%" stop-color="#2a8c4a" stop-opacity="0.04"/></linearGradient><linearGradient id="gn'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#882222" stop-opacity="0.04"/><stop offset="100%" stop-color="#882222" stop-opacity="0.22"/></linearGradient></defs>';
+  s+='<line x1="0" y1="'+mid+'" x2="'+totalW+'" y2="'+mid+'" stroke="rgba(0,0,0,0.12)" stroke-width="0.5"/>';
+  var fp=buildFillPaths(rawVals,pxR,py,mid);
+  if(fp.posPath)s+='<path d="'+fp.posPath+'" fill="url(#gp'+uid+')" />';
+  if(fp.negPath)s+='<path d="'+fp.negPath+'" fill="url(#gn'+uid+')" />';
+  var pc=null,pd='';
+  for(var i=0;i<ns;i++){var v=i<ns-1?(smooth[i]+smooth[i+1])/2:smooth[i],col=getWaveColor(v);if(col!==pc){if(pd&&pc)s+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';pd='M'+pxS(i)+','+py(smooth[i]);pc=col;}else pd+=' L'+pxS(i)+','+py(smooth[i]);}
+  if(pd&&pc)s+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+  if(currIdx>=0&&currIdx<n){var cx=pxR(currIdx),cy=py(rawVals[currIdx]);s+='<line x1="'+cx+'" y1="0" x2="'+cx+'" y2="'+graphH+'" stroke="rgba(160,60,160,0.6)" stroke-width="1.2" stroke-dasharray="3,2"/>';s+='<text x="'+cx+'" y="'+(cy+8)+'" text-anchor="middle" font-size="18" dominant-baseline="middle">🌟</text>';}
+  return s+'</svg>';
+}
+function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
+  var CW_=28,totalW=MAX_AGE*CW_,graphH=110,lblW=60;
+  function cst(r){var cs=getJuniCellStyle(r.ju,r.isCurr);var st=cs.bg?'background:'+cs.bg+';':'';if(cs.ol)st+='outline:'+cs.ol+';';return st;}
+  function ccls(r,i){var c='u-cell';if(i>0&&A2D[i]&&A2D[i-1]&&A2D[i].ks!==A2D[i-1].ks)c+=' db';return c;}
+  function tc(r,fb){if(r.isCurr)return'#6a0080';var cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
+  function bH(fn){return BLK.map(function(b){return'<div class="u-blk'+(b.isSk?' sk':'')+'" style="width:'+(b.sp*CW_)+'px;min-width:'+(b.sp*CW_)+'px"><div>'+fn(b)+'</div></div>';}).join('');}
+  var h='<div style="width:'+(totalW+lblW)+'px">';
+  // 年齢行
+  h+='<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-size:0.62rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</div>';}).join('')+'</div></div>';
+  // 西暦行
+  h+='<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.48rem;color:'+tc(r,'#4a3c28')+';line-height:1.1;text-align:center">'+String(r.yr).split('').join('<br>')+'</span></div>';}).join('')+'</div></div>';
+  // 年支行
+  h+='<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-family:\'Zen Old Mincho\',serif;font-size:0.82rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</div>';}).join('')+'</div></div>';
+  // 十二運気行
+  h+='<div class="u-row r-ju"><div class="u-lbl">十二<br>運気</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;writing-mode:vertical-rl;font-size:0.54rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</div>';}).join('')+'</div></div>';
+  // グラフ行
+  h+='<div class="u-graph-row"><div class="u-lbl graph-lbl" style="height:'+graphH+'px;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.55rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.55rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.55rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="width:'+totalW+'px;min-width:'+totalW+'px;height:'+graphH+'px;flex-shrink:0;overflow:hidden">'+makeInlineSvg(ND,currIdx,totalW,graphH)+'</div></div>';
+  // 吉凶行
+  h+='<div class="u-row r-ku"><div class="u-lbl dl">吉凶</div><div class="u-blks">'+bH(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=2?'0.48rem':b.sp<=4?'0.58rem':'0.66rem')+';font-weight:700;color:'+kc+'">'+kk+'</span>';})+'</div></div>';
+  // 大運干支行
+  h+='<div class="u-row r-dks r-sep"><div class="u-lbl dl">大運干支</div><div class="u-blks">'+bH(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:\'Zen Old Mincho\',serif;font-size:'+(b.sp<=2?'0.58rem':'0.8rem')+';color:'+(ds.col||'#1a1208')+'">'+b.ks+'</span>';})+'</div></div>';
+  // 通変星行
+  h+='<div class="u-row r-th"><div class="u-lbl dl">通変星</div><div class="u-blks">'+bH(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=2?'0.48rem':b.sp<=4?'0.58rem':'0.65rem')+';color:'+(ds.col||'#7a1a1a')+';white-space:nowrap">'+b.th+'</span>';})+'</div></div>';
+  // 十二従星行
+  h+='<div class="u-row r-jos"><div class="u-lbl dl">十二<br>従星</div><div class="u-blks">'+bH(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=2?'0.42rem':b.sp<=4?'0.52rem':'0.6rem')+';color:'+(ds.col||'#8a6800')+';white-space:nowrap">'+b.jos+'</span>';})+'</div></div>';
+  h+='</div>';
+  return h;
+}
+function buildBlockRows(ND,A2D,BLK,currIdx,startAge,endAge,ht){
+  var blockND=ND.slice(startAge,endAge+1);
+  var blockA2D=A2D.slice(startAge,endAge+1);
+  var blockCount=blockND.length;
+  var blockBLK=[];
+  for(var bi=0;bi<BLK.length;bi++){var b=BLK[bi],bs=b.sa,be=b.sa+b.sp-1;if(be<startAge||bs>endAge)continue;var cs_=Math.max(bs,startAge),ce_=Math.min(be,endAge);blockBLK.push(Object.assign({},b,{sa:cs_-startAge,sp:ce_-cs_+1}));}
+  var graphH=100,totalW=blockCount*28;
+  var rawVals=blockND.map(function(r){return r.w;});
+  var smooth=catmullRom(rawVals,8),ns=smooth.length;
+  var pT=5,pB=5,gH=graphH-pT-pB,minV=-4.5,maxV=6;
+  var pxR=function(i){return blockCount>1?i/(blockCount-1)*totalW:totalW/2;};
+  var pxS=function(i){return ns>1?i/(ns-1)*totalW:totalW/2;};
+  var py=function(v){return pT+gH*(1-(Math.max(minV,Math.min(maxV,v))-minV)/(maxV-minV));};
+  var mid=py(0),uid='b'+Math.random().toString(36).slice(2,6);
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 '+totalW+' '+graphH+'" preserveAspectRatio="none" style="display:block;height:'+graphH+'px">';
+  svg+='<defs><linearGradient id="gp'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a8c4a" stop-opacity="0.28"/><stop offset="100%" stop-color="#2a8c4a" stop-opacity="0.04"/></linearGradient><linearGradient id="gn'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#882222" stop-opacity="0.04"/><stop offset="100%" stop-color="#882222" stop-opacity="0.22"/></linearGradient></defs>';
+  svg+='<line x1="0" y1="'+mid+'" x2="'+totalW+'" y2="'+mid+'" stroke="rgba(0,0,0,0.12)" stroke-width="0.5"/>';
+  var fp=buildFillPaths(rawVals,pxR,py,mid);
+  if(fp.posPath)svg+='<path d="'+fp.posPath+'" fill="url(#gp'+uid+')" />';
+  if(fp.negPath)svg+='<path d="'+fp.negPath+'" fill="url(#gn'+uid+')" />';
+  var pc=null,pd='';
+  for(var i=0;i<ns;i++){var v=i<ns-1?(smooth[i]+smooth[i+1])/2:smooth[i],col=getWaveColor(v);if(col!==pc){if(pd&&pc)svg+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';pd='M'+pxS(i)+','+py(smooth[i]);pc=col;}else pd+=' L'+pxS(i)+','+py(smooth[i]);}
+  if(pd&&pc)svg+='<path d="'+pd+'" stroke="'+pc+'" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+  svg+='</svg>';
+  var ci=currIdx-startAge;
+  var starOverlay='';
+  if(ci>=0&&ci<blockCount){
+    var cx_=pxR(ci),cy_=py(rawVals[ci]);
+    var pctX=(cx_/totalW*100).toFixed(3),pctY=(cy_/graphH*100).toFixed(3);
+    starOverlay='<div style="position:absolute;inset:0;pointer-events:none;z-index:2">'
+      +'<div style="position:absolute;left:'+pctX+'%;top:0;bottom:0;width:1.2px;background:repeating-linear-gradient(to bottom,rgba(160,60,160,0.6) 0,rgba(160,60,160,0.6) 4px,transparent 4px,transparent 7px);transform:translateX(-50%)"></div>'
+      +'<div style="position:absolute;left:'+pctX+'%;top:'+pctY+'%;transform:translate(-50%,-50%);font-size:20px;line-height:1;pointer-events:none">🌟</div>'
+      +'</div>';
+  }
+  function cst(r){var cs=getJuniCellStyle(r.ju,r.isCurr);var st=cs.bg?'background:'+cs.bg+';':'';if(cs.ol)st+='outline:'+cs.ol+';';return st;}
+  function tc(r,fb){if(r.isCurr)return'#6a0080';var cs=getJuniCellStyle(r.ju,false);return cs.col||fb;}
+  function bHb(fn){return blockBLK.map(function(b){return'<div class="ub-blk'+(b.isSk?' sk':'')+'" style="flex:'+b.sp+' 0 0;min-width:0"><div>'+fn(b)+'</div></div>';}).join('');}
+  var cells=function(hpx,fn){return blockND.map(function(r,i){return'<div style="'+cst(r)+'flex:1 0 0;height:'+hpx+'px;min-width:0;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(184,134,11,0.08);overflow:hidden">'+fn(r)+'</div>';}).join('');};
+  return '<div class="ub-wrap">'
+    +'<div class="ub-header">'+startAge+'〜'+endAge+'歳</div>'
+    +'<div class="ub-row"><div class="ub-lbl">年齢</div><div class="ub-cells">'+cells(18,function(r){return'<span style="font-size:0.6rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl">西暦</div><div class="ub-cells">'+cells(40,function(r){return'<span style="font-size:0.46rem;color:'+tc(r,'#4a3c28')+';line-height:1.15;text-align:center">'+String(r.yr).split('').join('<br>')+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl">年支</div><div class="ub-cells">'+cells(24,function(r){return'<span style="font-family:\'Zen Old Mincho\',serif;font-size:0.75rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl">十二<br>運気</div><div class="ub-cells">'+cells(46,function(r){return'<span style="writing-mode:vertical-rl;font-size:0.5rem;font-weight:500;white-space:nowrap;color:'+(r.isCurr?'#6a0080':getJuniColor(r.ju))+'">'+r.ju+'</span>';})+'</div></div>'
+    +'<div class="ub-graph-row"><div class="ub-lbl" style="font-size:0.5rem;display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:2px 4px"><span style="font-size:0.52rem;writing-mode:vertical-rl">運気波</span><div style="display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:100%;padding:4px 0"><span style="font-size:0.52rem;color:#1a6b3a;font-weight:700;text-align:center;line-height:1.3">好調<br>↑</span><span style="font-size:0.52rem;color:#882222;font-weight:700;text-align:center;line-height:1.3">↓<br>不調</span></div></div><div style="flex:1;overflow:visible;height:'+graphH+'px;min-height:'+graphH+'px;position:relative">'+svg+starOverlay+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl ub-dl">吉凶</div><div class="ub-blks">'+bHb(function(b){var ju=getJuniUnki(ht,b.shi);var ds=getDaiunBlkStyle(ju,b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';var kk=getKikkyo(ju,ht);var kc=ds.col||getKikkyoColor(ju,ht);return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.4rem':b.sp<=6?'0.5rem':'0.6rem')+';font-weight:700;color:'+kc+'">'+kk+'</span>';})+'</div></div>'
+    +'<div class="ub-row ub-sep"><div class="ub-lbl ub-dl">大運干支</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-family:\'Zen Old Mincho\',serif;font-size:'+(b.sp<=3?'0.52rem':'0.75rem')+';color:'+(ds.col||'#1a1208')+'">'+b.ks+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl ub-dl">通変星</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.42rem':b.sp<=6?'0.52rem':'0.62rem')+';color:'+(ds.col||'#7a1a1a')+';white-space:nowrap">'+b.th+'</span>';})+'</div></div>'
+    +'<div class="ub-row"><div class="ub-lbl ub-dl">十二<br>従星</div><div class="ub-blks">'+bHb(function(b){var ds=getDaiunBlkStyle(getJuniUnki(ht,b.shi),b.isSk);var bg=ds.bg?'background:'+ds.bg+';':'';var ol=ds.ol?'outline:'+ds.ol+';':'';return'<span style="'+bg+ol+'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:'+(b.sp<=3?'0.38rem':b.sp<=6?'0.48rem':'0.56rem')+';color:'+(ds.col||'#8a6800')+';white-space:nowrap">'+b.jos+'</span>';})+'</div></div>'
+    +'</div>';
+}
+
 // ============================================================
 // STORAGE (localStorage wrapper)
 // ============================================================
@@ -623,7 +828,7 @@ function startApp(data){
   try{
     var b=data.account.birthday,g=data.account.gender;
     var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined){
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND){
       if(!by||!bm||!bd){
         // データ破損 → ログアウト状態に戻す
         S.save(null);localStorage.removeItem(STORAGE_KEY);
@@ -642,7 +847,7 @@ function startApp(data){
     try{
       var b=p.birthday;
       var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-      if((!p.G||!p.G.ht||!p.G.nenKS)&&by&&bm&&bd){
+      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND)&&by&&bm&&bd){
         data.people[i].G=doCalc(by,bm,bd,p.gender);
       }
     }catch(e){}
@@ -778,10 +983,108 @@ function switchNav(nav,btn){
 function renderCurrentPage(){
   var ca=document.getElementById('content-area');
   if(currentNav==='home')ca.innerHTML=buildHomePage();
-  else if(currentNav==='meishiki')ca.innerHTML=buildMeishikiPage();
+  else if(currentNav==='meishiki'){ca.innerHTML=buildMeishikiPage();initDaiunChart();}
   else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
   else if(currentNav==='ai'){ca.innerHTML=buildAIPage();initAIPage();}
   else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
+}
+
+// 大運タブ切り替え
+function switchDaiunTab(name,btn){
+  var panes=document.querySelectorAll('.daiun-tab-pane');
+  panes.forEach(function(p){p.classList.remove('active');});
+  var btns=document.querySelectorAll('.daiun-tab-btn');
+  btns.forEach(function(b){b.classList.remove('active');});
+  var pane=document.getElementById('dtab-'+name);
+  if(pane)pane.classList.add('active');
+  if(btn)btn.classList.add('active');
+  // グラフタブが選ばれたら初期化
+  if(name==='graph')setTimeout(initDaiunChart,50);
+}
+
+// 大運グラフ(Chart.js)初期化
+var _daiunChart=null;
+function initDaiunChart(){
+  var G=getCurrentTargetG();
+  if(!G||!G.ND||!G.A2D)return;
+  var canvas=document.getElementById('daiunLifeChart');
+  if(!canvas)return;
+  if(_daiunChart){_daiunChart.destroy();_daiunChart=null;}
+  var ht=G.ht,sats=G.sats||[];
+  var lifeWave=G.ND.map(function(r){return r.w;});
+  var CY=new Date().getFullYear();
+  var currAgeIdx=CY-G.y;
+  if(typeof Chart==='undefined')return;
+  _daiunChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{
+      labels:Array.from({length:MAX_AGE},function(_,i){return i+'歳';}),
+      datasets:[{
+        data:lifeWave,borderWidth:2,pointRadius:0,
+        fill:{target:'origin',above:'rgba(42,140,74,0.12)',below:'rgba(136,34,34,0.1)'},
+        tension:0.4,
+        segment:{borderColor:function(ctx){return getWaveColor((lifeWave[ctx.p0DataIndex]+lifeWave[ctx.p1DataIndex])/2);}}
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:function(i){return i[0].label+'（'+(G.y+i[0].dataIndex)+'年）';},
+          label:function(i){var dk=G.A2D[i.dataIndex];var dj=getJuniUnki(ht,dk.shi);return['大運：'+dk.ks,'運気：'+dj+(sats.indexOf(dk.shi)>=0?' ⚠':''),'波：'+(i.raw>0?'+':'')+i.raw];}
+        }}
+      },
+      scales:{
+        x:{ticks:{font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:20,color:'#7a6b52'},grid:{display:false}},
+        y:{min:-5,max:6,ticks:{font:{size:9},color:'#7a6b52',callback:function(v){return v>0?'+'+v:v;}},grid:{color:'rgba(0,0,0,0.04)'},border:{dash:[2,2]}}
+      }
+    }
+  });
+  // 転化天蛹・現在地マーカープラグイン
+  if(window._appTpPlugin)Chart.unregister(window._appTpPlugin);
+  window._appTpPlugin={
+    id:'appTurningPoints',
+    afterDraw:function(chart){
+      var ctx=chart.ctx,ca=chart.chartArea,x=chart.scales.x,ysc=chart.scales.y,n=lifeWave.length;
+      ctx.save();
+      // 転化天蛹帯
+      var satsSet={};sats.forEach(function(s){satsSet[s]=true;});
+      for(var i=0;i<n;){
+        if(!satsSet[G.A2D[i].shi]){i++;continue;}
+        var j=i;while(j<n&&satsSet[G.A2D[j].shi])j++;
+        var x1=x.getPixelForValue(i),x2=x.getPixelForValue(j-1);
+        ctx.fillStyle='rgba(130,60,180,0.10)';ctx.fillRect(x1,ca.top,x2-x1,ca.bottom-ca.top);
+        ctx.strokeStyle='rgba(110,40,160,0.35)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.strokeRect(x1,ca.top,x2-x1,ca.bottom-ca.top);ctx.setLineDash([]);
+        ctx.font='7px sans-serif';ctx.fillStyle='rgba(100,40,150,0.7)';ctx.textAlign='center';
+        ctx.fillText('転化天蛹',(x1+x2)/2,ca.top+10);
+        i=j;
+      }
+      // 現在地
+      if(currAgeIdx>=0&&currAgeIdx<n){
+        var xp=x.getPixelForValue(currAgeIdx);
+        ctx.strokeStyle='rgba(160,60,160,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+        ctx.beginPath();ctx.moveTo(xp,ca.top);ctx.lineTo(xp,ca.bottom);ctx.stroke();ctx.setLineDash([]);
+        ctx.font='bold 8px sans-serif';ctx.fillStyle='rgba(160,60,160,0.9)';ctx.textAlign='center';
+        ctx.fillText('現在▼',xp,ca.bottom-4);
+        var yp=ysc.getPixelForValue(lifeWave[currAgeIdx]);
+        ctx.font='18px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('🌟',xp,yp);
+      }
+      ctx.restore();
+    }
+  };
+  Chart.register(window._appTpPlugin);
+  _daiunChart.update();
+  // 凡例
+  var leg=document.getElementById('daiun-legend');
+  if(leg)leg.innerHTML='<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#1a6b3a"></span>吉（強）</span>'
+    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#5aaa7a"></span>吉</span>'
+    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#cc8833"></span>注意</span>'
+    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#660000"></span>凶</span>'
+    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(130,60,180,0.15);border:1px dashed rgba(110,40,160,0.4)"></span>転化天蛹</span>';
 }
 </script>
 <script>
@@ -931,29 +1234,71 @@ function buildMeishikiPage(){
     +'日柱の納音：'+getNayin(G.nichiKS)+'（'+getNayinYinYang(G.nichiKS)+'）'
     +'</div></div>';
 
-  // 大運表
+  // 大運表（タブ付き）
   html+='<div class="card"><div class="card-title">◆ 大運の流れ</div>';
+  // タブヘッダー
+  html+='<div class="daiun-tab-header" role="tablist">'
+    +'<button class="daiun-tab-btn active" role="tab" onclick="switchDaiunTab(\'table\',this)">'
+    +'<span class="tab-icon">📋</span>大運表</button>'
+    +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'scroll\',this)">'
+    +'<span class="tab-icon">↔️</span>横スクロール</button>'
+    +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'block\',this)">'
+    +'<span class="tab-icon">🔲</span>20年ブロック</button>'
+    +'<button class="daiun-tab-btn" role="tab" onclick="switchDaiunTab(\'graph\',this)">'
+    +'<span class="tab-icon">📈</span>大運グラフ</button>'
+    +'</div>';
+
+  // タブ1: 大運表
+  html+='<div class="daiun-tab-pane active" id="dtab-table" role="tabpanel">';
+  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">紫●＝転化天蛹期間　★＝現在の大運</p>';
   html+='<div style="overflow-x:auto"><table class="daiun-table"><thead><tr>'
-    +'<th>歳</th><th>開始年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二大従星</th><th>十二運気</th><th>吉凶</th>'
+    +'<th>歳</th><th>開始年</th><th>大運</th><th>蔵干</th><th>通変</th><th>十二従星</th><th>十二運気</th><th>吉凶</th>'
     +'</tr></thead><tbody>';
   getDaiunRows(G).forEach(function(r){
     var cls=(r.isCurr?'current':'')+' '+(r.isSk?'sk':'');
     var kkc=getKikkyoColor(r.ju,G.ht);
     html+='<tr class="'+cls.trim()+'">'
-      +'<td class="td-age" style="font-size:0.68rem">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
+      +'<td style="font-size:0.68rem">'+r.age+'〜'+(r.age+r.sp-1)+'</td>'
       +'<td style="font-size:0.62rem;color:var(--ink3)">'+r.startY+'</td>'
-      +'<td class="td-ks" style="font-weight:700">'+(r.isCurr?'★':'')+r.ks+'</td>'
+      +'<td style="font-weight:700">'+(r.isCurr?'★':'')+r.ks+'</td>'
       +'<td style="font-size:0.68rem;color:var(--ink3)">'+r.zo+'</td>'
-      +'<td class="td-th" style="font-size:0.7rem;color:#7a1a1a">'+r.th+'</td>'
+      +'<td style="font-size:0.7rem;color:#7a1a1a">'+r.th+'</td>'
       +'<td style="font-size:0.68rem;color:var(--gold)">'+r.jos+'</td>'
       +'<td style="color:'+getJuniColor(r.ju)+';font-size:0.7rem;font-weight:700">'+juniRuby(r.ju)+'</td>'
       +'<td style="color:'+kkc+';font-size:0.7rem;font-weight:600">'+r.kk+'</td>'
-
       +'</tr>';
   });
   html+='</tbody></table></div>';
-  html+='<div style="font-size:0.68rem;color:var(--ink3);margin-top:0.5rem">紫●＝転化天蛹期間　★＝現在の大運</div>';
   html+='</div>';
+
+  // タブ2: 横スクロール
+  html+='<div class="daiun-tab-pane" id="dtab-scroll" role="tabpanel">';
+  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">毎年の運気の流れ・10年ごとの大運を一覧。左右にスクロールできます。🌟＝現在年</p>';
+  (function(){
+    var CY=new Date().getFullYear();
+    var currIdx=G.ND.findIndex(function(r){return r.isCurr;});
+    html+='<div class="unsei-outer"><div class="unsei-inner">'+buildUnseiRows(G.ND,G.A2D,G.BLK,currIdx,G.ht)+'</div></div>';
+  })();
+  html+='</div>';
+
+  // タブ3: 20年ブロック
+  html+='<div class="daiun-tab-pane" id="dtab-block" role="tabpanel">';
+  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">一生分の変化を20年毎にまとめています。🌟現在地　紫背景＝転化天蛹</p>';
+  (function(){
+    var currIdx=G.ND.findIndex(function(r){return r.isCurr;});
+    var blocks=[[0,19],[20,39],[40,59],[60,79],[80,99],[100,119]];
+    blocks.forEach(function(b){html+=buildBlockRows(G.ND,G.A2D,G.BLK,currIdx,b[0],b[1],G.ht);});
+  })();
+  html+='</div>';
+
+  // タブ4: 大運グラフ
+  html+='<div class="daiun-tab-pane" id="dtab-graph" role="tabpanel">';
+  html+='<p style="font-size:0.68rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝転化天蛹。</p>';
+  html+='<div class="chart-wrap-inner"><canvas id="daiunLifeChart"></canvas></div>';
+  html+='<div id="daiun-legend" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;font-size:0.7rem;color:var(--ink3)"></div>';
+  html+='</div>';
+
+  html+='</div>';// card終わり
 
   html+='</div>';
   return html;
