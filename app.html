@@ -1006,15 +1006,42 @@ function switchDaiunTab(name,btn){
 var _daiunChart=null;
 function initDaiunChart(){
   var G=getCurrentTargetG();
-  if(!G||!G.ND||!G.A2D)return;
+  if(!G||!G.A2D||!G.BLK)return;
   var canvas=document.getElementById('daiunLifeChart');
   if(!canvas)return;
   if(_daiunChart){_daiunChart.destroy();_daiunChart=null;}
   var ht=G.ht,sats=G.sats||[];
-  var lifeWave=G.ND.map(function(r){return r.w;});
   var CY=new Date().getFullYear();
   var currAgeIdx=CY-G.y;
   if(typeof Chart==='undefined')return;
+
+  // ★ 正しいlifeWave: 大運干支（A2D）から運気を計算（index.htmlと同じ）
+  var lifeWaveRaw=G.A2D.map(function(dk){return JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0;});
+
+  // 引寒・休眠・残雪を連続グループとしてなだらかな弧に補間（index.htmlと完全同一）
+  var SOFT_JUNI={'引寒':true,'休眠':true,'残雪':true};
+  var lifeWave=lifeWaveRaw.slice();
+  var i=0;
+  while(i<lifeWave.length){
+    if(SOFT_JUNI[getJuniUnki(ht,G.A2D[i].shi)]){
+      var gs=i,ge=i;
+      while(ge+1<G.A2D.length&&SOFT_JUNI[getJuniUnki(ht,G.A2D[ge+1].shi)])ge++;
+      var wStart=gs>0?lifeWaveRaw[gs-1]:lifeWaveRaw[gs];
+      var wEnd=ge+1<G.A2D.length?lifeWaveRaw[ge+1]:lifeWaveRaw[ge];
+      var wBottom=Math.min.apply(null,lifeWaveRaw.slice(gs,ge+1));
+      var span=ge-gs+1;
+      for(var jj=gs;jj<=ge;jj++){
+        var t=(jj-gs)/(Math.max(span-1,1));
+        var arc=Math.sin(t*Math.PI);
+        var base=wStart+(wEnd-wStart)*t;
+        lifeWave[jj]=base+(wBottom-Math.max(wStart,wEnd))*arc;
+      }
+      i=ge+1;
+    } else {
+      i++;
+    }
+  }
+
   _daiunChart=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{
@@ -1049,7 +1076,7 @@ function initDaiunChart(){
     afterDraw:function(chart){
       var ctx=chart.ctx,ca=chart.chartArea,x=chart.scales.x,ysc=chart.scales.y,n=lifeWave.length;
       ctx.save();
-      // 転化天蛹帯
+      // 転化天蛹帯（大運の支が対象支の期間）
       var satsSet={};sats.forEach(function(s){satsSet[s]=true;});
       for(var i=0;i<n;){
         if(!satsSet[G.A2D[i].shi]){i++;continue;}
@@ -1062,7 +1089,7 @@ function initDaiunChart(){
         ctx.fillText('転化天蛹',(x1+x2)/2,ca.top+10);
         i=j;
       }
-      // 現在地
+      // 現在地マーカー
       if(currAgeIdx>=0&&currAgeIdx<n){
         var xp=x.getPixelForValue(currAgeIdx);
         ctx.strokeStyle='rgba(160,60,160,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
@@ -1080,7 +1107,8 @@ function initDaiunChart(){
   _daiunChart.update();
   // 凡例
   var leg=document.getElementById('daiun-legend');
-  if(leg)leg.innerHTML='<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#1a6b3a"></span>吉（強）</span>'
+  if(leg)leg.innerHTML=''
+    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#1a6b3a"></span>吉（強）</span>'
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#5aaa7a"></span>吉</span>'
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#cc8833"></span>注意</span>'
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#660000"></span>凶</span>'
