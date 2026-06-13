@@ -1332,9 +1332,9 @@ function buildMeishikiPage(){
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
-  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS)+'（'+getNayinYinYang(G.nenKS)+'）');
-  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS)+'（'+getNayinYinYang(G.tsuKS)+'）');
-  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS)+'（'+getNayinYinYang(G.nichiKS)+'）');
+  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS));
+  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS));
+  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS));
   html+='</div></div>';
 
   // 大運表（タブ付き）
@@ -1415,7 +1415,7 @@ function msCol(lbl,sub,kan,shi,zo,th,thZo,jos,ju,nayin){
   else if(thZo&&thZo!=='—')thDisplay='—・'+thZo;
   return '<div class="ms-col">'
     +'<div class="ms-lbl">'+lbl+'</div>'
-    +(sub?'<div style="font-size:0.72rem;color:var(--ink3);margin-bottom:0.15rem;letter-spacing:0.05em">'+sub+'</div>':'')
+    +(sub?'<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.15rem;letter-spacing:0.03em;white-space:nowrap">'+sub+'</div>':'')
     +'<div style="display:flex;align-items:flex-end;justify-content:center;margin:0.3rem 0">'
     +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:var(--ink)">'+kan+'</span>'
     +gogyoBadge(kan)
