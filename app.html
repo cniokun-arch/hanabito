@@ -178,9 +178,32 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-bottom{flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(184,134,11,0.15);padding-bottom:env(safe-area-inset-bottom,0px)}
 .ai-quick{padding:5px 8px;display:flex;flex-wrap:wrap;gap:5px;background:var(--bg)}
 .ai-quick button{font-size:1rem;padding:4px 10px;background:#fff;border:1px solid rgba(124,58,237,0.3);border-radius:12px;cursor:pointer;color:var(--purple);font-family:'Noto Serif JP',serif}
-.ai-input-area{display:flex;gap:6px;padding:0.6rem 0.7rem;background:var(--bg2)}
+.ai-input-area{display:flex;gap:6px;padding:0.6rem 0.7rem;background:var(--bg2);align-items:center}
+.ai-plus-btn{width:48px;height:52px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:12px;cursor:pointer;font-size:1.4rem;color:var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .ai-input-area textarea{flex:1;font-size:1rem;padding:8px 12px;border:1px solid rgba(184,134,11,0.3);border-radius:12px;resize:none;height:52px;font-family:'Noto Serif JP',serif;background:#fff;color:var(--ink);outline:none}
-.ai-send-btn{padding:0 16px;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:1.2rem;flex-shrink:0}
+.ai-right-btns{display:flex;gap:5px;flex-shrink:0;align-items:center}
+.ai-mic-btn2{width:44px;height:52px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:12px;cursor:pointer;font-size:1.1rem;color:var(--gold);display:flex;align-items:center;justify-content:center}
+.ai-send-btn{width:52px;height:52px;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center}
+/* ボトムシート */
+.ai-bottom-sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:300}
+.ai-bottom-sheet-bg.open{display:block}
+.ai-bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-radius:16px 16px 0 0;z-index:301;padding:0.8rem 0.8rem 2rem;transform:translateY(100%);transition:transform 0.25s ease;box-shadow:0 -4px 24px rgba(0,0,0,0.15)}
+.ai-bottom-sheet.open{transform:translateY(0)}
+.ai-sheet-handle{width:36px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 0.8rem}
+.ai-sheet-title{font-size:0.8rem;color:var(--ink3);text-align:center;margin-bottom:0.8rem;font-family:'Noto Serif JP',serif}
+.ai-sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+.ai-sheet-btn{padding:0.75rem 0.5rem;background:#fff;border:1px solid rgba(184,134,11,0.25);border-radius:10px;font-size:0.88rem;font-family:'Noto Serif JP',serif;color:var(--ink);cursor:pointer;text-align:center;line-height:1.4;transition:background 0.1s}
+.ai-sheet-btn:active{background:rgba(184,134,11,0.1)}
+/* 長押しメニュー */
+.ai-ctx-menu{display:none;position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.2);z-index:400;overflow:hidden;min-width:150px}
+.ai-ctx-menu.show{display:block}
+.ai-ctx-item{padding:0.8rem 1.1rem;font-size:0.95rem;font-family:'Noto Serif JP',serif;cursor:pointer;display:flex;align-items:center;gap:0.6rem;border-bottom:1px solid rgba(0,0,0,0.06);color:var(--ink)}
+.ai-ctx-item:last-child{border-bottom:none}
+.ai-ctx-item:active{background:rgba(184,134,11,0.08)}
+.ai-ctx-item.danger{color:#c0392b}
+/* 使い方オーバーレイ */
+.about-overlay-wrap{display:none;position:fixed;inset:0;background:#faf6ef;z-index:500;overflow-y:auto}
+.about-overlay-wrap.show{display:block}
 
 /* ===== SETTINGS ===== */
 .setting-section{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:1.1rem;margin-bottom:1rem}
@@ -1983,7 +2006,7 @@ function buildAIPage(){
     +'<div style="font-size:0.86rem;color:var(--ink2)">'+name+'をAIに相談</div>'
     +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.77rem;flex-shrink:0">'+G.ht+'</span>'
     +'</div>'
-    +'<button onclick="if(confirm(\'この会話履歴を削除しますか？\')){clearChatHistory();initAIPage();}" style="font-size:0.86rem;padding:2px 8px;border:1px solid rgba(192,57,43,0.3);border-radius:10px;background:var(--bg);color:#c0392b;cursor:pointer;white-space:nowrap;flex-shrink:0">履歴を削除</button>'
+    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.add(\'show\')" style="font-size:0.86rem;padding:2px 8px;border:1px solid rgba(184,134,11,0.35);border-radius:10px;background:var(--bg);color:var(--gold);cursor:pointer;white-space:nowrap;flex-shrink:0">📖 使い方</button>'
     +'</div>'
     +'</div>';
 
@@ -1993,13 +2016,73 @@ function buildAIPage(){
   // 入力エリア
   html+='<div class="ai-bottom">'
     +'<div class="ai-input-area">'
-    +'<button id="ai-mic-btn" onclick="toggleMic()" style="padding:0 10px;background:var(--bg2);border:1px solid rgba(184,134,11,0.35);border-radius:10px;cursor:pointer;font-size:1.1rem;color:var(--gold);flex-shrink:0">🎤</button>'
+    +'<button class="ai-plus-btn" onclick="toggleAISheet()" title="メニュー">＋</button>'
     +'<textarea id="ai-input" placeholder="何でも聞いてみてください…" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendAI();}"></textarea>'
+    +'<div class="ai-right-btns">'
+    +'<button id="ai-mic-btn" class="ai-mic-btn2" onclick="toggleMic()">🎤</button>'
     +'<button class="ai-send-btn" onclick="sendAI()">→</button>'
+    +'</div>'
     +'</div>'
     +'</div>';
 
-  // ボトムナビ（AIページ内に自前で持つ）
+  // ボトムシート
+  html+='<div class="ai-bottom-sheet-bg" id="ai-sheet-bg" onclick="closeAISheet()"></div>'
+    +'<div class="ai-bottom-sheet" id="ai-sheet">'
+    +'<div class="ai-sheet-handle"></div>'
+    +'<div class="ai-sheet-title">何について聞きますか？</div>'
+    +'<div class="ai-sheet-grid">'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'今日の運気を教えて\')">🌸<br>今日の運気は？</button>'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'今年の運勢を詳しく教えて\')">📅<br>今年の運勢は？</button>'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'私の性格と強みを詳しく教えて\')">✨<br>性格・強みを教えて</button>'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'恋愛について、今の状況とアドバイスを教えて\')">💗<br>恋愛のアドバイス</button>'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'仕事運と今後のアドバイスを教えて\')">💼<br>仕事のアドバイス</button>'
+    +'<button class="ai-sheet-btn" onclick="aiSheetAsk(\'転化天蛹について教えて\')">🦋<br>転化天蛹とは？</button>'
+    +'</div>'
+    +'</div>';
+
+  // 長押しメニュー
+  html+='<div class="ai-ctx-menu" id="ai-ctx-menu">'
+    +'<div class="ai-ctx-item" onclick="ctxCopy()">📋 コピー</div>'
+    +'<div class="ai-ctx-item danger" onclick="ctxDelete()">🗑 このメッセージを削除</div>'
+    +'</div>';
+
+  // 使い方オーバーレイ
+  html+='<div class="about-overlay-wrap" id="ai-about-wrap">'
+    +'<div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
+    +'<h2 style="font-family:\'Zen Old Mincho\',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">花 人 占 術 と は</h2>'
+    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>'
+    +'</div>'
+    +'<div style="padding:1.4rem 1.2rem 2.5rem">'
+    +'<div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.1));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.5rem">'
+    +'<p style="font-size:1rem;color:#1a1208;line-height:1.9;margin:0"><ruby>花人占術<rt>かじんせんじゅつ</rt></ruby>とは、占術の祖である<strong style="color:#b8860b">易卦・易経</strong>の分析・研究・新解釈と、今まで明確でなかった<strong style="color:#b8860b">十干の性質</strong>の個人統計・研究により<strong style="color:#b8860b">完全オリジナルの体系化</strong>を行い、それに四柱推命、算命学、心理学など、現状のあらゆる統計・学問・占術のエッセンスを加えて<strong style="color:#7c3aed">総合的に融合させた新しい占い</strong>です。</p>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.7rem">'
+    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">易卦・易経</span>'
+    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">四柱推命</span>'
+    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">算命学</span>'
+    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">心理学</span>'
+    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(124,58,237,0.1);color:#4a1a99;border:1px solid rgba(124,58,237,0.35)">完全オリジナル</span>'
+    +'</div></div>'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🔮 何が分かるの？</h3>'
+    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:6px">'
+    +'<p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ その人が<strong style="color:#b8860b">求めるもの・性格</strong><br>✦ <strong style="color:#b8860b">幸運と不運のタイミング</strong><br>✦ <strong style="color:#b8860b">人生の転換期</strong>（大きな変化が来る時期）<br>✦ 人生を豊かにする<strong style="color:#b8860b">ヒント</strong></p>'
+    +'</div></div>'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🌱 進化し続ける占術</h3>'
+    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">常に新しい<strong style="color:#b8860b">統計・研究・技術</strong>を取り込んで進化を目指しており、発展を続ける<strong style="color:#7c3aed">将来性の高い占術</strong>でもあります。</p>'
+    +'</div>'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1.5rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🤖 最新AIによるアドバイス</h3>'
+    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">最新の<strong style="color:#b8860b">AI（人工知能）</strong>による解説を導入し、聞きたいこと・分からないことが聞ける、<strong style="color:#7c3aed">いつでもどこでも誰でも</strong>アドバイスが受けられる体制を実現しています。</p>'
+    +'</div>'
+    +'<hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0">'
+    +'<p style="text-align:center;font-size:0.95rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem">自分や大切な人を深く知り、<br><strong style="color:#b8860b">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>'
+    +'<div style="text-align:center">'
+    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:\'Noto Serif JP\',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>'
+    +'</div></div>'
+    +'</div>';
+
+  // ボトムナビ
   html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
     +'<button class="nav-btn" onclick="switchNav(\'home\',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
@@ -2110,6 +2193,83 @@ async function speakText(text,btn){
 }
 
 // ============================================================
+// AI ボトムシート・長押しメニュー
+// ============================================================
+function toggleAISheet(){
+  var bg=document.getElementById('ai-sheet-bg');
+  var sh=document.getElementById('ai-sheet');
+  if(!bg||!sh)return;
+  var isOpen=sh.classList.contains('open');
+  if(isOpen){closeAISheet();}else{bg.classList.add('open');sh.classList.add('open');}
+}
+function closeAISheet(){
+  var bg=document.getElementById('ai-sheet-bg');
+  var sh=document.getElementById('ai-sheet');
+  if(bg)bg.classList.remove('open');
+  if(sh)sh.classList.remove('open');
+}
+function aiSheetAsk(q){
+  closeAISheet();
+  var inp=document.getElementById('ai-input');
+  if(inp){inp.value=q;sendAI();}
+}
+
+// 長押しメニュー
+var _ctxTarget=null;
+var _ctxLongTimer=null;
+function attachLongPress(row,role,text,idx){
+  function onStart(e){
+    _ctxLongTimer=setTimeout(function(){
+      _ctxTarget={role:role,text:text,idx:idx,row:row};
+      showCtxMenu(e);
+    },500);
+  }
+  function onEnd(){clearTimeout(_ctxLongTimer);}
+  row.addEventListener('touchstart',onStart,{passive:true});
+  row.addEventListener('touchend',onEnd);
+  row.addEventListener('touchmove',onEnd);
+  row.addEventListener('mousedown',onStart);
+  row.addEventListener('mouseup',onEnd);
+}
+function showCtxMenu(e){
+  var menu=document.getElementById('ai-ctx-menu');
+  if(!menu)return;
+  var x=0,y=0;
+  if(e.touches&&e.touches[0]){x=e.touches[0].clientX;y=e.touches[0].clientY;}
+  else{x=e.clientX;y=e.clientY;}
+  menu.style.left=Math.min(x,window.innerWidth-160)+'px';
+  menu.style.top=Math.max(y-80,10)+'px';
+  menu.classList.add('show');
+  setTimeout(function(){document.addEventListener('click',hideCtxMenu,{once:true});},10);
+}
+function hideCtxMenu(){
+  var menu=document.getElementById('ai-ctx-menu');
+  if(menu)menu.classList.remove('show');
+}
+function ctxCopy(){
+  if(_ctxTarget){
+    if(navigator.clipboard){navigator.clipboard.writeText(_ctxTarget.text);}
+    else{var t=document.createElement('textarea');t.value=_ctxTarget.text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);}
+  }
+  hideCtxMenu();
+}
+function ctxDelete(){
+  if(!_ctxTarget)return;
+  hideCtxMenu();
+  // aiHistoryから削除
+  var idx=_ctxTarget.idx;
+  if(idx>=0&&idx<aiHistory.length){
+    aiHistory.splice(idx,1);
+    saveChatHistory();
+  }
+  // DOMから削除
+  if(_ctxTarget.row&&_ctxTarget.row.parentNode){
+    _ctxTarget.row.parentNode.removeChild(_ctxTarget.row);
+  }
+  _ctxTarget=null;
+}
+
+// ============================================================
 // BUBBLE RENDERER（LINEスタイル・時刻・読み上げ付き）
 // ============================================================
 function renderBubble(container, role, text, ts, doScroll){
@@ -2171,6 +2331,9 @@ function renderBubble(container, role, text, ts, doScroll){
   }
 
   container.appendChild(row);
+  // 長押しメニューをアタッチ（履歴インデックスはaiHistory.length-1）
+  var hIdx=role==='user'?aiHistory.length-1:aiHistory.length-1;
+  attachLongPress(row,role,text,hIdx);
   if(doScroll)container.scrollTop=container.scrollHeight;
   return row;
 }
