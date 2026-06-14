@@ -58,12 +58,27 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   background:linear-gradient(135deg,#1a0830,var(--purple) 55%,var(--gold));
   padding:0.8rem 1rem 0.6rem;
   display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100
+  position:sticky;top:0;z-index:100;position:relative
 }
-.top-header-title{font-family:'Zen Old Mincho',serif;font-size:1rem;color:#fff;letter-spacing:0.2em}
+.top-header-left{display:flex;align-items:center}
+.top-header-hamburger{width:24px;height:18px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;padding:0;background:none;border:none}
+.top-header-hamburger span{display:block;height:2px;border-radius:1px;background:rgba(255,255,255,0.85)}
+.top-header-title{font-family:'Zen Old Mincho',serif;font-size:1rem;color:#fff;letter-spacing:0.2em;position:absolute;left:50%;transform:translateX(-50%)}
 .top-header-right{display:flex;align-items:center;gap:0.6rem}
 .top-header-name{font-size:1rem;color:rgba(255,255,255,0.8)}
 .btn-logout{font-size:0.94rem;padding:4px 10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:10px;color:#fff;cursor:pointer}
+/* ハンバーガードロワー */
+.hmenu-ov{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.hmenu-ov.on{display:block}
+.hmenu-panel{position:fixed;top:0;left:0;bottom:0;width:75%;max-width:300px;background:var(--bg);box-shadow:4px 0 20px rgba(0,0,0,0.15);padding:4rem 1.4rem 2rem;overflow-y:auto;transform:translateX(-100%);transition:transform 0.28s ease;z-index:601}
+.hmenu-ov.on .hmenu-panel{transform:translateX(0)}
+.hmenu-close{position:absolute;top:0.9rem;right:1rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink3)}
+.hmenu-ttl{font-family:'Zen Old Mincho',serif;color:var(--gold);font-size:1rem;letter-spacing:0.15em;margin-bottom:1.5rem;font-weight:600}
+.hmenu-item{display:flex;align-items:center;gap:0.7rem;padding:0.9rem 0;border-bottom:1px solid rgba(184,134,11,0.15);cursor:pointer;font-size:0.97rem;color:var(--ink);font-family:'Noto Serif JP',serif}
+.hmenu-item:last-child{border-bottom:none}
+.hmenu-item:active{color:var(--gold)}
+.hmenu-item-icon{font-size:1.1rem;width:26px;text-align:center;flex-shrink:0}
+.hmenu-ver{font-size:0.75rem;color:var(--ink3);text-align:center;margin-top:1.5rem;letter-spacing:0.06em}
 
 /* ===== MEMBER TABS ===== */
 .member-tab-bar{background:var(--bg2);border-bottom:2px solid var(--gold-light);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 0.5rem}
@@ -427,10 +442,39 @@ body.theme-dark .ai-input-area{background:#1c1914}
 <div id="screen-main" class="screen">
   <!-- トップヘッダー -->
   <div class="top-header">
+    <div class="top-header-left">
+      <button class="top-header-hamburger" onclick="openHmenu()" aria-label="メニュー">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
     <div class="top-header-title">花 人 占 術</div>
     <div class="top-header-right">
       <span class="top-header-name" id="header-name"></span>
       <button class="btn-logout" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <!-- ハンバーガードロワー -->
+  <div class="hmenu-ov" id="hmenuOv" onclick="if(event.target===this)closeHmenu()">
+    <div class="hmenu-panel">
+      <button class="hmenu-close" onclick="closeHmenu()">✕</button>
+      <div class="hmenu-ttl">メニュー</div>
+      <div class="hmenu-item" onclick="closeHmenu();document.getElementById('ai-about-wrap')&&document.getElementById('ai-about-wrap').classList.add('show');switchNav('ai')">
+        <span class="hmenu-item-icon">🌸</span>AI相談の使い方
+      </div>
+      <div class="hmenu-item" onclick="closeHmenu();switchNav('setting')">
+        <span class="hmenu-item-icon">⚙️</span>設定
+      </div>
+      <div class="hmenu-item" onclick="closeHmenu();showHmenuAbout()">
+        <span class="hmenu-item-icon">🔒</span>プライバシーポリシー
+      </div>
+      <div class="hmenu-item" onclick="closeHmenu();showHmenuTerms()">
+        <span class="hmenu-item-icon">📋</span>利用規約
+      </div>
+      <div class="hmenu-item" onclick="closeHmenu();doLogout()">
+        <span class="hmenu-item-icon">🚪</span>ログアウト
+      </div>
+      <div class="hmenu-ver">花人占術</div>
     </div>
   </div>
 
@@ -2195,6 +2239,18 @@ async function speakText(text,btn){
   }catch(e){
     if(btn){btn.textContent='▶️ 読み上げ';btn.disabled=false;}
   }
+}
+
+// ============================================================
+// ハンバーガーメニュー
+// ============================================================
+function openHmenu(){document.getElementById('hmenuOv').classList.add('on');}
+function closeHmenu(){document.getElementById('hmenuOv').classList.remove('on');}
+function showHmenuAbout(){
+  alert('プライバシーポリシー\n\nこのアプリに入力された個人情報（名前・生年月日など）はすべてお使いのデバイス内にのみ保存されます。外部サーバーへの送信は、AIチャット機能のみに限られます（占術の鑑定のためのみに使用）。');
+}
+function showHmenuTerms(){
+  alert('利用規約\n\n本アプリは占術・エンターテイメント目的のサービスです。鑑定結果はあくまで参考情報としてご活用ください。医療・法律・投資等の専門的判断の代替としてはご利用いただけません。');
 }
 
 // ============================================================
