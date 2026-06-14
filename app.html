@@ -68,8 +68,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .top-header-name{font-size:1rem;color:rgba(255,255,255,0.8)}
 .btn-logout{font-size:0.94rem;padding:4px 10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:10px;color:#fff;cursor:pointer}
 /* ハンバーガードロワー */
-.hmenu-ov{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.hmenu-ov.on{display:block}
+.hmenu-ov{display:block;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.25s ease}
+.hmenu-ov.on{opacity:1;pointer-events:auto}
 .hmenu-panel{position:fixed;top:0;left:0;bottom:0;width:75%;max-width:300px;background:var(--bg);box-shadow:4px 0 20px rgba(0,0,0,0.15);padding:4rem 1.4rem 2rem;overflow-y:auto;transform:translateX(-100%);transition:transform 0.28s ease;z-index:601}
 .hmenu-ov.on .hmenu-panel{transform:translateX(0)}
 .hmenu-close{position:absolute;top:0.9rem;right:1rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink3)}
@@ -458,8 +458,11 @@ body.theme-dark .ai-input-area{background:#1c1914}
     <div class="hmenu-panel">
       <button class="hmenu-close" onclick="closeHmenu()">✕</button>
       <div class="hmenu-ttl">メニュー</div>
+      <div class="hmenu-item" onclick="closeHmenu();showAboutOverlay()">
+        <span class="hmenu-item-icon">🌸</span>花人占術とは？
+      </div>
       <div class="hmenu-item" onclick="closeHmenu();showAIGuide()">
-        <span class="hmenu-item-icon">🌸</span>AI相談の使い方
+        <span class="hmenu-item-icon">🤖</span>AI相談の使い方
       </div>
       <div class="hmenu-item" onclick="closeHmenu();switchNav('setting')">
         <span class="hmenu-item-icon">⚙️</span>設定
@@ -474,6 +477,45 @@ body.theme-dark .ai-input-area{background:#1c1914}
         <span class="hmenu-item-icon">🚪</span>ログアウト
       </div>
       <div class="hmenu-ver">花人占術</div>
+    </div>
+  </div>
+
+  <!-- 花人占術とは オーバーレイ -->
+  <div class="about-overlay-wrap" id="hanabito-about-overlay">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">花 人 占 術 と は</h2>
+      <button onclick="document.getElementById('hanabito-about-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 2.5rem">
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.1));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.5rem">
+        <p style="font-size:0.95rem;color:#1a1208;line-height:1.9;margin:0"><ruby>花人占術<rt>かじんせんじゅつ</rt></ruby>とは、占術の祖である<strong style="color:#b8860b">易卦・易経</strong>の分析・研究・新解釈と、今まで明確でなかった<strong style="color:#b8860b">十干の性質</strong>の個人統計・研究により<strong style="color:#b8860b">完全オリジナルの体系化</strong>を行い、それに四柱推命、算命学、心理学など、現状のあらゆる統計・学問・占術のエッセンスを加えて<strong style="color:#7c3aed">総合的に融合させた新しい占い</strong>です。</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.7rem">
+          <span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">易卦・易経</span>
+          <span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">四柱推命</span>
+          <span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">算命学</span>
+          <span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">心理学</span>
+          <span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(124,58,237,0.1);color:#4a1a99;border:1px solid rgba(124,58,237,0.35)">完全オリジナル</span>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🔮 何が分かるの？</h3>
+        <div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:6px">
+          <p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ その人が<strong style="color:#b8860b">求めるもの・性格</strong><br>✦ <strong style="color:#b8860b">幸運と不運のタイミング</strong><br>✦ <strong style="color:#b8860b">人生の転換期</strong>（大きな変化が来る時期）<br>✦ 人生を豊かにする<strong style="color:#b8860b">ヒント</strong></p>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🌱 進化し続ける占術</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">常に新しい<strong style="color:#b8860b">統計・研究・技術</strong>を取り込んで進化を目指しており、発展を続ける<strong style="color:#7c3aed">将来性の高い占術</strong>でもあります。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1.5rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🤖 最新AIによるアドバイス</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">最新の<strong style="color:#b8860b">AI（人工知能）</strong>による解説を導入し、聞きたいこと・分からないことが聞ける、<strong style="color:#7c3aed">いつでもどこでも誰でも</strong>アドバイスが受けられる体制を実現しています。</p>
+      </div>
+      <hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0">
+      <p style="text-align:center;font-size:0.95rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem">自分や大切な人を深く知り、<br><strong style="color:#b8860b">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('hanabito-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
     </div>
   </div>
 
@@ -2361,13 +2403,11 @@ async function speakText(text,btn){
 // ============================================================
 function openHmenu(){document.getElementById('hmenuOv').classList.add('on');}
 function closeHmenu(){document.getElementById('hmenuOv').classList.remove('on');}
+function showAboutOverlay(){document.getElementById('hanabito-about-overlay').classList.add('show');}
 function showAIGuide(){
-  // AI相談ページに移動してから使い方を表示
-  switchNav('ai');
-  setTimeout(function(){
-    var wrap=document.getElementById('ai-about-wrap');
-    if(wrap)wrap.classList.add('show');
-  },100);
+  // ページ移動なし。今いるページの上にそのまま表示
+  var wrap=document.getElementById('ai-about-wrap');
+  if(wrap)wrap.classList.add('show');
 }
 function showPrivacyOverlay(){document.getElementById('privacy-overlay').classList.add('show');}
 function showTermsOverlay(){document.getElementById('terms-overlay').classList.add('show');}
