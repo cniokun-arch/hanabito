@@ -1100,7 +1100,7 @@ function startApp(data){
   S.save(data);
   document.getElementById('screen-login').classList.remove('active');
   document.getElementById('screen-main').classList.add('active');
-  document.getElementById('header-name').textContent=data.account.nickname;
+  var hn=document.getElementById('header-name');if(hn)hn.textContent=data.account.nickname;
   if(!data.settings||data.settings.petals!==false)startPetals();
   currentMemberIdx=0;
   loadKB();
