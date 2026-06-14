@@ -187,7 +187,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 /* ボトムシート */
 .ai-bottom-sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:300}
 .ai-bottom-sheet-bg.open{display:block}
-.ai-bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-radius:16px 16px 0 0;z-index:301;padding:0.8rem 0.8rem 2rem;transform:translateY(100%);transition:transform 0.25s ease;box-shadow:0 -4px 24px rgba(0,0,0,0.15)}
+.ai-bottom-sheet{position:fixed;bottom:64px;left:0;right:0;background:var(--bg);border-radius:16px 16px 0 0;z-index:301;padding:0.8rem 0.8rem 1rem;transform:translateY(100%);transition:transform 0.25s ease;box-shadow:0 -4px 24px rgba(0,0,0,0.15)}
 .ai-bottom-sheet.open{transform:translateY(0)}
 .ai-sheet-handle{width:36px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 0.8rem}
 .ai-sheet-title{font-size:0.8rem;color:var(--ink3);text-align:center;margin-bottom:0.8rem;font-family:'Noto Serif JP',serif}
@@ -201,6 +201,9 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-ctx-item:last-child{border-bottom:none}
 .ai-ctx-item:active{background:rgba(184,134,11,0.08)}
 .ai-ctx-item.danger{color:#c0392b}
+/* バブルのネイティブ選択を抑制 */
+.ai-bubble-row{-webkit-user-select:none;user-select:none}
+.ai-bubble-row.user .ai-bubble,.ai-bubble-row.ai .ai-bubble{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* 使い方オーバーレイ */
 .about-overlay-wrap{display:none;position:fixed;inset:0;background:#faf6ef;z-index:500;overflow-y:auto}
 .about-overlay-wrap.show{display:block}
@@ -2046,41 +2049,43 @@ function buildAIPage(){
     +'<div class="ai-ctx-item danger" onclick="ctxDelete()">🗑 このメッセージを削除</div>'
     +'</div>';
 
-  // 使い方オーバーレイ
+  // 使い方オーバーレイ（AI相談ガイド）
   html+='<div class="about-overlay-wrap" id="ai-about-wrap">'
     +'<div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
-    +'<h2 style="font-family:\'Zen Old Mincho\',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">花 人 占 術 と は</h2>'
-    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>'
+    +'<h2 style="font-family:\'Zen Old Mincho\',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">🌸 AI相談の使い方</h2>'
+    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>'
     +'</div>'
-    +'<div style="padding:1.4rem 1.2rem 2.5rem">'
-    +'<div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.1));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.5rem">'
-    +'<p style="font-size:1rem;color:#1a1208;line-height:1.9;margin:0"><ruby>花人占術<rt>かじんせんじゅつ</rt></ruby>とは、占術の祖である<strong style="color:#b8860b">易卦・易経</strong>の分析・研究・新解釈と、今まで明確でなかった<strong style="color:#b8860b">十干の性質</strong>の個人統計・研究により<strong style="color:#b8860b">完全オリジナルの体系化</strong>を行い、それに四柱推命、算命学、心理学など、現状のあらゆる統計・学問・占術のエッセンスを加えて<strong style="color:#7c3aed">総合的に融合させた新しい占い</strong>です。</p>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.7rem">'
-    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">易卦・易経</span>'
-    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">四柱推命</span>'
-    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">算命学</span>'
-    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(184,134,11,0.12);color:#7a5700;border:1px solid rgba(184,134,11,0.4)">心理学</span>'
-    +'<span style="font-size:0.8rem;padding:3px 10px;border-radius:20px;font-weight:700;background:rgba(124,58,237,0.1);color:#4a1a99;border:1px solid rgba(124,58,237,0.35)">完全オリジナル</span>'
+    +'<div style="padding:1.4rem 1.2rem 3rem">'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">💬 何でも聞いてみよう</h3>'
+    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">あなたの<strong style="color:#b8860b">命式データを読み込んだAI</strong>が、あなた専用の鑑定をしてくれます。</p>'
+    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px">'
+    +'<p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ 今日・今月・今年の<strong style="color:#b8860b">運気</strong><br>✦ あなたの<strong style="color:#b8860b">性格・強み・弱点</strong><br>✦ <strong style="color:#b8860b">恋愛・仕事・人間関係</strong>のアドバイス<br>✦ <strong style="color:#b8860b">転化天蛹</strong>（人生の転換期）について<br>✦ 気になることなら<strong style="color:#b8860b">何でもOK</strong></p>'
     +'</div></div>'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🔮 何が分かるの？</h3>'
-    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:6px">'
-    +'<p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ その人が<strong style="color:#b8860b">求めるもの・性格</strong><br>✦ <strong style="color:#b8860b">幸運と不運のタイミング</strong><br>✦ <strong style="color:#b8860b">人生の転換期</strong>（大きな変化が来る時期）<br>✦ 人生を豊かにする<strong style="color:#b8860b">ヒント</strong></p>'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">🌍 地運と天運で読む</h3>'
+    +'<div style="display:flex;flex-direction:column;gap:0.6rem">'
+    +'<div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.06);border-radius:8px;border-left:3px solid #7c3aed">'
+    +'<p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#7c3aed">地運（一生変わらない本質）</strong><br>年柱・月柱・日柱の納音と心理学的な三層構造であなたの<strong style="color:#b8860b">根本的な性質</strong>を読みます。</p>'
+    +'</div>'
+    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px;border-left:3px solid #b8860b">'
+    +'<p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#b8860b">天運（変わり続ける運気）</strong><br>大運・年運・月運・日運の組み合わせで<strong style="color:#b8860b">今の状況とベストな行動</strong>をアドバイスします。</p>'
+    +'</div></div></div>'
+    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
+    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">📱 画面の使い方</h3>'
+    +'<div style="font-size:0.95rem;color:#3a2a00;line-height:1;display:flex;flex-direction:column;gap:0.8rem">'
+    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">＋</span><span style="line-height:1.7">タップするとよく聞かれる質問が出てきます。タップするだけで質問できます。</span></div>'
+    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.1rem;flex-shrink:0;width:28px;text-align:center">🎤</span><span style="line-height:1.7">マイクボタンで<strong style="color:#b8860b">音声入力</strong>ができます。</span></div>'
+    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">🌸</span><span style="line-height:1.7"><strong style="color:#b8860b">Claude</strong>：より深い洞察・占い的な表現が得意</span></div>'
+    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">✨</span><span style="line-height:1.7"><strong style="color:#b8860b">Gemini</strong>：会話的・フレンドリーな回答が得意</span></div>'
+    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">👆</span><span style="line-height:1.7">メッセージを<strong style="color:#b8860b">長押し</strong>するとコピーや削除ができます。</span></div>'
     +'</div></div>'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🌱 進化し続ける占術</h3>'
-    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">常に新しい<strong style="color:#b8860b">統計・研究・技術</strong>を取り込んで進化を目指しており、発展を続ける<strong style="color:#7c3aed">将来性の高い占術</strong>でもあります。</p>'
-    +'</div>'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1.5rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.65rem">🤖 最新AIによるアドバイス</h3>'
-    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">最新の<strong style="color:#b8860b">AI（人工知能）</strong>による解説を導入し、聞きたいこと・分からないことが聞ける、<strong style="color:#7c3aed">いつでもどこでも誰でも</strong>アドバイスが受けられる体制を実現しています。</p>'
-    +'</div>'
-    +'<hr style="border:none;border-top:1px solid rgba(184,134,11,0.2);margin:1.2rem 0">'
-    +'<p style="text-align:center;font-size:0.95rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem">自分や大切な人を深く知り、<br><strong style="color:#b8860b">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>'
+    +'<p style="text-align:center;font-size:0.85rem;color:#7a6b52;line-height:1.8;margin-bottom:1.5rem">※AIは占い師の視点でアドバイスします。<br>重要な決定はご自身の責任でお願いします。</p>'
     +'<div style="text-align:center">'
     +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:\'Noto Serif JP\',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>'
     +'</div></div>'
     +'</div>';
+
 
   // ボトムナビ
   html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
