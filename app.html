@@ -449,7 +449,6 @@ body.theme-dark .ai-input-area{background:#1c1914}
     </div>
     <div class="top-header-title">花 人 占 術</div>
     <div class="top-header-right">
-      <span class="top-header-name" id="header-name"></span>
       <button class="btn-logout" onclick="doLogout()">ログアウト</button>
     </div>
   </div>
@@ -459,22 +458,138 @@ body.theme-dark .ai-input-area{background:#1c1914}
     <div class="hmenu-panel">
       <button class="hmenu-close" onclick="closeHmenu()">✕</button>
       <div class="hmenu-ttl">メニュー</div>
-      <div class="hmenu-item" onclick="closeHmenu();document.getElementById('ai-about-wrap')&&document.getElementById('ai-about-wrap').classList.add('show');switchNav('ai')">
+      <div class="hmenu-item" onclick="closeHmenu();showAIGuide()">
         <span class="hmenu-item-icon">🌸</span>AI相談の使い方
       </div>
       <div class="hmenu-item" onclick="closeHmenu();switchNav('setting')">
         <span class="hmenu-item-icon">⚙️</span>設定
       </div>
-      <div class="hmenu-item" onclick="closeHmenu();showHmenuAbout()">
+      <div class="hmenu-item" onclick="closeHmenu();showPrivacyOverlay()">
         <span class="hmenu-item-icon">🔒</span>プライバシーポリシー
       </div>
-      <div class="hmenu-item" onclick="closeHmenu();showHmenuTerms()">
+      <div class="hmenu-item" onclick="closeHmenu();showTermsOverlay()">
         <span class="hmenu-item-icon">📋</span>利用規約
       </div>
       <div class="hmenu-item" onclick="closeHmenu();doLogout()">
         <span class="hmenu-item-icon">🚪</span>ログアウト
       </div>
       <div class="hmenu-ver">花人占術</div>
+    </div>
+  </div>
+
+  <!-- プライバシーポリシー オーバーレイ -->
+  <div class="about-overlay-wrap" id="privacy-overlay">
+    <div style="background:linear-gradient(135deg,#1a3a00,#1a6b3a 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">🔒 プライバシーポリシー</h2>
+      <button onclick="document.getElementById('privacy-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 3rem">
+      <div style="background:linear-gradient(135deg,rgba(26,107,58,0.08),rgba(184,134,11,0.08));border-left:4px solid #1a6b3a;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem">
+        <p style="font-size:0.95rem;color:#1a1208;line-height:1.9;margin:0">花人占術は、お客様のプライバシーを最大限に尊重します。本ポリシーは、当アプリにおける個人情報の取り扱いについて説明します。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(26,107,58,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#1a6b3a;letter-spacing:0.1em;margin:0 0 0.6rem">📱 データの保存場所</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">ニックネーム・生年月日・性別などの個人情報は、<strong style="color:#1a6b3a">お使いのデバイス内のみ</strong>に保存されます。外部サーバーには送信されません。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(26,107,58,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#1a6b3a;letter-spacing:0.1em;margin:0 0 0.6rem">🤖 AIチャット機能について</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">AI相談機能をご利用の際、占術の鑑定に必要な命式データ（生年月日から算出されたデータ）のみが<strong style="color:#1a6b3a">暗号化された通信</strong>でサーバーに送信されます。会話内容は当社のサーバーに保存されます。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(26,107,58,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#1a6b3a;letter-spacing:0.1em;margin:0 0 0.6rem">🚫 第三者への提供</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">お客様の個人情報を第三者に販売・提供することは一切ありません。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(26,107,58,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.5rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#1a6b3a;letter-spacing:0.1em;margin:0 0 0.6rem">🗑 データの削除</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0">設定画面から「すべてのデータを削除」でデバイス内のすべてのデータをいつでも削除できます。</p>
+      </div>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('privacy-overlay').classList.remove('show')" style="background:#1a6b3a;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 利用規約 オーバーレイ -->
+  <div class="about-overlay-wrap" id="terms-overlay">
+    <div style="background:linear-gradient(135deg,#1a0830,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.15em;margin:0">📋 利用規約・免責事項</h2>
+      <button onclick="document.getElementById('terms-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 3rem">
+      <p style="font-size:0.8rem;color:var(--ink3);margin-bottom:1.2rem;text-align:right">最終更新日：2026年5月</p>
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.08));border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem">
+        <p style="font-size:0.95rem;color:#1a1208;line-height:1.9;margin:0">本サービスをご利用いただく前に、以下の利用規約および免責事項をよくお読みください。本サービスのご利用をもって、これらの内容に同意いただいたものとみなします。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第1条　サービスの目的と性質</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">花人占術は、東洋占術の考え方をもとにした独自の占術体系を用いて、生年月日から命式・運気・大運の推移を算出し、参考情報として提供する<strong style="color:#7c3aed">娯楽・教養目的のWebアプリケーション</strong>です。<br>本サービスが提供する情報はいかなる意味においても、将来の出来事・結果・人生の選択を保証するものではありません。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第2条　免責事項</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">本サービスの利用に際して、以下の事項について一切の責任を負いません。</p>
+        <div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.04);border-radius:8px;margin-bottom:0.6rem">
+          <p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:2">
+            ✦ 本サービスの情報を参考にした判断・行動の結果生じた損害<br>
+            ✦ 医療・法律・財務・投資・人間関係等の重要な判断への利用による不利益<br>
+            ✦ システム障害・メンテナンス・予告なきサービス変更・終了による損害<br>
+            ✦ 通信環境・端末の問題による利用不能・データ損失<br>
+            ✦ 第三者によるサービスへの不正アクセスによる被害
+          </p>
+        </div>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">本サービスは医療診断・法律相談・投資助言の代替となるものではありません。健康・法律・財務に関わる重要な判断は、必ず専門家にご相談ください。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第3条　個人情報・データの取り扱い</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">本サービスにご入力いただいた生年月日・性別等のデータは、お客様の<strong style="color:#7c3aed">ブラウザ内でのみ処理</strong>されます。</p>
+        <div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.04);border-radius:8px">
+          <p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:2">
+            ✦ 入力データは当サービスのサーバーに保存・記録されません<br>
+            ✦ AIへの質問内容はAnthropicのAPIを経由しますが、当サービスが保存・利用することはありません<br>
+            ✦ Anthropic社のプライバシーポリシーが適用される場合があります<br>
+            ✦ Googleフォントの読み込みにより、アクセス元のIPアドレスがGoogleに送信される場合があります
+          </p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第4条　AIによる回答について</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">本サービスのAIチャット機能はAnthropic社のClaude APIおよびGoogle Gemini APIを利用しています。AIの回答は参考情報であり、専門家の意見に代わるものではありません。AIの回答内容の正確性・完全性を保証するものではなく、その利用による損害について責任を負いません。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第5条　知的財産権</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">本サービスのデザイン・コード・占術体系・コンテンツの著作権は運営者に帰属します。無断での複製・転載・改変・再配布・商業利用を禁止します。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第6条　利用制限</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">以下に該当する場合、予告なくサービスの提供を制限・停止することがあります。</p>
+        <div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.04);border-radius:8px">
+          <p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:2">
+            ✦ 過度なアクセスによりサービスに負荷をかける行為<br>
+            ✦ 本サービスを不正な目的で利用する行為<br>
+            ✦ 本規約に違反する行為
+          </p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第7条　サービスの変更・終了</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">本サービスの内容は予告なく変更・追加・削除される場合があります。また、諸般の事情によりサービスを終了する場合があります。これらによって生じた損害について責任を負いません。</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.5rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.1em;margin:0 0 0.6rem">第8条　準拠法・管轄</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">本規約は日本法に準拠します。本サービスに関する紛争については、運営者の所在地を管轄する裁判所を専属的合意管轄裁判所とします。</p>
+      </div>
+
+      <p style="text-align:center;font-size:0.82rem;color:var(--ink3);margin-bottom:1.5rem">花人占術 © 2026 All rights reserved.</p>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('terms-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
     </div>
   </div>
 
@@ -2246,12 +2361,18 @@ async function speakText(text,btn){
 // ============================================================
 function openHmenu(){document.getElementById('hmenuOv').classList.add('on');}
 function closeHmenu(){document.getElementById('hmenuOv').classList.remove('on');}
-function showHmenuAbout(){
-  alert('プライバシーポリシー\n\nこのアプリに入力された個人情報（名前・生年月日など）はすべてお使いのデバイス内にのみ保存されます。外部サーバーへの送信は、AIチャット機能のみに限られます（占術の鑑定のためのみに使用）。');
+function showAIGuide(){
+  // AI相談ページに移動してから使い方を表示
+  switchNav('ai');
+  setTimeout(function(){
+    var wrap=document.getElementById('ai-about-wrap');
+    if(wrap)wrap.classList.add('show');
+  },100);
 }
-function showHmenuTerms(){
-  alert('利用規約\n\n本アプリは占術・エンターテイメント目的のサービスです。鑑定結果はあくまで参考情報としてご活用ください。医療・法律・投資等の専門的判断の代替としてはご利用いただけません。');
-}
+function showPrivacyOverlay(){document.getElementById('privacy-overlay').classList.add('show');}
+function showTermsOverlay(){document.getElementById('terms-overlay').classList.add('show');}
+function showHmenuAbout(){showPrivacyOverlay();}
+function showHmenuTerms(){showTermsOverlay();}
 
 // ============================================================
 // AI ボトムシート・長押しメニュー
