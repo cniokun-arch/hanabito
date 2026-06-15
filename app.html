@@ -1723,6 +1723,9 @@ function buildCompatPage(){
   var html='<div class="page active">';
   html+='<div class="card-title" style="padding:0 0 0.6rem;margin-bottom:0.8rem">💞 2人の相性を見る</div>';
 
+  // 相関図リンク（常時表示）
+  html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn" style="margin-bottom:1rem">🗺 相関図で人間関係を見る <span>→</span></a>';
+
   // 人物1
   html+='<div class="compat-person-card">'
     +'<div class="cpc-label">👤 1人目（あなた／登録から選ぶ）</div>'
@@ -1963,9 +1966,6 @@ function buildCompatResult(G1,G2,n1,n2){
     +'<div id="compat-ai-result" style="font-size:1rem;line-height:1.8;color:var(--ink2);white-space:pre-wrap"></div>'
     +'<button class="btn-primary" id="compat-ai-btn" style="margin-top:0.5rem">🔮 AIに詳しく鑑定してもらう</button>'
     +'</div>';
-
-  // 相関図リンク
-  html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn" style="margin-top:0.8rem">🗺 相関図で人間関係を見る <span>→</span></a>';
 
   html+='</div>';
   return html;
