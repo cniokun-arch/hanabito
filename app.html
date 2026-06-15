@@ -1723,9 +1723,6 @@ function buildCompatPage(){
   var html='<div class="page active">';
   html+='<div class="card-title" style="padding:0 0 0.6rem;margin-bottom:0.8rem">💞 2人の相性を見る</div>';
 
-  // 相関図リンク（常時表示）
-  html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn" style="margin-bottom:1rem">🗺 相関図で人間関係を見る <span>→</span></a>';
-
   // 人物1
   html+='<div class="compat-person-card">'
     +'<div class="cpc-label">👤 1人目（あなた／登録から選ぶ）</div>'
@@ -1771,6 +1768,7 @@ function buildCompatPage(){
     +'</div></div>';
 
   html+='<button class="btn-primary" style="margin-top:0.8rem" onclick="calcCompat()">🌸 相性を鑑定する</button>';
+  html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn" style="margin-top:0.6rem">🗺 相関図で人間関係を見る <span>→</span></a>';
   html+='<div id="compat-result-area" style="margin-top:0.8rem"></div>';
   html+='</div>';
 
