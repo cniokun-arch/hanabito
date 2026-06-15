@@ -480,6 +480,48 @@ body.theme-dark .ai-input-area{background:#1c1914}
     </div>
   </div>
 
+  <!-- AI相談の使い方 オーバーレイ（常時表示可能） -->
+  <div class="about-overlay-wrap" id="ai-about-wrap">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">🌸 AI相談の使い方</h2>
+      <button onclick="document.getElementById('ai-about-wrap').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 3rem">
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">💬 何でも聞いてみよう</h3>
+        <p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">あなたの<strong style="color:#b8860b">命式データを読み込んだAI</strong>が、あなた専用の鑑定をしてくれます。</p>
+        <div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px">
+          <p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ 今日・今月・今年の<strong style="color:#b8860b">運気</strong><br>✦ あなたの<strong style="color:#b8860b">性格・強み・弱点</strong><br>✦ <strong style="color:#b8860b">恋愛・仕事・人間関係</strong>のアドバイス<br>✦ <strong style="color:#b8860b">転化天蛹</strong>（人生の転換期）について<br>✦ 気になることなら<strong style="color:#b8860b">何でもOK</strong></p>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">🌍 地運と天運で読む</h3>
+        <div style="display:flex;flex-direction:column;gap:0.6rem">
+          <div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.06);border-radius:8px;border-left:3px solid #7c3aed">
+            <p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#7c3aed">地運（一生変わらない本質）</strong><br>年柱・月柱・日柱の納音と心理学的な三層構造であなたの<strong style="color:#b8860b">根本的な性質</strong>を読みます。</p>
+          </div>
+          <div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px;border-left:3px solid #b8860b">
+            <p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#b8860b">天運（変わり続ける運気）</strong><br>大運・年運・月運・日運の組み合わせで<strong style="color:#b8860b">今の状況とベストな行動</strong>をアドバイスします。</p>
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">📱 画面の使い方</h3>
+        <div style="font-size:0.95rem;color:#3a2a00;display:flex;flex-direction:column;gap:0.8rem">
+          <div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">＋</span><span style="line-height:1.7">タップするとよく聞かれる質問が出てきます。</span></div>
+          <div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.1rem;flex-shrink:0;width:28px;text-align:center">🎤</span><span style="line-height:1.7">マイクボタンで<strong style="color:#b8860b">音声入力</strong>ができます。</span></div>
+          <div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">🌸</span><span style="line-height:1.7"><strong style="color:#b8860b">Claude</strong>：深い洞察・占い的な表現が得意</span></div>
+          <div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">✨</span><span style="line-height:1.7"><strong style="color:#b8860b">Gemini</strong>：会話的・フレンドリーな回答が得意</span></div>
+          <div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">👆</span><span style="line-height:1.7">メッセージを<strong style="color:#b8860b">長押し</strong>するとコピーや削除ができます。</span></div>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:0.85rem;color:#7a6b52;line-height:1.8;margin-bottom:1.5rem">※AIは占い師の視点でアドバイスします。<br>重要な決定はご自身の責任でお願いします。</p>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('ai-about-wrap').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 花人占術とは オーバーレイ -->
   <div class="about-overlay-wrap" id="hanabito-about-overlay">
     <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -2248,43 +2290,6 @@ function buildAIPage(){
   html+='<div class="ai-ctx-menu" id="ai-ctx-menu">'
     +'<div class="ai-ctx-item" onclick="ctxCopy()">📋 コピー</div>'
     +'<div class="ai-ctx-item danger" onclick="ctxDelete()">🗑 このメッセージを削除</div>'
-    +'</div>';
-
-  // 使い方オーバーレイ（AI相談ガイド）
-  html+='<div class="about-overlay-wrap" id="ai-about-wrap">'
-    +'<div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
-    +'<h2 style="font-family:\'Zen Old Mincho\',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">🌸 AI相談の使い方</h2>'
-    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>'
-    +'</div>'
-    +'<div style="padding:1.4rem 1.2rem 3rem">'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">💬 何でも聞いてみよう</h3>'
-    +'<p style="font-size:0.95rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">あなたの<strong style="color:#b8860b">命式データを読み込んだAI</strong>が、あなた専用の鑑定をしてくれます。</p>'
-    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px">'
-    +'<p style="margin:0;font-size:0.95rem;color:#3a2a00;line-height:2.1">✦ 今日・今月・今年の<strong style="color:#b8860b">運気</strong><br>✦ あなたの<strong style="color:#b8860b">性格・強み・弱点</strong><br>✦ <strong style="color:#b8860b">恋愛・仕事・人間関係</strong>のアドバイス<br>✦ <strong style="color:#b8860b">転化天蛹</strong>（人生の転換期）について<br>✦ 気になることなら<strong style="color:#b8860b">何でもOK</strong></p>'
-    +'</div></div>'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">🌍 地運と天運で読む</h3>'
-    +'<div style="display:flex;flex-direction:column;gap:0.6rem">'
-    +'<div style="padding:0.7rem 0.9rem;background:rgba(124,58,237,0.06);border-radius:8px;border-left:3px solid #7c3aed">'
-    +'<p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#7c3aed">地運（一生変わらない本質）</strong><br>年柱・月柱・日柱の納音と心理学的な三層構造であなたの<strong style="color:#b8860b">根本的な性質</strong>を読みます。</p>'
-    +'</div>'
-    +'<div style="padding:0.7rem 0.9rem;background:rgba(184,134,11,0.06);border-radius:8px;border-left:3px solid #b8860b">'
-    +'<p style="margin:0;font-size:0.9rem;color:#3a2a00;line-height:1.8"><strong style="color:#b8860b">天運（変わり続ける運気）</strong><br>大運・年運・月運・日運の組み合わせで<strong style="color:#b8860b">今の状況とベストな行動</strong>をアドバイスします。</p>'
-    +'</div></div></div>'
-    +'<div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
-    +'<h3 style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.15em;margin:0 0 0.7rem">📱 画面の使い方</h3>'
-    +'<div style="font-size:0.95rem;color:#3a2a00;line-height:1;display:flex;flex-direction:column;gap:0.8rem">'
-    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">＋</span><span style="line-height:1.7">タップするとよく聞かれる質問が出てきます。タップするだけで質問できます。</span></div>'
-    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1.1rem;flex-shrink:0;width:28px;text-align:center">🎤</span><span style="line-height:1.7">マイクボタンで<strong style="color:#b8860b">音声入力</strong>ができます。</span></div>'
-    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">🌸</span><span style="line-height:1.7"><strong style="color:#b8860b">Claude</strong>：より深い洞察・占い的な表現が得意</span></div>'
-    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">✨</span><span style="line-height:1.7"><strong style="color:#b8860b">Gemini</strong>：会話的・フレンドリーな回答が得意</span></div>'
-    +'<div style="display:flex;align-items:flex-start;gap:0.7rem"><span style="font-size:1rem;flex-shrink:0;width:28px;text-align:center">👆</span><span style="line-height:1.7">メッセージを<strong style="color:#b8860b">長押し</strong>するとコピーや削除ができます。</span></div>'
-    +'</div></div>'
-    +'<p style="text-align:center;font-size:0.85rem;color:#7a6b52;line-height:1.8;margin-bottom:1.5rem">※AIは占い師の視点でアドバイスします。<br>重要な決定はご自身の責任でお願いします。</p>'
-    +'<div style="text-align:center">'
-    +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.remove(\'show\')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:\'Noto Serif JP\',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>'
-    +'</div></div>'
     +'</div>';
 
 
