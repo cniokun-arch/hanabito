@@ -1529,13 +1529,6 @@ function buildHomePage(){
     +'<div class="info-chip"><div class="ic-lbl">大運の運気</div><div class="ic-val" style="color:'+getJuniColor(u.daiJu)+'">'+u.daiJu+'</div></div>'
     +'</div>';
 
-  // 相関図リンク（自分タブのみ表示）
-  if(currentMemberIdx===0){
-    var data=S.load();
-    var ppl=data&&data.people?data.people:[];
-    html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn">🗺 相関図で人間関係を見る <span>→</span></a>';
-  }
-
   html+='</div>';
   // タブ初期描画はDOMに追加後に実行
   setTimeout(function(){
@@ -1970,6 +1963,9 @@ function buildCompatResult(G1,G2,n1,n2){
     +'<div id="compat-ai-result" style="font-size:1rem;line-height:1.8;color:var(--ink2);white-space:pre-wrap"></div>'
     +'<button class="btn-primary" id="compat-ai-btn" style="margin-top:0.5rem">🔮 AIに詳しく鑑定してもらう</button>'
     +'</div>';
+
+  // 相関図リンク
+  html+='<a href="graph.html" onclick="sendToGraph(event)" class="graph-link-btn" style="margin-top:0.8rem">🗺 相関図で人間関係を見る <span>→</span></a>';
 
   html+='</div>';
   return html;
