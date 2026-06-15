@@ -241,13 +241,32 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   position:fixed;bottom:0;left:0;right:0;
   background:#fff;border-top:1px solid rgba(184,134,11,0.2);
   display:flex;z-index:200;
-  box-shadow:0 -2px 12px rgba(0,0,0,0.08)
+  box-shadow:0 -2px 12px rgba(0,0,0,0.08);
+  padding-bottom:env(safe-area-inset-bottom,0px)
 }
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:0.45rem 0.3rem 0.5rem;cursor:pointer;transition:all 0.15s;background:none;border:none;font-family:'Noto Serif JP',serif}
 .nav-btn .nav-icon{font-size:1.25rem;line-height:1}
 .nav-btn .nav-lbl{font-size:0.94rem;color:var(--ink3);margin-top:2px;letter-spacing:0.05em}
 .nav-btn.active .nav-lbl{color:var(--gold);font-weight:700}
 .nav-btn.active .nav-icon{filter:none}
+/* 中央AI相談ボタン */
+.nav-btn-ai{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 0.5rem;cursor:pointer;background:none;border:none;font-family:'Noto Serif JP',serif;position:relative}
+.nav-btn-ai-circle{
+  position:absolute;
+  bottom:calc(100% - 20px);
+  left:50%;transform:translateX(-50%);
+  width:56px;height:56px;
+  background:linear-gradient(135deg,var(--purple),#b8860b);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;line-height:1;
+  box-shadow:0 4px 16px rgba(124,58,237,0.45);
+  border:3px solid #fff;
+  transition:transform 0.15s,box-shadow 0.15s
+}
+.nav-btn-ai:active .nav-btn-ai-circle{transform:translateX(-50%) scale(0.93);box-shadow:0 2px 8px rgba(124,58,237,0.35)}
+.nav-btn-ai .nav-lbl{font-size:0.94rem;color:var(--ink3);margin-top:28px;letter-spacing:0.05em}
+.nav-btn-ai.active .nav-lbl{color:var(--purple);font-weight:700}
 
 /* ===== MEMBER MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:flex-end;justify-content:center}
@@ -697,13 +716,13 @@ body.theme-dark .ai-input-area{background:#1c1914}
       <span class="nav-icon">☯</span>
       <span class="nav-lbl">命式</span>
     </button>
+    <button class="nav-btn-ai" onclick="switchNav('ai',this)">
+      <div class="nav-btn-ai-circle">🌸</div>
+      <span class="nav-lbl">AI相談</span>
+    </button>
     <button class="nav-btn" onclick="switchNav('compat',this)">
       <span class="nav-icon">💞</span>
       <span class="nav-lbl">相性</span>
-    </button>
-    <button class="nav-btn" onclick="switchNav('ai',this)">
-      <span class="nav-icon">🌸</span>
-      <span class="nav-lbl">AI相談</span>
     </button>
     <button class="nav-btn" onclick="switchNav('setting',this)">
       <span class="nav-icon">⚙️</span>
@@ -1305,7 +1324,7 @@ function deleteMember(){
 // ============================================================
 function switchNav(nav,btn){
   currentNav=nav;
-  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.nav-btn,.nav-btn-ai').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
   renderCurrentPage();
 }
@@ -2297,8 +2316,8 @@ function buildAIPage(){
   html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
     +'<button class="nav-btn" onclick="switchNav(\'home\',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
-    +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💗</span><span class="nav-lbl">相性</span></button>'
-    +'<button class="nav-btn active" onclick="switchNav(\'ai\',this)"><span class="nav-icon">🌸</span><span class="nav-lbl">AI相談</span></button>'
+    +'<button class="nav-btn-ai active" onclick="switchNav(\'ai\',this)"><div class="nav-btn-ai-circle">🌸</div><span class="nav-lbl">AI相談</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'setting\',this)"><span class="nav-icon">⚙️</span><span class="nav-lbl">設定</span></button>'
     +'</div>';
 
