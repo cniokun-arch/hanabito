@@ -84,7 +84,13 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .member-tab-bar{background:var(--bg2);border-bottom:1px solid rgba(184,134,11,0.2);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0.4rem 0.5rem;gap:0.3rem;align-items:center}
 .member-tab-bar::-webkit-scrollbar{height:2px}
 .member-tab{flex-shrink:0;padding:0.4rem 1rem;font-size:0.94rem;color:var(--ink3);cursor:pointer;white-space:nowrap;transition:all 0.18s;background:none;border:none;font-family:'Noto Serif JP',serif;border-radius:20px}
-.member-tab.active{background:linear-gradient(135deg,var(--purple),#9333ea);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(124,58,237,0.3)}
+.member-tab.active{color:#fff;font-weight:700}
+.member-tab.active.rt-天花人{background:linear-gradient(135deg,#3a7a20,#5a9c3a);box-shadow:0 2px 8px rgba(58,122,32,0.35)}
+.member-tab.active.rt-白花人{background:linear-gradient(135deg,#3a3a9a,#6b6bbf);box-shadow:0 2px 8px rgba(58,58,154,0.35)}
+.member-tab.active.rt-離花人{background:linear-gradient(135deg,#8a1a1a,#c04040);box-shadow:0 2px 8px rgba(138,26,26,0.35)}
+.member-tab.active.rt-風花人{background:linear-gradient(135deg,#4a7a1a,#7aaa4a);box-shadow:0 2px 8px rgba(74,122,26,0.35)}
+.member-tab.active.rt-仙花人{background:linear-gradient(135deg,#1a5a7a,#4a8aaa);box-shadow:0 2px 8px rgba(26,90,122,0.35)}
+.member-tab.active.rt-水花人{background:linear-gradient(135deg,#1a2a8a,#5a6abf);box-shadow:0 2px 8px rgba(26,42,138,0.35)}
 .member-tab-add{flex-shrink:0;padding:0.4rem 0.8rem;font-size:0.94rem;color:var(--purple);cursor:pointer;white-space:nowrap;background:none;border:none;font-family:'Noto Serif JP',serif}
 
 /* ===== PAGE SECTIONS ===== */
@@ -1219,16 +1225,24 @@ function renderMemberTabs(){
   var data=S.load();if(!data)return;
   var bar=document.getElementById('member-tab-bar');
   bar.innerHTML='';
+
+  function getRokkaClass(G){
+    if(!G||!G.ht)return '';
+    return ' rt-'+G.ht.replace(/[＋－]/g,'');
+  }
+
   // 自分
   var selfBtn=document.createElement('button');
-  selfBtn.className='member-tab'+(currentMemberIdx===0?' active':'');
+  var selfRokka=getRokkaClass(data.account.G);
+  selfBtn.className='member-tab'+(currentMemberIdx===0?' active'+selfRokka:'');
   selfBtn.textContent=data.account.nickname;
   selfBtn.onclick=(function(i){return function(){switchMember(i);};})(0);
   bar.appendChild(selfBtn);
   // 登録メンバー
   (data.people||[]).forEach(function(p,i){
     var btn=document.createElement('button');
-    btn.className='member-tab'+(currentMemberIdx===i+1?' active':'');
+    var pRokka=getRokkaClass(p.G);
+    btn.className='member-tab'+(currentMemberIdx===i+1?' active'+pRokka:'');
     btn.textContent=p.nickname;
     btn.onclick=(function(idx){return function(){switchMember(idx);};})(i+1);
     // 長押しで編集
