@@ -932,6 +932,28 @@ const SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,9575057
 const TROPICAL_YEAR_MS=365.24219879*86400000;
 
 function getSetsuDate(y,m){var b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
+function fmtMD(dt){return (dt.getMonth()+1)+'月'+dt.getDate()+'日';}
+function getMonthPeriodLabel(y,m,d){
+  var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  var yo=y,mo=m;
+  if(bd<sD){mo--;if(mo<1){mo=12;yo--;}}
+  var startS=getSetsuDate(yo,mo),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  var nm=mo+1,ny=yo;if(nm>12){nm=1;ny++;}
+  var endS=getSetsuDate(ny,nm),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  var endBefore=new Date(endD-86400000);
+  var SETSU_NAMES=['小寒','立春','啓蟄','清明','立夏','芒種','小暑','立秋','白露','寒露','立冬','大雪'];
+  var startName=SETSU_NAMES[mo-1]||'';
+  var endName=SETSU_NAMES[nm-1]||'';
+  return fmtMD(startD)+'('+startName+')〜'+fmtMD(endBefore)+'('+endName+'前日)';
+}
+function getYearPeriodLabel(y,m,d){
+  var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());
+  var refY=bd>=rsD?y:y-1;
+  var startS=getSetsuDate(refY,2),startD=new Date(startS.getFullYear(),startS.getMonth(),startS.getDate());
+  var endS=getSetsuDate(refY+1,2),endD=new Date(endS.getFullYear(),endS.getMonth(),endS.getDate());
+  var endBefore=new Date(endD-86400000);
+  return startD.getFullYear()+'年'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'年'+fmtMD(endBefore)+'(立春前日)';
+}
 function getDaysFromSetsu(y,m,d){var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());if(bd>=sD)return Math.round((bd-sD)/86400000);var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());return Math.max(0,Math.round((bd-psD)/86400000));}
 function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
 function getYearKS(y,m,d){var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
@@ -1728,7 +1750,7 @@ function renderUnkiBody(tab){
   if(!G){body.innerHTML='';return;}
 
   var od=getOffsetDate(tab, unkiOffset);
-  var ks, label;
+  var ks, label, periodLabel='';
   // 干支を取得（干・支の両方を保持）
   if(tab==='day'){
     ks=getDayKS(od.y,od.m,od.d);
@@ -1736,9 +1758,11 @@ function renderUnkiBody(tab){
   } else if(tab==='month'){
     ks=getMonthKS(od.y,od.m,od.d);
     label='月干支';
+    periodLabel=getMonthPeriodLabel(od.y,od.m,od.d);
   } else {
     ks=getYearKS(od.y,od.m,od.d);
     label='年干支';
+    periodLabel=getYearPeriodLabel(od.y,od.m,od.d);
   }
   // 将来の拡張用：干と支を分けて保持
   var kanStr=ks[0]||''; // 干（天干）
@@ -1769,6 +1793,7 @@ function renderUnkiBody(tab){
     +'<div style="font-size:2rem;flex-shrink:0">'+(JUNI_EMOJI[juni]||'🌸')+'</div>'
     +'<div style="flex:1">'
     +'<div style="font-size:1rem;color:var(--ink3);margin-bottom:2px">'+label+'：'+ks+'</div>'
+    +(periodLabel?'<div style="font-size:0.83rem;color:var(--purple);margin-bottom:4px">📅 '+periodLabel+'</div>':'')
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:'+color+'">'+juni+'</div>'
     +barsHtml
     +'<p style="font-size:0.97rem;color:var(--ink2);line-height:1.7;margin-top:0.4rem">'+(JUNI_DESC[juni]||'')+'</p>'
