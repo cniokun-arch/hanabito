@@ -101,12 +101,27 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .card{background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:1.1rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 .card-title{font-family:'Zen Old Mincho',serif;font-size:0.97rem;letter-spacing:0.15em;color:var(--gold);border-bottom:1px solid var(--gold-light);padding-bottom:0.4rem;margin-bottom:0.8rem}
 
-/* ===== TODAY UNKI WIDGET ===== */
+/* ===== 運気ウィジェット（indexスタイル） ===== */
+.unki-widget{background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:10px;overflow:hidden;margin-bottom:0.8rem}
+.unki-widget-header{background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.unki-widget-title{font-family:'Zen Old Mincho',serif;color:#fff;font-size:1rem;letter-spacing:0.15em}
+.unki-widget-tabs{display:flex;gap:0}
+.unki-widget-tab{font-family:'Noto Serif JP',serif;font-size:0.94rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.6);cursor:pointer;background:rgba(255,255,255,0.2);color:#fff;transition:all 0.15s}
+.unki-widget-tab:first-child{border-radius:12px 0 0 12px}
+.unki-widget-tab:last-child{border-radius:0 12px 12px 0;border-left:none}
+.unki-widget-tab:nth-child(2){border-left:none;border-right:none}
+.unki-widget-tab.active{background:rgba(255,255,255,0.92);color:#4a3c28;font-weight:700}
+.unki-widget-body{padding:0.9rem 1rem}
+.unki-date-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.7rem;background:rgba(184,134,11,0.06);border-radius:8px;padding:0.4rem 0.5rem}
+.unki-nav-btn{background:none;border:1px solid rgba(184,134,11,0.3);border-radius:6px;width:34px;height:34px;cursor:pointer;font-size:1rem;color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.unki-nav-date{font-size:0.94rem;color:var(--ink2);font-weight:600;text-align:center;flex:1;font-family:'Noto Serif JP',serif;padding:0 0.4rem}
+.unki-nav-today{font-size:0.75rem;color:var(--purple);font-weight:700;padding:2px 7px;border:1px solid rgba(124,58,237,0.35);border-radius:10px;cursor:pointer;background:rgba(124,58,237,0.06);white-space:nowrap;margin-left:4px;flex-shrink:0}
+.unki-widget-link{border-top:1px solid rgba(184,134,11,0.15);display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:transparent;border-left:none;border-right:none;border-bottom:none;cursor:pointer;font-family:'Noto Serif JP',serif;width:100%}
+/* 後方互換用 */
 .unki-tabs{display:flex;gap:0;margin-bottom:0.8rem;border-radius:8px;overflow:hidden;border:1.5px solid rgba(184,134,11,0.4)}
 .unki-tab{flex:1;padding:8px 0;text-align:center;font-size:1rem;font-weight:600;border:none;background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all 0.2s;border-right:1px solid rgba(184,134,11,0.3);font-family:'Noto Serif JP',serif}
 .unki-tab:last-child{border-right:none}
 .unki-tab.active{background:var(--gold);color:#fff;font-weight:700}
-.unki-tab:not(.active):hover{background:var(--bg3)}
 .unki-body{min-height:80px}
 .unki-main{font-family:'Zen Old Mincho',serif;font-size:1.6rem;font-weight:700}
 .unki-bars{display:flex;gap:2px;margin:4px 0}
@@ -582,6 +597,92 @@ body.theme-dark .ai-input-area{background:#1c1914}
       <p style="text-align:center;font-size:0.95rem;color:#7a6b52;line-height:1.9;margin-bottom:1.5rem">自分や大切な人を深く知り、<br><strong style="color:#b8860b">人生を豊かにするヒント</strong>をぜひ手にしてください。</p>
       <div style="text-align:center">
         <button onclick="document.getElementById('hanabito-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 十二運気とは オーバーレイ -->
+  <div class="about-overlay-wrap" id="juni-about-overlay">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.2em;margin:0">十 二 運 気 と は</h2>
+      <button onclick="document.getElementById('juni-about-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 3rem">
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(184,134,11,0.06));border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem">
+        <p style="font-size:0.95rem;color:#1a1208;line-height:1.9;margin:0">12運気とは、<strong style="color:#b8860b">自然の四季のリズム</strong>に合わせて、人の運気が12のサイクルで巡るという考え方です。今いる季節を知ることで、<strong style="color:#7c3aed">どう動けばいいか</strong>のヒントが得られます。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem">
+        <div style="background:#fff;border:1px solid rgba(42,122,58,0.25);border-radius:8px;padding:0.8rem 1rem">
+          <p style="font-size:0.94rem;font-weight:700;color:#2a7a3a;margin:0 0 0.4rem">🌸 春 ― 芽吹きと成長</p>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#2a7a3a">発芽</strong>…新しいことを始めるのに最適な時期。小さな行動が大きな実りにつながる。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#2a7a3a">青葉</strong>…エネルギーが伸びていく成長期。積極的に動くと縁が広がる。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#2a7a3a">開花</strong>…運気が満開の最良期。チャンスをつかむ力が最も高まっている。</div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(26,90,138,0.25);border-radius:8px;padding:0.8rem 1rem">
+          <p style="font-size:0.94rem;font-weight:700;color:#1a5a8a;margin:0 0 0.4rem">☀️ 夏 ― 内側を深める</p>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#1a5a8a">内省</strong>…外より内側を見つめる時期。学びや準備に集中するのが吉。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#1a5a8a">成天</strong>…努力が形になる安定期。着実な積み重ねで確かな成果が生まれる。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#1a5a8a">狂咲</strong>…エネルギーが過剰になりやすい不安定な時期。勢いで動かず冷静に。</div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(184,134,11,0.25);border-radius:8px;padding:0.8rem 1rem">
+          <p style="font-size:0.94rem;font-weight:700;color:#b8860b;margin:0 0 0.4rem">🍂 秋 ― 実りと分かち合い</p>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#b8860b">豊穣</strong>…努力の成果が実る収穫期。積み重ねが形になって現れる。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#b8860b">穂分</strong>…実りを人と分かち合う時期。つながりを大切にするとさらに豊かになる。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#b8860b">平凪</strong>…波風のない穏やかな時期。日常を丁寧に積み上げることが吉。</div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(74,60,40,0.2);border-radius:8px;padding:0.8rem 1rem">
+          <p style="font-size:0.94rem;font-weight:700;color:#4a3c28;margin:0 0 0.4rem">❄️ 冬 ― 手放しと充電</p>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#4a3c28">引寒</strong>…エネルギーが内向きになる準備期。無理に動かず、静かに充電する。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#4a3c28">休眠</strong>…エネルギーが最も低い冬の底。じっくり次の春に備える大切な時期。</div>
+          <div style="font-size:0.92rem;color:#3a2a00;line-height:2"><strong style="color:#4a3c28">残雪</strong>…冬から春への移行期。雪が溶けるように少しずつ動き始めるとよい。</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('juni-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 運気の切り替わりタイミング オーバーレイ -->
+  <div class="about-overlay-wrap" id="setsu-about-overlay">
+    <div style="background:linear-gradient(135deg,#3a2a00,#b8860b 60%,#7c3aed);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.15em;margin:0">📅 運気の切り替わりタイミング</h2>
+      <button onclick="document.getElementById('setsu-about-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 3rem">
+      <div style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(124,58,237,0.06));border-left:4px solid #b8860b;border-radius:0 8px 8px 0;padding:1rem 1.1rem;margin-bottom:1.2rem">
+        <p style="font-size:0.95rem;color:#1a1208;line-height:1.9;margin:0">花人占術では、運気の切り替わりは<strong style="color:#b8860b">カレンダーの月初め・元旦ではなく</strong>、古来から使われてきた<strong style="color:#b8860b">節気（せっき）の日</strong>を基準にしています。「月が変わったのに運気が変わらない」と感じたときは、まだ節気を迎えていないサインです。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem">📅 年の運気の切り替わり</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">年の運気は<strong style="color:#b8860b">立春（りっしゅん）</strong>の日から切り替わります。毎年2月4日頃です。</p>
+        <p style="font-size:0.88rem;color:#7a6b52;line-height:1.8;margin:0.5rem 0 0">例：2026年の運気は <strong>2026年2月4日（立春）〜2027年2月3日</strong> まで続きます。1月中はまだ前年の運気です。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(184,134,11,0.22);border-radius:8px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#b8860b;letter-spacing:0.12em;margin:0 0 0.6rem">🗓️ 月の運気の切り替わり</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0 0 0.6rem">月の運気は以下の<strong style="color:#b8860b">12の節気</strong>の当日から切り替わります。</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem">
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">立春</span>（2月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">啓蟄</span>（3月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">清明</span>（4月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">立夏</span>（5月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">芒種</span>（6月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">小暑</span>（7月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">立秋</span>（8月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">白露</span>（9月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">寒露</span>（10月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">立冬</span>（11月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">大雪</span>（12月初旬）</div>
+          <div style="font-size:0.9rem;color:#3a2a00;line-height:1.8"><span style="color:#b8860b;font-weight:700">小寒</span>（1月初旬）</div>
+        </div>
+        <p style="font-size:0.85rem;color:#7a6b52;line-height:1.8;margin:0.6rem 0 0">例：6月1日はまだ前月の運気。<strong>6月6日（芒種）</strong>から新しい月の運気に切り替わります。</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1.5rem">
+        <h3 style="font-family:'Zen Old Mincho',serif;font-size:0.95rem;color:#7c3aed;letter-spacing:0.12em;margin:0 0 0.6rem">💡 アプリでの確認方法</h3>
+        <p style="font-size:0.92rem;color:#3a2a00;line-height:1.9;margin:0">「今月」「今年」タブでその運気が適用される期間が確認できます。切り替わりのタイミングの目安としてご活用ください。</p>
+      </div>
+      <div style="text-align:center">
+        <button onclick="document.getElementById('setsu-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
       </div>
     </div>
   </div>
@@ -1521,15 +1622,25 @@ function buildHomePage(){
     +'</div>';
 
   // 運気タブウィジェット
-  html+='<div class="card">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">'
-    +'<div class="card-title" style="margin-bottom:0;border:none;padding:0">今の運気</div>'
-    +'<div class="unki-tabs" style="margin-bottom:0">'
-    +'<button class="unki-tab active" id="ut-day" onclick="switchUnkiTab(\'day\')">今日</button>'
-    +'<button class="unki-tab" id="ut-mon" onclick="switchUnkiTab(\'month\')">今月</button>'
-    +'<button class="unki-tab" id="ut-yr" onclick="switchUnkiTab(\'year\')">今年</button>'
-    +'</div></div>'
-    +'<div id="unki-body-home" class="unki-body"></div>'
+  // 運気ウィジェット（indexスタイル）
+  html+='<div class="unki-widget">'
+    +'<div class="unki-widget-header">'
+    +'<span class="unki-widget-title">◆ あなたの運気</span>'
+    +'<div class="unki-widget-tabs">'
+    +'<button class="unki-widget-tab active" id="uwt-day" onclick="switchUnkiTab(\'day\')">今日</button>'
+    +'<button class="unki-widget-tab" id="uwt-mon" onclick="switchUnkiTab(\'month\')">今月</button>'
+    +'<button class="unki-widget-tab" id="uwt-yr" onclick="switchUnkiTab(\'year\')">今年</button>'
+    +'</div>'
+    +'</div>'
+    +'<div class="unki-widget-body"><div id="unki-body-home"></div></div>'
+    +'<button class="unki-widget-link" onclick="document.getElementById(\'juni-about-overlay\').classList.add(\'show\')">'
+    +'<span style="font-size:0.94rem;color:#7c3aed;font-weight:700">🌸 十二運気について</span>'
+    +'<span style="font-size:0.9rem;color:#7c3aed">▶</span>'
+    +'</button>'
+    +'<button class="unki-widget-link" onclick="document.getElementById(\'setsu-about-overlay\').classList.add(\'show\')">'
+    +'<span style="font-size:0.94rem;color:#b8860b;font-weight:700">📅 運気の切り替わりタイミングについて</span>'
+    +'<span style="font-size:0.9rem;color:#b8860b">▶</span>'
+    +'</button>'
     +'</div>';
 
   // 大運の通変星（干から計算）
@@ -1546,52 +1657,118 @@ function buildHomePage(){
   html+='</div>';
   // タブ初期描画はDOMに追加後に実行
   setTimeout(function(){
-    // タブ初期化
-    var tabs=document.querySelectorAll('.unki-tab');
-    tabs.forEach(function(el){
-      el.classList.remove('active');
-      if(el.id==='ut-day')el.classList.add('active');
-    });
     renderUnkiBody('day');
     currentUnkiTab='day';
+    unkiOffset=0;
   },50);
   return html;
 }
 
 var currentUnkiTab='day';
+var unkiOffset=0; // 今日からのオフセット（日・月・年）
+
 function switchUnkiTab(tab){
   currentUnkiTab=tab;
+  unkiOffset=0;
   // タブのactive切り替え
-  var tabs=document.querySelectorAll('.unki-tab');
-  tabs.forEach(function(el){
-    var id=el.id;
-    if(id==='ut-day')el.classList.toggle('active',tab==='day');
-    else if(id==='ut-mon')el.classList.toggle('active',tab==='month');
-    else if(id==='ut-yr')el.classList.toggle('active',tab==='year');
+  ['day','mon','yr'].forEach(function(t){
+    var el=document.getElementById('uwt-'+t);
+    if(el)el.classList.toggle('active',
+      (t==='day'&&tab==='day')||(t==='mon'&&tab==='month')||(t==='yr'&&tab==='year'));
   });
   renderUnkiBody(tab);
 }
+
+function changeUnkiOffset(delta){
+  unkiOffset+=delta;
+  renderUnkiBody(currentUnkiTab);
+}
+
+function resetUnkiOffset(){
+  unkiOffset=0;
+  renderUnkiBody(currentUnkiTab);
+}
+
+function getOffsetDate(tab, offset){
+  var now=new Date();
+  var y=now.getFullYear(), m=now.getMonth()+1, d=now.getDate();
+  if(tab==='day'){
+    var dt=new Date(y,m-1,d+offset);
+    return {y:dt.getFullYear(),m:dt.getMonth()+1,d:dt.getDate()};
+  } else if(tab==='month'){
+    var nm=m+offset;
+    var ny=y+Math.floor((nm-1)/12);
+    nm=((nm-1)%12+12)%12+1;
+    return {y:ny,m:nm,d:d};
+  } else {
+    return {y:y+offset,m:m,d:d};
+  }
+}
+
+function getNavLabel(tab, offset, od){
+  var now=new Date();
+  if(tab==='day'){
+    if(offset===0)return '今日 '+od.m+'/'+od.d;
+    if(offset===1)return '明日 '+od.m+'/'+od.d;
+    if(offset===-1)return '昨日 '+od.m+'/'+od.d;
+    return (offset>0?'+'+offset+'日 ':offset+'日 ')+od.m+'/'+od.d;
+  } else if(tab==='month'){
+    if(offset===0)return '今月 '+od.y+'年'+od.m+'月';
+    return od.y+'年'+od.m+'月';
+  } else {
+    if(offset===0)return '今年 '+od.y+'年';
+    return od.y+'年';
+  }
+}
+
 function renderUnkiBody(tab){
   var body=document.getElementById('unki-body-home');
   if(!body)return;
   var G=getCurrentTargetG();
   if(!G){body.innerHTML='';return;}
-  var now=new Date(),y=now.getFullYear(),m=now.getMonth()+1,d=now.getDate();
-  var ks,label;
-  if(tab==='day'){ks=getDayKS(y,m,d);label='今日の日干支：'+ks;}
-  else if(tab==='month'){ks=getMonthKS(y,m,d);label='今月の月干支：'+ks;}
-  else{ks=getYearKS(y,m,d);label='今年の年干支：'+ks;}
-  var juni=getJuniUnki(G.ht,ks[1]);
+
+  var od=getOffsetDate(tab, unkiOffset);
+  var ks, label;
+  // 干支を取得（干・支の両方を保持）
+  if(tab==='day'){
+    ks=getDayKS(od.y,od.m,od.d);
+    label='日干支';
+  } else if(tab==='month'){
+    ks=getMonthKS(od.y,od.m,od.d);
+    label='月干支';
+  } else {
+    ks=getYearKS(od.y,od.m,od.d);
+    label='年干支';
+  }
+  // 将来の拡張用：干と支を分けて保持
+  var kanStr=ks[0]||''; // 干（天干）
+  var shiStr=ks[1]||''; // 支（地支）← 現在はこちらだけで運気計算
+
+  var juni=getJuniUnki(G.ht, shiStr);
   var wave=JUNI_WAVE[juni]||0;
   var color=getJuniColor(juni);
   var bars=Math.round((wave+4)/9*10);
-  var barsHtml='<div style="display:flex;gap:2px;margin-top:4px">';
+  var barsHtml='<div style="display:flex;gap:2px;margin-top:4px;align-items:center">';
   for(var i=0;i<10;i++)barsHtml+='<div class="unki-bar" style="background:'+(i<bars?color:'rgba(184,134,11,0.15)')+'"></div>';
-  barsHtml+='<span style="font-size:1rem;color:'+color+';margin-left:4px;font-weight:700">'+(wave>=3?'好調':wave>=0?'普通':'要注意')+'</span></div>';
-  body.innerHTML='<div style="display:flex;align-items:flex-start;gap:0.8rem">'
+  var unkiLabel=wave>=3?'好調':wave>=0?'普通':'要注意';
+  barsHtml+='<span style="font-size:1rem;color:'+color+';margin-left:6px;font-weight:700">'+unkiLabel+'</span></div>';
+
+  var navLabel=getNavLabel(tab, unkiOffset, od);
+  var isToday=unkiOffset===0;
+
+  body.innerHTML=
+    // 日付ナビ
+    '<div class="unki-date-nav">'
+    +'<button class="unki-nav-btn" onclick="changeUnkiOffset(-1)">＜</button>'
+    +'<span class="unki-nav-date">'+navLabel+'</span>'
+    +(!isToday?'<button class="unki-nav-today" onclick="resetUnkiOffset()">今'+({'day':'日','month':'月','year':'年'}[tab==='day'?'day':tab==='month'?'month':'year'])+'に戻る</button>':'')
+    +'<button class="unki-nav-btn" onclick="changeUnkiOffset(1)">＞</button>'
+    +'</div>'
+    // 運気本体
+    +'<div style="display:flex;align-items:flex-start;gap:0.8rem">'
     +'<div style="font-size:2rem;flex-shrink:0">'+(JUNI_EMOJI[juni]||'🌸')+'</div>'
     +'<div style="flex:1">'
-    +'<div style="font-size:1rem;color:var(--ink3);margin-bottom:2px">'+label+'</div>'
+    +'<div style="font-size:1rem;color:var(--ink3);margin-bottom:2px">'+label+'：'+ks+'</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:'+color+'">'+juni+'</div>'
     +barsHtml
     +'<p style="font-size:0.97rem;color:var(--ink2);line-height:1.7;margin-top:0.4rem">'+(JUNI_DESC[juni]||'')+'</p>'
