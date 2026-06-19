@@ -375,6 +375,22 @@ body.theme-dark .ai-input-area{background:#1c1914}
 .daiun-tab-btn .tab-icon{display:block;font-size:1rem;margin-bottom:1px}
 .daiun-tab-pane{display:none;border:1px solid rgba(184,134,11,0.25);border-top:none;background:var(--bg);padding:0.8rem 0.6rem;border-radius:0 0 8px 8px}
 .daiun-tab-pane.active{display:block}
+/* 魂のコア（人格核） */
+.core-text-row{display:flex;align-items:center;justify-content:center;gap:1.2rem;padding:1rem 0.5rem}
+.core-text-item{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+.core-text-label{font-size:0.72rem;color:var(--ink3);letter-spacing:0.1em}
+.core-text-value{font-family:'Zen Old Mincho',serif;font-size:1.25rem;font-weight:700;color:var(--ink)}
+.core-text-sub{font-size:0.78rem;color:var(--gold)}
+.core-text-arrow{font-size:1.1rem;color:var(--ink3);margin-top:1.1rem}
+.core-circle-wrap{display:flex;align-items:center;justify-content:center;padding:1.2rem 0.5rem}
+.core-circle-svg{width:100%;max-width:300px;height:auto}
+.core-ring{transform-origin:190px 180px;transform:scale(0);opacity:0;transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1),opacity 0.5s ease}
+.core-circle-svg.bwa .core-ring{transform:scale(1);opacity:1}
+.core-ring.ring-outer{transition-delay:0.05s}
+.core-ring.ring-mid{transition-delay:0.18s}
+.core-ring.ring-inner{transition-delay:0.31s}
+.core-ring-text{opacity:0;transition:opacity 0.4s ease}
+.core-circle-svg.bwa .core-ring-text{opacity:1;transition-delay:0.55s}
 /* 横スクロール表 */
 .unsei-outer{border:1px solid rgba(184,134,11,0.22);border-radius:4px;overflow:hidden}
 .unsei-inner{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
@@ -966,6 +982,21 @@ function getHoshiType(y,m,d){var dayKS=getDayKS(y,m,d),name=HOSHI_BY_IDX[ROKUJU.
 function getHoshiName(y,m,d){return HOSHI_BY_IDX[ROKUJU.indexOf(getDayKS(y,m,d))];}
 function getDaiunStartAge(y,m,d,isFwd){var bd=new Date(y,m-1,d);var days=0;try{if(isFwd){var st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{var nm=m+1,ny=y;if(nm>12){nm=1;ny++;}var ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{var st2=getSetsuDate(y,m),stD2=new Date(st2.getFullYear(),st2.getMonth(),st2.getDate());if(bd>=stD2)days=Math.round((bd-stD2)/86400000);else{var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
 function getJuniColor(j){return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
+
+// 魂のコア（人格核）：日干（核）×六花人の対応支2つ（外面・内面）から十二大従星を導く
+function getTamashiiNoCore(G){
+  if(!G||!G.ht||G.nichiKanIdx===undefined||!G.sats||G.sats.length<2)return null;
+  var kanIdx=G.nichiKanIdx;
+  var isPlus=G.ht.indexOf('＋')>=0;
+  var shiA=G.sats[0],shiB=G.sats[1];// SATSKAIの並び順（例：天花人=['戌','亥']）
+  var yangShi=(GOGYO[shiA]&&GOGYO[shiA]['陰陽']==='＋')?shiA:shiB;
+  var yinShi=(yangShi===shiA)?shiB:shiA;
+  var outerShi=isPlus?yangShi:yinShi;// ＋なら陽の支が外面、－なら陰の支が外面
+  var innerShi=isPlus?yinShi:yangShi;
+  var outerJus=(JUSEI[kanIdx]||[])[JUNISHI.indexOf(outerShi)]||'—';
+  var innerJus=(JUSEI[kanIdx]||[])[JUNISHI.indexOf(innerShi)]||'—';
+  return {core:G.nichiKan,coreShi:G.nichiShi,outerShi,innerShi,outerJus,innerJus,isPlus};
+}
 
 // doCalc: 生年月日・性別からGオブジェクト生成
 function doCalc(y,m,d,gender){
@@ -1834,6 +1865,9 @@ function buildMeishikiPage(){
   html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS));
   html+='</div></div>';
 
+  // 魂のコア（人格核）
+  html+=buildTamashiiCoreCard(G,name);
+
   // 大運表（タブ付き）
   html+='<div class="card"><div class="card-title">◆ 大運の流れ</div>';
   // タブヘッダー
@@ -1925,6 +1959,68 @@ function msCol(lbl,sub,kan,shi,zo,th,thZo,jos,ju,nayin){
     +(nayin?'<div style="font-size:0.83rem;color:var(--ink3);margin-top:0.15rem;letter-spacing:0.05em">'+nayin+'</div>':'')
     +'<div class="ms-ju" style="color:'+color+';font-size:1.05rem;font-weight:700;margin-top:0.2rem">'+juniRuby(ju)+'</div>'
     +'</div>';
+}
+
+// 魂のコア（人格核）カード：文字表示タブ＋同心円グラフタブ
+function buildTamashiiCoreCard(G,name){
+  var core=getTamashiiNoCore(G);
+  if(!core)return '';
+  var html='<div class="card"><div class="card-title">◆ 魂のコア（'+name+'）</div>';
+  html+='<div class="daiun-tab-header" role="tablist">'
+    +'<button class="daiun-tab-btn active" role="tab" onclick="switchCoreTab(\'text\',this)">'
+    +'<span class="tab-icon">🔠</span>文字表示</button>'
+    +'<button class="daiun-tab-btn" role="tab" onclick="switchCoreTab(\'circle\',this)">'
+    +'<span class="tab-icon">◎</span>同心円グラフ</button>'
+    +'</div>';
+
+  // タブ1：文字表示
+  html+='<div class="daiun-tab-pane active" id="ctab-text" role="tabpanel">';
+  html+='<div class="core-text-row">'
+    +'<div class="core-text-item"><div class="core-text-label">外面</div>'+gogyoBadge(core.outerShi)+'<div class="core-text-value">'+core.outerJus+'</div><div class="core-text-sub">（'+core.outerShi+'）</div></div>'
+    +'<div class="core-text-arrow">▶</div>'
+    +'<div class="core-text-item"><div class="core-text-label">核</div>'+gogyoBadge(core.core)+'<div class="core-text-value">'+core.core+'</div><div class="core-text-sub">（日干）</div></div>'
+    +'<div class="core-text-arrow">◀</div>'
+    +'<div class="core-text-item"><div class="core-text-label">内面</div>'+gogyoBadge(core.innerShi)+'<div class="core-text-value">'+core.innerJus+'</div><div class="core-text-sub">（'+core.innerShi+'）</div></div>'
+    +'</div>';
+  html+='</div>';
+
+  // タブ2：同心円グラフ
+  html+='<div class="daiun-tab-pane" id="ctab-circle" role="tabpanel">';
+  html+='<div class="core-circle-wrap"><svg class="core-circle-svg" id="core-circle-svg" viewBox="0 0 380 380">'
+    +'<circle class="core-ring ring-outer" cx="190" cy="180" r="150" fill="rgba(124,58,237,0.08)" stroke="#7c3aed" stroke-width="1.5"/>'
+    +'<circle class="core-ring ring-mid" cx="190" cy="180" r="95" fill="rgba(184,134,11,0.1)" stroke="#b8860b" stroke-width="1.5"/>'
+    +'<circle class="core-ring ring-inner" cx="190" cy="180" r="45" fill="rgba(192,64,64,0.12)" stroke="#c04040" stroke-width="1.5"/>'
+    +'<g class="core-ring-text">'
+    +'<text x="190" y="172" text-anchor="middle" style="font-family:\'Zen Old Mincho\',serif;font-size:1.4rem;font-weight:700;fill:var(--ink)">'+core.core+'</text>'
+    +'<text x="190" y="196" text-anchor="middle" style="font-size:0.7rem;fill:var(--ink3)">核</text>'
+    +'<text x="190" y="103" text-anchor="middle" style="font-size:1rem;font-weight:700;fill:var(--ink)">'+core.innerJus+'</text>'
+    +'<text x="190" y="123" text-anchor="middle" style="font-size:0.7rem;fill:var(--ink3)">内面</text>'
+    +'<text x="190" y="48" text-anchor="middle" style="font-size:1rem;font-weight:700;fill:var(--ink)">'+core.outerJus+'</text>'
+    +'<text x="190" y="68" text-anchor="middle" style="font-size:0.7rem;fill:var(--ink3)">外面</text>'
+    +'</g>'
+    +'</svg></div>';
+  html+='</div>';
+
+  html+='</div>';
+  return html;
+}
+
+function switchCoreTab(name,btn){
+  var card=btn?btn.closest('.card'):document;
+  var panes=card.querySelectorAll('.daiun-tab-pane');
+  panes.forEach(function(p){p.classList.remove('active');});
+  var btns=card.querySelectorAll('.daiun-tab-btn');
+  btns.forEach(function(b){b.classList.remove('active');});
+  var pane=document.getElementById('ctab-'+name);
+  if(pane)pane.classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='circle'){
+    var svg=document.getElementById('core-circle-svg');
+    if(svg){
+      svg.classList.remove('bwa');
+      setTimeout(function(){svg.classList.add('bwa');},30);
+    }
+  }
 }
 </script>
 <script>
