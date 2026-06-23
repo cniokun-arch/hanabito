@@ -2717,7 +2717,7 @@ async function speakText(text,btn){
     });
     var data=await res.json();
     if(!data.audioContent)throw new Error('音声データなし');
-    var audio=new Audio('data:audio/wav;base64,'+data.audioContent);
+    var audio=new Audio('data:audio/mp3;base64,'+data.audioContent);
     currentAudio=audio;
     audio.onplay=function(){if(btn){btn.textContent='⏹ 停止';btn.disabled=false;}};
     audio.onended=function(){if(btn)btn.textContent='▶️ 読み上げ';currentAudio=null;};
