@@ -980,6 +980,20 @@ function getNayin(ks){return NAYIN_MAP[ks]||'';}
 function getNayinYinYang(ks){var yo=['甲','丙','戊','庚','壬'];return yo.indexOf(ks[0])>=0?'外向き':'内向き';}
 function getHoshiType(y,m,d){var dayKS=getDayKS(y,m,d),name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)],nenKS=getYearKS(y,m,d),num=ROKUJU.indexOf(nenKS)+1;return name+(num%2===1?'＋':'－');}
 function getHoshiName(y,m,d){return HOSHI_BY_IDX[ROKUJU.indexOf(getDayKS(y,m,d))];}
+
+// ===== 表示名変換（内部キー＝旧名称はロジック用に維持、画面・AI入出力には新名称を使う二層構造） =====
+const HT_DISPLAY_MAP={'天花人':'天人花','白花人':'珀人花','離花人':'麗人花','風花人':'風人花','仙花人':'仙人花','水花人':'水人花'};
+function htDisplayBase(htBase){return HT_DISPLAY_MAP[htBase]||htBase;}
+// G.ht（例:'天花人＋'）→ 表示用の六花人名＋日向/日陰の完全表記（例:'天人花（日向）'）
+function htDisplayFull(ht){
+  if(!ht)return '';
+  var base=ht.replace(/[＋－]/g,'');
+  var disp=htDisplayBase(base);
+  var hinataHikage=ht.indexOf('＋')>=0?'日向':'日陰';
+  return disp+'（'+hinataHikage+'）';
+}
+function htDisplayHinataHikage(ht){return (ht&&ht.indexOf('＋')>=0)?'日向':'日陰';}
+
 function getDaiunStartAge(y,m,d,isFwd){var bd=new Date(y,m-1,d);var days=0;try{if(isFwd){var st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{var nm=m+1,ny=y;if(nm>12){nm=1;ny++;}var ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{var st2=getSetsuDate(y,m),stD2=new Date(st2.getFullYear(),st2.getMonth(),st2.getDate());if(bd>=stD2)days=Math.round((bd-stD2)/86400000);else{var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
 function getJuniColor(j){return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
 
@@ -1670,8 +1684,8 @@ function buildHomePage(){
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
     +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'の六花人</div>'
-    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htBase+'</div>'
-    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+G.ht.replace(/[＋－]/g,'')+(G.ht.includes('＋')?'＋（陽）':'－（陰）')+'</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBase(htBase)+'</div>'
+    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+htDisplayHinataHikage(G.ht)+'</div>'
     +'</div>';
 
   // 運気タブウィジェット
@@ -2322,8 +2336,8 @@ async function runCompatAI(){
     +'・月支の相性＝普段の日常的な付き合いの中で出る相性。\n'
     +'・日支の相性＝何かに熱中した時・話し合い・喧嘩した時に出てくる相性。\n'
     +'必ず年支→月支→日支の順に重みをつけて解説すること。データに忠実に、良い面も悪い面も正直に伝えること。\n\n'
-    +'1人目: '+compatN1+'（'+compatG1.ht+'・'+compatG1.y+'年生）\n'
-    +'2人目: '+compatN2+'（'+compatG2.ht+'・'+compatG2.y+'年生）\n\n'
+    +'1人目: '+compatN1+'（'+htDisplayFull(compatG1.ht)+'・'+compatG1.y+'年生）\n'
+    +'2人目: '+compatN2+'（'+htDisplayFull(compatG2.ht)+'・'+compatG2.y+'年生）\n\n'
     +fixedText(compatG1,compatG2,compatN1,compatN2)+'\n\n'
     +fixedText(compatG2,compatG1,compatN2,compatN1)+'\n\n'
     +'【'+compatN1+'の今の状態】年運:'+u1.yrJu+' 大運:'+u1.daiJu+'（'+u1.currDaiun.ks+'） 今日:'+u1.dayJu+'\n'
@@ -2349,6 +2363,7 @@ async function runCompatAI(){
     ?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間。命式の干支が転化天蛹の支でも転化天蛹ではない。'+(KB['転化天蛹']['説明']||'')+' 過ごし方：'+(KB['転化天蛹']['過ごし方']||'')
     :'';
   var sysPrompt='あなたは花人占術AIです。2人の命式データを使って相性鑑定を行います。\n\n'
+    +'【六花人の名称について】回答内で六花人の名前を使う場合は必ず新名称を使うこと：天花人→天人花、白花人→珀人花、離花人→麗人花、風花人→風人花、仙花人→仙人花、水花人→水人花。陰陽（＋／－）は「日向（ひなた）」「日陰（ひかげ）」と表現する（＋＝日向、－＝日陰）。旧名称や記号（＋／－）、「陽」「陰」という単語は回答内で絶対に使わないこと。\n\n'
     +'【知識ベース（通常のAI相談と同じデータ）】\n'
     +'【十二運気】\n'+juniInfo+'\n\n'
     +daiInfo+'\n\n'
@@ -2428,7 +2443,7 @@ function buildSystemPromptFull(G){
     var tone=wave>=3?'この性質がプラスに発揮されやすく、'
       :wave>=0?'この性質が穏やかに作用し、'
       :'この性質が自家中毒になりやすく（自分の性格がトラブルを呼ぶ）、';
-    return pillar+'の納音「'+name+'（'+dir+'）」は、'+G.ht+'では「'+ju+'（'+kikkyo+'）」の運気に当たる。'
+    return pillar+'の納音「'+name+'（'+dir+'）」は、'+htDisplayFull(G.ht)+'では「'+ju+'（'+kikkyo+'）」の運気に当たる。'
       +juTxt+' → '+tone+'「'+name+'の性質」が'+pillar+'として一生涯作用する。';
   }
 
@@ -2479,7 +2494,7 @@ function buildSystemPromptFull(G){
   // ── 六花人の特徴 ──
   var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
   var starInfo=starKey&&KB[starKey]&&KB[starKey][htKey]
-    ?'【'+G.ht+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||'')
+    ?'【'+htDisplayFull(G.ht)+'の特徴】'+(KB[starKey][htKey]['説明']||'')+' 性格：'+(KB[starKey][htKey]['性格']||'')
     :'';
 
   // ── 転化天蛹 ──
@@ -2502,6 +2517,7 @@ function buildSystemPromptFull(G){
 
   // ── システムプロンプト組み立て ──
   return 'あなたは花人占術AIです。以下のロジックと命式データに基づいて鑑定してください。\n\n'
+    +'【六花人の名称について】回答内で六花人の名前を使う場合は必ず新名称を使うこと：天花人→天人花、白花人→珀人花、離花人→麗人花、風花人→風人花、仙花人→仙人花、水花人→水人花。陰陽（＋／－）は「日向（ひなた）」「日陰（ひかげ）」と表現する（＋＝日向、－＝日陰）。旧名称（天花人など）や記号（＋／－）、「陽」「陰」という単語は回答内で絶対に使わないこと。\n\n'
     +'【花人占術の鑑定ロジック】\n'
     +'地運（一生変わらない本質）と天運（今の運気）の二軸で読む。\n'
     +'地運：①心理学的三層（月柱エゴ×年柱スーパーエゴ→日柱イド）②納音×六花人の十二運気（各柱の性質が好運気か自家中毒か）\n'
@@ -2575,7 +2591,7 @@ function buildAIPage(){
     +'<div style="display:flex;align-items:center;justify-content:space-between">'
     +'<div style="display:flex;align-items:center;gap:0.5rem;min-width:0">'
     +'<div style="font-size:0.86rem;color:var(--ink2)">'+name+'をAIに相談</div>'
-    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.77rem;flex-shrink:0">'+G.ht+'</span>'
+    +'<span class="rokka-badge rokka-'+htBase+'" style="font-size:0.77rem;flex-shrink:0">'+htDisplayFull(G.ht)+'</span>'
     +'</div>'
     +'<button onclick="document.getElementById(\'ai-about-wrap\').classList.add(\'show\')" style="font-size:0.86rem;padding:2px 8px;border:1px solid rgba(184,134,11,0.35);border-radius:10px;background:var(--bg);color:var(--gold);cursor:pointer;white-space:nowrap;flex-shrink:0">📖 使い方</button>'
     +'</div>'
@@ -2704,7 +2720,8 @@ async function speakText(text,btn){
   if(!text)return;
   // 干支漢字を読み仮名に
   var t=text;
-  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん'],
+  [['風人花','ふうじんか'],['天人花','てんにんか'],['水人花','すいじんか'],['珀人花','はくじんか'],['麗人花','れいじんか'],['仙人花','せんにんか'],
+   ['日向','ひなた'],['日陰','ひかげ'],
    ['開花','かいか'],['豊穣','ほうじょう'],['青葉','あおば'],['発芽','はつが'],['穂分','ほわけ'],['平凪','ひらなぎ'],
    ['成天','せいてん'],['内省','ないせい'],['狂咲','くるいざき'],['引寒','いんかん'],['休眠','きゅうみん'],['残雪','ざんせつ'],
    ['転化天蛹','てんかてんよう'],['大運','だいうん'],['命式','めいしき'],['六花人','ろっかじん'],['納音','ないん']
