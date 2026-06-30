@@ -1697,7 +1697,7 @@ function buildHomePage(){
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
-    +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'に咲く花は</div>'
+    +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'さんに咲く花は</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBaseRuby(htBase)+'</div>'
     +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
     +'</div>';
@@ -1706,7 +1706,7 @@ function buildHomePage(){
   // 運気ウィジェット（indexスタイル）
   html+='<div class="unki-widget">'
     +'<div class="unki-widget-header">'
-    +'<span class="unki-widget-title">◆ あなたの運気</span>'
+    +'<span class="unki-widget-title">◆ あなたの<ruby>運気<rt>うんき</rt></ruby></span>'
     +'<div class="unki-widget-tabs">'
     +'<button class="unki-widget-tab active" id="uwt-day" onclick="switchUnkiTab(\'day\')">今日</button>'
     +'<button class="unki-widget-tab" id="uwt-mon" onclick="switchUnkiTab(\'month\')">今月</button>'
@@ -1853,7 +1853,7 @@ function renderUnkiBody(tab){
     +'<div style="flex:1">'
     +'<div style="font-size:1rem;color:var(--ink3);margin-bottom:2px">'+label+'：'+ks+'</div>'
     +(periodLabel?'<div style="font-size:0.83rem;color:var(--purple);margin-bottom:4px">📅 '+periodLabel+'</div>':'')
-    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:'+color+'">'+juni+'</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:700;color:'+color+'">'+juniRuby(juni)+'</div>'
     +barsHtml
     +'<p style="font-size:0.97rem;color:var(--ink2);line-height:1.7;margin-top:0.4rem">'+(JUNI_DESC[juni]||'')+'</p>'
     +'</div></div>';
