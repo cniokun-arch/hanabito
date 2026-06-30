@@ -268,6 +268,19 @@ function getZokan(shi,days){const col=ZOKAN_SHI.indexOf(shi);if(col<0)return '�
 function getJuniUnki(ht,shi){const s=TEISHI[ht];if(s===undefined)return '—';const si=JUNISHI.indexOf(shi);if(si<0)return '—';return JUNI_NAMES[(si-s+12)%12]||'—';}
 function getRokkaJin(y,m,d){const dayKS=getDayKS(y,m,d);const name=HOSHI_BY_IDX[ROKUJU.indexOf(dayKS)];const nenKS=getYearKS(y,m,d);const num=ROKUJU.indexOf(nenKS)+1;return name+(num%2===1?'＋':'－');}
 
+// ===== 表示名変換（内部キー＝旧名称はロジック用に維持、画面表示には新名称を使う二層構造） =====
+const HT_DISPLAY_MAP={'天花人':'天人花','白花人':'珀人花','離花人':'麗人花','風花人':'風人花','仙花人':'仙人花','水花人':'水人花'};
+function htDisplayBase(htBase){return HT_DISPLAY_MAP[htBase]||htBase;}
+function htDisplayFull(ht){
+  if(!ht)return '';
+  var base=ht.replace(/[＋－]/g,'');
+  var disp=htDisplayBase(base);
+  var hinataHikage=ht.indexOf('＋')>=0?'日向':'日陰';
+  return disp+'（'+hinataHikage+'）';
+}
+function htDisplayHinataHikage(ht){return (ht&&ht.indexOf('＋')>=0)?'日向':'日陰';}
+
+
 // 十二運気カラー（index.htmlと同じ）
 function getJuniColor(j){
   return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';
@@ -1006,8 +1019,8 @@ function initDiagramEngine(nodes,edges){
     }
     if(wasTap&&tapped){
       var kb=NAYIN_KB[tapped.person?tapped.person.nichiN:'']||{};
-      var htBase=tapped.person?tapped.person.ht.replace(/[＋－]/g,''):'';
-      var detail=htBase+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+      var htDisp=tapped.person?htDisplayFull(tapped.person.ht):'';
+      var detail=htDisp+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
       showDiagDetail(tapped.name+'\uff08'+tapped.memo+'\uff09',detail,'#b8860b');
     }
   });
@@ -1047,8 +1060,8 @@ function initDiagramEngine(nodes,edges){
     mMode=null;mNode=null;
     if(wasTap&&tapped){
       var kb=NAYIN_KB[tapped.person?tapped.person.nichiN:'']||{};
-      var htBase=tapped.person?tapped.person.ht.replace(/[＋－]/g,''):'';
-      var detail=htBase+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
+      var htDisp=tapped.person?htDisplayFull(tapped.person.ht):'';
+      var detail=htDisp+'\n'+(tapped.person?tapped.person.nenKS+' / '+tapped.person.tsuKS+' / '+tapped.person.nichiKS:'')+'\n\n'+(kb['性格']||'');
       showDiagDetail(tapped.name+'\uff08'+tapped.memo+'\uff09',detail,'#b8860b');
     }
   });
@@ -1116,7 +1129,7 @@ function buildPeopleTab(result){
     det.style.cssText='font-size:0.82rem;color:#3a2a00;margin-top:0.5rem;line-height:1.7;display:none';
     det.textContent=kb['性格']||'';
     card.innerHTML='<div style="display:flex;align-items:center;gap:0.7rem">'
-      +'<div style="width:44px;height:44px;border-radius:50%;background:'+rc.bg+';border:2px solid '+rc.border+';display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;color:'+rc.col+';flex-shrink:0;text-align:center;line-height:1.2">'+htBase+'</div>'
+      +'<div style="width:44px;height:44px;border-radius:50%;background:'+rc.bg+';border:2px solid '+rc.border+';display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;color:'+rc.col+';flex-shrink:0;text-align:center;line-height:1.2">'+htDisplayBase(htBase)+'</div>'
       +'<div><div style="font-size:0.95rem;font-weight:700">'+p.name+'</div>'
       +'<div style="font-size:0.78rem;color:#7a6b52">'+p.role.replace('あなた（本人）','本人')+'</div>'
       +'<div style="font-size:0.75rem;color:#4a3c28;margin-top:2px">'+p.nenKS+' / '+p.tsuKS+' / '+p.nichiKS+'</div>'
@@ -1295,7 +1308,7 @@ async function speakAdvice(btn){
   var gender=document.getElementById('adviceVoiceGender').value||'female';
   var t=rawText;
   ['#','*','【','】','「','」'].forEach(function(c){while(t.indexOf(c)>=0)t=t.replace(c,'');});
-  [['風花人','ふうかじん'],['天花人','てんかじん'],['水花人','すいかじん'],['白花人','はくかじん'],['離花人','りかじん'],['仙花人','せんかじん']].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
+  [['風人花','ふうじんか'],['天人花','てんにんか'],['水人花','すいじんか'],['珀人花','はくじんか'],['麗人花','れいじんか'],['仙人花','せんにんか'],['日向','ひなた'],['日陰','ひかげ']].forEach(function(p){while(t.indexOf(p[0])>=0)t=t.replace(p[0],p[1]);});
   btn.textContent='⏳ 生成中...';btn.disabled=true;
   try{
     var res=await fetch('https://polished-flower-2524.cniokun.workers.dev/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,gender:gender})});
