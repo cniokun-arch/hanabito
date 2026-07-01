@@ -934,6 +934,40 @@ const ROKUJU=['甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','�
 const HOSHI_BY_IDX=['天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','天花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','白花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','離花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','風花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','仙花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人','水花人'];
 const NAYIN_MAP={'甲子':'海中金','乙丑':'海中金','丙寅':'炉中火','丁卯':'炉中火','戊辰':'大森木','己巳':'大森木','庚午':'路傍土','辛未':'路傍土','壬申':'剣鋒金','癸酉':'剣鋒金','甲戌':'山頭火','乙亥':'山頭火','丙子':'澗下水','丁丑':'澗下水','戊寅':'城頭土','己卯':'城頭土','庚辰':'白鑞金','辛巳':'白鑞金','壬午':'楊柳木','癸未':'楊柳木','甲申':'泉中水','乙酉':'泉中水','丙戌':'屋上土','丁亥':'屋上土','戊子':'霹靂火','己丑':'霹靂火','庚寅':'松柏木','辛卯':'松柏木','壬辰':'長流水','癸巳':'長流水','甲午':'沙中金','乙未':'沙中金','丙申':'山下火','丁酉':'山下火','戊戌':'平地木','己亥':'平地木','庚子':'壁上土','辛丑':'壁上土','壬寅':'金箔金','癸卯':'金箔金','甲辰':'覆燈火','乙巳':'覆燈火','丙午':'天河水','丁未':'天河水','戊申':'大駅土','己酉':'大駅土','庚戌':'釵釧金','辛亥':'釵釧金','壬子':'桑柘木','癸丑':'桑柘木','甲寅':'大渓水','乙卯':'大渓水','丙辰':'沙中土','丁巳':'沙中土','戊午':'天上火','己未':'天上火','庚申':'石榴木','辛酉':'石榴木','壬戌':'大海水','癸亥':'大海水'};
 const SATSKAI={'天花人':['戌','亥'],'白花人':['申','酉'],'離花人':['午','未'],'風花人':['辰','巳'],'仙花人':['寅','卯'],'水花人':['子','丑']};
+
+// 六花人の共通土台：空亡の支→従星キーワード（レポートより確定）
+const ROKKA_JUSEI_KW={
+  '天庫星':['探求','凝り性','狭く深く掘り下げる','精神性','哲学'],
+  '天馳星':['瞬間のひらめき','自由','束縛が嫌','瞬発力'],
+  '天胡星':['直感','審美眼','夢追い人','芸術・音楽','ロマンチスト'],
+  '天極星':['純粋','お人好し','境界線のなさ','技術','精神世界'],
+  '天将星':['帝王','孤独','完全燃焼の炎','絶対的リーダー','波乱万丈'],
+  '天堂星':['俯瞰','一歩引いた視点','頑固','補佐役','長老'],
+  '天南星':['批判精神','逆境で闘争心','正義感','言葉が鋭い'],
+  '天禄星':['観察眼','堅実','コツコツ','安心感','組織の要'],
+  '天貴星':['プライド','品格','誠実','嘘が嫌い','一生学び続ける'],
+  '天恍星':['自立心','色気','新しい世界へ飛び込む','芸能の星'],
+  '天報星':['変幻自在','多芸多才','無限の可能性','転職','マルチタスク'],
+  '天印星':['無邪気','愛され力','受動的','マスコット','人を和ます'],
+};
+
+// 六花人（内部キー）×日向日陰 → {outer:従星名, inner:従星名}
+function getRokkaJusei(ht){
+  if(!ht)return null;
+  var base=ht.replace(/[＋－]/g,'');
+  var sats=SATSKAI[base];
+  if(!sats||sats.length<2)return null;
+  var isPlus=ht.indexOf('＋')>=0;
+  var shiA=sats[0],shiB=sats[1];
+  var yangShi=(GOGYO[shiA]&&GOGYO[shiA]['陰陽']==='＋')?shiA:shiB;
+  var yinShi=(yangShi===shiA)?shiB:shiA;
+  var outerShi=isPlus?yangShi:yinShi;
+  var innerShi=isPlus?yinShi:yangShi;
+  // 空亡の支→従星名は固定マップで引く
+  var shiToJus={'戌':'天庫星','亥':'天馳星','申':'天胡星','酉':'天極星','午':'天将星','未':'天堂星','辰':'天南星','巳':'天禄星','寅':'天貴星','卯':'天恍星','子':'天報星','丑':'天印星'};
+  return {outer:shiToJus[outerShi]||'', inner:shiToJus[innerShi]||'', outerShi:outerShi, innerShi:innerShi};
+}
+
 const TSUHEN=[['比肩','劫財','食神','傷官','偏財','正財','偏官','正官','偏印','印綬'],['劫財','比肩','傷官','食神','正財','偏財','正官','偏官','印綬','偏印'],['偏印','印綬','比肩','劫財','食神','傷官','偏財','正財','偏官','正官'],['印綬','偏印','劫財','比肩','傷官','食神','正財','偏財','正官','偏官'],['偏官','正官','偏印','印綬','比肩','劫財','食神','傷官','偏財','正財'],['正官','偏官','印綬','偏印','劫財','比肩','傷官','食神','正財','偏財'],['偏財','正財','偏官','正官','偏印','印綬','比肩','劫財','食神','傷官'],['正財','偏財','正官','偏官','印綬','偏印','劫財','比肩','傷官','食神'],['食神','傷官','偏財','正財','偏官','正官','偏印','印綬','比肩','劫財'],['傷官','食神','正財','偏財','正官','偏官','印綬','偏印','劫財','比肩']];
 const JUNI_NAMES=['休眠','残雪','発芽','青葉','開花','内省','成天','狂咲','豊穣','穂分','平凪','引寒'];
 const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
@@ -1699,8 +1733,28 @@ function buildHomePage(){
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
     +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'さんに咲く花は</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBaseRuby(htBase)+'</div>'
-    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
-    +'</div>';
+    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>';
+
+  // 六花人の共通土台：外面・内面の従星
+  var rj=getRokkaJusei(G.ht);
+  if(rj&&rj.outer&&rj.inner){
+    var kwOuter=(ROKKA_JUSEI_KW[rj.outer]||[]).slice(0,3).join('・');
+    var kwInner=(ROKKA_JUSEI_KW[rj.inner]||[]).slice(0,3).join('・');
+    html+='<div style="margin-top:0.9rem;border-top:1px solid rgba(255,255,255,0.2);padding-top:0.7rem;display:flex;gap:0.6rem;justify-content:center">'
+      +'<div style="flex:1;text-align:center">'
+      +'<div style="font-size:0.7rem;color:rgba(255,255,255,0.6);letter-spacing:0.1em;margin-bottom:0.2rem">外面</div>'
+      +'<div style="font-size:0.95rem;font-weight:700;color:#fff">'+rj.outer+'</div>'
+      +'<div style="font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">'+kwOuter+'</div>'
+      +'</div>'
+      +'<div style="width:1px;background:rgba(255,255,255,0.2);flex-shrink:0"></div>'
+      +'<div style="flex:1;text-align:center">'
+      +'<div style="font-size:0.7rem;color:rgba(255,255,255,0.6);letter-spacing:0.1em;margin-bottom:0.2rem">内面</div>'
+      +'<div style="font-size:0.95rem;font-weight:700;color:#fff">'+rj.inner+'</div>'
+      +'<div style="font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">'+kwInner+'</div>'
+      +'</div>'
+      +'</div>';
+  }
+  html+='</div>';
 
   // 運気タブウィジェット
   // 運気ウィジェット（indexスタイル）
