@@ -819,6 +819,17 @@ body.theme-dark .ai-input-area{background:#1c1914}
     </div>
   </div>
 
+  <!-- 従星解説 オーバーレイ -->
+  <div class="about-overlay-wrap" id="jusei-about-overlay">
+    <div id="jusei-overlay-header" style="background:linear-gradient(135deg,#1a7a4a,#27ae60);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 id="jusei-overlay-title" style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.15em;margin:0">✦ あなたに与えられた従星</h2>
+      <button onclick="document.getElementById('jusei-about-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div id="jusei-overlay-body" style="padding:1.4rem 1.2rem 3rem">
+      <!-- JS で動的生成 -->
+    </div>
+  </div>
+
   <!-- メンバータブ -->
   <div class="member-tab-bar" id="member-tab-bar">
     <!-- JS で生成 -->
@@ -1752,7 +1763,8 @@ function buildHomePage(){
       +'<div style="font-size:0.95rem;font-weight:700;color:#fff">'+rj.inner+'</div>'
       +'<div style="font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">'+kwInner+'</div>'
       +'</div>'
-      +'</div>';
+      +'</div>'
+      +'<button onclick="openJuseiOverlay()" style="margin-top:0.7rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;font-family:\'Noto Serif JP\',serif;font-size:0.82rem;padding:0.4rem 1.2rem;border-radius:20px;cursor:pointer;letter-spacing:0.05em">✦ 従星の詳しい解説を見る</button>';
   }
   html+='</div>';
 
@@ -1801,6 +1813,86 @@ function buildHomePage(){
 
 var currentUnkiTab='day';
 var unkiOffset=0; // 今日からのオフセット（日・月・年）
+
+// 従星解説オーバーレイを開く
+function openJuseiOverlay(){
+  var G=getCurrentTargetG();
+  if(!G)return;
+  var htBase=G.ht.replace(/[＋－]/g,'');
+  var dispName=htDisplayBase(htBase);
+  var hinata=htDisplayHinataHikage(G.ht);
+  var rj=getRokkaJusei(G.ht);
+  if(!rj)return;
+
+  // ヘッダーの色を六花人カラーに合わせる
+  var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
+  var hdr=document.getElementById('jusei-overlay-header');
+  if(hdr)hdr.style.background=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
+  var ttl=document.getElementById('jusei-overlay-title');
+  if(ttl)ttl.textContent='✦ '+dispName+'に与えられた従星';
+
+  // KBから従星説明を取得（風花人のみ対応、他はデフォルト文）
+  var jusei=(KB['星人']&&KB['星人'][htBase]&&KB['星人'][htBase]['従星説明'])||null;
+  var kwOuter=(ROKKA_JUSEI_KW[rj.outer]||[]);
+  var kwInner=(ROKKA_JUSEI_KW[rj.inner]||[]);
+
+  var body=document.getElementById('jusei-overlay-body');
+  if(!body)return;
+
+  var h='';
+
+  // 1. 導入文
+  h+='<div style="background:var(--bg);border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem;line-height:1.9;font-size:0.95rem;color:var(--ink)">'
+    +(jusei&&jusei['導入']?jusei['導入']:dispName+'には2つの従星が与えられています。'+rj.outer+'と'+rj.inner+'です。このふたつの星によって、'+dispName+'の基本的な性格・性質・運命の土台が決まります。')
+    +'</div>';
+
+  // 2. 日向/日陰の説明
+  h+='<div style="background:rgba(184,134,11,0.06);border-left:3px solid #b8860b;padding:0.8rem 1rem;margin-bottom:1.2rem;border-radius:0 8px 8px 0;font-size:0.92rem;color:var(--ink);line-height:1.8">'
+    +(jusei&&jusei['日向内面外面']?jusei['日向内面外面']:'日向の人は'+rj.outer+'が外面（表に出る顔）として強く現れ、'+rj.inner+'が内面（奥にある性質）として見えにくく出ます。日陰の人はその逆で、'+rj.inner+'が外面として強く現れ、'+rj.outer+'が内面として見えにくく出ます。')
+    +'</div>';
+
+  // 3. 各従星のキーワード・説明
+  var stars=[{name:rj.outer, kw:kwOuter, desc:jusei&&jusei[rj.outer+'説明']}, {name:rj.inner, kw:kwInner, desc:jusei&&jusei[rj.inner+'説明']}];
+  stars.forEach(function(st){
+    h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
+      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:#b8860b;margin-bottom:0.5rem">'+st.name+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem">'
+      +st.kw.map(function(k){return '<span style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.25);border-radius:12px;padding:2px 10px;font-size:0.78rem;color:#4a3c28">'+k+'</span>';}).join('')
+      +'</div>'
+      +(st.desc?'<p style="font-size:0.9rem;color:var(--ink2);line-height:1.8;margin:0">'+st.desc+'</p>':'')
+      +'</div>';
+  });
+
+  // 4. 性格まとめ（日向・日陰それぞれ）
+  var charaHinata=jusei&&jusei['日向性格'];
+  var charaHikage=jusei&&jusei['日陰性格'];
+  if(charaHinata||charaHikage){
+    h+='<div style="margin-top:0.5rem">';
+    h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:var(--gold);margin-bottom:0.8rem;letter-spacing:0.1em">◆ 日向・日陰の性格まとめ</div>';
+    if(charaHinata){
+      h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">'
+        +'<div style="font-size:0.82rem;color:var(--gold);font-weight:700;margin-bottom:0.4rem">☀️ 日向（ひなた）の'+dispName+'</div>'
+        +'<p style="font-size:0.9rem;color:var(--ink);line-height:1.8;margin:0">'+charaHinata+'</p>'
+        +'</div>';
+    }
+    if(charaHikage){
+      h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">'
+        +'<div style="font-size:0.82rem;color:#555;font-weight:700;margin-bottom:0.4rem">🌙 日陰（ひかげ）の'+dispName+'</div>'
+        +'<p style="font-size:0.9rem;color:var(--ink);line-height:1.8;margin:0">'+charaHikage+'</p>'
+        +'</div>';
+    }
+    h+='</div>';
+  }
+
+  h+='<div style="text-align:center;margin-top:1.5rem">'
+    +'<button onclick="document.getElementById(\'jusei-about-overlay\').classList.remove(\'show\')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:\'Noto Serif JP\',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>'
+    +'</div>';
+
+  body.innerHTML=h;
+  document.getElementById('jusei-about-overlay').classList.add('show');
+}
+
+
 
 function switchUnkiTab(tab){
   currentUnkiTab=tab;
