@@ -1881,7 +1881,7 @@ function buildHomePage(){
       +'<div style="font-size:0.72rem;color:rgba(255,255,255,0.7);margin-top:0.2rem">'+kwInner+'</div>'
       +'</div>'
       +'</div>'
-      +'<button onclick="openJuseiOverlay()" style="margin-top:0.7rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;font-family:\'Noto Serif JP\',serif;font-size:0.82rem;padding:0.4rem 1.2rem;border-radius:20px;cursor:pointer;letter-spacing:0.05em">✦ 従星の詳しい解説を見る</button>';
+      +'<button onclick="openJuseiOverlay()" style="margin-top:0.7rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;font-family:\'Noto Serif JP\',serif;font-size:0.82rem;padding:0.4rem 1.2rem;border-radius:20px;cursor:pointer;letter-spacing:0.05em">✦ '+htDisplayBase(htBase)+'の説明を見る</button>';
   }
   html+='</div>';
 
@@ -1959,6 +1959,9 @@ function openJuseiOverlay(){
   var h='';
 
   // 1. 導入文
+  h+='<div style="background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.15);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem;line-height:1.9;font-size:0.92rem;color:var(--ink2)">'
+    +'花人占術では、どんな人も六種類の性質（花）のひとつが与えられ、それが日向（ひなた）と日陰（ひかげ）にそれぞれ分けられていると考えます。そしてその花には2つの星（従星）が与えられ、その性質により咲く花が決まる、という考え方をします。'
+    +'</div>';
   h+='<div style="background:var(--bg);border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem;line-height:1.9;font-size:0.95rem;color:var(--ink)">'
     +(jusei&&jusei['導入']?jusei['導入']:dispName+'には2つの従星が与えられています。'+rj.outer+'と'+rj.inner+'です。このふたつの星によって、'+dispName+'の基本的な性格・性質・運命の土台が決まります。')
     +'</div>';
