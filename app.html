@@ -860,7 +860,7 @@ body.theme-dark .ai-input-area{background:#1c1914}
     </button>
     <button class="nav-btn" onclick="switchNav('manual',this)">
       <span class="nav-icon">📖</span>
-      <span class="nav-lbl">説明書</span>
+      <span class="nav-lbl">あなたの本</span>
     </button>
   </div>
 </div>
@@ -2948,7 +2948,7 @@ function buildAIPage(){
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
     +'<button class="nav-btn-ai active" onclick="switchNav(\'ai\',this)"><div class="nav-btn-ai-circle">🌸</div><span class="nav-lbl">AI相談</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
-    +'<button class="nav-btn" onclick="switchNav(\'manual\',this)"><span class="nav-icon">📖</span><span class="nav-lbl">説明書</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'manual\',this)"><span class="nav-icon">📖</span><span class="nav-lbl">あなたの本</span></button>'
     +'</div>';
 
   html+='</div>';
@@ -3402,13 +3402,19 @@ function buildManualPage(){
   var starData=(KB['星人']&&KB['星人'][htBase])||{};
   var html='<div class="page active">';
 
-  // ヘッダーバナー
+  // タイトルバナー（最上部・独立）
+  html+='<div style="text-align:center;padding:1.2rem 0 0.8rem">'
+    +'<div style="font-size:0.78rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.4rem">✦ HANABITO SENJUTSU ✦</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.3rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.2rem">花人占術があなたを本にします</div>'
+    +'<div style="font-size:0.85rem;color:var(--ink3)">'+name+'さん専用の解説書</div>'
+    +'</div>';
+
+  // 六人花バナー（独立カード）
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var bg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
-  html+='<div style="background:'+bg+';border-radius:12px;padding:1.2rem;text-align:center;margin-bottom:1rem;color:#fff">'
-    +'<div style="font-size:0.8rem;opacity:0.8;margin-bottom:0.3rem">'+name+'さんの説明書</div>'
-    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.8rem;font-weight:700;letter-spacing:0.1em">'+htDisplayBaseRuby(htBase)+'</div>'
-    +'<div style="font-size:1rem;margin-top:0.3rem;opacity:0.9">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
+  html+='<div style="background:'+bg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15);color:#fff">'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.8rem;font-weight:700;letter-spacing:0.1em;margin-bottom:0.3rem">'+htDisplayBaseRuby(htBase)+'</div>'
+    +'<div style="font-size:1rem;opacity:0.9">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
     +'</div>';
 
   // 1. 基本性格（AI生成 or 生成前はプレースホルダー）
