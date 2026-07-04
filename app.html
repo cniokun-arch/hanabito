@@ -2151,11 +2151,9 @@ function buildMeishikiPage(){
   function kyuseiBadge(n,y,m,d,role,type,kan){
     if(!n)return '';
     var nm=kyuseiDisplayName(n,y,m,d,type,kan);
-    var kw=KYUSEI_KEYWORD[n]||'';
-    return '<div style="margin-top:0.5rem;background:rgba(100,60,180,0.07);border:1px solid rgba(100,60,180,0.2);border-radius:8px;padding:0.4rem 0.6rem;text-align:center">'
-      +'<div style="font-size:0.68rem;color:#7a5aaa;margin-bottom:0.2rem">'+role+'</div>'
-      +'<div style="font-size:0.85rem;font-weight:700;color:#5a3a99">'+nm+'</div>'
-      +'<div style="font-size:0.7rem;color:#7a6b8a;margin-top:0.2rem">'+kw+'</div>'
+    return '<div style="margin-top:0.5rem;background:rgba(100,60,180,0.06);border:1px solid rgba(100,60,180,0.15);border-radius:6px;padding:0.3rem 0.5rem;text-align:center">'
+      +'<div style="font-size:0.65rem;color:#9a7acc;margin-bottom:0.1rem">'+role+'</div>'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#5a3a99">'+nm+'</div>'
       +'</div>';
   }
 
