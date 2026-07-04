@@ -1712,6 +1712,7 @@ function renderCurrentPage(){
     else if(currentNav==='meishiki'){ca.innerHTML=buildMeishikiPage();initDaiunChart();}
     else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
+    else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
   }
 }
 
@@ -2940,7 +2941,7 @@ function buildAIPage(){
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
     +'<button class="nav-btn-ai active" onclick="switchNav(\'ai\',this)"><div class="nav-btn-ai-circle">🌸</div><span class="nav-lbl">AI相談</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
-    +'<button class="nav-btn" onclick="switchNav(\'setting\',this)"><span class="nav-icon">⚙️</span><span class="nav-lbl">設定</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'manual\',this)"><span class="nav-icon">📖</span><span class="nav-lbl">説明書</span></button>'
     +'</div>';
 
   html+='</div>';
@@ -3380,6 +3381,173 @@ async function updateProfileFromChat(userMsg,aiReply){
 // ============================================================
 // SETTING PAGE
 // ============================================================
+// ===== あなたの説明書ページ =====
+var _manualAIRunning=false;
+
+function buildManualPage(){
+  var G=getCurrentTargetG();
+  var name=getCurrentTargetName();
+  if(!G)return '<div class="page active"><p style="color:var(--ink3);padding:2rem;text-align:center">データがありません</p></div>';
+
+  var htBase=G.ht.replace(/[＋－]/g,'');
+  var dispName=htDisplayBase(htBase);
+  var hinata=htDisplayHinataHikage(G.ht);
+  var starData=(KB['星人']&&KB['星人'][htBase])||{};
+  var html='<div class="page active">';
+
+  // ヘッダーバナー
+  var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
+  var bg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
+  html+='<div style="background:'+bg+';border-radius:12px;padding:1.2rem;text-align:center;margin-bottom:1rem;color:#fff">'
+    +'<div style="font-size:0.8rem;opacity:0.8;margin-bottom:0.3rem">'+name+'さんの説明書</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.8rem;font-weight:700;letter-spacing:0.1em">'+htDisplayBaseRuby(htBase)+'</div>'
+    +'<div style="font-size:1rem;margin-top:0.3rem;opacity:0.9">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
+    +'</div>';
+
+  // 1. 六人花の基本性格（固定）
+  html+='<div class="card"><div class="card-title">◆ あなたの基本性格</div>';
+  if(starData['説明']) html+='<p style="font-size:0.95rem;line-height:1.9;color:var(--ink);margin-bottom:0.8rem">'+starData['説明']+'</p>';
+  if(starData['性格']) html+='<p style="font-size:0.92rem;line-height:1.8;color:var(--ink2)">'+starData['性格']+'</p>';
+  if(starData['キーワード']&&starData['キーワード'].length){
+    html+='<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.8rem">';
+    starData['キーワード'].forEach(function(k){
+      html+='<span style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.3);border-radius:12px;padding:2px 10px;font-size:0.8rem;color:#4a3c28">'+k+'</span>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+
+  // 2. 強み・弱み（固定）
+  html+='<div class="card"><div class="card-title">◆ 強みと弱み</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem">';
+  if(starData['強み']&&starData['強み'].length){
+    html+='<div><div style="font-size:0.78rem;color:#2a7a3a;font-weight:700;margin-bottom:0.4rem">✨ 強み</div>';
+    starData['強み'].forEach(function(s){html+='<div style="font-size:0.85rem;color:var(--ink);padding:0.2rem 0;border-bottom:1px solid rgba(184,134,11,0.1)">'+s+'</div>';});
+    html+='</div>';
+  }
+  if(starData['弱み']&&starData['弱み'].length){
+    html+='<div><div style="font-size:0.78rem;color:#c04040;font-weight:700;margin-bottom:0.4rem">⚠️ 注意点</div>';
+    starData['弱み'].forEach(function(s){html+='<div style="font-size:0.85rem;color:var(--ink);padding:0.2rem 0;border-bottom:1px solid rgba(184,134,11,0.1)">'+s+'</div>';});
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // 3. 仕事の傾向（固定）
+  if(starData['仕事']){
+    html+='<div class="card"><div class="card-title">◆ 仕事・天職の傾向</div>';
+    html+='<p style="font-size:0.92rem;line-height:1.8;color:var(--ink)">'+starData['仕事']+'</p>';
+    if(starData['日向・日陰の違い']){
+      html+='<div style="margin-top:0.8rem;background:rgba(184,134,11,0.05);border-left:3px solid #b8860b;padding:0.6rem 0.8rem;border-radius:0 6px 6px 0;font-size:0.85rem;color:var(--ink2)">'+starData['日向・日陰の違い']+'</div>';
+    }
+    html+='</div>';
+  }
+
+  // 4. 相性（固定）
+  html+='<div class="card"><div class="card-title">◆ 人間関係の傾向</div>';
+  html+='<div style="display:flex;gap:0.8rem;margin-bottom:0.6rem">';
+  if(starData['相性が良い'])html+='<div style="flex:1;background:rgba(42,107,58,0.07);border:1px solid rgba(42,107,58,0.2);border-radius:8px;padding:0.6rem;text-align:center"><div style="font-size:0.7rem;color:#2a7a3a;margin-bottom:0.2rem">相性が良い</div><div style="font-weight:700;font-size:0.9rem;color:#2a7a3a">'+htDisplayBase(starData['相性が良い'].replace(/[花人]/g,function(c){return c;})+'')+'</div></div>';
+  if(starData['相性に注意'])html+='<div style="flex:1;background:rgba(192,64,64,0.07);border:1px solid rgba(192,64,64,0.2);border-radius:8px;padding:0.6rem;text-align:center"><div style="font-size:0.7rem;color:#c04040;margin-bottom:0.2rem">要注意</div><div style="font-weight:700;font-size:0.9rem;color:#c04040">'+htDisplayBase(starData['相性に注意'].replace(/[花人]/g,function(c){return c;})+'')+'</div></div>';
+  html+='</div></div>';
+
+  // 5. AI生成セクション
+  html+='<div class="card" id="manual-ai-card">';
+  html+='<div class="card-title">◆ あなただけの詳細分析</div>';
+  html+='<p style="font-size:0.85rem;color:var(--ink3);margin-bottom:0.8rem">納音・九星・大運の流れを含む、あなた専用の詳細プロフィールをAIが生成します。</p>';
+
+  // 保存済みの説明書があれば表示
+  var saved=loadManualData();
+  if(saved){
+    html+='<div id="manual-ai-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+saved.replace(/\n/g,'<br>')+'</div>';
+    html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
+  } else {
+    html+='<div id="manual-ai-content"></div>';
+    html+='<button onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
+  }
+  html+='</div>';
+  html+='</div>';
+  return html;
+}
+
+function loadManualData(){
+  var data=S.load();if(!data)return null;
+  var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
+  return (data.manuals&&data.manuals[key])||null;
+}
+
+function saveManualData(text){
+  var data=S.load();if(!data)return;
+  if(!data.manuals)data.manuals={};
+  var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
+  data.manuals[key]=text;
+  S.save(data);
+}
+
+function initManualPage(){}
+
+async function generateManual(){
+  if(_manualAIRunning)return;
+  _manualAIRunning=true;
+  var G=getCurrentTargetG();
+  var name=getCurrentTargetName();
+  var btn=document.querySelector('#manual-ai-card button');
+  var content=document.getElementById('manual-ai-content');
+  if(!G||!content)return;
+  if(btn){btn.textContent='⏳ 生成中...';btn.disabled=true;}
+  content.innerHTML='<div style="color:var(--ink3);font-size:0.9rem">AIが分析中です。しばらくお待ちください...</div>';
+
+  var htBase=G.ht.replace(/[＋－]/g,'');
+  var dispName=htDisplayBase(htBase);
+  var hinata=htDisplayHinataHikage(G.ht);
+
+  // 大運テキストを生成
+  var daiunRows=getDaiunRows(G);
+  var daiunText=daiunRows.map(function(r){
+    return r.age+'〜'+(r.age+r.sp-1)+'歳（'+r.startY+'〜'+r.endY+'年）'+r.ks+' '+r.ju+(r.isSk?'【転化天蛹】':'');
+  }).join('\n');
+
+  var prompt='以下のデータを使って、'+name+'さんの「あなただけの詳細分析」を書いてください。\n\n'
+    +'【六人花】'+dispName+'（'+hinata+'）\n'
+    +'【本命星】'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan)+'\n'
+    +'【月命星】'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan)+'\n'
+    +'【日命星】'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan)+'\n'
+    +'【年柱納音】'+getNayin(G.nenKS)+'\n'
+    +'【月柱納音】'+getNayin(G.tsuKS)+'\n'
+    +'【日柱納音】'+getNayin(G.nichiKS)+'\n'
+    +'【大運の流れ】\n'+daiunText+'\n\n'
+    +'以下の構成で、丁寧でわかりやすい文章を書いてください。\n'
+    +'1. 恋愛・結婚・家庭運の傾向（'+dispName+'の本質と納音・九星から）\n'
+    +'2. 健康上の注意点（六人花の特性から）\n'
+    +'3. 本命星（内面）×月命星（外面）の組み合わせから見たあなたの特徴\n'
+    +'4. 大運の流れ（各大運ごとに：何歳から何歳・どんな時期・あなたにとってどう過ごすと良いか）\n\n'
+    +'占術用語は使わず、誰でも分かる具体的な言葉で。Markdown禁止。各セクションは見出しをつけて読みやすく。';
+
+  try{
+    var sys=buildSystemPromptFull(G);
+    var res=await fetch(WORKER_BASE+'/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:[{role:'user',content:prompt}],
+        system:sys,
+        engine:AI_ENGINE
+      })
+    });
+    var json=await res.json();
+    var text='';
+    if(json.content&&json.content[0])text=json.content[0].text||'';
+    else if(json.error)text='エラー：'+json.error;
+    else text=json.candidates?.[0]?.content?.parts?.[0]?.text||'生成できませんでした';
+    text=text.replace(/[#*]/g,'').trim();
+    content.innerHTML=text.replace(/\n/g,'<br>');
+    saveManualData(text);
+    if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
+  }catch(e){
+    content.innerHTML='<span style="color:#c04040">通信エラーが発生しました。</span>';
+    if(btn){btn.textContent='✨ AIで詳細分析を生成する';btn.disabled=false;}
+  }
+  _manualAIRunning=false;
+}
+
 function buildSettingPage(){
   var data=S.load();if(!data)return '<div class="page active"></div>';
   var theme=(data.settings&&data.settings.theme)||'default';
