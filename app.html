@@ -2761,10 +2761,14 @@ function buildSystemPromptFull(G){
     +chiUnDesc(G.nenKS,nenJu,'年柱')+'\n'
     +chiUnDesc(G.nichiKS,nichiJu,'日柱')+'\n\n'
     +'◎ 九星気学（坤運・集合無意識の層）\n'
-    +'※内面（年）・外面（月）・熱中時（日）という3層で人格を読む。AIはこの3つを組み合わせてアドバイスすること。\n'
-    +'・本命星（内面・年柱）：'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan)+(KYUSEI_KEYWORD[G.kyuseiHon]?' - '+KYUSEI_KEYWORD[G.kyuseiHon]:'')+'\n'
-    +'・月命星（外面・月柱）：'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan)+(KYUSEI_KEYWORD[G.kyuseiGets]?' - '+KYUSEI_KEYWORD[G.kyuseiGets]:'')+'\n'
-    +'・日命星（熱中・喧嘩・感情爆発時）：'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan)+(KYUSEI_KEYWORD[G.kyuseiNichi]?' - '+KYUSEI_KEYWORD[G.kyuseiNichi]:'')+'\n';
+    +'【三層×年齢の法則】命式の三柱は人生の年齢段階とも対応する。\n'
+    +'・本命星×年柱の従星（内面）：〜20歳頃まで。生まれ持った本能・土台として最初に現れる気質。人生の出発点。\n'
+    +'・月命星×月柱の従星（外面）：20〜40歳頃。社会・人間関係の中で形成される顔。この時期に外面が完成する。\n'
+    +'・日命星×日柱の従星（結論・本質）：40〜60歳頃。抑えていた本質が解放され、人生の答えが出てくる。年齢を重ねるごとにこの性質が強まり完成される。\n'
+    +'これは従星にも同様に適用される確定した設計思想。年・月・日の順に人格が完成していく流れとして読むこと。\n'
+    +'・本命星（内面・年柱）：'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan)+(KYUSEI_KEYWORD[G.kyuseiHon]?' - '+KYUSEI_KEYWORD[G.kyuseiHon]:'')+' × 従星：'+(G.nJus||'—')+'\n'
+    +'・月命星（外面・月柱）：'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan)+(KYUSEI_KEYWORD[G.kyuseiGets]?' - '+KYUSEI_KEYWORD[G.kyuseiGets]:'')+' × 従星：'+(G.tJus||'—')+'\n'
+    +'・日命星（結論・本質・日柱）：'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan)+(KYUSEI_KEYWORD[G.kyuseiNichi]?' - '+KYUSEI_KEYWORD[G.kyuseiNichi]:'')+' × 従星：'+(G.niJus||'—')+'\n';
 
   // ── 天運（変わり続ける運気） ──
   var skInfo='';
@@ -3404,24 +3408,16 @@ function buildManualPage(){
     +'<div style="font-size:1rem;margin-top:0.3rem;opacity:0.9">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
     +'</div>';
 
-  // 1. 六人花の基本性格（固定）＋従星の日向/日陰性格を織り込み
-  var juseiData=(starData['従星説明'])||null;
-  var isHinata=(G.ht.indexOf('＋')>=0);
-  var personalChara=juseiData?(isHinata?juseiData['日向性格']:juseiData['日陰性格']):null;
+  // 1. 基本性格（AI生成 or 生成前はプレースホルダー）
+  var savedManual=loadManualData();
+  var savedChara=savedManual?savedManual.chara:null;
 
   html+='<div class="card"><div class="card-title">◆ あなたの基本性格</div>';
-  if(starData['説明']) html+='<p style="font-size:0.95rem;line-height:1.9;color:var(--ink);margin-bottom:0.8rem">'+starData['説明']+'</p>';
-  if(starData['性格']) html+='<p style="font-size:0.92rem;line-height:1.8;color:var(--ink2);margin-bottom:0.8rem">'+starData['性格']+'</p>';
-
-  // 従星から導いた日向/日陰の個人性格を追加
-  if(personalChara){
-    html+='<div style="margin-top:0.6rem;background:rgba(184,134,11,0.06);border-left:3px solid #b8860b;padding:0.8rem 1rem;border-radius:0 8px 8px 0">'
-      +'<div style="font-size:0.75rem;color:#b8860b;font-weight:700;margin-bottom:0.4rem">'
-      +(isHinata?'☀️ 日向（ひなた）のあなたへ':'🌙 日陰（ひかげ）のあなたへ')+'</div>'
-      +'<p style="font-size:0.9rem;line-height:1.8;color:var(--ink);margin:0">'+personalChara+'</p>'
-      +'</div>';
+  if(savedChara){
+    html+='<div id="manual-chara-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+savedChara.replace(/\n/g,'<br>')+'</div>';
+  } else {
+    html+='<div id="manual-chara-content" style="font-size:0.9rem;color:var(--ink3);line-height:1.8">下の「AIで詳細分析を生成する」ボタンを押すと、あなただけの性格分析が表示されます。</div>';
   }
-
   if(starData['キーワード']&&starData['キーワード'].length){
     html+='<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.8rem">';
     starData['キーワード'].forEach(function(k){
@@ -3470,8 +3466,8 @@ function buildManualPage(){
 
   // 保存済みの説明書があれば表示
   var saved=loadManualData();
-  if(saved){
-    html+='<div id="manual-ai-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+saved.replace(/\n/g,'<br>')+'</div>';
+  if(saved&&saved.detail){
+    html+='<div id="manual-ai-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+saved.detail.replace(/\n/g,'<br>')+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
   } else {
     html+='<div id="manual-ai-content"></div>';
@@ -3485,18 +3481,28 @@ function buildManualPage(){
 function loadManualData(){
   var data=S.load();if(!data)return null;
   var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
-  return (data.manuals&&data.manuals[key])||null;
+  var v=data.manuals&&data.manuals[key];
+  if(!v)return null;
+  // 旧形式（文字列）との互換
+  if(typeof v==='string')return {detail:v,chara:null};
+  return v;
 }
 
-function saveManualData(text){
+function saveManualData(obj){
   var data=S.load();if(!data)return;
   if(!data.manuals)data.manuals={};
   var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
-  data.manuals[key]=text;
+  data.manuals[key]=obj;
   S.save(data);
 }
 
-function initManualPage(){}
+function initManualPage(){
+  // 保存済みデータがなければ自動生成
+  var saved=loadManualData();
+  if(!saved||!saved.chara){
+    generateManual();
+  }
+}
 
 async function generateManual(){
   if(_manualAIRunning)return;
@@ -3504,59 +3510,92 @@ async function generateManual(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
   var btn=document.querySelector('#manual-ai-card button');
-  var content=document.getElementById('manual-ai-content');
-  if(!G||!content)return;
+  var detailEl=document.getElementById('manual-ai-content');
+  var charaEl=document.getElementById('manual-chara-content');
+  if(!G)return;
   if(btn){btn.textContent='⏳ 生成中...';btn.disabled=true;}
-  content.innerHTML='<div style="color:var(--ink3);font-size:0.9rem">AIが分析中です。しばらくお待ちください...</div>';
+  if(charaEl)charaEl.innerHTML='<span style="color:var(--ink3)">分析中...</span>';
+  if(detailEl)detailEl.innerHTML='<span style="color:var(--ink3)">分析中...</span>';
 
   var htBase=G.ht.replace(/[＋－]/g,'');
   var dispName=htDisplayBase(htBase);
   var hinata=htDisplayHinataHikage(G.ht);
+  var starData=(KB['星人']&&KB['星人'][htBase])||{};
+  var juseiData=starData['従星説明']||{};
+  var isHinata=(G.ht.indexOf('＋')>=0);
+  var rj=getRokkaJusei(G.ht);
 
-  // 大運テキストを生成
+  // 大運テキスト
   var daiunRows=getDaiunRows(G);
   var daiunText=daiunRows.map(function(r){
     return r.age+'〜'+(r.age+r.sp-1)+'歳（'+r.startY+'〜'+r.endY+'年）'+r.ks+' '+r.ju+(r.isSk?'【転化天蛹】':'');
   }).join('\n');
 
-  var prompt='以下のデータを使って、'+name+'さんの「あなただけの詳細分析」を書いてください。\n\n'
-    +'【六人花】'+dispName+'（'+hinata+'）\n'
-    +'【本命星】'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan)+'\n'
-    +'【月命星】'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan)+'\n'
-    +'【日命星】'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan)+'\n'
+  var sys=buildSystemPromptFull(G);
+
+  // === 1. 統合性格文の生成 ===
+  var charaPrompt='以下のデータを使って、'+name+'さん（'+dispName+'・'+hinata+'）の基本性格を、ひとつの自然な文章にまとめてください。\n\n'
+    +'【'+dispName+'の本質】\n'+(starData['説明']||'')+'\n'
+    +'【'+dispName+'の性格】\n'+(starData['性格']||'')+'\n'
+    +(rj?'【外面の従星：'+rj.outer+'】\n'+(juseiData[rj.outer+'説明']||ROKKA_JUSEI_KW[rj.outer]&&ROKKA_JUSEI_KW[rj.outer].join('・'))+'\n':'')
+    +(rj?'【内面の従星：'+rj.inner+'】\n'+(juseiData[rj.inner+'説明']||ROKKA_JUSEI_KW[rj.inner]&&ROKKA_JUSEI_KW[rj.inner].join('・'))+'\n':'')
+    +'【'+hinata+'としての特徴】\n'+(isHinata?juseiData['日向性格']:juseiData['日陰性格']||'')+'\n\n'
+    +'なぜその人がそういう性格になるのかを、従星の組み合わせから分析しながら、ひとつの読みやすい文章にまとめてください。分析の説明は不要です。占術用語は使わず、誰でも分かる具体的な言葉で。Markdown禁止。300〜400文字程度。';
+
+  // === 2. 詳細分析の生成 ===
+  // 九星×従星の3層データを準備
+  var nenKyusei=kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan);
+  var tsuKyusei=kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan);
+  var nichiKyusei=kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan);
+  var nenJuseiKW=KYUSEI_KEYWORD[G.kyuseiHon]||'';
+  var tsuJuseiKW=KYUSEI_KEYWORD[G.kyuseiGets]||'';
+  var nichiJuseiKW=KYUSEI_KEYWORD[G.kyuseiNichi]||'';
+  var nenJos=G.nJus||'—';
+  var tsuJos=G.tJus||'—';
+  var nichiJos=G.niJus||'—';
+  var nenJosDesc=(KB['十二大従星']&&KB['十二大従星'][nenJos])?KB['十二大従星'][nenJos]['説明']||'':'';
+  var tsuJosDesc=(KB['十二大従星']&&KB['十二大従星'][tsuJos])?KB['十二大従星'][tsuJos]['説明']||'':'';
+  var nichiJosDesc=(KB['十二大従星']&&KB['十二大従星'][nichiJos])?KB['十二大従星'][nichiJos]['説明']||'':'';
+
+  var detailPrompt='以下のデータを使って、'+name+'さんの詳細分析を書いてください。\n\n'
+    +'【六人花】'+dispName+'（'+hinata+'）\n\n'
+    +'【九星気学×従星×年齢の三層分析データ】\n'
+    +'この三層は人格が年齢とともに完成していく流れを示す。年→月→日の順に人格が深まり、日柱の本質は年齢を重ねるほど強くなる。\n'
+    +'・内面（年柱・〜20歳）：'+nenKyusei+'（'+nenJuseiKW+'）× 従星：'+nenJos+(nenJosDesc?' - '+nenJosDesc:'')+'\n'
+    +'・外面（月柱・20〜40歳）：'+tsuKyusei+'（'+tsuJuseiKW+'）× 従星：'+tsuJos+(tsuJosDesc?' - '+tsuJosDesc:'')+'\n'
+    +'・結論・本質（日柱・40〜60歳以降）：'+nichiKyusei+'（'+nichiJuseiKW+'）× 従星：'+nichiJos+(nichiJosDesc?' - '+nichiJosDesc:'')+'\n\n'
     +'【年柱納音】'+getNayin(G.nenKS)+'\n'
     +'【月柱納音】'+getNayin(G.tsuKS)+'\n'
     +'【日柱納音】'+getNayin(G.nichiKS)+'\n'
     +'【大運の流れ】\n'+daiunText+'\n\n'
-    +'以下の構成で、丁寧でわかりやすい文章を書いてください。\n'
-    +'1. 恋愛・結婚・家庭運の傾向（'+dispName+'の本質と納音・九星から）\n'
-    +'2. 健康上の注意点（六人花の特性から）\n'
-    +'3. 本命星（内面）×月命星（外面）の組み合わせから見たあなたの特徴\n'
-    +'4. 大運の流れ（各大運ごとに：何歳から何歳・どんな時期・あなたにとってどう過ごすと良いか）\n\n'
-    +'占術用語は使わず、誰でも分かる具体的な言葉で。Markdown禁止。各セクションは見出しをつけて読みやすく。';
+    +'以下の構成で書いてください。\n'
+    +'1. 恋愛・結婚・家庭運の傾向\n'
+    +'2. 健康上の注意点\n'
+    +'3. 九星×従星×年齢の三層分析（20歳まで・20〜40歳・40歳以降でどのように人格が変化・完成していくか。それぞれの時期の特徴と、年齢を重ねることで何がより強くなっていくか）\n'
+    +'4. 大運の流れ（各大運ごとに：何歳から何歳・どんな時期・過ごし方）\n\n'
+    +'占術用語は使わず、誰でも分かる具体的な言葉で。Markdown禁止。各項目は見出しをつけて読みやすく。';
 
   try{
-    var sys=buildSystemPromptFull(G);
-    var res=await fetch(WORKER_BASE+'/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[{role:'user',content:prompt}],
-        system:sys,
-        engine:AI_ENGINE
-      })
-    });
-    var json=await res.json();
-    var text='';
-    if(json.content&&json.content[0])text=json.content[0].text||'';
-    else if(json.error)text='エラー：'+json.error;
-    else text=json.candidates?.[0]?.content?.parts?.[0]?.text||'生成できませんでした';
-    text=text.replace(/[#*]/g,'').trim();
-    content.innerHTML=text.replace(/\n/g,'<br>');
-    saveManualData(text);
+    // 性格文と詳細分析を並列生成
+    var [charaRes, detailRes]=await Promise.all([
+      fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:[{role:'user',content:charaPrompt}],system:sys,engine:AI_ENGINE})}),
+      fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:[{role:'user',content:detailPrompt}],system:sys,engine:AI_ENGINE})})
+    ]);
+    var charaJson=await charaRes.json();
+    var detailJson=await detailRes.json();
+
+    var charaText=(charaJson.content&&charaJson.content[0]?charaJson.content[0].text:charaJson.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+    var detailText=(detailJson.content&&detailJson.content[0]?detailJson.content[0].text:detailJson.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+
+    if(charaEl)charaEl.innerHTML=charaText.replace(/\n/g,'<br>');
+    if(detailEl)detailEl.innerHTML=detailText.replace(/\n/g,'<br>');
+    saveManualData({chara:charaText,detail:detailText});
     if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
   }catch(e){
-    content.innerHTML='<span style="color:#c04040">通信エラーが発生しました。</span>';
+    if(charaEl)charaEl.innerHTML='<span style="color:#c04040">通信エラー</span>';
+    if(detailEl)detailEl.innerHTML='<span style="color:#c04040">通信エラー</span>';
     if(btn){btn.textContent='✨ AIで詳細分析を生成する';btn.disabled=false;}
   }
   _manualAIRunning=false;
