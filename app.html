@@ -1073,16 +1073,33 @@ function getNichimeisei(y,m,d){
   return ((n-1)%9+9)%9+1;
 }
 // 五黄土星の戊/己分岐（偶数年→戊・行き、奇数年→己・帰り）
-function getGoouHeritage(y,m,d){
-  var bd=new Date(y,m-1,d);
-  var risshun=getSetsuDate(y,2);
-  var risshunD=new Date(risshun.getFullYear(),risshun.getMonth(),risshun.getDate());
-  var baseY=(bd<risshunD)?y-1:y;
-  return (baseY%2===0)?'戊（行き）':'己（帰り）';
+// 五黄土星の戊/己判定：干支の陰陽で決める
+// 陽干（甲丙戊庚壬）→戊（行き）、陰干（乙丁己辛癸）→己（帰り）
+var GOOU_YO_KAN=['甲','丙','戊','庚','壬']; // 陽干
+function goouFromKan(kan){
+  return GOOU_YO_KAN.indexOf(kan)>=0?'戊（行き）':'己（帰り）';
+}
+// 日命星の五黄土星：陽遁(mode=+1)→戊、隠遁(mode=-1)→己
+function goouFromNichiMode(y,m,d){
+  var target=new Date(y,m-1,d);
+  var points=_getNichiTonden();
+  var base=points[0];
+  for(var i=0;i<points.length;i++){
+    if(points[i].date<=target) base=points[i];
+    else break;
+  }
+  return base.mode===1?'戊（行き）':'己（帰り）';
 }
 // 九星の表示名（五黄土星は戊/己付き）
-function kyuseiDisplayName(n,y,m,d){
-  if(n===5){var heri=getGoouHeritage(y,m,d);return '五黄土星（'+heri+'）';}
+// type: 'nen'=年命星(年干で判定), 'gets'=月命星(月干で判定), 'nichi'=日命星(遁で判定)
+function kyuseiDisplayName(n, y, m, d, type, kan){
+  if(n===5){
+    var goou;
+    if(type==='nichi') goou=goouFromNichiMode(y,m,d);
+    else if(kan) goou=goouFromKan(kan);
+    else goou=goouFromNichiMode(y,m,d); // フォールバック
+    return '五黄土星（'+goou+'）';
+  }
   return KYUSEI_NAMES[n-1];
 }
 // 九星の対応する十干・易卦キーワード（レポートより）
@@ -2131,9 +2148,9 @@ function buildMeishikiPage(){
   var html='<div class="page active">';
 
   // 九星バッジ生成関数
-  function kyuseiBadge(n,y,m,d,role){
+  function kyuseiBadge(n,y,m,d,role,type,kan){
     if(!n)return '';
-    var nm=kyuseiDisplayName(n,y,m,d);
+    var nm=kyuseiDisplayName(n,y,m,d,type,kan);
     var kw=KYUSEI_KEYWORD[n]||'';
     return '<div style="margin-top:0.5rem;background:rgba(100,60,180,0.07);border:1px solid rgba(100,60,180,0.2);border-radius:8px;padding:0.4rem 0.6rem;text-align:center">'
       +'<div style="font-size:0.68rem;color:#7a5aaa;margin-bottom:0.2rem">'+role+'</div>'
@@ -2145,9 +2162,9 @@ function buildMeishikiPage(){
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
-  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS))+kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）');
-  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS))+kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）');
-  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS))+kyuseiBadge(G.kyuseiNichi,G.y,G.m,G.d,'⚡ 日命星（熱中時）');
+  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS),kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）','nen',G.nenKan));
+  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS),kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）','gets',G.tsuKan));
+  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS),kyuseiBadge(G.kyuseiNichi,G.y,G.m,G.d,'⚡ 日命星（熱中時）','nichi',G.nichiKan));
   html+='</div></div>';
 
   // 魂のコア（人格核）
@@ -2243,6 +2260,7 @@ function msCol(lbl,sub,kan,shi,zo,th,thZo,jos,ju,nayin){
     +(jos&&jos!=='—'?'<div style="font-size:0.94rem;color:var(--gold);margin-top:0.2rem;font-weight:600">'+jos+'</div>':'')
     +(nayin?'<div style="font-size:0.83rem;color:var(--ink3);margin-top:0.15rem;letter-spacing:0.05em">'+nayin+'</div>':'')
     +'<div class="ms-ju" style="color:'+color+';font-size:1.05rem;font-weight:700;margin-top:0.2rem">'+juniRuby(ju)+'</div>'
+    +(arguments[10]||'')
     +'</div>';
 }
 
@@ -2745,9 +2763,9 @@ function buildSystemPromptFull(G){
     +chiUnDesc(G.nichiKS,nichiJu,'日柱')+'\n\n'
     +'◎ 九星気学（坤運・集合無意識の層）\n'
     +'※内面（年）・外面（月）・熱中時（日）という3層で人格を読む。AIはこの3つを組み合わせてアドバイスすること。\n'
-    +'・本命星（内面・年柱）：'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiHon]?' - '+KYUSEI_KEYWORD[G.kyuseiHon]:'')+'\n'
-    +'・月命星（外面・月柱）：'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiGets]?' - '+KYUSEI_KEYWORD[G.kyuseiGets]:'')+'\n'
-    +'・日命星（熱中・喧嘩・感情爆発時）：'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiNichi]?' - '+KYUSEI_KEYWORD[G.kyuseiNichi]:'')+'\n';
+    +'・本命星（内面・年柱）：'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d,'nen',G.nenKan)+(KYUSEI_KEYWORD[G.kyuseiHon]?' - '+KYUSEI_KEYWORD[G.kyuseiHon]:'')+'\n'
+    +'・月命星（外面・月柱）：'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d,'gets',G.tsuKan)+(KYUSEI_KEYWORD[G.kyuseiGets]?' - '+KYUSEI_KEYWORD[G.kyuseiGets]:'')+'\n'
+    +'・日命星（熱中・喧嘩・感情爆発時）：'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d,'nichi',G.nichiKan)+(KYUSEI_KEYWORD[G.kyuseiNichi]?' - '+KYUSEI_KEYWORD[G.kyuseiNichi]:'')+'\n';
 
   // ── 天運（変わり続ける運気） ──
   var skInfo='';
