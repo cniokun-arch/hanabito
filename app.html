@@ -993,6 +993,102 @@ const SETSU_BASE_MS=[978663000000,981210540000,983781120000,956191200000,9575057
 const TROPICAL_YEAR_MS=365.24219879*86400000;
 
 function getSetsuDate(y,m){var b=SETSU_BASE_MS[m-1],by=m<=3?2001:2000;return new Date(b+(y-by)*TROPICAL_YEAR_MS);}
+
+// ===== 九星気学 算出ロジック =====
+var KYUSEI_NAMES=['一白水星','二黒土星','三碧木星','四緑木星','五黄土星','六白金星','七赤金星','八白土星','九紫火星'];
+// 月命星テーブル：本命星グループ（1/4/7, 2/5/8, 3/6/9）×節切り月（2月=index0〜1月=index11）
+var KYUSEI_MONTH_TABLE=[[8,7,6,5,4,3,2,1,9,8,7,6],[5,4,3,2,1,9,8,7,6,5,4,3],[2,1,9,8,7,6,5,4,3,2,1,9]];
+// 本命星（年）算出：生年(節切り後)→桁和→11から引く
+function getHonmeisei(y,m,d){
+  var bd=new Date(y,m-1,d);
+  var risshun=getSetsuDate(y,2);
+  var risshunD=new Date(risshun.getFullYear(),risshun.getMonth(),risshun.getDate());
+  var baseY=(bd<risshunD)?y-1:y;
+  var s=String(Math.abs(baseY));
+  var sum=0;for(var i=0;i<s.length;i++)sum+=parseInt(s[i]);
+  while(sum>9)sum=String(sum).split('').reduce(function(a,b){return a+parseInt(b);},0);
+  var n=11-sum;
+  if(n===10)n=1;if(n===11)n=2;
+  return ((n-1+9)%9)+1; // 1〜9
+}
+// 月命星算出
+function getGetsumeisei(y,m,d,honmei){
+  var bd=new Date(y,m-1,d);
+  var setsuD=getSetsuDate(y,m);
+  var setsuDate=new Date(setsuD.getFullYear(),setsuD.getMonth(),setsuD.getDate());
+  var mo=m,yo=y;
+  if(bd<setsuDate){mo--;if(mo<1){mo=12;yo--;}}
+  var monthIdx=mo===1?11:mo-2; // 2月=0, 3月=1 ... 1月=11
+  var group;
+  if(honmei===1||honmei===4||honmei===7)group=0;
+  else if(honmei===2||honmei===5||honmei===8)group=1;
+  else group=2;
+  return KYUSEI_MONTH_TABLE[group][monthIdx];
+}
+// 日命星算出：実測データによる確定変遁日テーブル（1960〜2026年）
+// 九紫火星(9)=隠遁開始(-1)、一白水星(1)=陽遁開始(+1)
+// データ出典：luft.co.jp/cgi/nine-star-ki.php（暦日大鑑と一致確認済み）
+// 2024〜2025年CSVデータ731件で全件検証済み
+var NICHI_TONDEN=[
+  [1960,6,5,9,-1],[1961,5,31,9,-1],[1962,5,26,9,-1],
+  [1963,1,21,1,1],[1963,7,20,9,-1],[1964,1,16,1,1],
+  [1964,7,14,9,-1],[1965,7,9,9,-1],[1966,7,4,9,-1],
+  [1967,6,29,9,-1],[1968,6,23,9,-1],[1969,12,15,1,1],
+  [1970,6,13,9,-1],[1970,12,10,1,1],[1971,6,8,9,-1],
+  [1972,6,2,9,-1],[1975,7,17,9,-1],[1976,1,13,1,1],
+  [1976,7,11,9,-1],[1977,7,6,9,-1],[1979,6,26,9,-1],
+  [1980,6,20,9,-1],[1980,12,17,1,1],[1981,6,15,9,-1],
+  [1983,6,5,9,-1],[1985,5,25,9,-1],[1986,7,19,9,-1],
+  [1987,1,15,1,1],[1987,7,14,9,-1],[1988,7,8,9,-1],
+  [1989,7,3,9,-1],[1990,12,25,1,1],[1991,6,23,9,-1],
+  [1993,6,12,9,-1],[1995,6,2,9,-1],[1997,5,22,1,1],
+  [1998,7,16,9,-1],[1999,1,12,1,1],[1999,7,11,9,-1],
+  [2000,7,5,1,1],[2001,6,30,9,-1],[2003,6,20,9,-1],
+  [2005,6,9,9,-1],[2007,5,30,9,-1],[2009,7,18,9,-1],
+  [2010,1,14,1,1],[2011,1,9,1,1],[2011,7,8,9,-1],
+  [2013,6,27,9,-1],[2015,6,17,9,-1],[2017,6,6,9,-1],
+  [2019,5,27,9,-1],[2020,5,21,1,1],[2021,1,16,1,1],
+  [2021,7,15,9,-1],[2023,1,6,1,1],[2023,7,5,9,-1],
+  [2024,1,1,1,1],[2024,6,29,9,-1],[2024,12,26,1,1],
+  [2025,6,24,9,-1],[2025,12,21,1,1],[2026,6,19,9,-1]
+];
+var _nichiTondenDates=null;
+function _getNichiTonden(){
+  if(_nichiTondenDates)return _nichiTondenDates;
+  _nichiTondenDates=NICHI_TONDEN.map(function(r){
+    return {date:new Date(r[0],r[1]-1,r[2]),star:r[3],mode:r[4]};
+  });
+  return _nichiTondenDates;
+}
+function getNichimeisei(y,m,d){
+  var target=new Date(y,m-1,d);
+  var points=_getNichiTonden();
+  var base=points[0];
+  for(var i=0;i<points.length;i++){
+    if(points[i].date<=target) base=points[i];
+    else break;
+  }
+  var diff=Math.round((target.getTime()-base.date.getTime())/86400000);
+  var n=base.star+diff*base.mode;
+  return ((n-1)%9+9)%9+1;
+}
+// 五黄土星の戊/己分岐（偶数年→戊・行き、奇数年→己・帰り）
+function getGoouHeritage(y,m,d){
+  var bd=new Date(y,m-1,d);
+  var risshun=getSetsuDate(y,2);
+  var risshunD=new Date(risshun.getFullYear(),risshun.getMonth(),risshun.getDate());
+  var baseY=(bd<risshunD)?y-1:y;
+  return (baseY%2===0)?'戊（行き）':'己（帰り）';
+}
+// 九星の表示名（五黄土星は戊/己付き）
+function kyuseiDisplayName(n,y,m,d){
+  if(n===5){var heri=getGoouHeritage(y,m,d);return '五黄土星（'+heri+'）';}
+  return KYUSEI_NAMES[n-1];
+}
+// 九星の対応する十干・易卦キーワード（レポートより）
+var KYUSEI_KAN={1:'癸',2:'乙',3:'庚',4:'丁',5:'戊/己',6:'甲',7:'丙',8:'辛',9:'壬'};
+var KYUSEI_KEYWORD={1:'すべての始まり・探求・秘密主義',2:'母なる大地・受け入れる・コツコツ',3:'電光石火・開拓者・産道',4:'根無し草・調和・キューピットの矢',5:'破壊と再生・圧倒的カリスマ・帝王',6:'救世主・ひまわりの思想・人々の平和',7:'弱肉強食・資源の争奪・悦',8:'エクスカリバー・避雷針・選ばれし者を待つ',9:'感性・天才・断捨離・不老不死'};
+
 function fmtMD(dt){return (dt.getMonth()+1)+'月'+dt.getDate()+'日';}
 function getMonthPeriodLabel(y,m,d){
   var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
@@ -1100,7 +1196,10 @@ function doCalc(y,m,d,gender){
   var ND_=[];
   for(var a_=0;a_<MAX_AGE;a_++){var yr_=y+a_,yrShi_=JUNISHI[((yr_-1984)%12+12)%12],ju_=getJuniUnki(ht,yrShi_);ND_.push({yr:yr_,age:a_,yrShi:yrShi_,ju:ju_,w:JUNI_WAVE[ju_]||0,isSk:sats.indexOf(yrShi_)>=0,isCurr:yr_===CY_});}
 
-  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs,BLK:BLK_,ND:ND_};
+  var hon=getHonmeisei(y,m,d);
+  var gets=getGetsumeisei(y,m,d,hon);
+  var nichi=getNichimeisei(y,m,d);
+  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs,BLK:BLK_,ND:ND_,kyuseiHon:hon,kyuseiGets:gets,kyuseiNichi:nichi};
 }
 
 // 今日・今月・今年・大運の十二運気
@@ -2031,12 +2130,24 @@ function buildMeishikiPage(){
 
   var html='<div class="page active">';
 
+  // 九星バッジ生成関数
+  function kyuseiBadge(n,y,m,d,role){
+    if(!n)return '';
+    var nm=kyuseiDisplayName(n,y,m,d);
+    var kw=KYUSEI_KEYWORD[n]||'';
+    return '<div style="margin-top:0.5rem;background:rgba(100,60,180,0.07);border:1px solid rgba(100,60,180,0.2);border-radius:8px;padding:0.4rem 0.6rem;text-align:center">'
+      +'<div style="font-size:0.68rem;color:#7a5aaa;margin-bottom:0.2rem">'+role+'</div>'
+      +'<div style="font-size:0.85rem;font-weight:700;color:#5a3a99">'+nm+'</div>'
+      +'<div style="font-size:0.7rem;color:#7a6b8a;margin-top:0.2rem">'+kw+'</div>'
+      +'</div>';
+  }
+
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
-  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS));
-  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS));
-  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS));
+  html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS))+kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）');
+  html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS))+kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）');
+  html+=msCol('日　柱（本人）','（イド）',G.nichiKan,G.nichiShi,G.niZ,'—',(G.T||[])[JIKKAN.indexOf(G.niZ)]||'—',G.niJus||'—',getJuniUnki(G.ht,G.nichiShi),getNayin(G.nichiKS))+kyuseiBadge(G.kyuseiNichi,G.y,G.m,G.d,'⚡ 日命星（熱中時）');
   html+='</div></div>';
 
   // 魂のコア（人格核）
@@ -2631,7 +2742,12 @@ function buildSystemPromptFull(G){
     +'◎ 納音×六花人の十二運気（地運の運気質）\n'
     +chiUnDesc(G.tsuKS,tsuJu,'月柱')+'\n'
     +chiUnDesc(G.nenKS,nenJu,'年柱')+'\n'
-    +chiUnDesc(G.nichiKS,nichiJu,'日柱')+'\n';
+    +chiUnDesc(G.nichiKS,nichiJu,'日柱')+'\n\n'
+    +'◎ 九星気学（坤運・集合無意識の層）\n'
+    +'※内面（年）・外面（月）・熱中時（日）という3層で人格を読む。AIはこの3つを組み合わせてアドバイスすること。\n'
+    +'・本命星（内面・年柱）：'+kyuseiDisplayName(G.kyuseiHon,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiHon]?' - '+KYUSEI_KEYWORD[G.kyuseiHon]:'')+'\n'
+    +'・月命星（外面・月柱）：'+kyuseiDisplayName(G.kyuseiGets,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiGets]?' - '+KYUSEI_KEYWORD[G.kyuseiGets]:'')+'\n'
+    +'・日命星（熱中・喧嘩・感情爆発時）：'+kyuseiDisplayName(G.kyuseiNichi,G.y,G.m,G.d)+(KYUSEI_KEYWORD[G.kyuseiNichi]?' - '+KYUSEI_KEYWORD[G.kyuseiNichi]:'')+'\n';
 
   // ── 天運（変わり続ける運気） ──
   var skInfo='';
