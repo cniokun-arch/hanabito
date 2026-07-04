@@ -3404,10 +3404,24 @@ function buildManualPage(){
     +'<div style="font-size:1rem;margin-top:0.3rem;opacity:0.9">'+htDisplayHinataHikageRuby(G.ht)+'</div>'
     +'</div>';
 
-  // 1. 六人花の基本性格（固定）
+  // 1. 六人花の基本性格（固定）＋従星の日向/日陰性格を織り込み
+  var juseiData=(starData['従星説明'])||null;
+  var isHinata=(G.ht.indexOf('＋')>=0);
+  var personalChara=juseiData?(isHinata?juseiData['日向性格']:juseiData['日陰性格']):null;
+
   html+='<div class="card"><div class="card-title">◆ あなたの基本性格</div>';
   if(starData['説明']) html+='<p style="font-size:0.95rem;line-height:1.9;color:var(--ink);margin-bottom:0.8rem">'+starData['説明']+'</p>';
-  if(starData['性格']) html+='<p style="font-size:0.92rem;line-height:1.8;color:var(--ink2)">'+starData['性格']+'</p>';
+  if(starData['性格']) html+='<p style="font-size:0.92rem;line-height:1.8;color:var(--ink2);margin-bottom:0.8rem">'+starData['性格']+'</p>';
+
+  // 従星から導いた日向/日陰の個人性格を追加
+  if(personalChara){
+    html+='<div style="margin-top:0.6rem;background:rgba(184,134,11,0.06);border-left:3px solid #b8860b;padding:0.8rem 1rem;border-radius:0 8px 8px 0">'
+      +'<div style="font-size:0.75rem;color:#b8860b;font-weight:700;margin-bottom:0.4rem">'
+      +(isHinata?'☀️ 日向（ひなた）のあなたへ':'🌙 日陰（ひかげ）のあなたへ')+'</div>'
+      +'<p style="font-size:0.9rem;line-height:1.8;color:var(--ink);margin:0">'+personalChara+'</p>'
+      +'</div>';
+  }
+
   if(starData['キーワード']&&starData['キーワード'].length){
     html+='<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.8rem">';
     starData['キーワード'].forEach(function(k){
