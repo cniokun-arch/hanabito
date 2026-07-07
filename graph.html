@@ -251,9 +251,9 @@ const NAYIN_MAP={'甲子':'海中金','乙丑':'海中金','丙寅':'炉中火',
 function getNayin(ks){return NAYIN_MAP[ks]||'';}
 function getNayinYinYang(ks){const yo=['甲','丙','戊','庚','壬'];return yo.includes(ks[0])?'外向き':'内向き';}
 const SATSKAI={'天花人':['戌','亥'],'白花人':['申','酉'],'離花人':['午','未'],'風花人':['辰','巳'],'仙花人':['寅','卯'],'水花人':['子','丑']};
-const JUNI_NAMES=['休眠','残雪','発芽','青葉','開花','内省','成天','狂咲','豊穣','穂分','平凪','引寒'];
-const JUNI_WAVE={'開花':5.0,'豊穣':5.0,'青葉':4.5,'発芽':4.0,'穂分':3.5,'平凪':3.0,'成天':2.0,'内省':-2.0,'狂咲':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
-const JUNI_RUBY={'休眠':'きゅうみん','残雪':'ざんせつ','発芽':'はつが','青葉':'あおば','開花':'かいか','内省':'ないせい','成天':'せいてん','狂咲':'くるいざき','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん'};
+const JUNI_NAMES=['休眠','残雪','芽吹','青葉','結蕾','含苞','天華','零花','豊穣','穂分','平凪','引寒'];
+const JUNI_WAVE={'結蕾':5.0,'豊穣':5.0,'青葉':4.5,'芽吹':4.0,'穂分':3.5,'平凪':3.0,'天華':2.0,'含苞':-2.0,'零花':-2.5,'引寒':-2.0,'休眠':-3.5,'残雪':-2.0};
+const JUNI_RUBY={'休眠':'きゅうみん','残雪':'ざんせつ','芽吹':'めぶき','青葉':'あおば','結蕾':'ゆいつぼみ','含苞':'がんぽう','天華':'てんか','零花':'こぼればな','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん'};
 const TEISHI={'天花人＋':10,'天花人－':11,'白花人＋':8,'白花人－':9,'離花人＋':6,'離花人－':7,'風花人＋':4,'風花人－':5,'仙花人＋':2,'仙花人－':3,'水花人＋':0,'水花人－':1};
 const ZOKAN_SHI=['亥','戌','酉','申','未','午','巳','辰','卯','寅','丑','子'];
 const ZOKAN_DATA=[[0,['戊','辛','庚','戊','丁','丙','戊','乙','甲','戊','癸','壬']],[9,['甲','辛','庚','壬','丁','丙','庚','乙','甲','丙','癸','壬']],[11,['甲','丁','庚','壬','乙','丙','庚','癸','甲','丙','辛','壬']],[12,['甲','丁','辛','壬','乙','己','庚','癸','乙','丙','辛','癸']],[14,['甲','戊','辛','壬','己','己','庚','戊','乙','丙','己','癸']],[16,['壬','戊','辛','庚','己','己','丙','戊','乙','甲','己','癸']]];
@@ -283,7 +283,7 @@ function htDisplayHinataHikage(ht){return (ht&&ht.indexOf('＋')>=0)?'日向':'�
 
 // 十二運気カラー（index.htmlと同じ）
 function getJuniColor(j){
-  return({'開花':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','発芽':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','成天':'#6aaa8a','内省':'#cc8833','狂咲':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';
+  return({'結蕾':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','芽吹':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','天華':'#6aaa8a','含苞':'#cc8833','零花':'#bb4422','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';
 }
 function getJuniBg(j){
   const w=JUNI_WAVE[j]||0;
@@ -393,8 +393,8 @@ function getCurrentDaiun(y,m,d,gender,tsuKS){
 function getMonthlyUnkiYear(ht, year){
   var MONTH_SHI=['丑','寅','卯','辰','巳','午','未','申','酉','戌','亥','子'];
   var MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
-  var goodJuni=['開花','豊穣','青葉','発芽','成天'];
+  var badJuni=['含苞','零花','引寒','休眠','残雪'];
+  var goodJuni=['結蕾','豊穣','青葉','芽吹','天華'];
   var results=[];
   for(var i=0;i<12;i++){
     var ju=getJuniUnki(ht,MONTH_SHI[i]);
@@ -414,8 +414,8 @@ function buildCurrentUnkiSummary(p,name,birthY,birthM,birthD,gender){
   var nenNext=getNextNenUnki(p.ht,CY);
   var tsuNow=getTsuUnki(p.ht,CY,CM);
   var daiun=getCurrentDaiun(birthY,birthM,birthD,gender,p.tsuKS);
-  var goodJuni=['発芽','青葉','開花','成天','豊穣','穂分','平凪'];
-  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  var goodJuni=['発芽','青葉','結蕾','天華','豊穣','穂分','平凪'];
+  var badJuni=['内省','零花','引寒','休眠','残雪'];
   function rating(j){return goodJuni.indexOf(j)>=0?'良':badJuni.indexOf(j)>=0?'要注意':'普通';}
   var monthlyThis=getMonthlyUnkiYear(p.ht,CY);
   var s='【'+name+'の現在の運気】\n';
@@ -442,10 +442,10 @@ function getNayinCompat(n1,n2){
 
 // 個人視点のスコア（自分→相手）
 function getPersonalScore(myHt,theirNenShi,theirTsuShi,theirNichiShi,theirHt,myNenShi){
-  var goodJuni=['発芽','青葉','成天','豊穣','穂分','平凪'];
-  var badJuni=['内省','狂咲','引寒','休眠','残雪'];
+  var goodJuni=['芽吹','青葉','天華','豊穣','穂分','平凪'];
+  var badJuni=['内省','零花','引寒','休眠','残雪'];
   function sj(j,otherJ){
-    if(j==='開花') return badJuni.indexOf(otherJ)>=0?-1:1;
+    if(j==='結蕾') return badJuni.indexOf(otherJ)>=0?-1:1;
     return goodJuni.indexOf(j)>=0?1:badJuni.indexOf(j)>=0?-1:0;
   }
   var nenJu=getJuniUnki(myHt,theirNenShi);
@@ -642,15 +642,15 @@ function showError(msg){
 var RESULT_DATA=null;
 
 var JUNI_PLAIN={
-  '発芽':'新たな挑戦や実りをもたらしてくれる',
+  '芽吹':'新たな挑戦や実りをもたらしてくれる',
   '青葉':'自分を成長させてくれる',
   '開花':'良いものも悪いものも増幅する',
-  '成天':'最も求めていた縁の相手',
-  '狂咲':'ついつい従ってしまい心が乱れやすい',
+  '天華':'最も求めていた縁の相手',
+  '零花':'ついつい従ってしまい心が乱れやすい',
   '豊穣':'できなかったことのチャンスをくれる',
   '穂分':'安定と恵みをもたらしてくれる',
   '平凪':'一緒にいると安心できる',
-  '内省':'疲れを感じやすいが気づきをくれる',
+  '含苞':'疲れを感じやすいが気づきをくれる',
   '引寒':'小さなトラブルを持ち込みやすい',
   '休眠':'やりたいことを先取りされやすい',
   '残雪':'最初は良さそうに見えるが結果になりにくい'
@@ -1240,8 +1240,8 @@ async function getRelationAdvice(){
   var persons=RESULT_DATA.persons;
   var me=persons[0];
   var pairs=RESULT_DATA.pairs;
-  var goodJ=['発芽','青葉','成天','豊穣','穂分','平凪'];
-  var badJ=['内省','狂咲','引寒','休眠','残雪'];
+  var goodJ=['芽吹','青葉','天華','豊穣','穂分','平凪'];
+  var badJ=['内省','零花','引寒','休眠','残雪'];
   function jr(j){return goodJ.indexOf(j)>=0?'良':badJ.indexOf(j)>=0?'要注意':'普通';}
 
   var compatSummary=pairs.filter(function(pair){return pair.i===0;}).map(function(pair){
