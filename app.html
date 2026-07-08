@@ -1972,14 +1972,121 @@ function buildHomePage(){
     +'</div>';
 
   html+='</div>';
+
+  // ===== 月間カレンダー =====
+  html+='<div class="card" id="home-calendar-card">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">'
+    +'<div style="font-size:1rem;font-weight:700;color:var(--gold);font-family:\'Noto Serif JP\',serif">📅 運気カレンダー</div>'
+    +'<div style="display:flex;align-items:center;gap:0.5rem">'
+    +'<button onclick="calPrevMonth()" style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.3);color:var(--gold);border-radius:6px;padding:0.2rem 0.7rem;font-size:1rem;cursor:pointer">‹</button>'
+    +'<span id="cal-month-label" style="font-size:0.95rem;font-weight:700;color:var(--ink);min-width:80px;text-align:center"></span>'
+    +'<button onclick="calNextMonth()" style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.3);color:var(--gold);border-radius:6px;padding:0.2rem 0.7rem;font-size:1rem;cursor:pointer">›</button>'
+    +'</div>'
+    +'</div>'
+    +'<div id="cal-body"></div>'
+    +'</div>';
+
   // タブ初期描画はDOMに追加後に実行
+
   setTimeout(function(){
     renderUnkiBody('day');
     currentUnkiTab='day';
     unkiOffset=0;
+    renderCalendar();
   },50);
   return html;
 }
+
+// ===== 運気カレンダー =====
+var calYear=new Date().getFullYear();
+var calMonth=new Date().getMonth(); // 0-11
+
+function calPrevMonth(){
+  calMonth--;
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+function calNextMonth(){
+  calMonth++;
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+
+function renderCalendar(){
+  var G=getCurrentTargetG();
+  var label=document.getElementById('cal-month-label');
+  var body=document.getElementById('cal-body');
+  if(!label||!body)return;
+
+  label.textContent=calYear+'年'+(calMonth+1)+'月';
+
+  if(!G){body.innerHTML='<p style="text-align:center;color:var(--ink3);padding:1rem">データがありません</p>';return;}
+
+  var today=new Date();
+  var firstDay=new Date(calYear,calMonth,1);
+  var lastDay=new Date(calYear,calMonth+1,0);
+  var startDow=firstDay.getDay(); // 0=日
+  var days=lastDay.getDate();
+
+  // 曜日ヘッダー
+  var DOW=['日','月','火','水','木','金','土'];
+  var html='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
+  DOW.forEach(function(d,i){
+    var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
+    html+='<div style="text-align:center;font-size:0.72rem;font-weight:700;color:'+c+';padding:0.2rem 0">'+d+'</div>';
+  });
+  html+='</div>';
+
+  // カレンダーグリッド
+  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+
+  // 空白セル
+  for(var i=0;i<startDow;i++){
+    html+='<div></div>';
+  }
+
+  // 日付セル
+  for(var d=1;d<=days;d++){
+    var dt=new Date(calYear,calMonth,d);
+    var dow=dt.getDay();
+    var isToday=(dt.getFullYear()===today.getFullYear()&&dt.getMonth()===today.getMonth()&&dt.getDate()===today.getDate());
+
+    // その日の十二運気を計算
+    var dayKS=getDayKS(calYear,calMonth+1,d);
+    var ju=getJuniUnki(G.ht,dayKS[1]);
+    var juColor=getJuniColor(ju);
+    var juShort=ju.length>2?ju.substring(0,2):ju;
+
+    // 日付の色
+    var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
+
+    var bg=isToday?'rgba(124,58,237,0.12)':'rgba(184,134,11,0.03)';
+    var border=isToday?'1px solid rgba(124,58,237,0.5)':'1px solid rgba(184,134,11,0.12)';
+
+    html+='<div style="border:'+border+';border-radius:6px;padding:0.25rem 0.1rem;text-align:center;background:'+bg+'">'
+      +'<div style="font-size:0.8rem;font-weight:'+(isToday?'700':'400')+';color:'+dayColor+'">'+d+'</div>'
+      +'<div style="font-size:0.6rem;color:'+juColor+';font-weight:700;line-height:1.2;margin-top:1px">'+juShort+'</div>'
+      +'</div>';
+  }
+  html+='</div>';
+
+  // 凡例
+  var legendItems=[
+    {name:'天華',color:getJuniColor('天華'),desc:'チャンス'},
+    {name:'零花',color:getJuniColor('零花'),desc:'試練'},
+    {name:'含苞',color:getJuniColor('含苞'),desc:'苦難'},
+    {name:'結蕾',color:getJuniColor('結蕾'),desc:'増幅'},
+  ];
+  html+='<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.8rem;padding-top:0.6rem;border-top:1px solid rgba(184,134,11,0.15)">';
+  legendItems.forEach(function(it){
+    html+='<span style="font-size:0.7rem;color:'+it.color+';font-weight:700">'+it.name+'='+it.desc+'</span>';
+  });
+  html+='</div>';
+
+  body.innerHTML=html;
+}
+
+
 
 var currentUnkiTab='day';
 var unkiOffset=0; // 今日からのオフセット（日・月・年）
