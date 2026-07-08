@@ -2107,7 +2107,7 @@ function renderCalendar(){
     var dayKS=getDayKS(calYear,calMonth+1,d);
     var ju=getJuniUnki(G.ht,dayKS[1]);
     var juColor=getJuniColor(ju);
-    var juShort=ju.length>2?ju.substring(0,2):ju;
+    // 運気名は漢字2文字なのでそのまま表示
     var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
 
     var bg=isSelected?'rgba(124,58,237,0.18)':isToday?'rgba(124,58,237,0.07)':'rgba(184,134,11,0.03)';
@@ -2120,9 +2120,9 @@ function renderCalendar(){
       markHtml='<div style="font-size:0.55rem;line-height:1;margin-top:1px">'+marks+'</div>';
     }
 
-    html+='<div onclick="calSelectDate(\''+dk+'\')" style="border:'+border+';border-radius:6px;padding:0.25rem 0.1rem;text-align:center;background:'+bg+';cursor:pointer;min-height:52px">'
-      +'<div style="font-size:0.8rem;font-weight:'+(isToday||isSelected?'700':'400')+';color:'+dayColor+'">'+d+'</div>'
-      +'<div style="font-size:0.6rem;color:'+juColor+';font-weight:700;line-height:1.2;margin-top:1px">'+juShort+'</div>'
+    html+='<div onclick="calSelectDate(\''+dk+'\')" style="border:'+border+';border-radius:6px;padding:0.3rem 0.1rem;text-align:center;background:'+bg+';cursor:pointer;min-height:62px">'
+      +'<div style="font-size:0.82rem;font-weight:'+(isToday||isSelected?'700':'400')+';color:'+dayColor+'">'+d+'</div>'
+      +'<div style="font-size:0.72rem;color:'+juColor+';font-weight:700;line-height:1.3;margin-top:2px">'+ju+'</div>'
       +markHtml
       +'</div>';
   }
