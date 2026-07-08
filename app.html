@@ -2171,41 +2171,40 @@ function renderCalendar(){
   html+='<span style="font-size:0.68rem;color:rgba(184,134,11,0.8)">｜線=節入り日</span>';
   html+='</div>';
 
-  // 選択日の予定表示エリア
-  if(calSelectedDate){
-    var parts=calSelectedDate.split('-');
-    var sy=parseInt(parts[0]),sm=parseInt(parts[1]),sd=parseInt(parts[2]);
-    var selDow=['日','月','火','水','木','金','土'][new Date(sy,sm-1,sd).getDay()];
-    var selScheds=schedules[calSelectedDate]||[];
-    var selDayKS=getDayKS(sy,sm,sd);
-    var selJu=getJuniUnki(G.ht,selDayKS[1]);
-    var selJuColor=getJuniColor(selJu);
+  // 選択日の予定表示エリア（常に表示・初期値は今日）
+  var dispDate=calSelectedDate||calDateKey(today.getFullYear(),today.getMonth()+1,today.getDate());
+  var parts=dispDate.split('-');
+  var sy=parseInt(parts[0]),sm=parseInt(parts[1]),sd=parseInt(parts[2]);
+  var selDow=['日','月','火','水','木','金','土'][new Date(sy,sm-1,sd).getDay()];
+  var selScheds=schedules[dispDate]||[];
+  var selDayKS=getDayKS(sy,sm,sd);
+  var selJu=getJuniUnki(G.ht,selDayKS[1]);
+  var selJuColor=getJuniColor(selJu);
 
-    html+='<div style="margin-top:0.8rem;border-top:2px solid rgba(124,58,237,0.2);padding-top:0.8rem">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">';
-    html+='<div>'
-      +'<span style="font-size:1rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>'
-      +'<span style="font-size:0.8rem;color:'+selJuColor+';font-weight:700;margin-left:0.5rem">'+selJu+'</span>'
-      +'</div>';
-    html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.3rem 0.8rem;font-size:0.85rem;cursor:pointer;font-family:\'Noto Serif JP\',serif">＋ 追加</button>';
-    html+='</div>';
+  html+='<div style="margin-top:0.8rem;border-top:2px solid rgba(124,58,237,0.2);padding-top:0.8rem">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">';
+  html+='<div>'
+    +'<span style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>'
+    +'<span style="font-size:0.8rem;color:'+selJuColor+';font-weight:700;margin-left:0.4rem">'+selJu+'</span>'
+    +'</div>';
+  html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.3rem 0.8rem;font-size:0.85rem;cursor:pointer;font-family:\'Noto Serif JP\',serif">＋ 追加</button>';
+  html+='</div>';
 
-    if(selScheds.length===0){
-      html+='<p style="font-size:0.85rem;color:var(--ink3);text-align:center;padding:0.5rem 0">予定はありません</p>';
-    } else {
-      selScheds.forEach(function(s,idx){
-        html+='<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;background:rgba(184,134,11,0.05);border-radius:8px;margin-bottom:0.4rem">'
-          +'<span style="font-size:1.2rem">'+(s.mark||'🌸')+'</span>'
-          +'<div style="flex:1">'
-          +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</div>'
-          +(s.memo?'<div style="font-size:0.78rem;color:var(--ink2)">'+escHtml(s.memo)+'</div>':'')
-          +'</div>'
-          +'<button onclick="calDeleteSchedule('+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem">✕</button>'
-          +'</div>';
-      });
-    }
-    html+='</div>';
+  if(selScheds.length===0){
+    html+='<p style="font-size:0.85rem;color:var(--ink3);text-align:center;padding:0.4rem 0">予定はありません</p>';
+  } else {
+    selScheds.forEach(function(s,idx){
+      html+='<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;background:rgba(184,134,11,0.05);border-radius:8px;margin-bottom:0.4rem">'
+        +'<span style="font-size:1.2rem">'+(s.mark||'🌸')+'</span>'
+        +'<div style="flex:1">'
+        +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</div>'
+        +(s.memo?'<div style="font-size:0.78rem;color:var(--ink2)">'+escHtml(s.memo)+'</div>':'')
+        +'</div>'
+        +'<button onclick="calDeleteSchedule(\''+dispDate+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem">✕</button>'
+        +'</div>';
+    });
   }
+  html+='</div>';
 
   body.innerHTML=html;
 }
@@ -2223,8 +2222,9 @@ function calSelectDate(dk){
 }
 
 function calOpenAdd(){
-  if(!calSelectedDate)return;
-  var parts=calSelectedDate.split('-');
+  var now=new Date();
+  var dk=calSelectedDate||calDateKey(now.getFullYear(),now.getMonth()+1,now.getDate());
+  var parts=dk.split('-');
   var sy=parseInt(parts[0]),sm=parseInt(parts[1]),sd=parseInt(parts[2]);
   var selDow=['日','月','火','水','木','金','土'][new Date(sy,sm-1,sd).getDay()];
   var lbl=document.getElementById('cal-add-date-label');
@@ -2274,12 +2274,12 @@ function calSaveSchedule(){
   renderCalendar();
 }
 
-function calDeleteSchedule(idx){
-  if(!calSelectedDate)return;
+function calDeleteSchedule(dk,idx){
+  if(!dk)return;
   var data=calGetSchedules();
-  if(!data[calSelectedDate])return;
-  data[calSelectedDate].splice(idx,1);
-  if(data[calSelectedDate].length===0) delete data[calSelectedDate];
+  if(!data[dk])return;
+  data[dk].splice(idx,1);
+  if(data[dk].length===0) delete data[dk];
   calSaveSchedules(data);
   renderCalendar();
 }
