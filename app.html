@@ -1996,17 +1996,6 @@ function buildHomePage(){
     +'</button>'
     +'</div>';
 
-  // 大運の通変星（干から計算）
-  var daiTh=(G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—';
-  var daiJos=G.nichiKanIdx!==undefined?(JUSEI[G.nichiKanIdx]||[])[JUNISHI.indexOf(u.currDaiun.shi)]||'—':'—';
-  // 情報チップ（4つ）
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem">'
-    +'<div class="info-chip"><div class="ic-lbl">年　齢</div><div class="ic-val">'+u.age+'歳</div></div>'
-    +'<div class="info-chip"><div class="ic-lbl">現在の大運</div><div class="ic-val">'+u.currDaiun.ks+'</div></div>'
-    +'<div class="info-chip"><div class="ic-lbl">大運の通変星</div><div class="ic-val" style="color:var(--purple)">'+daiTh+'</div></div>'
-    +'<div class="info-chip"><div class="ic-lbl">大運の運気</div><div class="ic-val" style="color:'+getJuniColor(u.daiJu)+'">'+u.daiJu+'</div></div>'
-    +'</div>';
-
   html+='</div>';
 
   // ===== 月間カレンダー =====
@@ -2084,15 +2073,19 @@ function renderCalendar(){
   var schedules=calGetSchedules();
 
   // 今月・今年の運気を計算
-  var monKS=getMonthKS(calYear,calMonth+1,15); // その月の中旬で代表
+  var monKS=getMonthKS(calYear,calMonth+1,15);
   var monJu=getJuniUnki(G.ht,monKS[1]);
   var monJuColor=getJuniColor(monJu);
-  var yrKS=getYearKS(calYear,6,15); // その年の6月で代表
+  var yrKS=getYearKS(calYear,6,15);
   var yrJu=getJuniUnki(G.ht,yrKS[1]);
   var yrJuColor=getJuniColor(yrJu);
 
-  // 今月・今年の運気バッジ
-  var html='<div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;justify-content:center">'
+  // 大運情報
+  var u=getCurrentUnki(G);
+  var daiTh=(G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—';
+
+  // 今年・今月・大運バッジ
+  var html='<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;justify-content:center">'
     +'<div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:20px;padding:0.25rem 0.8rem;display:flex;align-items:center;gap:0.3rem">'
     +'<span style="font-size:0.7rem;color:var(--ink3)">今年</span>'
     +'<span style="font-size:0.85rem;font-weight:700;color:'+yrJuColor+'">'+yrJu+'</span>'
@@ -2101,6 +2094,15 @@ function renderCalendar(){
     +'<span style="font-size:0.7rem;color:var(--ink3)">'+(calMonth+1)+'月</span>'
     +'<span style="font-size:0.85rem;font-weight:700;color:'+monJuColor+'">'+monJu+'</span>'
     +'</div>'
+    +'</div>'
+    // 大運情報を1行で
+    +'<div style="text-align:center;margin-bottom:0.7rem">'
+    +'<span style="font-size:0.75rem;color:var(--ink3)">現在の大運：</span>'
+    +'<span style="font-size:0.82rem;font-weight:700;color:var(--ink)">'+u.currDaiun.ks+'</span>'
+    +'<span style="font-size:0.75rem;color:var(--purple);margin-left:0.4rem">'+daiTh+'</span>'
+    +'<span style="font-size:0.75rem;color:var(--ink3);margin-left:0.3rem">／</span>'
+    +'<span style="font-size:0.82rem;font-weight:700;color:'+getJuniColor(u.daiJu)+';margin-left:0.3rem">'+u.daiJu+'</span>'
+    +'<span style="font-size:0.75rem;color:var(--ink3);margin-left:0.3rem">（'+u.age+'歳）</span>'
     +'</div>';
   // 曜日ヘッダー
   var DOW=['日','月','火','水','木','金','土'];
