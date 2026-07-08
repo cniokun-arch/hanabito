@@ -2083,9 +2083,28 @@ function renderCalendar(){
   var days=lastDay.getDate();
   var schedules=calGetSchedules();
 
+  // 今月・今年の運気を計算
+  var monKS=getMonthKS(calYear,calMonth+1,15); // その月の中旬で代表
+  var monJu=getJuniUnki(G.ht,monKS[1]);
+  var monJuColor=getJuniColor(monJu);
+  var yrKS=getYearKS(calYear,6,15); // その年の6月で代表
+  var yrJu=getJuniUnki(G.ht,yrKS[1]);
+  var yrJuColor=getJuniColor(yrJu);
+
+  // 今月・今年の運気バッジ
+  var html='<div style="display:flex;gap:0.5rem;margin-bottom:0.8rem;justify-content:center">'
+    +'<div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:20px;padding:0.25rem 0.8rem;display:flex;align-items:center;gap:0.3rem">'
+    +'<span style="font-size:0.7rem;color:var(--ink3)">今年</span>'
+    +'<span style="font-size:0.85rem;font-weight:700;color:'+yrJuColor+'">'+yrJu+'</span>'
+    +'</div>'
+    +'<div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:0.25rem 0.8rem;display:flex;align-items:center;gap:0.3rem">'
+    +'<span style="font-size:0.7rem;color:var(--ink3)">'+(calMonth+1)+'月</span>'
+    +'<span style="font-size:0.85rem;font-weight:700;color:'+monJuColor+'">'+monJu+'</span>'
+    +'</div>'
+    +'</div>';
   // 曜日ヘッダー
   var DOW=['日','月','火','水','木','金','土'];
-  var html='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
+  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
   DOW.forEach(function(d,i){
     var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
     html+='<div style="text-align:center;font-size:0.72rem;font-weight:700;color:'+c+';padding:0.2rem 0">'+d+'</div>';
@@ -2107,22 +2126,36 @@ function renderCalendar(){
     var dayKS=getDayKS(calYear,calMonth+1,d);
     var ju=getJuniUnki(G.ht,dayKS[1]);
     var juColor=getJuniColor(ju);
-    // 運気名は漢字2文字なのでそのまま表示
     var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
 
-    var bg=isSelected?'rgba(124,58,237,0.18)':isToday?'rgba(124,58,237,0.07)':'rgba(184,134,11,0.03)';
-    var border=isSelected?'1.5px solid rgba(124,58,237,0.7)':isToday?'1px solid rgba(124,58,237,0.4)':'1px solid rgba(184,134,11,0.12)';
+    // 節入り判定：その日が節入り日かどうか、また前月扱いかどうか
+    var setsuDate=getSetsuDate(calYear,calMonth+1);
+    var setsuDay=new Date(setsuDate.getFullYear(),setsuDate.getMonth(),setsuDate.getDate());
+    var isBeforeSetsu=(dt<setsuDay); // 節入り前＝前月扱い
+    var isSetsuDay=(dt.getTime()===setsuDay.getTime()); // 節入り当日
 
-    // マーク表示
+    // 背景色：前月扱いは薄いグレー、節入り後は通常
+    var bg=isSelected?'rgba(124,58,237,0.18)':isToday?'rgba(124,58,237,0.07)':isBeforeSetsu?'rgba(150,150,150,0.06)':'rgba(184,134,11,0.03)';
+    var border=isSelected?'1.5px solid rgba(124,58,237,0.7)':isToday?'1px solid rgba(124,58,237,0.4)':isSetsuDay?'1.5px solid rgba(184,134,11,0.5)':'1px solid rgba(184,134,11,0.12)';
+    // 前月扱いは運気名も薄く
+    var juOpacity=isBeforeSetsu?'opacity:0.45;':'';
+
+    // マーク表示（常に同じ高さを確保）
     var markHtml='';
     if(dayScheds.length>0){
       var marks=dayScheds.slice(0,2).map(function(s){return s.mark||'🌸';}).join('');
-      markHtml='<div style="font-size:0.9rem;line-height:1;margin-top:2px">'+marks+'</div>';
+      markHtml='<div style="font-size:1rem;line-height:1;height:1.2rem;display:flex;align-items:center;justify-content:center">'+marks+'</div>';
+    } else {
+      markHtml='<div style="height:1.2rem"></div>';
     }
 
-    html+='<div onclick="calSelectDate(\''+dk+'\')" style="border:'+border+';border-radius:6px;padding:0.2rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">'
-      +'<div style="font-size:0.72rem;font-weight:'+(isToday||isSelected?'700':'400')+';color:'+dayColor+';line-height:1">'+d+'</div>'
-      +'<div style="font-size:0.88rem;color:'+juColor+';font-weight:700;line-height:1.2;letter-spacing:-0.03em">'+ju+'</div>'
+    // 節入り日に縦線マーカーを表示
+    var setsuMarker=isSetsuDay?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:rgba(184,134,11,0.6);border-radius:6px 0 0 6px"></div>':'';
+
+    html+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:6px;padding:0.3rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
+      +setsuMarker
+      +'<div style="font-size:0.72rem;font-weight:'+(isToday||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
+      +'<div style="font-size:0.9rem;color:'+juColor+';font-weight:700;line-height:1.2;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
       +markHtml
       +'</div>';
   }
@@ -2133,6 +2166,9 @@ function renderCalendar(){
   [{name:'天華',desc:'チャンス'},{name:'零花',desc:'試練'},{name:'含苞',desc:'苦難'},{name:'結蕾',desc:'増幅'}].forEach(function(it){
     html+='<span style="font-size:0.68rem;color:'+getJuniColor(it.name)+';font-weight:700">'+it.name+'='+it.desc+'</span>';
   });
+  html+='<span style="font-size:0.68rem;color:var(--ink3)">｜</span>';
+  html+='<span style="font-size:0.68rem;color:var(--ink3)">薄色=前月扱い</span>';
+  html+='<span style="font-size:0.68rem;color:rgba(184,134,11,0.8)">｜線=節入り日</span>';
   html+='</div>';
 
   // 選択日の予定表示エリア
