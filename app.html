@@ -1300,7 +1300,7 @@ function doCalc(y,m,d,gender){
   var BLK_=[]; var bi_=0;
   while(bi_<MAX_AGE){var dk_=A2D[bi_];var end_=bi_;while(end_+1<MAX_AGE&&A2D[end_+1].ks===dk_.ks)end_++;var sp_=end_-bi_+1;BLK_.push({sa:bi_,sp:sp_,ks:dk_.ks,kan:dk_.kan,shi:dk_.shi,th:(T||[])[JIKKAN.indexOf(dk_.kan)]||'—',jos:(JUSEI[nichiKanIdx]||[])[JUNISHI.indexOf(dk_.shi)]||'—',ku:KN_[A2K[bi_]]||'',isSk:sats.indexOf(dk_.shi)>=0});bi_=end_+1;}
   var ND_=[];
-  for(var a_=0;a_<MAX_AGE;a_++){var yr_=y+a_,yrShi_=JUNISHI[((yr_-1984)%12+12)%12],ju_=getJuniUnki(ht,yrShi_);ND_.push({yr:yr_,age:a_,yrShi:yrShi_,ju:ju_,w:JUNI_WAVE[ju_]||0,isSk:sats.indexOf(yrShi_)>=0,isCurr:yr_===CY_});}
+  for(var a_=0;a_<MAX_AGE;a_++){var yr_=y+a_,yrShi_=JUNISHI[((yr_-1984)%12+12)%12],yrKan_=JIKKAN[((yr_-1984)%10+10)%10],ju_=getJuniUnki(ht,yrShi_);ND_.push({yr:yr_,age:a_,yrShi:yrShi_,yrKan:yrKan_,ju:ju_,w:JUNI_WAVE[ju_]||0,isSk:sats.indexOf(yrShi_)>=0,isCurr:yr_===CY_});}
 
   var hon=getHonmeisei(y,m,d);
   var gets=getGetsumeisei(y,m,d,hon);
@@ -1424,6 +1424,8 @@ function buildUnseiRows(ND,A2D,BLK,currIdx,ht){
   h+='<div class="u-row r-age"><div class="u-lbl">年齢</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-size:0.86rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</div>';}).join('')+'</div></div>';
   // 西暦行
   h+='<div class="u-row r-yr"><div class="u-lbl">西暦</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;display:flex;align-items:center;justify-content:center"><span style="font-size:0.48rem;color:'+tc(r,'#4a3c28')+';line-height:1.1;text-align:center">'+String(r.yr).split('').join('<br>')+'</span></div>';}).join('')+'</div></div>';
+  // 年干行
+  h+='<div class="u-row"><div class="u-lbl">年干</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrKan+'</div>';}).join('')+'</div></div>';
   // 年支行
   h+='<div class="u-row r-shi"><div class="u-lbl">年支</div><div class="u-cells">'+ND.map(function(r,i){return'<div class="'+ccls(r,i)+'" style="'+cst(r)+'width:'+CW_+'px;font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</div>';}).join('')+'</div></div>';
   // 十二運気行
@@ -1480,6 +1482,8 @@ function buildBlockRows(ND,A2D,BLK,currIdx,startAge,endAge,ht){
   h+='<div class="ub-row">'+lbl('年齢')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,20,'<span style="font-size:0.86rem;font-weight:700;color:'+tc(r,'#4a3c28')+'">'+r.age+'</span>');}).join('')+'</div></div>';
   // 西暦行 ← 横スクロールと同じ 0.48rem / line-height:1.1
   h+='<div class="ub-row">'+lbl('西暦')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,42,'<span style="font-size:0.48rem;color:'+tc(r,'#4a3c28')+';line-height:1.1;text-align:center">'+String(r.yr).split('').join('<br>')+'</span>');}).join('')+'</div></div>';
+  // 年干行
+  h+='<div class="ub-row">'+lbl('年干')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,28,'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrKan+'</span>');}).join('')+'</div></div>';
   // 年支行
   h+='<div class="ub-row">'+lbl('年支')+'<div style="display:flex">'+blockND.map(function(r){return cell(r,28,'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;color:'+tc(r,'#1a1208')+'">'+r.yrShi+'</span>');}).join('')+'</div></div>';
   // 十二運気行
@@ -1614,7 +1618,7 @@ function startApp(data){
   try{
     var b=data.account.birthday,g=data.account.gender;
     var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND||data.account.G.kyuseiHon===undefined||(data.account.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(data.account.G.ND[0].ju)>=0)){
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND||data.account.G.kyuseiHon===undefined||(data.account.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(data.account.G.ND[0].ju)>=0)||(data.account.G.ND[0]&&!data.account.G.ND[0].yrKan)){
       if(!by||!bm||!bd){
         // データ破損 → ログアウト状態に戻す
         S.save(null);localStorage.removeItem(STORAGE_KEY);
@@ -1633,7 +1637,7 @@ function startApp(data){
     try{
       var b=p.birthday;
       var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND||p.G.kyuseiHon===undefined||(p.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(p.G.ND[0].ju)>=0))&&by&&bm&&bd){
+      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND||p.G.kyuseiHon===undefined||(p.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(p.G.ND[0].ju)>=0)||(p.G.ND[0]&&!p.G.ND[0].yrKan))&&by&&bm&&bd){
         data.people[i].G=doCalc(by,bm,bd,p.gender);
       }
     }catch(e){}
@@ -3202,6 +3206,7 @@ function buildSystemPromptFull(G){
     +(customInfo?'【追加知識】\n'+customInfo+'\n\n':'')
     +'【時間軸ルール】大運×年運→方向性（大きな筆）。月運→タイミング。日運→今日の質（小さな字）。日運の低さを人生の判断材料にしない。\n\n'
     +'【絶対守ること】甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥を回答に出さない。Markdown禁止。親しみやすい日本語。単発200〜300文字。総合400〜800文字。転化天蛹は大運のみ。\n'
+    +'【十干の表現ルール】十干（甲乙丙丁戊己庚辛壬癸）のデータは鑑定に積極的に活用するが、干の名前（「あなたの年干は丙」など）を直接出力してはならない。必ず「あなたには〜のような心象・本能があり、〜したいという欲求がある」という形でその人への言葉に変換して表現すること。十干名を出さなくても鑑定の深みは十分に伝わる。\n'
     +'「天運」「地運」という言葉は六星占術の用語であり、花人占術では絶対に使わないこと。花人占術では「坤運（こんうん）」＝命式に現れる一生変わらない本質、「乾運（けんうん）」＝大運・年運・月運・日運など変わり続ける運気、という用語を使うこと。ユーザーへの説明では「坤運」「乾運」そのままか、「一生の本質」「今の運気の流れ」のような分かりやすい言葉に置き換えること。\n'
     +'【大運の三時期（必ず守ること）】\n'
     +'・苦難の時期（大運が含苞）：心身の不健康に悩まされやすく、頑張りすぎると逆効果。息苦しさや将来への漠然とした不安を感じやすい時期でもある。心身のケアを優先しながら次のチャンスを静かに待つ時期と伝えること。\n'
