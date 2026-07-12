@@ -2548,15 +2548,6 @@ function buildMeishikiPage(){
 
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
-  // デバッグ表示（確認後削除）
-  try{
-    var _dbg='G.dfs='+G.dfs+' nZ='+G.nZ+' y='+G.y+'/'+G.m+'/'+G.d;
-    var _s=getSetsuDate(1977,8);
-    _dbg+=' | 節入='+_s.getFullYear()+'/'+(_s.getMonth()+1)+'/'+_s.getDate();
-    _dbg+=' dfs1977='+getDaysFromSetsu(1977,8,16);
-    html+='<div style="font-size:0.7rem;color:red;word-break:break-all;padding:0.3rem">'+_dbg+'</div>';
-  }catch(_e){html+='<div style="color:red">DBG ERR:'+_e.message+'</div>';}
-
   html+='<div class="meishiki-grid">';
   html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS),kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）','nen',G.nenKan));
   html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS),kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）','gets',G.tsuKan));
