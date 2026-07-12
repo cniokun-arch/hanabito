@@ -1305,7 +1305,7 @@ function doCalc(y,m,d,gender){
   var hon=getHonmeisei(y,m,d);
   var gets=getGetsumeisei(y,m,d,hon);
   var nichi=getNichimeisei(y,m,d);
-  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs,BLK:BLK_,ND:ND_,kyuseiHon:hon,kyuseiGets:gets,kyuseiNichi:nichi};
+  return {y,m,d,gender,ht,nenKS,tsuKS,nichiKS,nenShi,tsuShi,nichiShi,nenKan,tsuKan,nichiKan,nichiKanIdx,nZ,tZ,niZ,nJus,tJus,niJus,T,DL,A2D,sa,sats,isFwd,dfs,BLK:BLK_,ND:ND_,kyuseiHon:hon,kyuseiGets:gets,kyuseiNichi:nichi,zokanVer:2};
 }
 
 // 今日・今月・今年・大運の十二運気
@@ -1618,7 +1618,7 @@ function startApp(data){
   try{
     var b=data.account.birthday,g=data.account.gender;
     var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND||data.account.G.kyuseiHon===undefined||(data.account.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(data.account.G.ND[0].ju)>=0)||(data.account.G.ND[0]&&!data.account.G.ND[0].yrKan)){
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND||data.account.G.kyuseiHon===undefined||(data.account.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(data.account.G.ND[0].ju)>=0)||(data.account.G.ND[0]&&!data.account.G.ND[0].yrKan)||!data.account.G.zokanVer||data.account.G.zokanVer<2){
       if(!by||!bm||!bd){
         // データ破損 → ログアウト状態に戻す
         S.save(null);localStorage.removeItem(STORAGE_KEY);
@@ -1637,7 +1637,7 @@ function startApp(data){
     try{
       var b=p.birthday;
       var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND||p.G.kyuseiHon===undefined||(p.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(p.G.ND[0].ju)>=0)||(p.G.ND[0]&&!p.G.ND[0].yrKan))&&by&&bm&&bd){
+      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND||p.G.kyuseiHon===undefined||(p.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(p.G.ND[0].ju)>=0)||(p.G.ND[0]&&!p.G.ND[0].yrKan)||!p.G.zokanVer||p.G.zokanVer<2)&&by&&bm&&bd){
         data.people[i].G=doCalc(by,bm,bd,p.gender);
       }
     }catch(e){}
