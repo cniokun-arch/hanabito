@@ -1218,19 +1218,25 @@ function getYearPeriodLabel(y,m,d){
   return startD.getFullYear()+'年'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'年'+fmtMD(endBefore)+'(立春前日)';
 }
 function getDaysFromSetsu(y,m,d){
-  var bd=new Date(y,m-1,d);
-  var s=getSetsuDate(y,m);
-  // タイムゾーンオフセットを考慮してUTC日付に変換
-  var sYear=s.getFullYear(),sMon=s.getMonth(),sDay=s.getDate();
-  var bdTime=bd.getTime()-bd.getTimezoneOffset()*60000;
-  var sTime=new Date(sYear,sMon,sDay).getTime()-new Date(sYear,sMon,sDay).getTimezoneOffset()*60000;
-  if(bdTime>=sTime) return Math.round((bdTime-sTime)/86400000);
-  var pm=m-1,py=y;
-  if(pm<1){pm=12;py--;}
-  var ps=getSetsuDate(py,pm);
-  var psYear=ps.getFullYear(),psMon=ps.getMonth(),psDay=ps.getDate();
-  var psTime=new Date(psYear,psMon,psDay).getTime()-new Date(psYear,psMon,psDay).getTimezoneOffset()*60000;
-  return Math.max(0,Math.round((bdTime-psTime)/86400000));
+  // 誕生日を「その地のローカル日付」として扱うため、UTCに変換せずローカルのまま比較
+  var bdLocalMs = new Date(y, m-1, d).getTime();
+
+  // 節入り日時を取得（getSetsuDateはUTCベースのDateオブジェクトを返す）
+  var setsuDate = getSetsuDate(y, m);
+  // 節入りの「日付部分のみ」をローカル時刻の00:00:00として取得
+  var setsuLocalMs = new Date(setsuDate.getFullYear(), setsuDate.getMonth(), setsuDate.getDate()).getTime();
+
+  if(bdLocalMs >= setsuLocalMs){
+    return Math.round((bdLocalMs - setsuLocalMs) / 86400000);
+  }
+
+  // 誕生日が節入り前の場合は前月の節入りからの日数を計算
+  var pm = m - 1, py = y;
+  if(pm < 1){ pm = 12; py--; }
+  var prevSetsuDate = getSetsuDate(py, pm);
+  var prevSetsuLocalMs = new Date(prevSetsuDate.getFullYear(), prevSetsuDate.getMonth(), prevSetsuDate.getDate()).getTime();
+
+  return Math.max(0, Math.round((bdLocalMs - prevSetsuLocalMs) / 86400000));
 }
 function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
 function getYearKS(y,m,d){var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
