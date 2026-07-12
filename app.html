@@ -1217,17 +1217,7 @@ function getYearPeriodLabel(y,m,d){
   var endBefore=new Date(endD-86400000);
   return startD.getFullYear()+'年'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'年'+fmtMD(endBefore)+'(立春前日)';
 }
-function getDaysFromSetsu(y,m,d){
-  var s=getSetsuDate(y,m);
-  var bdMs=new Date(y,m-1,d).setHours(0,0,0,0);
-  var sDMs=new Date(s.getFullYear(),s.getMonth(),s.getDate()).setHours(0,0,0,0);
-  if(bdMs>=sDMs) return Math.round((bdMs-sDMs)/86400000);
-  var pm=m-1,py=y;
-  if(pm<1){pm=12;py--;}
-  var ps=getSetsuDate(py,pm);
-  var psDMs=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate()).setHours(0,0,0,0);
-  return Math.max(0,Math.round((bdMs-psDMs)/86400000));
-}
+function getDaysFromSetsu(y,m,d){var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());if(bd>=sD)return Math.round((bd-sD)/86400000);var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());return Math.max(0,Math.round((bd-psD)/86400000));}
 function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
 function getYearKS(y,m,d){var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
 function getMonthKS(y,m,d){var bd=new Date(y,m-1,d),s=getSetsuDate(y,m),sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());var mo=m,yo=y;if(bd<sD){mo--;if(mo<1){mo=12;yo--;}}var rs=getSetsuDate(yo,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());var refY=new Date(yo,Math.max(0,mo-1),1)>=rsD?yo:yo-1;var yk=ROKUJU[((refY-1984)%60+60)%60];var mkBase=[2,4,6,8,0][JIKKAN.indexOf(yk[0])%5];var mo2=(mo<=0?mo+12:mo)===1?11:(mo<=0?mo+12:mo)-2;return JIKKAN[(mkBase+mo2)%10]+JUNISHI[(2+mo2)%12];}
@@ -1517,7 +1507,7 @@ function buildBlockRows(ND,A2D,BLK,currIdx,startAge,endAge,ht){
 // ============================================================
 // STORAGE (localStorage wrapper)
 // ============================================================
-var STORAGE_KEY='hanabito_v3';
+var STORAGE_KEY='hanabito_v2';
 var S={
   load:function(){try{var d=localStorage.getItem(STORAGE_KEY);return d?JSON.parse(d):null;}catch(e){return null;}},
   save:function(data){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}}
@@ -1628,23 +1618,23 @@ function startApp(data){
   try{
     var b=data.account.birthday,g=data.account.gender;
     var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-    if(!by||!bm||!bd){
-      S.save(null);localStorage.removeItem(STORAGE_KEY);
-      return;
+    if(!data.account.G||!data.account.G.ht||!data.account.G.nenKS||data.account.G.nichiKanIdx===undefined||!data.account.G.ND||data.account.G.kyuseiHon===undefined||(data.account.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(data.account.G.ND[0].ju)>=0)||(data.account.G.ND[0]&&!data.account.G.ND[0].yrKan)){
+      if(!by||!bm||!bd){
+        S.save(null);localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+      data.account.G=doCalc(by,bm,bd,g);
+      S.save(data);
     }
-    // 常に再計算（蔵干の修正を確実に反映）
-    data.account.G=doCalc(by,bm,bd,g);
-    S.save(data);
   }catch(e){
     localStorage.removeItem(STORAGE_KEY);
     return;
   }
-  // 登録メンバーも常に再計算
   (data.people||[]).forEach(function(p,i){
     try{
       var b=p.birthday;
       var by=+(b&&b.y),bm=+(b&&b.m),bd=+(b&&b.d);
-      if(by&&bm&&bd){
+      if((!p.G||!p.G.ht||!p.G.nenKS||!p.G.ND||p.G.kyuseiHon===undefined||(p.G.ND[0]&&['発芽','開花','内省','成天','狂咲'].indexOf(p.G.ND[0].ju)>=0)||(p.G.ND[0]&&!p.G.ND[0].yrKan))&&by&&bm&&bd){
         data.people[i].G=doCalc(by,bm,bd,p.gender);
       }
     }catch(e){}
