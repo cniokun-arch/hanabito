@@ -1218,25 +1218,26 @@ function getYearPeriodLabel(y,m,d){
   return startD.getFullYear()+'年'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'年'+fmtMD(endBefore)+'(立春前日)';
 }
 function getDaysFromSetsu(y,m,d){
-  // 誕生日を「その地のローカル日付」として扱うため、UTCに変換せずローカルのまま比較
   var bdLocalMs = new Date(y, m-1, d).getTime();
-
-  // 節入り日時を取得（getSetsuDateはUTCベースのDateオブジェクトを返す）
   var setsuDate = getSetsuDate(y, m);
-  // 節入りの「日付部分のみ」をローカル時刻の00:00:00として取得
   var setsuLocalMs = new Date(setsuDate.getFullYear(), setsuDate.getMonth(), setsuDate.getDate()).getTime();
-
   if(bdLocalMs >= setsuLocalMs){
     return Math.round((bdLocalMs - setsuLocalMs) / 86400000);
   }
-
-  // 誕生日が節入り前の場合は前月の節入りからの日数を計算
   var pm = m - 1, py = y;
   if(pm < 1){ pm = 12; py--; }
   var prevSetsuDate = getSetsuDate(py, pm);
   var prevSetsuLocalMs = new Date(prevSetsuDate.getFullYear(), prevSetsuDate.getMonth(), prevSetsuDate.getDate()).getTime();
-
   return Math.max(0, Math.round((bdLocalMs - prevSetsuLocalMs) / 86400000));
+}
+function debugDfs(y,m,d){
+  var s=getSetsuDate(y,m);
+  var sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
+  var bd=new Date(y,m-1,d);
+  var dfs=getDaysFromSetsu(y,m,d);
+  return '節入:'+s.getFullYear()+'/'+(s.getMonth()+1)+'/'+s.getDate()
+    +' bd:'+bd.getFullYear()+'/'+(bd.getMonth()+1)+'/'+bd.getDate()
+    +' dfs:'+dfs;
 }
 function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
 function getYearKS(y,m,d){var bd=new Date(y,m-1,d),rs=getSetsuDate(y,2),rsD=new Date(rs.getFullYear(),rs.getMonth(),rs.getDate());return ROKUJU[(((bd>=rsD?y:y-1)-1984)%60+60)%60];}
@@ -2546,6 +2547,15 @@ function buildMeishikiPage(){
 
   // 命式グリッド
   html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
+  // デバッグ表示（確認後削除）
+  try{
+    var _dbg='G.dfs='+G.dfs+' nZ='+G.nZ+' y='+G.y+'/'+G.m+'/'+G.d;
+    var _s=getSetsuDate(1977,8);
+    _dbg+=' | 節入='+_s.getFullYear()+'/'+(_s.getMonth()+1)+'/'+_s.getDate();
+    _dbg+=' dfs1977='+getDaysFromSetsu(1977,8,16);
+    html+='<div style="font-size:0.7rem;color:red;word-break:break-all;padding:0.3rem">'+_dbg+'</div>';
+  }catch(_e){html+='<div style="color:red">DBG ERR:'+_e.message+'</div>';}
+
   html+='<div class="meishiki-grid">';
   html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS),kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）','nen',G.nenKan));
   html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS),kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）','gets',G.tsuKan));
