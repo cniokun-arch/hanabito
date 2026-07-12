@@ -1218,17 +1218,14 @@ function getYearPeriodLabel(y,m,d){
   return startD.getFullYear()+'年'+fmtMD(startD)+'(立春)〜'+endBefore.getFullYear()+'年'+fmtMD(endBefore)+'(立春前日)';
 }
 function getDaysFromSetsu(y,m,d){
-  var bd=new Date(y,m-1,d);
   var s=getSetsuDate(y,m);
-  var sD=new Date(s.getFullYear(),s.getMonth(),s.getDate());
-  var bdMs=Date.UTC(bd.getFullYear(),bd.getMonth(),bd.getDate());
-  var sDMs=Date.UTC(sD.getFullYear(),sD.getMonth(),sD.getDate());
+  var bdMs=new Date(y,m-1,d).setHours(0,0,0,0);
+  var sDMs=new Date(s.getFullYear(),s.getMonth(),s.getDate()).setHours(0,0,0,0);
   if(bdMs>=sDMs) return Math.round((bdMs-sDMs)/86400000);
   var pm=m-1,py=y;
   if(pm<1){pm=12;py--;}
   var ps=getSetsuDate(py,pm);
-  var psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());
-  var psDMs=Date.UTC(psD.getFullYear(),psD.getMonth(),psD.getDate());
+  var psDMs=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate()).setHours(0,0,0,0);
   return Math.max(0,Math.round((bdMs-psDMs)/86400000));
 }
 function getDayKS(y,m,d){var diff=Math.round((new Date(y,m-1,d)-new Date(1900,0,1))/86400000);return ROKUJU[((diff+10)%60+60)%60];}
@@ -2538,7 +2535,7 @@ function buildMeishikiPage(){
   }
 
   // 命式グリッド
-  html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）v3</div>';
+  html+='<div class="card"><div class="card-title">◆ 命式（'+name+'）</div>';
   html+='<div class="meishiki-grid">';
   html+=msCol('年　柱','（スーパーエゴ）',G.nenKan,G.nenShi,G.nZ,(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.nZ)]||'—',G.nJus||'—',getJuniUnki(G.ht,G.nenShi),getNayin(G.nenKS),kyuseiBadge(G.kyuseiHon,G.y,G.m,G.d,'🌌 本命星（内面）','nen',G.nenKan));
   html+=msCol('月　柱','（エゴ）',G.tsuKan,G.tsuShi,G.tZ,(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—',(G.T||[])[JIKKAN.indexOf(G.tZ)]||'—',G.tJus||'—',getJuniUnki(G.ht,G.tsuShi),getNayin(G.tsuKS),kyuseiBadge(G.kyuseiGets,G.y,G.m,G.d,'🌙 月命星（外面）','gets',G.tsuKan));
