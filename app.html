@@ -3906,21 +3906,23 @@ function buildManualPage(){
   var layerStyle='font-size:0.92rem;line-height:1.9;color:var(--ink);margin-bottom:1.2rem';
   var dividerStyle='border:none;border-top:1px solid var(--gold);opacity:0.3;margin:1rem 0';
   if(saved&&saved.layer1){
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER I ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">あなたという人</div></div>';
     html+='<div id="manual-layer1" style="'+layerStyle+'">'+saved.layer1.replace(/\n/g,'<br>')+'</div>';
-    html+='<hr style="'+dividerStyle+'">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER II ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">年齢とともに育つ人格</div></div>';
     html+='<div id="manual-layer2" style="'+layerStyle+'">'+((saved.layer2||'').replace(/\n/g,'<br>'))+'</div>';
-    html+='<hr style="'+dividerStyle+'">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER III ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">人生の大きな流れ</div></div>';
     html+='<div id="manual-layer3" style="'+layerStyle+'">'+((saved.layer3||'').replace(/\n/g,'<br>'))+'</div>';
-    html+='<hr style="'+dividerStyle+'">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER IV ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">今のあなたへ</div></div>';
     html+='<div id="manual-layer4" style="'+layerStyle+'">'+((saved.layer4||'').replace(/\n/g,'<br>'))+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
   } else {
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER I ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">あなたという人</div></div>';
     html+='<div id="manual-layer1"></div>';
-    html+='<hr id="manual-div1" style="'+dividerStyle+';display:none">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER II ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">年齢とともに育つ人格</div></div>';
     html+='<div id="manual-layer2"></div>';
-    html+='<hr id="manual-div2" style="'+dividerStyle+';display:none">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER III ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">人生の大きな流れ</div></div>';
     html+='<div id="manual-layer3"></div>';
-    html+='<hr id="manual-div3" style="'+dividerStyle+';display:none">';
+    html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER IV ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">今のあなたへ</div></div>';
     html+='<div id="manual-layer4"></div>';
     html+='<button id="manual-gen-btn" onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
   }
@@ -4132,9 +4134,7 @@ async function generateManual(){
   }
   function showLayer(id,divId,text){
     var el=document.getElementById(id);
-    var divEl=document.getElementById(divId);
     if(el)el.innerHTML=text.replace(/\n/g,'<br>');
-    if(divEl)divEl.style.display='';
   }
 
   try{
