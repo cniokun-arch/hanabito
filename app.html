@@ -3897,19 +3897,32 @@ function buildManualPage(){
   if(starData['相性に注意'])html+='<div style="flex:1;background:rgba(192,64,64,0.07);border:1px solid rgba(192,64,64,0.2);border-radius:8px;padding:0.6rem;text-align:center"><div style="font-size:0.7rem;color:#c04040;margin-bottom:0.2rem">要注意</div><div style="font-weight:700;font-size:0.9rem;color:#c04040">'+htDisplayBase(starData['相性に注意'].replace(/[花人]/g,function(c){return c;})+'')+'</div></div>';
   html+='</div></div>';
 
-  // 5. AI生成セクション
+  // 5. AI生成セクション（4層分割）
   html+='<div class="card" id="manual-ai-card">';
   html+='<div class="card-title">◆ あなただけの詳細分析</div>';
   html+='<p style="font-size:0.85rem;color:var(--ink3);margin-bottom:0.8rem">納音・九星・大運の流れを含む、あなた専用の詳細プロフィールをAIが生成します。</p>';
 
-  // 保存済みの説明書があれば表示
   var saved=loadManualData();
-  if(saved&&saved.detail){
-    html+='<div id="manual-ai-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+saved.detail.replace(/\n/g,'<br>')+'</div>';
+  var layerStyle='font-size:0.92rem;line-height:1.9;color:var(--ink);margin-bottom:1.2rem';
+  var dividerStyle='border:none;border-top:1px solid var(--gold);opacity:0.3;margin:1rem 0';
+  if(saved&&saved.layer1){
+    html+='<div id="manual-layer1" style="'+layerStyle+'">'+saved.layer1.replace(/\n/g,'<br>')+'</div>';
+    html+='<hr style="'+dividerStyle+'">';
+    html+='<div id="manual-layer2" style="'+layerStyle+'">'+((saved.layer2||'').replace(/\n/g,'<br>'))+'</div>';
+    html+='<hr style="'+dividerStyle+'">';
+    html+='<div id="manual-layer3" style="'+layerStyle+'">'+((saved.layer3||'').replace(/\n/g,'<br>'))+'</div>';
+    html+='<hr style="'+dividerStyle+'">';
+    html+='<div id="manual-layer4" style="'+layerStyle+'">'+((saved.layer4||'').replace(/\n/g,'<br>'))+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
   } else {
-    html+='<div id="manual-ai-content"></div>';
-    html+='<button onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
+    html+='<div id="manual-layer1"></div>';
+    html+='<hr id="manual-div1" style="'+dividerStyle+';display:none">';
+    html+='<div id="manual-layer2"></div>';
+    html+='<hr id="manual-div2" style="'+dividerStyle+';display:none">';
+    html+='<div id="manual-layer3"></div>';
+    html+='<hr id="manual-div3" style="'+dividerStyle+';display:none">';
+    html+='<div id="manual-layer4"></div>';
+    html+='<button id="manual-gen-btn" onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
   }
   html+='</div>';
   html+='</div>';
@@ -4047,27 +4060,124 @@ async function generateManual(){
     +'【重要】坤運（命式）を説明する時は「この時期は〜」という表現を使ってはならない。命式は一生変わらない性質であるため、必ず「あなたは〜」「あなたの性質として〜」「あなたの中には〜」という形で表現すること。「時期」という言葉は乾運（大運・年運）の説明にのみ使う。\n'
     +'【各柱の説明の構造】各柱（年・月・日）の説明は以下の流れで自然につなげること：①その柱の性格・性質・強み・弱みを語る→②「あなたの中には〜という力が一生涯働いています」という形でその柱の十二運気が自分にどう作用するかを自然につなげる。弱みを無理やりポジティブに変換して締めるのではなく、十二運気の作用として別途伝えること。十二運気の名前（青葉・結蕾・含苞など）を直接出力してはならない。運気名を知らない人でも理解できるよう、その運気の性質を言葉で表現すること。';
 
+  // 各層のプロンプト定義
+  var baseData='【命式データ】\n'
+    +'六花人：'+dispName+'（'+hinata+'）\n'
+    +'年柱（社会的な顔）：'+G.nenKS+'  通変星='+((G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—')+'  十二運気='+getJuniUnki(G.ht,G.nenShi)+'  従星='+nenJos+'  九星='+nenKyusei+'  納音='+getNayin(G.nenKS)+'\n'
+    +'月柱（内面の欲求）：'+G.tsuKS+'  通変星='+((G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—')+'  十二運気='+getJuniUnki(G.ht,G.tsuShi)+'  従星='+tsuJos+'  九星='+tsuKyusei+'  納音='+getNayin(G.tsuKS)+'\n'
+    +'日柱（本質）：'+G.nichiKS+'  通変星='+((G.T||[])[JIKKAN.indexOf(G.nichiKan)]||'—')+'  十二運気='+getJuniUnki(G.ht,G.nichiShi)+'  従星='+nichiJos+'  九星='+nichiKyusei+'  納音='+getNayin(G.nichiKS)+'\n';
+
+  var p1='以下のデータを使って【第1層A：あなたという人】を書いてください。\n\n'
+    +baseData+'\n'
+    +'■ 書き方\n'
+    +'・「社会的な顔」「内面の欲求」「本質（熱中・結論時）」の3つを別々のまとまりで書く\n'
+    +'・各部分は「性格・性質・強み・弱み→十二運気がどう作用するか」の流れで書く\n'
+    +'・運気名（青葉・結蕾など）は直接出力せず、その性質を日常の言葉で表現する\n'
+    +'・「年柱」「月柱」「日柱」という言葉は使わず「社会的な顔」「内面の欲求」「本質」に置き換える\n'
+    +'・占術用語・専門用語は使わず誰でも分かる言葉で。Markdown禁止。\n'
+    +'・600〜800文字程度。';
+
+  var p2='以下のデータを使って【第1層B：年齢ごとの人格形成】と【第1層C：恋愛・家庭・健康の傾向】を書いてください。\n\n'
+    +baseData+'\n'
+    +'■ 第1層B：年齢ごとの人格形成\n'
+    +'・〜20歳頃：年柱の従星×本命星の組み合わせで形成される土台・本能\n'
+    +'・20〜40歳頃：月柱の従星×月命星の組み合わせで完成する社会人格\n'
+    +'・40歳以降：日柱の従星×日命星で解放される本質（年齢を重ねるほど強まる）\n'
+    +'また年柱・月柱の通変星同士の関係（強め合うか抑え合うか）を、心理・行動の言葉で説明する。\n'
+    +'「相生」「相剋」「火剋金」などの用語は出力に使わない。\n\n'
+    +'■ 第1層C：恋愛・家庭・健康の傾向\n'
+    +'六花人・通変星・従星から恋愛・家庭・健康への傾向を伝える。\n\n'
+    +'占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
+
+  var p3='以下のデータを使って【第2層：大運の流れ】を書いてください。\n\n'
+    +baseData+'\n'
+    +'【大運データ】\n'+daiunText+'\n\n'
+    +'■ 書き方\n'
+    +'・0歳から最後まで全期間を省略せず均等な分量で書く\n'
+    +'・書式：「○歳〜○歳（○年〜○年）：〜」で統一\n'
+    +'・各大運は通変星×従星×十二運気の3要素で読む\n'
+    +'・現在の大運（★）は特に詳しく\n'
+    +'・苦難の時期（含苞）：心身のケアを最優先に、次のチャンスを静かに待つ時期\n'
+    +'・チャンスの時期（天華）：★最重要。抑圧から解放され、やりたかったことへ動ける唯一の機会\n'
+    +'・試練の時期（零花）：普段やらないことに手を染めやすい。乗り越えることが課題\n'
+    +'・「時期」という言葉は乾運（大運）の説明にのみ使う\n'
+    +'・運気名（青葉・結蕾など）は直接出力しない\n'
+    +'・占術用語は使わず誰でも分かる言葉で。Markdown禁止。';
+
+  // 現在の大運情報を取得
+  var currDaiun=daiunRows.filter(function(r){return r.isCurr;})[0]||daiunRows[0];
+  var currTH=currDaiun?currDaiun.th:'—';
+  var nenTH=(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—';
+  var tsuTH=(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—';
+  var nichiTH=(G.T||[])[JIKKAN.indexOf(G.nichiKan)]||'—';
+
+  var p4='以下のデータを使って【第3層：現在の心理状態】と【第4層：まとめのアドバイス】を書いてください。\n\n'
+    +baseData+'\n'
+    +'現在の大運：'+( currDaiun?(currDaiun.age+'〜'+(currDaiun.age+currDaiun.sp-1)+'歳  通変星='+currDaiun.th+'  従星='+currDaiun.jos+'  十二運気='+currDaiun.ju):'—')+'\n\n'
+    +'■ 第3層：現在の心理状態\n'
+    +'・まず命式内部の通変星同士の関係（'+nenTH+'・'+tsuTH+'・'+nichiTH+'）から生まれる本来の心理状態（強め合い・抑え合いによるジレンマや傾向）を先に説明する\n'
+    +'・次に現在の大運の通変星（'+currTH+'）が各柱の通変星にどう作用しているか（強めるか抑えるか）で今の心理状態を説明する\n'
+    +'・「相生」「相剋」「火剋金」などの五行用語は出力に使わない。心理・感覚・行動の言葉に翻訳して書く\n'
+    +'・「年柱」「月柱」「日柱」は使わず「社会的な顔」「内面の欲求」「本質」に置き換える\n\n'
+    +'■ 第4層：まとめ\n'
+    +'総括して簡潔に、思いやりのある言葉で、良い点・注意点・前向きなアドバイスをして終わる。\n\n'
+    +'占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
+
+  function apiCall(prompt){
+    return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:sys,engine:AI_ENGINE})});
+  }
+  function getText(json){
+    return (json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+  }
+  function showLayer(id,divId,text){
+    var el=document.getElementById(id);
+    var divEl=document.getElementById(divId);
+    if(el)el.innerHTML=text.replace(/\n/g,'<br>');
+    if(divEl)divEl.style.display='';
+  }
+
   try{
-    // 性格文と詳細分析を並列生成
-    var [charaRes, detailRes]=await Promise.all([
-      fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:[{role:'user',content:charaPrompt}],system:sys,engine:AI_ENGINE})}),
-      fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:[{role:'user',content:detailPrompt}],system:sys,engine:AI_ENGINE})})
-    ]);
-    var charaJson=await charaRes.json();
-    var detailJson=await detailRes.json();
-
-    var charaText=(charaJson.content&&charaJson.content[0]?charaJson.content[0].text:charaJson.error||'生成できませんでした').replace(/[#*]/g,'').trim();
-    var detailText=(detailJson.content&&detailJson.content[0]?detailJson.content[0].text:detailJson.error||'生成できませんでした').replace(/[#*]/g,'').trim();
-
+    // 性格文（並列）＋第1層A（順次）
+    var charaJson=await (await apiCall(charaPrompt)).json();
+    var charaText=getText(charaJson);
+    var charaEl=document.getElementById('manual-chara-content');
     if(charaEl)charaEl.innerHTML=charaText.replace(/\n/g,'<br>');
-    if(detailEl)detailEl.innerHTML=detailText.replace(/\n/g,'<br>');
-    saveManualData({chara:charaText,detail:detailText});
+
+    var l1El=document.getElementById('manual-layer1');
+    if(l1El)l1El.innerHTML='<span style="color:var(--ink3)">第1層を生成中...</span>';
+    var l1Json=await (await apiCall(p1)).json();
+    var l1Text=getText(l1Json);
+    showLayer('manual-layer1','manual-div1',l1Text);
+
+    var l2El=document.getElementById('manual-layer2');
+    if(l2El)l2El.innerHTML='<span style="color:var(--ink3)">年齢別・恋愛傾向を生成中...</span>';
+    var l2Json=await (await apiCall(p2)).json();
+    var l2Text=getText(l2Json);
+    showLayer('manual-layer2','manual-div2',l2Text);
+
+    var l3El=document.getElementById('manual-layer3');
+    if(l3El)l3El.innerHTML='<span style="color:var(--ink3)">大運の流れを生成中...</span>';
+    var l3Json=await (await apiCall(p3)).json();
+    var l3Text=getText(l3Json);
+    showLayer('manual-layer3','manual-div3',l3Text);
+
+    var l4El=document.getElementById('manual-layer4');
+    if(l4El)l4El.innerHTML='<span style="color:var(--ink3)">現在の心理状態・まとめを生成中...</span>';
+    var l4Json=await (await apiCall(p4)).json();
+    var l4Text=getText(l4Json);
+    var l4ElFinal=document.getElementById('manual-layer4');
+    if(l4ElFinal)l4ElFinal.innerHTML=l4Text.replace(/\n/g,'<br>');
+
+    saveManualData({chara:charaText,layer1:l1Text,layer2:l2Text,layer3:l3Text,layer4:l4Text});
+    var btn2=document.getElementById('manual-gen-btn');
+    if(btn2){btn2.textContent='🔄 再生成する';btn2.disabled=false;}
     if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
   }catch(e){
-    if(charaEl)charaEl.innerHTML='<span style="color:#c04040">通信エラー</span>';
-    if(detailEl)detailEl.innerHTML='<span style="color:#c04040">通信エラー</span>';
+    var errMsg='<span style="color:#c04040">通信エラー：'+e.message+'</span>';
+    ['manual-layer1','manual-layer2','manual-layer3','manual-layer4'].forEach(function(id){
+      var el=document.getElementById(id);if(el&&el.innerHTML.indexOf('生成中')>=0)el.innerHTML=errMsg;
+    });
     if(btn){btn.textContent='✨ AIで詳細分析を生成する';btn.disabled=false;}
   }
   _manualAIRunning=false;
