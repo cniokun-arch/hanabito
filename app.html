@@ -58,7 +58,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   background:linear-gradient(135deg,#1a0830,var(--purple) 55%,var(--gold));
   padding:0.8rem 1rem 0.6rem;
   display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;position:relative
+  position:sticky;top:0;z-index:100
 }
 .top-header-left{display:flex;align-items:center}
 .top-header-hamburger{width:24px;height:18px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;padding:0;background:none;border:none}
@@ -81,7 +81,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .hmenu-ver{font-size:0.75rem;color:var(--ink3);text-align:center;margin-top:1.5rem;letter-spacing:0.06em}
 
 /* ===== MEMBER TABS ===== */
-.member-tab-bar{background:var(--bg2);border-bottom:1px solid rgba(184,134,11,0.2);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0.4rem 0.5rem;gap:0.3rem;align-items:center}
+.member-tab-bar{background:var(--bg2);border-bottom:1px solid rgba(184,134,11,0.2);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0.4rem 0.5rem;gap:0.3rem;align-items:center;position:sticky;top:var(--header-h,52px);z-index:99}
 .member-tab-bar::-webkit-scrollbar{height:2px}
 .member-tab{flex-shrink:0;padding:0.4rem 1rem;font-size:0.94rem;color:var(--ink3);cursor:pointer;white-space:nowrap;transition:all 0.18s;background:none;border:none;font-family:'Noto Serif JP',serif;border-radius:20px}
 .member-tab.active{color:#fff;font-weight:700}
@@ -4076,6 +4076,7 @@ async function generateManual(){
     +'・各部分は「性格・性質・強み・弱み→十二運気がどう作用するか」の流れで書く\n'
     +'・運気名（青葉・結蕾など）は直接出力せず、その性質を日常の言葉で表現する\n'
     +'・「年柱」「月柱」「日柱」という言葉は使わず「社会的な顔」「内面の欲求」「本質」に置き換える\n'
+    +'・「通変星を見ると」「従星の側面では」「第1層A」などの内部用語・書き出しは一切使わない\n'
     +'・占術用語・専門用語は使わず誰でも分かる言葉で。Markdown禁止。\n'
     +'・600〜800文字程度。';
 
@@ -4089,7 +4090,7 @@ async function generateManual(){
     +'「相生」「相剋」「火剋金」などの用語は出力に使わない。\n\n'
     +'■ 第1層C：恋愛・家庭・健康の傾向\n'
     +'六花人・通変星・従星から恋愛・家庭・健康への傾向を伝える。\n\n'
-    +'占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
+    +'「第1層B」「第1層C」「通変星を見ると」などの内部用語・書き出しは一切使わない。占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
 
   var p3='以下のデータを使って【第2層：大運の流れ】を書いてください。\n\n'
     +baseData+'\n'
@@ -4123,7 +4124,7 @@ async function generateManual(){
     +'・「年柱」「月柱」「日柱」は使わず「社会的な顔」「内面の欲求」「本質」に置き換える\n\n'
     +'■ 第4層：まとめ\n'
     +'総括して簡潔に、思いやりのある言葉で、良い点・注意点・前向きなアドバイスをして終わる。\n\n'
-    +'占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
+    +'「第3層」「第4層」「通変星を見ると」などの内部用語・書き出しは一切使わない。占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
 
   function apiCall(prompt){
     return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
