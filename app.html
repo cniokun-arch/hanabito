@@ -4129,9 +4129,9 @@ async function generateManual(){
     +'総括して簡潔に、思いやりのある言葉で、良い点・注意点・前向きなアドバイスをして終わる。\n\n'
     +'「第3層」「第4層」「通変星を見ると」などの内部用語・書き出しは一切使わない。占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
 
-  function apiCall(prompt){
+  function apiCall(prompt,overrideSys){
     return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:sys,engine:AI_ENGINE})});
+      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:overrideSys||sys,engine:AI_ENGINE})});
   }
   function getText(json){
     return (json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
@@ -4173,7 +4173,39 @@ async function generateManual(){
     var l4ElFinal=document.getElementById('manual-layer4');
     if(l4ElFinal)l4ElFinal.innerHTML=l4Text.replace(/\n/g,'<br>');
 
-    saveManualData({chara:charaText,layer1:l1Text,layer2:l2Text,layer3:l3Text,layer4:l4Text});
+    // 校正フェーズ：全4層をまとめて校正
+    var proofEl1=document.getElementById('manual-layer1');
+    var proofEl2=document.getElementById('manual-layer2');
+    var proofEl3=document.getElementById('manual-layer3');
+    var proofEl4=document.getElementById('manual-layer4');
+    var proofStatus='<span style="color:var(--ink3);font-size:0.85rem">✍️ 文章を整えています...</span>';
+    if(proofEl1)proofEl1.innerHTML=proofEl1.innerHTML+'<br>'+proofStatus;
+
+    var proofSys='あなたは日本語の校正専門家です。以下のルールを厳守してください。\n'
+      +'・内容・事実・構成・順序は一切変えない\n'
+      +'・占術用語・専門用語はそのまま残す\n'
+      +'・ぎこちない表現・回りくどい言い回し・繰り返しを自然な日本語に整える\n'
+      +'・読んだ人が自然にすっと入ってくる文章にする\n'
+      +'・Markdown禁止。出力は校正後の文章のみ。説明・コメント不要\n'
+      +'・各章（CHAPTER I〜IV）の区切りは「===CHAPTER_BREAK===」で示すこと';
+
+    var allText='=== CHAPTER I ===\n'+l1Text+'\n\n=== CHAPTER II ===\n'+l2Text+'\n\n=== CHAPTER III ===\n'+l3Text+'\n\n=== CHAPTER IV ===\n'+l4Text;
+    var proofJson=await (await apiCall(allText,proofSys)).json();
+    var proofRaw=getText(proofJson);
+
+    // CHAPTER_BREAKで分割して各層に反映
+    var proofParts=proofRaw.split('===CHAPTER_BREAK===');
+    var pl1=proofParts[0]?proofParts[0].trim():l1Text;
+    var pl2=proofParts[1]?proofParts[1].trim():l2Text;
+    var pl3=proofParts[2]?proofParts[2].trim():l3Text;
+    var pl4=proofParts[3]?proofParts[3].trim():l4Text;
+
+    if(proofEl1)proofEl1.innerHTML=pl1.replace(/\n/g,'<br>');
+    if(proofEl2)proofEl2.innerHTML=pl2.replace(/\n/g,'<br>');
+    if(proofEl3)proofEl3.innerHTML=pl3.replace(/\n/g,'<br>');
+    if(proofEl4)proofEl4.innerHTML=pl4.replace(/\n/g,'<br>');
+
+    saveManualData({chara:charaText,layer1:pl1,layer2:pl2,layer3:pl3,layer4:pl4});
     var btn2=document.getElementById('manual-gen-btn');
     if(btn2){btn2.textContent='🔄 再生成する';btn2.disabled=false;}
     if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
