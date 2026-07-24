@@ -1183,15 +1183,17 @@ function goouFromNichiMode(y,m,d){
 }
 // 九星の表示名（五黄土星は戊/己付き）
 // type: 'nen'=年命星(年干で判定), 'gets'=月命星(月干で判定), 'nichi'=日命星(遁で判定)
+var KYUSEI_HAKKE={1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兌',8:'艮',9:'離'};
 function kyuseiDisplayName(n, y, m, d, type, kan){
   if(n===5){
     var goou;
     if(type==='nichi') goou=goouFromNichiMode(y,m,d);
     else if(kan) goou=goouFromKan(kan);
-    else goou=goouFromNichiMode(y,m,d); // フォールバック
+    else goou=goouFromNichiMode(y,m,d);
     return '五黄土星（'+goou+'）';
   }
-  return KYUSEI_NAMES[n-1];
+  var hakke=KYUSEI_HAKKE[n];
+  return KYUSEI_NAMES[n-1]+(hakke?'（'+hakke+'）':'');
 }
 // 九星の対応する十干・易卦キーワード（レポートより）
 var KYUSEI_KAN={1:'癸',2:'乙',3:'庚',4:'丁',5:'戊/己',6:'甲',7:'丙',8:'辛',9:'壬'};
