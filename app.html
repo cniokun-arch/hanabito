@@ -3935,12 +3935,17 @@ function buildManualPage(){
   return html;
 }
 
+function getManualKey(){
+  var G=getCurrentTargetG();
+  if(!G)return null;
+  return 'manual_'+G.y+'_'+G.m+'_'+G.d;
+}
+
 function loadManualData(){
   var data=S.load();if(!data)return null;
-  var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
+  var key=getManualKey();if(!key)return null;
   var v=data.manuals&&data.manuals[key];
   if(!v)return null;
-  // 旧形式（文字列）との互換
   if(typeof v==='string')return {detail:v,chara:null};
   return v;
 }
@@ -3948,7 +3953,7 @@ function loadManualData(){
 function saveManualData(obj){
   var data=S.load();if(!data)return;
   if(!data.manuals)data.manuals={};
-  var key=currentMemberIdx===0?'manual_self':'manual_p'+(currentMemberIdx-1);
+  var key=getManualKey();if(!key)return;
   data.manuals[key]=obj;
   S.save(data);
 }
