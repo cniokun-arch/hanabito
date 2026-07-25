@@ -3919,6 +3919,7 @@ function buildManualPage(){
     html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER IV ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">今のあなたへ</div></div>';
     html+='<div id="manual-layer4" style="'+layerStyle+'">'+((saved.layer4||'').replace(/\n/g,'<br>'))+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
+    html+=renderChapter5();
   } else {
     html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER I ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">あなたという人</div></div>';
     html+='<div id="manual-layer1"></div>';
@@ -3929,6 +3930,7 @@ function buildManualPage(){
     html+='<div style="text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER IV ✦</div><div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">今のあなたへ</div></div>';
     html+='<div id="manual-layer4"></div>';
     html+='<button id="manual-gen-btn" onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
+    html+=renderChapter5();
   }
   html+='</div>';
   html+='</div>';
@@ -3957,6 +3959,290 @@ function saveManualData(obj){
   data.manuals[key]=obj;
   S.save(data);
 }
+
+
+// ========== CHAPTER V: 人生設計 ==========
+
+// 心理テスト設問（マズロー×VIA強み）
+var LIFE_QUIZ=[
+  {id:'q1',text:'今の生活で一番満たされていないと感じるのは？',opts:['安定・安全（お金、仕事、住まい）','つながり（家族、友人、恋愛）','認められたい（評価、地位、実績）','自分らしく生きたい（夢、成長、表現）']},
+  {id:'q2',text:'5年後、どんな状態が一番理想ですか？',opts:['経済的に余裕があり、安心して暮らしている','大切な人と深い関係を築いている','社会や周囲から認められている','自分がやりたいことに没頭している']},
+  {id:'q3',text:'あなたが一番自然に発揮できる強みは？',opts:['計画・分析・コツコツ積み上げる','人を助ける・気持ちに寄り添う','リードする・場をつくる・決断する','創る・表現する・アイデアを出す']},
+  {id:'q4',text:'時間とお金が無限にあったら、真っ先に何をしますか？',opts:['世界中を旅する・多くのことを体験する','大切な人のために使う・環境を整える','事業や作品など何か大きなものを残す','学び続けて深い専門性を身につける']},
+  {id:'q5',text:'過去に一番「やっておけばよかった」と思うことは？',opts:['もっと挑戦・行動すればよかった','もっと人間関係を大切にすればよかった','もっと自分を磨けばよかった','もっと好きなことをすればよかった']},
+  {id:'q6',text:'あなたにとって「幸せ」を一言で表すなら？',opts:['安心・安定・余裕がある状態','愛されている・必要とされている状態','認められている・成果が出ている状態','自分らしくいられる・成長している状態']},
+  {id:'q7',text:'仕事や活動で一番やりがいを感じる瞬間は？',opts:['計画通りに物事が進んだとき','誰かの役に立てたと感じたとき','自分の成果が認められたとき','新しいことを創り出せたとき']},
+  {id:'q8',text:'今、一番変えたいことは？',opts:['お金・仕事・生活環境','人間関係・家族・パートナー','自分のスキル・知識・習慣','生きがい・夢・やりたいこと']},
+  {id:'q9',text:'10年後、あなたが一番誇りに思いたいことは？',opts:['安定した豊かな生活を築いたこと','大切な人たちとの深い絆','社会への貢献・残した実績','自分の人生を自分らしく生きたこと']},
+  {id:'q10',text:'あなたが一番恐れていることは？',opts:['将来への不安・経済的な困窮','孤独・大切な人を失うこと','失敗・周りからの評価が下がること','自分らしく生きられないこと']},
+  {id:'q11',text:'今すぐ始められるとしたら、何に取り組みたいですか？',opts:['収入・資産・キャリアアップ','家族・友人・パートナーとの関係改善','新しいスキルや知識を身につけること','ずっとやりたかったことへの挑戦']},
+  {id:'q12',text:'あなたが大切にしている価値観に一番近いのは？',opts:['安心・堅実・計画性','愛情・調和・つながり','達成・成功・向上心','自由・個性・創造性']}
+];
+
+// 8分野定義
+var MANDALA_FIELDS=['仕事・キャリア','健康・体','お金・資産','家族・パートナー','学び・成長','趣味・楽しみ','人間関係','精神・生きがい'];
+
+// 運気グレード
+var UNKI_GRADE={
+  '天華':3,'豊穣':3,'青葉':2,'芽吹':2,'穂分':2,
+  '平凪':1,'結蕾':1,
+  '零花':-1,'引寒':-1,'休眠':-1,'静容':-1,'残雪':-1
+};
+
+function getLifeDesignData(){
+  var data=S.load();
+  if(!data)return null;
+  if(!data.lifeDesign)data.lifeDesign={};
+  var key='ld_'+getCurrentTargetG().y+'_'+getCurrentTargetG().m+'_'+getCurrentTargetG().d;
+  return data.lifeDesign[key]||null;
+}
+
+function saveLifeDesignData(obj){
+  var data=S.load();
+  if(!data)return;
+  if(!data.lifeDesign)data.lifeDesign={};
+  var G=getCurrentTargetG();
+  var key='ld_'+G.y+'_'+G.m+'_'+G.d;
+  data.lifeDesign[key]=obj;
+  S.save(data);
+}
+
+function renderChapter5(){
+  var chStyle='text-align:center;padding:0.8rem 0 0.6rem;border-top:1px solid rgba(184,134,11,0.25);border-bottom:1px solid rgba(184,134,11,0.25);margin-bottom:1rem';
+  var html='<div style="'+chStyle+'"><div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.2em;margin-bottom:0.3rem">✦ CHAPTER V ✦</div>';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">あなたの人生設計</div></div>';
+
+  var ld=getLifeDesignData();
+  if(ld&&ld.step>=4){
+    // 完成済み: マンダラ+タイムライン表示
+    html+=renderMandala(ld);
+    html+=renderTimeline(ld);
+    html+='<button onclick="startLifeDesign()" style="margin-top:1rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;width:100%">🔄 人生設計をやり直す</button>';
+  } else {
+    html+='<p style="font-size:0.88rem;color:var(--ink3);line-height:1.8;margin-bottom:1rem">心理テスト・AIアドバイス・マンダラチャートを使って、あなただけの人生設計を作ります。</p>';
+    html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.95rem;cursor:pointer;width:100%">🌸 人生設計を始める</button>';
+  }
+  return html;
+}
+
+function renderMandala(ld){
+  var html='<div style="margin-bottom:1.2rem">';
+  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ あなたの人生マンダラ</div>';
+  // 3x3グリッド（中央=人生の目的、周囲8分野）
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:0.5rem">';
+  var order=[0,1,2,3,8,4,5,6,7]; // 左上から時計回り、中央=8(人生目的)
+  for(var i=0;i<9;i++){
+    var fi=order[i];
+    if(fi===8){
+      // 中央セル：人生の目的
+      html+='<div style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;padding:0.6rem 0.3rem;text-align:center;border-radius:4px;font-size:0.72rem;font-weight:700;min-height:70px;display:flex;align-items:center;justify-content:center">';
+      html+=(ld.purpose||'人生の目的')+'</div>';
+    } else {
+      var field=MANDALA_FIELDS[fi];
+      var goal=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'（未設定）';
+      html+='<div style="background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.2);padding:0.5rem 0.3rem;text-align:center;border-radius:4px;min-height:70px;cursor:pointer" onclick="editMandalaCell('+fi+')">';
+      html+='<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:0.2rem">'+field+'</div>';
+      html+='<div style="font-size:0.72rem;color:var(--ink);line-height:1.4">'+goal+'</div></div>';
+    }
+  }
+  html+='</div>';
+  html+='<p style="font-size:0.72rem;color:var(--ink3);text-align:center">各分野をタップして目標を編集できます</p>';
+  html+='</div>';
+  return html;
+}
+
+function renderTimeline(ld){
+  var G=getCurrentTargetG();
+  if(!G)return '';
+  var html='<div style="margin-bottom:1.2rem">';
+  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ 運気×人生設計タイムライン</div>';
+
+  var currentYear=new Date().getFullYear();
+  var endYear=currentYear+15;
+  html+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">';
+  html+='<div style="display:flex;gap:6px;padding-bottom:0.5rem;min-width:max-content">';
+
+  for(var y=currentYear;y<=endYear;y++){
+    // その年の干支計算
+    var ks=ROKUJU[((y-1984)%60+60)%60];
+    // 六花人の運気（納音ベースの地運）
+    var nay=getNayin(ks);
+    var age=y-G.y;
+    // 大運の通変星取得
+    var daiunJu=getDaiunJuForYear(y,G);
+    var grade=UNKI_GRADE[daiunJu]||0;
+    var bgColor=grade>=3?'rgba(26,107,58,0.85)':grade>=2?'rgba(42,140,74,0.75)':grade>=1?'rgba(90,156,122,0.65)':grade<=-1?'rgba(184,50,50,0.7)':'rgba(184,134,11,0.15)';
+    var textColor=grade!==0?'#fff':'var(--ink)';
+    var label=grade>=3?'◎':grade>=2?'○':grade>=1?'△':grade<=-1?'×':'―';
+
+    html+='<div style="min-width:64px;text-align:center">';
+    html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">'+y+'</div>';
+    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:6px;padding:0.4rem 0.2rem;margin-bottom:2px">';
+    html+='<div style="font-size:0.8rem;font-weight:700">'+label+'</div>';
+    html+='<div style="font-size:0.62rem">'+ks+'</div>';
+    html+='<div style="font-size:0.6rem">'+age+'歳</div>';
+    html+='</div>';
+    // 目標メモ表示
+    var memo=ld.timeline&&ld.timeline[y]?ld.timeline[y]:'';
+    html+='<div style="font-size:0.6rem;color:var(--ink3);min-height:1.2em;word-break:break-all;cursor:pointer" onclick="editTimelineMemo('+y+')">'+(memo||'+')+'</div>';
+    html+='</div>';
+  }
+  html+='</div></div>';
+  html+='<p style="font-size:0.7rem;color:var(--ink3);margin-top:0.3rem">◎好運気／○良好／△普通／×注意　年をタップしてメモを追加できます</p>';
+  html+='</div>';
+  return html;
+}
+
+function getDaiunJuForYear(year,G){
+  // 大運の従星（十二運気）からその年の運気グレードを返す
+  try{
+    var daiunRows=buildDaiunRows(G);
+    for(var i=0;i<daiunRows.length;i++){
+      var r=daiunRows[i];
+      if(year>=G.y+r.age&&year<G.y+r.age+r.sp){
+        return r.ju||'';
+      }
+    }
+  }catch(e){}
+  return '';
+}
+
+function startLifeDesign(){
+  // 心理テストモーダルを開く
+  var modal=document.createElement('div');
+  modal.id='life-design-modal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;padding:1rem';
+  modal.innerHTML=buildQuizHTML();
+  document.body.appendChild(modal);
+}
+
+function buildQuizHTML(){
+  var html='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:1rem">🌸 人生設計 心理テスト</div>';
+  html+='<p style="font-size:0.82rem;color:var(--ink3);margin-bottom:1rem;line-height:1.7">直感で答えてください。正解はありません。今の自分の気持ちに一番近いものを選んでください。</p>';
+
+  for(var i=0;i<LIFE_QUIZ.length;i++){
+    var q=LIFE_QUIZ[i];
+    html+='<div style="margin-bottom:1.2rem">';
+    html+='<div style="font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:0.5rem">Q'+(i+1)+'. '+q.text+'</div>';
+    for(var j=0;j<q.opts.length;j++){
+      html+='<label style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;margin-bottom:0.3rem;cursor:pointer;font-size:0.82rem;color:var(--ink)">';
+      html+='<input type="radio" name="'+q.id+'" value="'+j+'" style="margin-top:2px;accent-color:#b8860b"> '+q.opts[j]+'</label>';
+    }
+    html+='</div>';
+  }
+
+  html+='<button onclick="submitQuiz()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.95rem;cursor:pointer;width:100%;margin-top:0.5rem">AIに分析してもらう →</button>';
+  html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.8rem;cursor:pointer;width:100%;margin-top:0.5rem;padding:0.4rem">キャンセル</button>';
+  html+='</div>';
+  return html;
+}
+
+function closeLifeModal(){
+  var m=document.getElementById('life-design-modal');
+  if(m)m.remove();
+}
+
+async function submitQuiz(){
+  var answers={};
+  var unanswered=[];
+  for(var i=0;i<LIFE_QUIZ.length;i++){
+    var q=LIFE_QUIZ[i];
+    var sel=document.querySelector('input[name="'+q.id+'"]:checked');
+    if(sel){answers[q.id]=parseInt(sel.value);}
+    else{unanswered.push(i+1);}
+  }
+  if(unanswered.length>0){
+    alert('Q'+unanswered.join('・Q')+'が未回答です');
+    return;
+  }
+
+  // ローディング表示
+  var modal=document.getElementById('life-design-modal');
+  modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><div style="font-size:1rem;color:var(--gold);font-family:\'Zen Old Mincho\',serif;margin-bottom:1rem">🌸 AIが分析しています...</div><p style="color:var(--ink3);font-size:0.85rem">あなたの回答から、本当に望んでいることを読み解いています。しばらくお待ちください。</p></div>';
+
+  // 回答テキスト生成
+  var ansText='';
+  for(var i=0;i<LIFE_QUIZ.length;i++){
+    var q=LIFE_QUIZ[i];
+    var ai=answers[q.id];
+    ansText+='Q'+(i+1)+'. '+q.text+'\n→ '+q.opts[ai]+'\n\n';
+  }
+
+  var G=getCurrentTargetG();
+  var name=getCurrentTargetName();
+  var dispName=HT_DISPLAY_MAP[G.ht]||G.ht;
+
+  var analysisSys='あなたは心理カウンセラー兼人生設計の専門家です。占術用語は使わず、誰でも分かる温かい言葉で書いてください。Markdown禁止。';
+  var analysisPrompt='以下は'+name+'さん（'+dispName+'・'+G.y+'年生まれ）の心理テスト回答です。\n\n'+ansText;
+  analysisPrompt+='この回答から以下を分析して出力してください:\n';
+  analysisPrompt+='1. この人が本当に求めているもの（100〜150字）\n';
+  analysisPrompt+='2. 人生の目的として相応しい一言（20字以内）\n';
+  analysisPrompt+='3. 8分野それぞれの中心目標（各30字以内）\n   形式: 仕事・キャリア:〇〇\n   健康・体:〇〇\n   お金・資産:〇〇\n   家族・パートナー:〇〇\n   学び・成長:〇〇\n   趣味・楽しみ:〇〇\n   人間関係:〇〇\n   精神・生きがい:〇〇';
+
+  try{
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:analysisPrompt}],system:analysisSys})});
+    var json=await res.json();
+    var text=(json.content&&json.content[0]?json.content[0].text:json.error||'').replace(/[#*]/g,'').trim();
+
+    // パース
+    var purpose='私らしい人生を生きる';
+    var mandala={};
+    var lines=text.split('\n');
+    for(var li=0;li<lines.length;li++){
+      var ln=lines[li].trim();
+      for(var fi=0;fi<MANDALA_FIELDS.length;fi++){
+        if(ln.indexOf(MANDALA_FIELDS[fi]+':')===0||ln.indexOf(MANDALA_FIELDS[fi]+'：')===0){
+          mandala[fi]=ln.replace(MANDALA_FIELDS[fi]+':','').replace(MANDALA_FIELDS[fi]+'：','').trim();
+        }
+      }
+      if(ln.indexOf('人生の目的')>=0&&ln.indexOf(':')>=0){
+        purpose=ln.split(/[:：]/)[1].trim().replace(/「|」/g,'');
+      }
+    }
+
+    var ld={step:4,answers:answers,analysis:text,purpose:purpose,mandala:mandala,timeline:{}};
+    saveLifeDesignData(ld);
+    closeLifeModal();
+
+    // ページ再描画
+    var ca=document.getElementById('content-area');
+    if(ca)ca.innerHTML=buildManualPage();
+    var el=document.querySelector('#manual-ai-card');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'end'});
+
+  }catch(e){
+    modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><p style="color:#c04040">エラーが発生しました: '+e.message+'</p><button onclick="closeLifeModal()" style="margin-top:1rem;padding:0.5rem 1rem;background:#b8860b;color:#fff;border:none;border-radius:6px;cursor:pointer">閉じる</button></div>';
+  }
+}
+
+function editMandalaCell(fi){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  var current=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
+  var val=prompt(MANDALA_FIELDS[fi]+'の目標を入力してください（30字以内）',current);
+  if(val===null)return;
+  if(!ld.mandala)ld.mandala={};
+  ld.mandala[fi]=val.slice(0,30);
+  saveLifeDesignData(ld);
+  var ca=document.getElementById('content-area');
+  if(ca)ca.innerHTML=buildManualPage();
+}
+
+function editTimelineMemo(year){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  if(!ld.timeline)ld.timeline={};
+  var current=ld.timeline[year]||'';
+  var val=prompt(year+'年の目標・メモを入力してください',current);
+  if(val===null)return;
+  ld.timeline[year]=val;
+  saveLifeDesignData(ld);
+  var ca=document.getElementById('content-area');
+  if(ca)ca.innerHTML=buildManualPage();
+}
+
 
 function initManualPage(){
   // 保存済みデータがなければ自動生成
