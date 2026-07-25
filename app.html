@@ -4231,6 +4231,23 @@ function closeLifeModal(){
   if(m)m.remove();
 }
 
+function showModalLoading(msg){
+  var modal=document.getElementById('life-design-modal');
+  if(modal)modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><div style="font-size:1rem;color:var(--gold);font-family:\'Zen Old Mincho\',serif;margin-bottom:1rem">🌸 '+msg+'</div><p style="color:var(--ink3);font-size:0.85rem">しばらくお待ちください...</p></div>';
+}
+
+function modalError(e){
+  var modal=document.getElementById('life-design-modal');
+  if(modal)modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><p style="color:#c04040">エラー: '+(e.message||e)+'</p><button onclick="closeLifeModal()" style="margin-top:1rem;padding:0.5rem 1rem;background:#b8860b;color:#fff;border:none;border-radius:6px;cursor:pointer">閉じる</button></div>';
+}
+
+async function aiChat(prompt,sys){
+  var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages:[{role:'user',content:prompt}],system:sys||'Markdown禁止。占術用語は使わず誰でも分かる言葉で。'})});
+  var json=await res.json();
+  return (json.content&&json.content[0]?json.content[0].text:json.error||'').replace(/[#*]/g,'').trim();
+}
+
 async function submitQuiz(){
   var answers={};
   var unanswered=[];
@@ -4240,65 +4257,196 @@ async function submitQuiz(){
     if(sel){answers[q.id]=parseInt(sel.value);}
     else{unanswered.push(i+1);}
   }
-  if(unanswered.length>0){
-    alert('Q'+unanswered.join('・Q')+'が未回答です');
-    return;
-  }
+  if(unanswered.length>0){alert('Q'+unanswered.join('・Q')+'が未回答です');return;}
 
-  // ローディング表示
-  var modal=document.getElementById('life-design-modal');
-  modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><div style="font-size:1rem;color:var(--gold);font-family:\'Zen Old Mincho\',serif;margin-bottom:1rem">🌸 AIが分析しています...</div><p style="color:var(--ink3);font-size:0.85rem">あなたの回答から、本当に望んでいることを読み解いています。しばらくお待ちください。</p></div>';
+  showModalLoading('あなたの想いを読み解いています...');
 
-  // 回答テキスト生成
   var ansText='';
   for(var i=0;i<LIFE_QUIZ.length;i++){
-    var q=LIFE_QUIZ[i];
-    var ai=answers[q.id];
-    ansText+='Q'+(i+1)+'. '+q.text+'\n→ '+q.opts[ai]+'\n\n';
+    var q=LIFE_QUIZ[i];ansText+='Q'+(i+1)+'. '+q.text+'\n→ '+q.opts[answers[q.id]]+'\n\n';
   }
 
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
-  var dispName=HT_DISPLAY_MAP[G.ht]||G.ht;
-
-  var analysisSys='あなたは心理カウンセラー兼人生設計の専門家です。占術用語は使わず、誰でも分かる温かい言葉で書いてください。Markdown禁止。';
-  var analysisPrompt='以下は'+name+'さん（'+dispName+'・'+G.y+'年生まれ）の心理テスト回答です。\n\n'+ansText;
-  analysisPrompt+='この回答から以下を分析して出力してください:\n';
-  analysisPrompt+='1. この人が本当に求めているもの（100〜150字）\n';
-  analysisPrompt+='2. 人生の目的として相応しい一言（20字以内）\n';
-  analysisPrompt+='3. 8分野それぞれの中心目標（各30字以内）\n   形式: 仕事・キャリア:〇〇\n   健康・体:〇〇\n   お金・資産:〇〇\n   家族・パートナー:〇〇\n   学び・成長:〇〇\n   趣味・楽しみ:〇〇\n   人間関係:〇〇\n   精神・生きがい:〇〇';
 
   try{
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:analysisPrompt}],system:analysisSys})});
-    var json=await res.json();
-    var text=(json.content&&json.content[0]?json.content[0].text:json.error||'').replace(/[#*]/g,'').trim();
+    // STEP1: やりたいことリストをAIが整理・提案
+    var p1=name+'さんの心理テスト回答:\n\n'+ansText;
+    p1+='この回答から「この人が本当に実現したいこと」を、具体的に3〜5個リストアップしてください。\n';
+    p1+='形式: 番号. 〇〇したい（30字以内）\n';
+    p1+='その後に「あなたが最も実現したいことは何ですか？」と問いかけてください。';
+    var wishText=await aiChat(p1);
 
-    // パース
-    var purpose='私らしい人生を生きる';
-    var mandala={};
-    var lines=text.split('\n');
-    for(var li=0;li<lines.length;li++){
-      var ln=lines[li].trim();
-      for(var fi=0;fi<MANDALA_FIELDS.length;fi++){
-        if(ln.indexOf(MANDALA_FIELDS[fi]+':')===0||ln.indexOf(MANDALA_FIELDS[fi]+'：')===0){
-          mandala[fi]=ln.replace(MANDALA_FIELDS[fi]+':','').replace(MANDALA_FIELDS[fi]+'：','').trim();
-        }
-      }
-      if(ln.indexOf('人生の目的')>=0&&ln.indexOf(':')>=0){
-        purpose=ln.split(/[:：]/)[1].trim().replace(/「|」/g,'');
-      }
-    }
-
-    var ld={step:2,answers:answers,analysis:text,purpose:purpose,mandala:mandala,timeline:{}};
+    var ld={step:1,answers:answers,wishList:wishText,timeline:{}};
     saveLifeDesignData(ld);
 
-    // バケットリスト確認・編集画面へ
-    modal.innerHTML=buildBucketListHTML(ld);
+    // STEP1画面: やりたいことリスト確認・大目標入力
+    showStep1(ld,wishText);
+  }catch(e){modalError(e);}
+}
 
-  }catch(e){
-    modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><p style="color:#c04040">エラーが発生しました: '+e.message+'</p><button onclick="closeLifeModal()" style="margin-top:1rem;padding:0.5rem 1rem;background:#b8860b;color:#fff;border:none;border-radius:6px;cursor:pointer">閉じる</button></div>';
+function showStep1(ld,wishText){
+  var modal=document.getElementById('life-design-modal');
+  var html='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">🌸 STEP 1 / 5　やりたいことを確認</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.8rem;font-size:0.84rem;line-height:1.8;color:var(--ink);margin-bottom:1rem;white-space:pre-wrap">'+wishText+'</div>';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:0.3rem">一番実現したいことを入力してください</div>';
+  html+='<textarea id="s1-goal" maxlength="30" placeholder="例：子供が欲しい、起業したい、世界一周したい..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:0.8rem"></textarea>';
+  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-bottom:0.8rem">AIが提案したもの以外でも、自由に書いて大丈夫です。</p>';
+  html+='<button onclick="submitStep1()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-bottom:0.5rem">次へ →</button>';
+  html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
+  html+='</div>';
+  modal.innerHTML=html;
+  setTimeout(function(){var el=document.getElementById('s1-goal');if(el)el.focus();},100);
+}
+
+async function submitStep1(){
+  var el=document.getElementById('s1-goal');
+  var goal=el?el.value.trim():'';
+  if(!goal){alert('一番実現したいことを入力してください');return;}
+
+  showModalLoading('「'+goal+'」を実現するために必要な要素を考えています...');
+
+  var ld=getLifeDesignData()||{};
+  ld.purpose=goal;
+  ld.step=2;
+  saveLifeDesignData(ld);
+
+  try{
+    // STEP2: 大目標に必要な8要素をAIが提案
+    var p2='「'+goal+'」を実現するために必要な要素を8つ提案してください。\n';
+    p2+='形式(必ず守ること): 1:〇〇 2:〇〇 3:〇〇 4:〇〇 5:〇〇 6:〇〇 7:〇〇 8:〇〇\n';
+    p2+='各要素は10字以内。コロンの後に要素名のみ。改行なし。';
+    var elemText=await aiChat(p2);
+
+    // パース: "1:〇〇 2:〇〇..." 形式
+    var elems=[];
+    var matches=elemText.match(/[0-9]+[:][^0-9\n]+/g)||[];
+    for(var i=0;i<matches.length&&elems.length<8;i++){
+      var e=matches[i].replace(/^[0-9]+[\uff1a:]/,'').trim();
+      if(e)elems.push(e.slice(0,15));
+    }
+    // 足りなければ空文字で補完
+    while(elems.length<8)elems.push('');
+
+    ld.mandala={};
+    for(var fi=0;fi<8;fi++)ld.mandala[fi]=elems[fi]||'';
+    ld.elemProposal=elemText;
+    saveLifeDesignData(ld);
+
+    showStep2(ld);
+  }catch(e){modalError(e);}
+}
+
+function showStep2(ld){
+  var modal=document.getElementById('life-design-modal');
+  var html='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌸 STEP 2 / 5　必要な8要素を確認</div>';
+  html+='<div style="text-align:center;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:8px;padding:0.5rem;font-size:0.9rem;font-weight:700;margin-bottom:0.8rem">大目標: '+ld.purpose+'</div>';
+  html+='<p style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.6rem">AIが提案した8要素です。内容を確認・編集してください。</p>';
+  for(var fi=0;fi<8;fi++){
+    var val=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
+    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">';
+    html+='<div style="font-size:0.72rem;color:var(--ink3);min-width:1.2rem">'+(fi+1)+'.</div>';
+    html+='<input id="s2-e'+fi+'" type="text" value="'+val.replace(/"/g,'&quot;')+'" maxlength="15" placeholder="要素を入力..." style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-size:0.84rem;background:var(--bg2);color:var(--ink)">';
+    html+='</div>';
   }
+  html+='<button onclick="submitStep2()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-top:0.8rem;margin-bottom:0.5rem">次へ → 具体行動をAIに提案してもらう</button>';
+  html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
+  html+='</div>';
+  modal.innerHTML=html;
+}
+
+async function submitStep2(){
+  var ld=getLifeDesignData()||{};
+  if(!ld.mandala)ld.mandala={};
+  for(var fi=0;fi<8;fi++){
+    var el=document.getElementById('s2-e'+fi);
+    if(el)ld.mandala[fi]=el.value.trim();
+  }
+  ld.step=3;
+  saveLifeDesignData(ld);
+
+  var elems=[];
+  for(var fi=0;fi<8;fi++)if(ld.mandala[fi])elems.push(ld.mandala[fi]);
+
+  showModalLoading('各要素の具体行動を考えています（少し時間がかかります）...');
+
+  try{
+    // STEP3: 各要素の具体行動8つをAIが提案（全要素まとめて）
+    var p3='「'+ld.purpose+'」を実現するための8要素について、それぞれ具体的行動を4つずつ提案してください。\n\n';
+    p3+='要素: '+elems.map(function(e,i){return (i+1)+'.'+e;}).join('、')+'\n\n';
+    p3+='形式（必ず守ること）:\n';
+    p3+='[要素名]\n1.行動 2.行動 3.行動 4.行動\n\n';
+    p3+='各行動は25字以内。';
+    var detailText=await aiChat(p3);
+
+    // パース: [要素名] の後に行動リスト
+    var mandalaDetail={};
+    var blocks=detailText.split('\n[');
+    for(var bi=0;bi<blocks.length;bi++){
+      var block=blocks[bi].trim();
+      var nameMatch=block.match(/^\[([^\]]+)\]/);
+      if(!nameMatch)continue;
+      var ename=nameMatch[1].trim();
+      // 対応する要素インデックスを探す
+      for(var fi=0;fi<8;fi++){
+        if(ld.mandala[fi]&&ld.mandala[fi].indexOf(ename)>=0||ename.indexOf(ld.mandala[fi])>=0){
+          var actions=block.replace(/^\[[^\]]+\]\n?/,'');
+          var acts=actions.match(/[0-9]+[.][^0-9\n]+/g)||[];
+          var details=acts.map(function(a){return a.replace(/^[0-9]+[.]/,'').trim().slice(0,30);});
+          while(details.length<8)details.push('');
+          mandalaDetail[fi]=details;
+          break;
+        }
+      }
+    }
+    // パースできなかった要素は空で初期化
+    for(var fi=0;fi<8;fi++){
+      if(!mandalaDetail[fi])mandalaDetail[fi]=Array(8).fill('');
+    }
+
+    ld.mandalaDetail=mandalaDetail;
+    ld.detailProposal=detailText;
+    saveLifeDesignData(ld);
+
+    showStep3(ld);
+  }catch(e){modalError(e);}
+}
+
+function showStep3(ld){
+  var modal=document.getElementById('life-design-modal');
+  var html='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌸 STEP 3 / 5　具体行動を確認</div>';
+  html+='<p style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.8rem">AIが提案した各要素の行動です。後でアプリ内から個別に編集できます。</p>';
+
+  for(var fi=0;fi<8;fi++){
+    var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
+    if(!elem)continue;
+    var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:[];
+    html+='<div style="margin-bottom:0.8rem;padding:0.6rem;background:rgba(184,134,11,0.06);border-radius:8px">';
+    html+='<div style="font-size:0.8rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">'+elem+'</div>';
+    var filled=details.filter(function(d){return d&&d.trim();});
+    if(filled.length>0){
+      html+='<div style="font-size:0.76rem;color:var(--ink);line-height:1.8">';
+      filled.forEach(function(d,i){html+=(i+1)+'. '+d+'<br>';});
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+
+  html+='<button onclick="showStep4()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-bottom:0.5rem">次へ → やりたいことリストを作る</button>';
+  html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
+  html+='</div>';
+  modal.innerHTML=html;
+}
+
+function showStep4(){
+  var ld=getLifeDesignData()||{};
+  ld.step=4;
+  saveLifeDesignData(ld);
+  var modal=document.getElementById('life-design-modal');
+  modal.innerHTML=buildBucketListHTML(ld);
 }
 
 
