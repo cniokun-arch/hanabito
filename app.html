@@ -4432,32 +4432,33 @@ async function submitStep2(){
   showModalLoading('各要素の具体行動を考えています（少し時間がかかります）...');
 
   try{
-    // STEP3: 各要素の具体行動8つをAIが提案（全要素まとめて）
-    var p3='「'+ld.purpose+'」を実現するための8要素について、それぞれ具体的行動を4つずつ提案してください。\n\n';
-    p3+='要素: '+elems.map(function(e,i){return (i+1)+'.'+e;}).join('、')+'\n\n';
-    p3+='形式（必ず守ること）:\n';
-    p3+='[要素名]\n1.行動 2.行動 3.行動 4.行動\n\n';
-    p3+='各行動は25字以内。';
+    // STEP3: 各要素の具体行動を番号形式でAIが提案
+    var p3='「'+ld.purpose+'」を実現するための以下の8要素について、各要素ごとに具体的行動を4つ提案してください。\n\n';
+    for(var pi=0;pi<elems.length;pi++)p3+=(pi+1)+'. '+elems[pi]+'\n';
+    p3+='\n出力形式（必ず守ること）:\n';
+    p3+='要素1: 行動A / 行動B / 行動C / 行動D\n';
+    p3+='要素2: 行動A / 行動B / 行動C / 行動D\n';
+    p3+='（要素8まで続ける）\n';
+    p3+='各行動は20字以内。スラッシュで区切る。';
     var detailText=await aiChat(p3);
 
-    // パース: [要素名] の後に行動リスト
+    // パース: "要素N: 行動A / 行動B / ..." 形式
     var mandalaDetail={};
-    var blocks=detailText.split('\n[');
-    for(var bi=0;bi<blocks.length;bi++){
-      var block=blocks[bi].trim();
-      var nameMatch=block.match(/^\[([^\]]+)\]/);
-      if(!nameMatch)continue;
-      var ename=nameMatch[1].trim();
-      // 対応する要素インデックスを探す
-      for(var fi=0;fi<8;fi++){
-        if(ld.mandala[fi]&&ld.mandala[fi].indexOf(ename)>=0||ename.indexOf(ld.mandala[fi])>=0){
-          var actions=block.replace(/^\[[^\]]+\]\n?/,'');
-          var acts=actions.match(/[0-9]+[.][^0-9\n]+/g)||[];
-          var details=acts.map(function(a){return a.replace(/^[0-9]+[.]/,'').trim().slice(0,30);});
-          while(details.length<8)details.push('');
-          mandalaDetail[fi]=details;
-          break;
-        }
+    var dlines=detailText.split('\n');
+    var elemIdx=0;
+    for(var dli=0;dli<dlines.length;dli++){
+      var dl=dlines[dli].trim();
+      // "要素N:" または行頭に数字がある行を検出
+      var mIdx=dl.match(/^要素([0-9]+)[：:]/);
+      var mNum=dl.match(/^([0-9]+)[.．、][　 ]*/);
+      var idx=-1;
+      if(mIdx)idx=parseInt(mIdx[1])-1;
+      else if(mNum&&elemIdx<8)idx=elemIdx++;
+      if(idx>=0&&idx<8){
+        var afterColon=dl.replace(/^[^：:]+[：:]/,'').trim();
+        var acts=afterColon.split(/[\/／]/).map(function(a){return a.trim().slice(0,25);}).filter(function(a){return a;});
+        while(acts.length<8)acts.push('');
+        mandalaDetail[idx]=acts;
       }
     }
     // パースできなかった要素は空で初期化
@@ -4496,6 +4497,10 @@ function showStep3(ld){
     html+='</div>';
   }
 
+  html+='<div style="background:rgba(184,134,11,0.08);border-radius:10px;padding:0.8rem;margin-bottom:1rem;text-align:center">';
+  html+='<div style="font-size:0.88rem;color:var(--ink)">😊 お疲れ様です！もう少しで完成です。</div>';
+  html+='<div style="font-size:0.76rem;color:var(--ink3);margin-top:0.3rem">次は「やりたいことリスト」を自由に書くだけ。難しく考えなくて大丈夫です。</div>';
+  html+='</div>';
   html+='<button onclick="showStep4()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-bottom:0.5rem">次へ → やりたいことリストを作る</button>';
   html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
   html+='</div>';
@@ -4562,10 +4567,26 @@ function addBucketRow(){
   var ld=getLifeDesignData();
   if(!ld)return;
   if(!ld.buckets)ld.buckets=[];
+  // 現在の入力内容を先に保存
+  var bi=0;
+  var currentBuckets=[];
+  while(true){
+    var btel=document.getElementById('bl-bt'+bi);
+    if(!btel)break;
+    var bael=document.getElementById('bl-ba'+bi);
+    currentBuckets.push({text:btel.value.trim(),age:bael?bael.value.trim():''});
+    bi++;
+  }
+  if(currentBuckets.length>0)ld.buckets=currentBuckets;
   ld.buckets.push({text:'',age:''});
   saveLifeDesignData(ld);
   var modal=document.getElementById('life-design-modal');
   if(modal)modal.innerHTML=buildBucketListHTML(ld);
+  // 最後の入力欄にフォーカス
+  setTimeout(function(){
+    var last=document.getElementById('bl-bt'+(ld.buckets.length-1));
+    if(last)last.focus();
+  },100);
 }
 
 function saveBucketList(){
