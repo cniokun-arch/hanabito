@@ -4152,8 +4152,10 @@ function redrawManualPage(){
 }
 
 function renderTimeline(ld){
-  var G=getCurrentTargetG();
-  if(!G)return '';
+  var Graw=getCurrentTargetG();
+  if(!Graw)return '';
+  // doCalcで大運データ(DL等)を含む完全なGを計算
+  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender)||Graw;
   var html='<div style="margin-bottom:1.2rem">';
   html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ 運気×人生設計タイムライン</div>';
 
@@ -4911,13 +4913,14 @@ function initScrollNav(){
   }
 
   ca.addEventListener('scroll',showNav);
+  window.addEventListener('scroll',showNav);
 
   // 押し続けで高速スクロール
   var scrollInterval=null;
   function startScroll(dir){
     clearInterval(scrollInterval);
     scrollInterval=setInterval(function(){
-      ca.scrollTop+=dir*80;
+      if(ca.scrollHeight>ca.clientHeight){ca.scrollTop+=dir*80;}else{window.scrollBy(0,dir*80);}
       showNav();
     },60);
   }
