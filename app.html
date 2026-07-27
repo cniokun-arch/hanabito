@@ -4173,20 +4173,27 @@ function renderTimeline(ld){
     var textColor=grade!==0?'#fff':'var(--ink)';
     var label=grade>=3?'◎':grade>=2?'○':grade>=1?'△':grade<=-1?'×':'―';
 
-    html+='<div style="min-width:64px;text-align:center">';
-    html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">'+y+'</div>';
-    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:6px;padding:0.4rem 0.2rem;margin-bottom:2px">';
-    html+='<div style="font-size:0.8rem;font-weight:700">'+label+'</div>';
-    html+='<div style="font-size:0.62rem">'+ks+'</div>';
-    html+='<div style="font-size:0.6rem">'+age+'歳</div>';
-    html+='</div>';
-    // 目標メモ表示
     var memo=ld.timeline&&ld.timeline[y]?ld.timeline[y]:'';
-    html+='<div style="font-size:0.6rem;color:var(--ink3);min-height:1.2em;word-break:break-all;cursor:pointer" onclick="editTimelineMemo('+y+')">'+(memo||'+')+'</div>';
+    var isCurrentYear=(y===new Date().getFullYear());
+    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.8)':'1px solid rgba(0,0,0,0.08)';
+    // ブロック全体をタップエリアに
+    html+='<div style="min-width:80px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
+    html+='<div style="font-size:0.72rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:3px;font-weight:'+(isCurrentYear?'700':'400')+'">';
+    html+=y+(isCurrentYear?' ◀':'')+'</div>';
+    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:8px;padding:0.5rem 0.3rem;border:'+borderStyle+';box-shadow:0 2px 6px rgba(0,0,0,0.1)">';
+    html+='<div style="font-size:0.88rem;font-weight:700;margin-bottom:0.1rem">'+label+'</div>';
+    html+='<div style="font-size:0.7rem">'+ks+'</div>';
+    html+='<div style="font-size:0.68rem;opacity:0.85">'+age+'歳</div>';
+    if(memo){
+      html+='<div style="margin-top:0.3rem;font-size:0.62rem;line-height:1.4;border-top:1px solid rgba(255,255,255,0.3);padding-top:0.2rem;word-break:break-all">'+memo+'</div>';
+    } else {
+      html+='<div style="margin-top:0.3rem;font-size:0.68rem;opacity:0.7">＋ メモ</div>';
+    }
+    html+='</div>';
     html+='</div>';
   }
   html+='</div></div>';
-  html+='<p style="font-size:0.7rem;color:var(--ink3);margin-top:0.3rem">◎好運気／○良好／△普通／×注意　年をタップしてメモを追加できます</p>';
+  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">◎好運気／○良好／△普通／×注意<br>各ブロックをタップしてメモを追加できます</p>';
   html+='</div>';
   return html;
 }
