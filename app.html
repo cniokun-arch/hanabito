@@ -4852,65 +4852,95 @@ function initManualPage(){
 }
 
 function initScrollNav(){
-  var old=document.getElementById('scroll-nav');
-  if(old)old.remove();
-  var nav=document.createElement('div');
-  nav.id='scroll-nav';
-  nav.style.cssText='position:fixed;right:6px;top:50%;transform:translateY(-50%);z-index:500;display:flex;flex-direction:column;gap:5px';
-  var items=[
-    {id:'nav-ch1',label:'I'},
-    {id:'nav-ch2',label:'II'},
-    {id:'nav-ch3',label:'III'},
-    {id:'nav-ch4',label:'IV'},
-    {id:'nav-ch5',label:'V'}
-  ];
-  var buttons=[];
-  items.forEach(function(item){
-    var el=document.getElementById(item.id);
-    if(!el)return;
-    var btn=document.createElement('div');
-    btn.dataset.navId=item.id;
-    btn.style.cssText='width:28px;height:28px;background:rgba(184,134,11,0.18);border:1px solid rgba(184,134,11,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.58rem;color:var(--gold);font-family:Zen Old Mincho,serif;font-weight:700;transition:all 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.12)';
-    btn.textContent=item.label;
-    var navId=item.id;
-    btn.onclick=function(){
-      var target=document.getElementById(navId);
-      if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
-    };
-    nav.appendChild(btn);
-    buttons.push({btn:btn,id:item.id});
-  });
-  if(buttons.length===0)return;
-  document.body.appendChild(nav);
+  removeScrollNav();
   var ca=document.getElementById('content-area');
   if(!ca)return;
-  function updateNav(){
+
+  var chaps=[
+    {id:'nav-ch1',label:'CHAPTER I\nあなたという人'},
+    {id:'nav-ch2',label:'CHAPTER II\n年齢とともに育つ人格'},
+    {id:'nav-ch3',label:'CHAPTER III\n人生の大きな流れ'},
+    {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'},
+    {id:'nav-ch5',label:'CHAPTER V\nあなたの人生設計'}
+  ];
+
+  // ▲▼ボタン
+  var nav=document.createElement('div');
+  nav.id='scroll-nav';
+  nav.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:4px;padding:4px';
+
+  var btnUp=document.createElement('div');
+  btnUp.style.cssText='width:32px;height:44px;background:rgba(30,30,30,0.72);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1rem;user-select:none;-webkit-user-select:none';
+  btnUp.textContent='▲';
+
+  var btnDn=document.createElement('div');
+  btnDn.style.cssText='width:32px;height:44px;background:rgba(30,30,30,0.72);border-radius:0 0 8px 8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1rem;user-select:none;-webkit-user-select:none';
+  btnDn.textContent='▼';
+
+  nav.appendChild(btnUp);
+  nav.appendChild(btnDn);
+  document.body.appendChild(nav);
+
+  // 章名オーバーレイ
+  var overlay=document.createElement('div');
+  overlay.id='scroll-chapter-overlay';
+  overlay.style.cssText='position:fixed;right:40px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.72);color:#fff;padding:0.5rem 0.8rem;border-radius:8px;font-size:0.75rem;line-height:1.5;text-align:right;display:none;pointer-events:none;max-width:160px;white-space:pre-line';
+  document.body.appendChild(overlay);
+
+  // スクロール中に表示、2秒後に隠す
+  var hideTimer=null;
+  function showNav(){
+    nav.style.display='flex';
+    // 現在の章名を特定
     var scrollTop=ca.scrollTop;
-    var active='';
-    buttons.forEach(function(b){
-      var el=document.getElementById(b.id);
+    var currentLabel='';
+    chaps.forEach(function(c){
+      var el=document.getElementById(c.id);
       if(!el)return;
-      if(el.offsetTop-ca.offsetTop<=scrollTop+120)active=b.id;
+      if(el.offsetTop-ca.offsetTop<=scrollTop+200)currentLabel=c.label;
     });
-    buttons.forEach(function(b){
-      if(b.id===active){
-        b.btn.style.background='rgba(184,134,11,0.9)';
-        b.btn.style.color='#fff';
-        b.btn.style.transform='scale(1.2)';
-      } else {
-        b.btn.style.background='rgba(184,134,11,0.18)';
-        b.btn.style.color='var(--gold)';
-        b.btn.style.transform='scale(1)';
-      }
-    });
+    if(currentLabel){
+      overlay.textContent=currentLabel;
+      overlay.style.display='block';
+    }
+    clearTimeout(hideTimer);
+    hideTimer=setTimeout(function(){
+      nav.style.display='none';
+      overlay.style.display='none';
+    },2000);
   }
-  ca.addEventListener('scroll',updateNav);
-  updateNav();
+
+  ca.addEventListener('scroll',showNav);
+
+  // 押し続けで高速スクロール
+  var scrollInterval=null;
+  function startScroll(dir){
+    clearInterval(scrollInterval);
+    scrollInterval=setInterval(function(){
+      ca.scrollTop+=dir*80;
+      showNav();
+    },60);
+  }
+  function stopScroll(){clearInterval(scrollInterval);}
+
+  btnUp.addEventListener('touchstart',function(e){e.preventDefault();startScroll(-1);},{passive:false});
+  btnUp.addEventListener('touchend',stopScroll);
+  btnUp.addEventListener('mousedown',function(){startScroll(-1);});
+  btnUp.addEventListener('mouseup',stopScroll);
+  btnUp.addEventListener('mouseleave',stopScroll);
+
+  btnDn.addEventListener('touchstart',function(e){e.preventDefault();startScroll(1);},{passive:false});
+  btnDn.addEventListener('touchend',stopScroll);
+  btnDn.addEventListener('mousedown',function(){startScroll(1);});
+  btnDn.addEventListener('mouseup',stopScroll);
+  btnDn.addEventListener('mouseleave',stopScroll);
 }
 
 function removeScrollNav(){
   var nav=document.getElementById('scroll-nav');
   if(nav)nav.remove();
+  var ov=document.getElementById('scroll-chapter-overlay');
+  if(ov)ov.remove();
 }
 
 async function generateManual(){
