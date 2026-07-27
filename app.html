@@ -4019,7 +4019,7 @@ function renderChapter5(){
     html+=renderTimeline(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:1rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;width:100%">🔄 人生設計をやり直す</button>';
   } else {
-    html+='<p style="font-size:0.88rem;color:var(--ink3);line-height:1.8;margin-bottom:1rem">心理テスト・AIアドバイス・マンダラチャートを使って、あなただけの人生設計を作ります。</p>';
+    html+='<p style="font-size:0.88rem;color:var(--ink3);line-height:1.8;margin-bottom:1rem">心理テスト・AIアドバイス・9マス目標シートを使って、あなただけの人生設計を作ります。</p>';
     html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.95rem;cursor:pointer;width:100%">🌸 人生設計を始める</button>';
   }
   return html;
@@ -4027,7 +4027,7 @@ function renderChapter5(){
 
 function renderMandala(ld){
   var html='<div style="margin-bottom:1.2rem">';
-  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">◆ あなたの人生マンダラ</div>';
+  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">◆ あなたの9マス目標シート</div>';
   html+='<p style="font-size:0.76rem;color:var(--ink3);margin-bottom:0.5rem">中央をタップして大目標を設定。周囲8マスをタップして要素を設定・詳細展開できます。</p>';
   html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.15),rgba(42,140,74,0.08));border:1px solid rgba(42,140,74,0.3);border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.5rem">';
   html+='<span style="font-size:1rem">✅</span>';
@@ -4217,11 +4217,11 @@ function buildIntroHTML(){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
   html+='<div style="text-align:center;margin-bottom:1.2rem">';
   html+='<div style="font-size:2rem;margin-bottom:0.4rem">🌸</div>';
-  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">マンダラチャート®＋心理学＋花人占術で<br>あなただけの人生設計を</div>';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">9マス目標シート＋心理学＋花人占術で<br>あなただけの人生設計を</div>';
   html+='</div>';
 
   html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.05));border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:1rem;margin-bottom:1.2rem">';
-  html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin-bottom:0.8rem">花人占術では、目標達成に有効な<strong>マンダラチャート®</strong>（考案：松村寧雄）と<strong>心理テスト</strong>を組み合わせ、あなたが一番叶えたいことを明確にした上で、<strong>あなたの運気に合わせて「動くべき年・備える年」を設計</strong>します。</p>';
+  html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin-bottom:0.8rem">花人占術では、目標達成に有効な<strong>9マス目標シート</strong>と<strong>心理テスト</strong>を組み合わせ、あなたが一番叶えたいことを明確にした上で、<strong>あなたの運気に合わせて「動くべき年・備える年」を設計</strong>します。</p>';
   html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin:0">運気の流れを知り、自分の力を最大限に発揮できるタイミングで行動することで、より実り豊かな人生を実現していきましょう。</p>';
   html+='</div>';
 
@@ -4407,7 +4407,7 @@ function showStep2(ld){
   html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 2 / 5</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:40%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌿 大目標に必要な8要素</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIが「'+( ld.purpose||'')+'」を実現するために必要な8つの要素を考えました。これがマンダラチャートの外側8マスになります。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 内容を自由に変えて大丈夫です。ピンと来なければ書き直してください。</span></p></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIが「'+( ld.purpose||'')+'」を実現するために必要な8つの要素を考えました。これが9マス目標シートの外側8マスになります。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 内容を自由に変えて大丈夫です。ピンと来なければ書き直してください。</span></p></div>';
   html+='<div style="text-align:center;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:8px;padding:0.5rem;font-size:0.9rem;font-weight:700;margin-bottom:0.8rem">大目標: '+ld.purpose+'</div>';
   html+='<p style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.6rem">AIが提案した8要素です。内容を確認・編集してください。</p>';
   for(var fi=0;fi<8;fi++){
@@ -4486,7 +4486,7 @@ function showStep3(ld){
   html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 3 / 5</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:60%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">⚡ 各要素の具体的行動</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">各要素を実現するための具体的な行動をAIが提案しました。マンダラチャートの各マスをタップすると、後からいつでも編集できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 今は内容を確認するだけで大丈夫です。</span></p></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">各要素を実現するための具体的な行動をAIが提案しました。9マス目標シートの各マスをタップすると、後からいつでも編集できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 今は内容を確認するだけで大丈夫です。</span></p></div>';
 
   for(var fi=0;fi<8;fi++){
     var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
