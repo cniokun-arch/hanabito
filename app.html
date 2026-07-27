@@ -4674,7 +4674,7 @@ function openMandalaDetail(fi){
         var cellBg=chk?'rgba(42,140,74,0.85)':lt;
         var cellTc=chk?'#fff':'var(--ink)';
         var cellBorder=chk?'2px solid #1a6b3a':'1px solid rgba(200,200,200,0.4)';
-        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:76px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)" onclick="'+(di>=0?'toggleMandalaCheck('+fi+','+di+')':'openMandalaEdit('+fi+')')+'">';
+        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:76px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)" onclick="'+(di>=0&&d?'toggleMandalaCheck('+fi+','+di+')':'openMandalaEdit('+fi+')')+'">';
         if(d){
           if(chk)h+='<div style="font-size:1rem;margin-bottom:0.1rem">✓</div>';
           h+='<div style="font-size:0.72rem;color:'+cellTc+';line-height:1.4;word-break:break-all">'+d+'</div>';
@@ -4702,15 +4702,18 @@ function openMandalaDetail(fi){
 }
 
 function toggleMandalaCheck(fi,di){
+  if(di<0||di>7)return; // 未設定セルは無視
   var ld=getLifeDesignData();
   if(!ld)return;
+  var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:[];
+  if(!details[di]||!details[di].trim())return; // 内容が空のセルは無視
   if(!ld.mandalaChecks)ld.mandalaChecks={};
   if(!ld.mandalaChecks[fi])ld.mandalaChecks[fi]=[false,false,false,false,false,false,false,false];
   ld.mandalaChecks[fi][di]=!ld.mandalaChecks[fi][di];
   saveLifeDesignData(ld);
-  // モーダルを再描画
-  var modal=document.getElementById('mandala-detail-modal');
-  if(modal&&window._buildDetailView)modal.innerHTML=window._buildDetailView();
+  // モーダルを閉じて再度開く（クロージャ問題を回避）
+  closeMandalaDetail();
+  openMandalaDetail(fi);
   redrawManualPage();
 }
 
