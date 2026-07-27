@@ -4041,15 +4041,16 @@ function renderMandala(ld){
     } else {
       var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
       var hasDetail=ld.mandalaDetail&&ld.mandalaDetail[fi]&&ld.mandalaDetail[fi].some(function(d){return d&&d.trim();});
-      var cellBgs=['#ff7f7f','#ffb347','#ffd700','#90ee90','#87ceeb','#dda0dd','#f4a9c0','#b0c4de'];
-      var cellTxts=['#8b0000','#8b4500','#8b6500','#1a5c1a','#1a4a6b','#5c1a6b','#8b1a4a','#2a3a5c'];
-      var bg=elem?cellBgs[fi%8]:'rgba(184,134,11,0.05)';
-      var tc=elem?cellTxts[fi%8]:'var(--ink3)';
+      var bg=elem?MC_BG[fi%8]:'rgba(184,134,11,0.05)';
+      var tc=elem?MC_TC[fi%8]:'var(--ink3)';
       var border=hasDetail?'2px solid rgba(0,0,0,0.25)':'1px solid rgba(255,255,255,0.5)';
       html+='<div style="background:'+bg+';border:'+border+';padding:0.5rem 0.3rem;text-align:center;border-radius:6px;min-height:80px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1)" onclick="openMandalaDetail('+fi+')">';
+      var doneCount=0;
+      if(ld.mandalaChecks&&ld.mandalaChecks[fi])doneCount=ld.mandalaChecks[fi].filter(function(c){return c;}).length;
       if(elem){
-        html+='<div style="font-size:0.82rem;color:'+tc+';line-height:1.4;font-weight:700">'+elem+'</div>';
-        if(hasDetail)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.7;margin-top:0.2rem">▶ 詳細あり</div>';
+        html+='<div style="font-size:0.84rem;color:'+tc+';line-height:1.4;font-weight:700">'+elem+'</div>';
+        if(hasDetail&&doneCount>0)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.8;margin-top:0.2rem">✓ '+doneCount+'/8</div>';
+        else if(hasDetail)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.7;margin-top:0.2rem">▶ 詳細あり</div>';
       } else {
         html+='<div style="font-size:0.7rem;color:var(--ink3)">タップして<br>設定</div>';
       }
@@ -4627,38 +4628,121 @@ function saveBucketList(){
 }
 
 // マンダラ詳細（第2層）表示
+// カラーパレット（マンダラ用）
+var MC_BG=['#ff7f7f','#ffb347','#ffd700','#90ee90','#87ceeb','#dda0dd','#f4a9c0','#b0c4de'];
+var MC_TC=['#8b0000','#8b4500','#8b6500','#1a5c1a','#1a4a6b','#5c1a6b','#8b1a4a','#2a3a5c'];
+var MC_LT=['rgba(255,127,127,0.18)','rgba(255,179,71,0.18)','rgba(255,215,0,0.18)','rgba(144,238,144,0.18)','rgba(135,206,235,0.18)','rgba(221,160,221,0.18)','rgba(244,169,192,0.18)','rgba(176,196,222,0.18)'];
+
 function openMandalaDetail(fi){
   var ld=getLifeDesignData();
   if(!ld)return;
   var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
   var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','','','','','',''];
+  var checks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false,false,false,false,false];
+  var bg=MC_BG[fi%8], tc=MC_TC[fi%8], lt=MC_LT[fi%8];
 
   var modal=document.createElement('div');
   modal.id='mandala-detail-modal';
   modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
 
-  var html='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:0 auto;padding:1.2rem">';
-  // 要素名入力
-  html+='<div style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.3rem">要素名（マンダラのマスに表示）</div>';
-  html+='<input id="md-elem" type="text" value="'+elem.replace(/"/g,'&quot;')+'" maxlength="20" placeholder="例：経済的自立" style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);margin-bottom:1rem">';
+  // 編集モードかビューモードかをトグル
+  window._mdMode='view'; // 初期はビューモード
+  window._mdFi=fi;
 
-  html+='<div style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.5rem">この要素を実現するための具体的行動（8つ）</div>';
+  function buildDetailView(){
+    var h='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
+    // 3x3グリッド
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:0.8rem">';
+    var order=[0,1,2,3,8,4,5,6,7];
+    var dChecks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false,false,false,false,false];
+    for(var i=0;i<9;i++){
+      var di=order[i];
+      if(di===8){
+        // 中央: 要素名（タップで要素名編集）
+        h+='<div style="background:'+bg+';color:'+tc+';padding:0.5rem;text-align:center;border-radius:8px;min-height:72px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.84rem;box-shadow:0 2px 8px rgba(0,0,0,0.15)" onclick="editMandalaElemName()">';
+        h+=elem||'要素名'+'</div>';
+      } else {
+        var d=details[di]||'';
+        var chk=dChecks[di]||false;
+        var cellBg=chk?'rgba(42,140,74,0.85)':lt;
+        var cellTc=chk?'#fff':'var(--ink)';
+        var cellBorder=chk?'2px solid #1a6b3a':'1px solid rgba(255,255,255,0.6)';
+        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:72px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.1)" onclick="toggleMandalaCheck('+fi+','+di+')">';
+        if(d){
+          if(chk)h+='<div style="font-size:1rem;margin-bottom:0.2rem">✓</div>';
+          h+='<div style="font-size:0.72rem;color:'+cellTc+';line-height:1.4">'+d+'</div>';
+        } else {
+          h+='<div style="font-size:0.65rem;color:var(--ink3)">未設定<br><span style="font-size:0.6rem">タップで編集</span></div>';
+        }
+        h+='</div>';
+      }
+    }
+    h+='</div>';
+    // 達成状況
+    var doneCount=(dChecks).filter(function(c){return c;}).length;
+    h+='<div style="text-align:center;font-size:0.78rem;color:var(--ink3);margin-bottom:0.8rem">'+doneCount+' / 8 達成</div>';
+    h+='<div style="display:flex;gap:0.5rem">';
+    h+='<button onclick="openMandalaEdit('+fi+')" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">✏️ 編集</button>';
+    h+='<button onclick="closeMandalaDetail()" style="flex:1;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
+    h+='</div></div>';
+    return h;
+  }
 
-  // 8つのtextarea（リスト形式）
+  modal.innerHTML=buildDetailView();
+  document.body.appendChild(modal);
+  // グローバルに参照できるようにする
+  window._buildDetailView=buildDetailView;
+}
+
+function toggleMandalaCheck(fi,di){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  if(!ld.mandalaChecks)ld.mandalaChecks={};
+  if(!ld.mandalaChecks[fi])ld.mandalaChecks[fi]=[false,false,false,false,false,false,false,false];
+  ld.mandalaChecks[fi][di]=!ld.mandalaChecks[fi][di];
+  saveLifeDesignData(ld);
+  // モーダルを再描画
+  var modal=document.getElementById('mandala-detail-modal');
+  if(modal&&window._buildDetailView)modal.innerHTML=window._buildDetailView();
+  redrawManualPage();
+}
+
+function editMandalaElemName(){
+  openInlineModal('要素名を編集してください','text',function(){
+    var ld=getLifeDesignData();
+    return ld&&ld.mandala&&ld.mandala[window._mdFi]?ld.mandala[window._mdFi]:'';
+  }(),function(val){
+    var ld=getLifeDesignData();
+    if(!ld||!val.trim())return;
+    if(!ld.mandala)ld.mandala={};
+    ld.mandala[window._mdFi]=val.trim().slice(0,20);
+    saveLifeDesignData(ld);
+    openMandalaDetail(window._mdFi);
+  });
+}
+
+function openMandalaEdit(fi){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
+  var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','','','','','',''];
+
+  var modal=document.getElementById('mandala-detail-modal');
+  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.3rem">要素名</div>';
+  html+='<input id="md-elem" type="text" value="'+elem.replace(/"/g,'&quot;')+'" maxlength="20" style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);margin-bottom:1rem">';
+  html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.5rem">具体的行動（8つ）</div>';
   for(var di=0;di<8;di++){
     html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.5rem">';
     html+='<div style="font-size:0.72rem;color:var(--ink3);padding-top:0.5rem;min-width:1.2rem">'+(di+1)+'.</div>';
-    html+='<textarea id="md-d'+di+'" maxlength="50" placeholder="具体的な行動を入力..." style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.82rem;background:var(--bg2);color:var(--ink);resize:none;height:52px;font-family:inherit;line-height:1.5">'+( details[di]||'')+'</textarea>';
+    html+='<textarea id="md-d'+di+'" maxlength="50" placeholder="具体的な行動..." style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.82rem;background:var(--bg2);color:var(--ink);resize:none;height:50px;font-family:inherit;line-height:1.5">'+(details[di]||'')+'</textarea>';
     html+='</div>';
   }
-
   html+='<div style="display:flex;gap:0.5rem;margin-top:0.8rem">';
   html+='<button onclick="saveMandalaDetail('+fi+')" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
   html+='<button onclick="closeMandalaDetail()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
   html+='</div></div>';
-
   modal.innerHTML=html;
-  document.body.appendChild(modal);
   setTimeout(function(){document.getElementById('md-elem').focus();},100);
 }
 
@@ -4672,10 +4756,8 @@ function saveMandalaDetail(fi){
   if(!ld)return;
   if(!ld.mandala)ld.mandala={};
   if(!ld.mandalaDetail)ld.mandalaDetail={};
-  // 要素名を保存
   var elemEl=document.getElementById('md-elem');
   if(elemEl)ld.mandala[fi]=elemEl.value.trim();
-  // 具体行動を保存
   var details=[];
   for(var di=0;di<8;di++){
     var el=document.getElementById('md-d'+di);
@@ -4684,6 +4766,8 @@ function saveMandalaDetail(fi){
   ld.mandalaDetail[fi]=details;
   saveLifeDesignData(ld);
   closeMandalaDetail();
+  // 保存後にビューモードで再度開く
+  openMandalaDetail(fi);
   redrawManualPage();
 }
 
