@@ -4155,7 +4155,7 @@ function renderTimeline(ld){
   var Graw=getCurrentTargetG();
   if(!Graw)return '';
   // doCalcで大運データ(DL等)を含む完全なGを計算
-  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender)||Graw;
+  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender||'男')||Graw;
   var html='<div style="margin-bottom:1.2rem">';
   html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ 運気×人生設計タイムライン</div>';
 
@@ -4859,84 +4859,90 @@ function initScrollNav(){
   if(!ca)return;
 
   var chaps=[
-    {id:'nav-ch1',label:'CHAPTER I\nあなたという人'},
-    {id:'nav-ch2',label:'CHAPTER II\n年齢とともに育つ人格'},
-    {id:'nav-ch3',label:'CHAPTER III\n人生の大きな流れ'},
-    {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'},
-    {id:'nav-ch5',label:'CHAPTER V\nあなたの人生設計'}
+    {id:'nav-ch1',label:'I あなたという人'},
+    {id:'nav-ch2',label:'II 年齢とともに育つ人格'},
+    {id:'nav-ch3',label:'III 人生の大きな流れ'},
+    {id:'nav-ch4',label:'IV 今のあなたへ'},
+    {id:'nav-ch5',label:'V あなたの人生設計'}
   ];
 
-  // ▲▼ボタン
-  var nav=document.createElement('div');
-  nav.id='scroll-nav';
-  nav.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:4px;padding:4px';
+  // ドラッグ式つまみ（1つ）
+  var thumb=document.createElement('div');
+  thumb.id='scroll-nav';
+  thumb.style.cssText='position:fixed;right:0;top:50%;z-index:600;width:28px;height:52px;background:rgba(30,30,30,0.65);border-radius:8px 0 0 8px;display:none;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;flex-direction:column;gap:3px';
+  thumb.innerHTML='<div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div>';
+  document.body.appendChild(thumb);
 
-  var btnUp=document.createElement('div');
-  btnUp.style.cssText='width:32px;height:44px;background:rgba(30,30,30,0.72);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1rem;user-select:none;-webkit-user-select:none';
-  btnUp.textContent='▲';
-
-  var btnDn=document.createElement('div');
-  btnDn.style.cssText='width:32px;height:44px;background:rgba(30,30,30,0.72);border-radius:0 0 8px 8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1rem;user-select:none;-webkit-user-select:none';
-  btnDn.textContent='▼';
-
-  nav.appendChild(btnUp);
-  nav.appendChild(btnDn);
-  document.body.appendChild(nav);
-
-  // 章名オーバーレイ
   var overlay=document.createElement('div');
   overlay.id='scroll-chapter-overlay';
-  overlay.style.cssText='position:fixed;right:40px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.72);color:#fff;padding:0.5rem 0.8rem;border-radius:8px;font-size:0.75rem;line-height:1.5;text-align:right;display:none;pointer-events:none;max-width:160px;white-space:pre-line';
+  overlay.style.cssText='position:fixed;right:34px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.78);color:#fff;padding:0.4rem 0.8rem;border-radius:8px;font-size:0.76rem;line-height:1.5;text-align:right;display:none;pointer-events:none;max-width:180px;white-space:nowrap';
   document.body.appendChild(overlay);
 
-  // スクロール中に表示、2秒後に隠す
   var hideTimer=null;
-  function showNav(){
-    nav.style.display='flex';
-    // 現在の章名を特定
-    var scrollTop=ca.scrollTop;
-    var currentLabel='';
+  var _isDragging=false;
+
+  function getCurrentChapter(){
+    var scrollTop=ca.scrollTop||window.scrollY;
+    var label='';
     chaps.forEach(function(c){
       var el=document.getElementById(c.id);
       if(!el)return;
-      if(el.offsetTop-ca.offsetTop<=scrollTop+200)currentLabel=c.label;
+      var rect=el.getBoundingClientRect();
+      if(rect.top<=200)label=c.label;
     });
-    if(currentLabel){
-      overlay.textContent=currentLabel;
-      overlay.style.display='block';
-    }
+    return label;
+  }
+
+  function showThumb(){
+    thumb.style.display='flex';
+    var label=getCurrentChapter();
+    if(label){overlay.textContent=label;overlay.style.display='block';}
     clearTimeout(hideTimer);
     hideTimer=setTimeout(function(){
-      nav.style.display='none';
-      overlay.style.display='none';
+      if(!_isDragging){thumb.style.display='none';overlay.style.display='none';}
     },2000);
   }
 
-  ca.addEventListener('scroll',showNav);
-  window.addEventListener('scroll',showNav);
+  ca.addEventListener('scroll',showThumb,{passive:true});
+  window.addEventListener('scroll',showThumb,{passive:true});
 
-  // 押し続けで高速スクロール
-  var scrollInterval=null;
-  function startScroll(dir){
-    clearInterval(scrollInterval);
-    scrollInterval=setInterval(function(){
-      if(ca.scrollHeight>ca.clientHeight){ca.scrollTop+=dir*80;}else{window.scrollBy(0,dir*80);}
-      showNav();
-    },60);
+  var _startY=0;
+  var _startScroll=0;
+
+  function onDragStart(e){
+    _isDragging=true;
+    thumb.style.cursor='grabbing';
+    _startY=e.touches?e.touches[0].clientY:e.clientY;
+    _startScroll=ca.scrollTop;
+    clearTimeout(hideTimer);
+    overlay.style.display='block';
+    e.preventDefault();
   }
-  function stopScroll(){clearInterval(scrollInterval);}
 
-  btnUp.addEventListener('touchstart',function(e){e.preventDefault();startScroll(-1);},{passive:false});
-  btnUp.addEventListener('touchend',stopScroll);
-  btnUp.addEventListener('mousedown',function(){startScroll(-1);});
-  btnUp.addEventListener('mouseup',stopScroll);
-  btnUp.addEventListener('mouseleave',stopScroll);
+  function onDragMove(e){
+    if(!_isDragging)return;
+    var clientY=e.touches?e.touches[0].clientY:e.clientY;
+    var delta=(clientY-_startY)*5;
+    ca.scrollTop=_startScroll+delta;
+    var label=getCurrentChapter();
+    if(label){overlay.textContent=label;}
+    e.preventDefault();
+  }
 
-  btnDn.addEventListener('touchstart',function(e){e.preventDefault();startScroll(1);},{passive:false});
-  btnDn.addEventListener('touchend',stopScroll);
-  btnDn.addEventListener('mousedown',function(){startScroll(1);});
-  btnDn.addEventListener('mouseup',stopScroll);
-  btnDn.addEventListener('mouseleave',stopScroll);
+  function onDragEnd(){
+    _isDragging=false;
+    thumb.style.cursor='grab';
+    hideTimer=setTimeout(function(){
+      thumb.style.display='none';overlay.style.display='none';
+    },1500);
+  }
+
+  thumb.addEventListener('touchstart',onDragStart,{passive:false});
+  thumb.addEventListener('touchmove',onDragMove,{passive:false});
+  thumb.addEventListener('touchend',onDragEnd);
+  thumb.addEventListener('mousedown',onDragStart);
+  document.addEventListener('mousemove',function(e){if(_isDragging)onDragMove(e);});
+  document.addEventListener('mouseup',function(){if(_isDragging)onDragEnd();});
 }
 
 function removeScrollNav(){
