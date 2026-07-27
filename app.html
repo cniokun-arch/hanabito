@@ -4650,29 +4650,36 @@ function openMandalaDetail(fi){
   window._mdFi=fi;
 
   function buildDetailView(){
-    var h='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
-    // 3x3グリッド
-    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:0.8rem">';
-    var order=[0,1,2,3,8,4,5,6,7];
+    var h='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1rem">';
     var dChecks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false,false,false,false,false];
-    for(var i=0;i<9;i++){
-      var di=order[i];
-      if(di===8){
-        // 中央: 要素名（タップで要素名編集）
-        h+='<div style="background:'+bg+';color:'+tc+';padding:0.5rem;text-align:center;border-radius:8px;min-height:72px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.84rem;box-shadow:0 2px 8px rgba(0,0,0,0.15)" onclick="editMandalaElemName()">';
-        h+=elem||'要素名'+'</div>';
+    // 3x3グリッド: 位置→データインデックスのマッピング
+    // 位置: 0=左上 1=上中 2=右上 3=左中 4=中央(要素名) 5=右中 6=左下 7=下中 8=右下
+    // データ: details[0]〜[7]を左上から時計回りに配置
+    //   0=左上, 1=上中, 2=右上, 3=右中, 4=右下, 5=下中, 6=左下, 7=左中
+    var posToData=[-1,-1,-1,-1,-1,-1,-1,-1,-1]; // -1=中央
+    // 時計回り: 上左=0, 上中=1, 上右=2, 右中=3, 下右=4, 下中=5, 下左=6, 左中=7
+    var clockwise=[0,1,2,5,8,7,6,3]; // グリッド位置インデックス(0=左上〜8=右下)
+    for(var ci=0;ci<8;ci++)posToData[clockwise[ci]]=ci;
+
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.7rem">';
+    for(var pos=0;pos<9;pos++){
+      if(pos===4){
+        // 中央セル: 要素名
+        h+='<div style="background:'+bg+';color:'+tc+';padding:0.5rem;text-align:center;border-radius:8px;min-height:76px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.86rem;box-shadow:0 2px 8px rgba(0,0,0,0.2);line-height:1.4" onclick="editMandalaElemName()">';
+        h+=(elem||'要素名')+'</div>';
       } else {
-        var d=details[di]||'';
-        var chk=dChecks[di]||false;
+        var di=posToData[pos];
+        var d=(di>=0&&details[di])?details[di]:'';
+        var chk=(di>=0&&dChecks[di])||false;
         var cellBg=chk?'rgba(42,140,74,0.85)':lt;
         var cellTc=chk?'#fff':'var(--ink)';
-        var cellBorder=chk?'2px solid #1a6b3a':'1px solid rgba(255,255,255,0.6)';
-        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:72px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.1)" onclick="toggleMandalaCheck('+fi+','+di+')">';
+        var cellBorder=chk?'2px solid #1a6b3a':'1px solid rgba(200,200,200,0.4)';
+        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:76px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)" onclick="'+(di>=0?'toggleMandalaCheck('+fi+','+di+')':'openMandalaEdit('+fi+')')+'">';
         if(d){
-          if(chk)h+='<div style="font-size:1rem;margin-bottom:0.2rem">✓</div>';
-          h+='<div style="font-size:0.72rem;color:'+cellTc+';line-height:1.4">'+d+'</div>';
+          if(chk)h+='<div style="font-size:1rem;margin-bottom:0.1rem">✓</div>';
+          h+='<div style="font-size:0.72rem;color:'+cellTc+';line-height:1.4;word-break:break-all">'+d+'</div>';
         } else {
-          h+='<div style="font-size:0.65rem;color:var(--ink3)">未設定<br><span style="font-size:0.6rem">タップで編集</span></div>';
+          h+='<div style="font-size:0.62rem;color:var(--ink3);line-height:1.5">未設定<br>✏️</div>';
         }
         h+='</div>';
       }
