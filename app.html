@@ -4154,8 +4154,8 @@ function redrawManualPage(){
 function renderTimeline(ld){
   var Graw=getCurrentTargetG();
   if(!Graw)return '';
-  // doCalcで大運データ(DL等)を含む完全なGを計算
-  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender||'男')||Graw;
+  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender||'男');
+  if(!G)return '';
   var html='<div style="margin-bottom:1.2rem">';
   html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ 運気×人生設計タイムライン</div>';
 
@@ -4205,15 +4205,17 @@ function renderTimeline(ld){
 function getDaiunJuForYear(year,G){
   try{
     var daiunRows=getDaiunRows(G);
+    if(year===2026&&console)console.log('DBG 2026: G.y='+G.y+' G.ht='+G.ht+' rows='+daiunRows.length+' sa='+G.sa);
     for(var i=0;i<daiunRows.length;i++){
       var r=daiunRows[i];
       var startY=G.y+r.age;
       var endY=startY+r.sp;
+      if(year===2026&&console)console.log('DBG row'+i+': '+r.ks+' age='+r.age+' sp='+r.sp+' startY='+startY+' endY='+endY+' ju='+r.ju);
       if(year>=startY&&year<endY){
         return r.ju||'';
       }
     }
-  }catch(e){}
+  }catch(e){if(console)console.log('DBG err:'+e);}
   return '';
 }
 
@@ -4855,8 +4857,6 @@ function initManualPage(){
 
 function initScrollNav(){
   removeScrollNav();
-  var ca=document.getElementById('content-area');
-  if(!ca)return;
 
   var chaps=[
     {id:'nav-ch1',label:'I あなたという人'},
@@ -4866,10 +4866,9 @@ function initScrollNav(){
     {id:'nav-ch5',label:'V あなたの人生設計'}
   ];
 
-  // ドラッグ式つまみ（1つ）
   var thumb=document.createElement('div');
   thumb.id='scroll-nav';
-  thumb.style.cssText='position:fixed;right:0;top:50%;z-index:600;width:28px;height:52px;background:rgba(30,30,30,0.65);border-radius:8px 0 0 8px;display:none;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;flex-direction:column;gap:3px';
+  thumb.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;width:28px;height:52px;background:rgba(30,30,30,0.65);border-radius:8px 0 0 8px;display:none;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;flex-direction:column;gap:3px';
   thumb.innerHTML='<div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div>';
   document.body.appendChild(thumb);
 
@@ -4882,7 +4881,6 @@ function initScrollNav(){
   var _isDragging=false;
 
   function getCurrentChapter(){
-    var scrollTop=ca.scrollTop||window.scrollY;
     var label='';
     chaps.forEach(function(c){
       var el=document.getElementById(c.id);
@@ -4903,7 +4901,6 @@ function initScrollNav(){
     },2000);
   }
 
-  ca.addEventListener('scroll',showThumb,{passive:true});
   window.addEventListener('scroll',showThumb,{passive:true});
 
   var _startY=0;
@@ -4913,7 +4910,7 @@ function initScrollNav(){
     _isDragging=true;
     thumb.style.cursor='grabbing';
     _startY=e.touches?e.touches[0].clientY:e.clientY;
-    _startScroll=ca.scrollTop;
+    _startScroll=window.scrollY;
     clearTimeout(hideTimer);
     overlay.style.display='block';
     e.preventDefault();
@@ -4922,10 +4919,10 @@ function initScrollNav(){
   function onDragMove(e){
     if(!_isDragging)return;
     var clientY=e.touches?e.touches[0].clientY:e.clientY;
-    var delta=(clientY-_startY)*5;
-    ca.scrollTop=_startScroll+delta;
+    var delta=(clientY-_startY)*6;
+    window.scrollTo(0,_startScroll+delta);
     var label=getCurrentChapter();
-    if(label){overlay.textContent=label;}
+    if(label)overlay.textContent=label;
     e.preventDefault();
   }
 
