@@ -4206,10 +4206,11 @@ function renderTimeline(ld){
     html+='<div style="border-radius:8px;border:'+borderStyle+';box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden">';
 
     // 上半分: 大運（薄い背景色）
+    var daiunColor=getJuniColor(daiunJu);
     html+='<div style="background:'+daiunBg+';padding:0.35rem 0.4rem;border-bottom:1px solid rgba(184,134,11,0.15)">';
-    html+='<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:1px">大運 '+label+'</div>';
-    html+='<div style="font-size:0.7rem;color:var(--ink);font-weight:700">'+ks+'</div>';
-    html+='<div style="font-size:0.65rem;color:var(--ink3)">'+age+'歳</div>';
+    html+='<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:1px">大運（10年）</div>';
+    html+='<div style="font-size:0.78rem;color:var(--ink);font-weight:700">'+ks+'　'+age+'歳</div>';
+    html+='<div style="font-size:0.72rem;font-weight:700;color:'+daiunColor+'">'+label+' '+daiunJu+'</div>';
     html+='</div>';
 
     // 下半分: 年運（白背景、はっきり）
@@ -4884,97 +4885,89 @@ function initManualPage(){
   if(!saved||!saved.chara){
     generateManual();
   }
-  // scrollbar via CSS only
+  setTimeout(initScrollNav,300);
 }
 
 function initScrollNav(){
   removeScrollNav();
 
   var chaps=[
-    {id:'nav-ch1',label:'I あなたという人'},
-    {id:'nav-ch2',label:'II 年齢とともに育つ人格'},
-    {id:'nav-ch3',label:'III 人生の大きな流れ'},
-    {id:'nav-ch4',label:'IV 今のあなたへ'},
-    {id:'nav-ch5',label:'V あなたの人生設計'}
+    {id:'nav-ch1',label:'CHAPTER I\nあなたという人'},
+    {id:'nav-ch2',label:'CHAPTER II\n年齢とともに育つ人格'},
+    {id:'nav-ch3',label:'CHAPTER III\n人生の大きな流れ'},
+    {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'},
+    {id:'nav-ch5',label:'CHAPTER V\nあなたの人生設計'}
   ];
 
-  var thumb=document.createElement('div');
-  thumb.id='scroll-nav';
-  thumb.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;width:28px;height:56px;background:rgba(30,30,30,0.7);border-radius:10px 0 0 10px;display:none;align-items:center;justify-content:center;flex-direction:column;gap:4px;touch-action:none;cursor:grab';
-  for(var li=0;li<3;li++){var line=document.createElement('div');line.style.cssText='width:12px;height:2px;background:#fff;border-radius:2px';thumb.appendChild(line);}
-  document.body.appendChild(thumb);
+  // ガイドパネル（右端・固定）
+  var guide=document.createElement('div');
+  guide.id='scroll-nav';
+  guide.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:3px;padding:4px 0';
 
+  chaps.forEach(function(c,idx){
+    var el=document.getElementById(c.id);
+    if(!el)return;
+    var btn=document.createElement('div');
+    btn.style.cssText='width:32px;height:32px;background:rgba(184,134,11,0.85);border-radius:6px 0 0 6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.6rem;color:#fff;font-weight:700;font-family:"Zen Old Mincho",serif;transition:all 0.15s';
+    btn.textContent='I II III IV V'.split(' ')[idx];
+    btn.title=c.label.replace('\n',' ');
+
+    // タップでジャンプ
+    btn.onclick=function(){
+      var target=document.getElementById(c.id);
+      if(target){
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+        // ラベル表示
+        showChapterLabel(c.label);
+      }
+      scheduleHide();
+    };
+    guide.appendChild(btn);
+  });
+
+  document.body.appendChild(guide);
+
+  // チャプター名オーバーレイ
   var overlay=document.createElement('div');
   overlay.id='scroll-chapter-overlay';
-  overlay.style.cssText='position:fixed;right:34px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.45rem 1rem;border-radius:10px;font-size:0.78rem;display:none;pointer-events:none;white-space:nowrap;max-width:200px';
+  overlay.style.cssText='position:fixed;right:38px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.5rem 0.9rem;border-radius:10px;font-size:0.76rem;line-height:1.6;text-align:right;display:none;pointer-events:none;white-space:pre-line;max-width:190px';
   document.body.appendChild(overlay);
 
   var hideTimer=null;
-  var isDrag=false;
-  var startClientY=0;
-  var startScrollY=0;
 
-  function getScrollY(){return window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;}
-  function setScrollY(y){window.scrollTo(0,y);document.documentElement.scrollTop=y;document.body.scrollTop=y;}
+  function showChapterLabel(label){
+    overlay.textContent=label;
+    overlay.style.display='block';
+  }
 
-  function getCurrentChapter(){
-    var sy=getScrollY();
+  function scheduleHide(){
+    clearTimeout(hideTimer);
+    hideTimer=setTimeout(function(){
+      guide.style.display='none';
+      overlay.style.display='none';
+    },2500);
+  }
+
+  // スクロール中にガイドを表示
+  var lastScrollY=0;
+  function onScroll(){
+    var sy=window.pageYOffset||document.documentElement.scrollTop||0;
+    if(Math.abs(sy-lastScrollY)<5)return;
+    lastScrollY=sy;
+    guide.style.display='flex';
+    // 現在の章を特定してラベル表示
     var label='';
     chaps.forEach(function(c){
       var el=document.getElementById(c.id);
       if(!el)return;
-      if(el.getBoundingClientRect().top<=150)label=c.label;
+      if(el.getBoundingClientRect().top<=200)label=c.label;
     });
-    return label;
+    if(label)showChapterLabel(label);
+    scheduleHide();
   }
 
-  var hideDelay=2000;
-  function showThumb(){
-    thumb.style.display='flex';
-    clearTimeout(hideTimer);
-    hideTimer=setTimeout(function(){if(!isDrag){thumb.style.display='none';overlay.style.display='none';}},hideDelay);
-  }
-
-  // スクロール検知（全パターン）
-  ['scroll','touchmove'].forEach(function(ev){
-    window.addEventListener(ev,showThumb,{passive:true});
-    document.addEventListener(ev,showThumb,{passive:true});
-  });
-
-  // ドラッグ開始
-  function dragStart(clientY){
-    isDrag=true;
-    startClientY=clientY;
-    startScrollY=getScrollY();
-    thumb.style.cursor='grabbing';
-    overlay.style.display='block';
-    var label=getCurrentChapter();
-    if(label)overlay.textContent=label;
-    clearTimeout(hideTimer);
-  }
-
-  // ドラッグ中
-  function dragMove(clientY){
-    if(!isDrag)return;
-    var delta=(clientY-startClientY)*7;
-    setScrollY(startScrollY+delta);
-    var label=getCurrentChapter();
-    if(label)overlay.textContent=label;
-  }
-
-  // ドラッグ終了
-  function dragEnd(){
-    isDrag=false;
-    thumb.style.cursor='grab';
-    hideTimer=setTimeout(function(){thumb.style.display='none';overlay.style.display='none';},1500);
-  }
-
-  thumb.addEventListener('touchstart',function(e){dragStart(e.touches[0].clientY);e.preventDefault();},{passive:false});
-  thumb.addEventListener('touchmove',function(e){dragMove(e.touches[0].clientY);e.preventDefault();},{passive:false});
-  thumb.addEventListener('touchend',dragEnd);
-  thumb.addEventListener('mousedown',function(e){dragStart(e.clientY);});
-  document.addEventListener('mousemove',function(e){if(isDrag)dragMove(e.clientY);});
-  document.addEventListener('mouseup',function(){if(isDrag)dragEnd();});
+  window.addEventListener('scroll',onScroll,{passive:true});
+  document.addEventListener('scroll',onScroll,{passive:true});
 }
 
 function removeScrollNav(){
