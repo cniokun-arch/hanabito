@@ -4862,22 +4862,71 @@ function editTimelineMemo(year){
   if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
   if(!tdata.months)tdata.months=Array(12).fill('');
 
+  var Graw=getCurrentTargetG();
+  var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+
+  var yrShi=JUNISHI[((year-1984)%12+12)%12];
+  var yrJu=G?getJuniUnki(G.ht,yrShi):'';
+  var yrGrade=UNKI_GRADE[yrJu]||0;
+  var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
+  var yrColor=getJuniColor(yrJu);
+  var daiunJu=G?getDaiunJuForYear(year,G):'';
+  var daiunGrade=UNKI_GRADE[daiunJu]||0;
+  var daiunLabel=daiunGrade>=3?'◎':daiunGrade>=2?'○':daiunGrade>=1?'△':daiunGrade<0?'×':'―';
+  var daiunColor=getJuniColor(daiunJu);
+
+  function juniDesc(ju){
+    var d=(KB['十二運気']||{})[ju];
+    if(!d)return '';
+    return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+  }
+
+  var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var monthJus=[];
+  for(var mi=0;mi<12;mi++){
+    var mks=getMonthKS(year,mi+1,15);
+    monthJus.push(G?getJuniUnki(G.ht,mks[1]):'');
+  }
+
   var modal=document.createElement('div');
   modal.id='timeline-edit-modal';
   modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
 
-  var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
-  html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:1rem">'+year+'年の目標設定</div>';
+  html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">'+year+'年の目標設定</div>';
+
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.7rem;margin-bottom:1rem">';
+  if(daiunJu){
+    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
+    html+='<span style="font-size:0.7rem;color:var(--ink3);white-space:nowrap">大運（10年）</span>';
+    html+='<span style="font-size:0.86rem;font-weight:700;color:'+daiunColor+'">'+daiunLabel+' '+daiunJu+'</span>';
+    html+='</div>';
+    var dd=juniDesc(daiunJu);
+    if(dd)html+='<div style="font-size:0.7rem;color:var(--ink3);line-height:1.5;margin-bottom:0.4rem">'+dd.slice(0,70)+'…</div>';
+  }
+  if(yrJu){
+    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
+    html+='<span style="font-size:0.7rem;color:var(--ink3);white-space:nowrap">年運（この年）</span>';
+    html+='<span style="font-size:0.86rem;font-weight:700;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
+    html+='</div>';
+    var yd=juniDesc(yrJu);
+    if(yd)html+='<div style="font-size:0.7rem;color:var(--ink3);line-height:1.5">'+yd.slice(0,70)+'…</div>';
+  }
+  html+='</div>';
 
   html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
-  html+='<textarea id="tl-goal" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+( tdata.goal||'')+'</textarea>';
+  html+='<textarea id="tl-goal" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+(tdata.goal||'')+'</textarea>';
 
-  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（任意）</div>';
+  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（運気をタップで説明）</div>';
   for(var mi=0;mi<12;mi++){
-    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">';
-    html+='<div style="font-size:0.78rem;color:var(--ink3);min-width:2.5rem">'+MONTH_NAMES[mi]+'</div>';
-    html+='<input id="tl-m'+mi+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標を入力..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
+    var mju=monthJus[mi];
+    var mgrade=UNKI_GRADE[mju]||0;
+    var mlabel=mgrade>=3?'◎':mgrade>=2?'○':mgrade>=1?'△':mgrade<0?'×':'―';
+    var mcolor=getJuniColor(mju);
+    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">';
+    html+='<div style="font-size:0.76rem;color:var(--ink3);min-width:2.2rem">'+MONTH_NAMES[mi]+'</div>';
+    if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px">'+mlabel+' '+mju+'</div>';}
+    html+='<input id="tl-m'+mi+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
     html+='</div>';
   }
 
@@ -4889,6 +4938,16 @@ function editTimelineMemo(year){
   modal.innerHTML=html;
   document.body.appendChild(modal);
   setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
+}
+
+function showJuniPopup(ju,label){
+  if(ju&&ju.dataset){label=ju.dataset.lb;ju=ju.dataset.ju;}
+  var desc=(KB['十二運気']||{})[ju];
+  var text=desc?(desc['説明']||'')+(desc['独自解釈']?' '+desc['独自解釈']:''):'説明がありません';
+  var popup=document.createElement('div');
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:12px;padding:1rem;max-width:300px;width:85%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  popup.innerHTML='<div style="font-weight:700;color:var(--gold);margin-bottom:0.5rem">'+label+' '+ju+'</div><div style="font-size:0.82rem;color:var(--ink);line-height:1.7">'+text+'</div><button onclick="this.parentNode.remove()" style="margin-top:0.8rem;width:100%;padding:0.5rem;background:rgba(184,134,11,0.15);border:none;border-radius:6px;cursor:pointer;font-size:0.82rem">閉じる</button>';
+  document.body.appendChild(popup);
 }
 
 function saveTimelineData(year){
