@@ -2036,6 +2036,73 @@ function buildHomePage(){
 
   html+='</div>';
 
+  // ===== 人生設計サマリーカード =====
+  var tlDataHome=getTimelineData();
+  var cy2=new Date().getFullYear();
+  var cm2=new Date().getMonth()+1;
+  var tdataHome=tlDataHome[cy2];
+  var G2=doCalc(parseInt(G.y),parseInt(G.m),parseInt(G.d),G.gender||'男');
+  if(G2){
+    var yrShiHome=JUNISHI[((cy2-1984)%12+12)%12];
+    var yrJuHome=getJuniUnki(G2.ht,yrShiHome);
+    var yrGradeHome=UNKI_GRADE[yrJuHome]||0;
+    var yrLabelHome=yrGradeHome>=3?'◎':yrGradeHome>=2?'○':yrGradeHome>=1?'△':yrGradeHome<0?'×':'―';
+    var yrColorHome=getJuniColor(yrJuHome);
+    var daiunJuHome=getDaiunJuForYear(cy2,G2);
+    var daiunGradeHome=UNKI_GRADE[daiunJuHome]||0;
+    var daiunLabelHome=daiunGradeHome>=3?'◎':daiunGradeHome>=2?'○':daiunGradeHome>=1?'△':daiunGradeHome<0?'×':'―';
+    var daiunColorHome=getJuniColor(daiunJuHome);
+    var mks2=getMonthKS(cy2,cm2,15);
+    var monJuHome=getJuniUnki(G2.ht,mks2[1]);
+    var monGradeHome=UNKI_GRADE[monJuHome]||0;
+    var monLabelHome=monGradeHome>=3?'◎':monGradeHome>=2?'○':monGradeHome>=1?'△':monGradeHome<0?'×':'―';
+    var monColorHome=getJuniColor(monJuHome);
+    var drows2=getDaiunRows(G2);
+    var daiunYearStrHome='';
+    for(var dri=0;dri<drows2.length;dri++){if(drows2[dri].startY<=cy2&&cy2<=drows2[dri].endY){daiunYearStrHome=drows2[dri].startY+'〜'+drows2[dri].endY+'年';break;}}
+
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(184,134,11,0.03));border:1px solid rgba(184,134,11,0.25)">';
+    html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">🌸 '+cy2+'年の運気と目標</div>';
+
+    // 大運・年運・月運を横並び
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:0.8rem">';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
+    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">大運（'+daiunYearStrHome+'）</div>';
+    html+='<div style="font-size:1.1rem;font-weight:700;color:'+daiunColorHome+'">'+daiunLabelHome+'</div>';
+    html+='<div style="font-size:0.76rem;font-weight:700;color:'+daiunColorHome+'">'+daiunJuHome+'</div>';
+    html+='</div>';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
+    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">年運（'+cy2+'年）</div>';
+    html+='<div style="font-size:1.1rem;font-weight:700;color:'+yrColorHome+'">'+yrLabelHome+'</div>';
+    html+='<div style="font-size:0.76rem;font-weight:700;color:'+yrColorHome+'">'+yrJuHome+'</div>';
+    html+='</div>';
+    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
+    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">月運（'+cm2+'月）</div>';
+    html+='<div style="font-size:1.1rem;font-weight:700;color:'+monColorHome+'">'+monLabelHome+'</div>';
+    html+='<div style="font-size:0.76rem;font-weight:700;color:'+monColorHome+'">'+monJuHome+'</div>';
+    html+='</div>';
+    html+='</div>';
+
+    // 今年の目標
+    if(tdataHome&&tdataHome.goal){
+      html+='<div style="background:var(--bg);border-radius:8px;padding:0.6rem;margin-bottom:0.5rem">';
+      html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">📌 今年の目標</div>';
+      html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700">'+tdataHome.goal+'</div>';
+      html+='</div>';
+    }
+    // 今月の目標
+    if(tdataHome&&tdataHome.months&&tdataHome.months[cm2-1]){
+      html+='<div style="background:var(--bg);border-radius:8px;padding:0.6rem">';
+      html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">📌 今月（'+cm2+'月）の目標</div>';
+      html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700">'+tdataHome.months[cm2-1]+'</div>';
+      html+='</div>';
+    }
+    if(!tdataHome||(!tdataHome.goal&&!(tdataHome.months&&tdataHome.months.some(function(m){return m;})))){
+      html+='<div style="font-size:0.78rem;color:var(--ink3);text-align:center;padding:0.3rem 0">「あなたの本」→ CHAPTER V から目標を設定してください</div>';
+    }
+    html+='</div>';
+  }
+
   // ===== 月間カレンダー =====
   html+='<div class="card" id="home-calendar-card">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">'
@@ -4005,7 +4072,8 @@ function getLifeDesignData(){
   var data=S.load();
   if(!data)return null;
   if(!data.lifeDesign)data.lifeDesign={};
-  var key='ld_'+getCurrentTargetG().y+'_'+getCurrentTargetG().m+'_'+getCurrentTargetG().d;
+  var G=getCurrentTargetG();if(!G)return null;
+  var key='ld_'+G.y+'_'+G.m+'_'+G.d;
   return data.lifeDesign[key]||null;
 }
 
@@ -4013,9 +4081,43 @@ function saveLifeDesignData(obj){
   var data=S.load();
   if(!data)return;
   if(!data.lifeDesign)data.lifeDesign={};
-  var G=getCurrentTargetG();
+  var G=getCurrentTargetG();if(!G)return;
   var key='ld_'+G.y+'_'+G.m+'_'+G.d;
+  // タイムラインデータは別キーで独立保存（やり直しても消えない）
+  if(obj&&obj.timeline){
+    var tlKey='timeline_'+G.y+'_'+G.m+'_'+G.d;
+    if(!data.lifeDesign)data.lifeDesign={};
+    data.lifeDesign[tlKey]=obj.timeline;
+  }
   data.lifeDesign[key]=obj;
+  S.save(data);
+}
+
+function getTimelineData(){
+  var data=S.load();
+  if(!data||!data.lifeDesign)return {};
+  var G=getCurrentTargetG();if(!G)return {};
+  var tlKey='timeline_'+G.y+'_'+G.m+'_'+G.d;
+  // 独立キーを優先、なければldから取得
+  if(data.lifeDesign[tlKey])return data.lifeDesign[tlKey];
+  var ld=data.lifeDesign['ld_'+G.y+'_'+G.m+'_'+G.d];
+  return (ld&&ld.timeline)||{};
+}
+
+function saveTimelineEntry(year,entry){
+  var data=S.load();
+  if(!data)return;
+  if(!data.lifeDesign)data.lifeDesign={};
+  var G=getCurrentTargetG();if(!G)return;
+  var tlKey='timeline_'+G.y+'_'+G.m+'_'+G.d;
+  if(!data.lifeDesign[tlKey])data.lifeDesign[tlKey]={};
+  data.lifeDesign[tlKey][year]=entry;
+  // ldにも同期
+  var key='ld_'+G.y+'_'+G.m+'_'+G.d;
+  if(data.lifeDesign[key]){
+    if(!data.lifeDesign[key].timeline)data.lifeDesign[key].timeline={};
+    data.lifeDesign[key].timeline[year]=entry;
+  }
   S.save(data);
 }
 
@@ -4187,7 +4289,8 @@ function renderTimeline(ld){
     var textColor=grade!==0?'#fff':'var(--ink)';
     var label=grade>=3?'◎':grade>=2?'○':grade>=1?'△':grade<=-1?'×':'―';
 
-    var memo=ld.timeline&&ld.timeline[y]?ld.timeline[y]:'';
+    var tlData=getTimelineData();
+    var memo=tlData[y]||'';
     var isCurrentYear=(y===new Date().getFullYear());
     // 年運（毎年の十二支から計算）
     var yrShi=JUNISHI[((y-1984)%12+12)%12];
@@ -4233,7 +4336,7 @@ function renderTimeline(ld){
     html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">年運（毎年）</div>';
     html+='<div style="font-size:1.3rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
     html+='<div style="font-size:0.86rem;font-weight:700;color:'+yrColor+';margin-top:2px">'+yrJu+'</div>';
-    var tdata=ld.timeline&&ld.timeline[y]?ld.timeline[y]:null;
+    var tdata=tlData[y]||null;
     var hasGoal=tdata&&(tdata.goal||(tdata.months&&tdata.months.some(function(m){return m;})));
     if(hasGoal){
       if(tdata.goal)html+='<div style="margin-top:0.3rem;font-size:0.68rem;color:var(--ink);font-weight:700;line-height:1.3">📌 '+tdata.goal+'</div>';
@@ -4857,8 +4960,8 @@ function saveMandalaDetail(fi){
 function editTimelineMemo(year){
   var ld=getLifeDesignData();
   if(!ld)return;
-  if(!ld.timeline)ld.timeline={};
-  var tdata=ld.timeline[year]||{goal:'',months:Array(12).fill('')};
+  var tlData2=getTimelineData();
+  var tdata=tlData2[year]||{goal:'',months:Array(12).fill('')};
   if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
   if(!tdata.months)tdata.months=Array(12).fill('');
 
@@ -4895,22 +4998,34 @@ function editTimelineMemo(year){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
   html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">'+year+'年の目標設定</div>';
 
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.7rem;margin-bottom:1rem">';
+  // 大運の開始・終了年を取得
+  var daiunStartY='',daiunEndY='';
+  if(G){
+    var drows=getDaiunRows(G);
+    for(var di2=0;di2<drows.length;di2++){
+      if(drows[di2].startY<=year&&year<=drows[di2].endY){
+        daiunStartY=drows[di2].startY;daiunEndY=drows[di2].endY;break;
+      }
+    }
+  }
+
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
   if(daiunJu){
-    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
-    html+='<span style="font-size:0.7rem;color:var(--ink3);white-space:nowrap">大運（10年）</span>';
-    html+='<span style="font-size:0.86rem;font-weight:700;color:'+daiunColor+'">'+daiunLabel+' '+daiunJu+'</span>';
+    var daiunYearStr=daiunStartY?(daiunStartY+'〜'+daiunEndY+'年'):'';
+    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;flex-wrap:wrap">';
+    html+='<span style="font-size:0.76rem;color:var(--ink3);white-space:nowrap">大運（'+daiunYearStr+'）</span>';
+    html+='<span style="font-size:0.92rem;font-weight:700;color:'+daiunColor+'">'+daiunLabel+' '+daiunJu+'</span>';
     html+='</div>';
     var dd=juniDesc(daiunJu);
-    if(dd)html+='<div style="font-size:0.7rem;color:var(--ink3);line-height:1.5;margin-bottom:0.4rem">'+dd.slice(0,70)+'…</div>';
+    if(dd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7;margin-bottom:0.6rem">'+dd+'</div>';
   }
   if(yrJu){
     html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
-    html+='<span style="font-size:0.7rem;color:var(--ink3);white-space:nowrap">年運（この年）</span>';
-    html+='<span style="font-size:0.86rem;font-weight:700;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
+    html+='<span style="font-size:0.76rem;color:var(--ink3);white-space:nowrap">年運（'+year+'年）</span>';
+    html+='<span style="font-size:0.92rem;font-weight:700;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
     html+='</div>';
     var yd=juniDesc(yrJu);
-    if(yd)html+='<div style="font-size:0.7rem;color:var(--ink3);line-height:1.5">'+yd.slice(0,70)+'…</div>';
+    if(yd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7">'+yd+'</div>';
   }
   html+='</div>';
 
@@ -4958,11 +5073,7 @@ function saveTimelineData(year){
     var el=document.getElementById('tl-m'+mi);
     months.push(el?el.value.trim():'');
   }
-  var ld=getLifeDesignData();
-  if(!ld)return;
-  if(!ld.timeline)ld.timeline={};
-  ld.timeline[year]={goal:goal,months:months};
-  saveLifeDesignData(ld);
+  saveTimelineEntry(year,{goal:goal,months:months});
   closeTimelineModal();
   redrawManualPage();
 }
