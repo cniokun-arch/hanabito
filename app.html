@@ -1976,21 +1976,66 @@ function initDaiunChart(){
 
 function addSwipeListener(el,onLeft,onRight){
   if(!el)return;
-  var startX=0,startY=0,moved=false;
+  var startX=0,startY=0,startTime=0;
+  var isDragging=false,isHoriz=null;
+  var currentX=0;
+  var inner=el.querySelector('div')||el;
+
   el.addEventListener('touchstart',function(e){
     startX=e.touches[0].clientX;
     startY=e.touches[0].clientY;
-    moved=false;
+    startTime=Date.now();
+    isDragging=true;isHoriz=null;currentX=0;
+    inner.style.transition='none';
+    inner.style.transform='translateX(0)';
   },{passive:true});
+
   el.addEventListener('touchmove',function(e){
-    moved=true;
+    if(!isDragging)return;
+    var dx=e.touches[0].clientX-startX;
+    var dy=e.touches[0].clientY-startY;
+    if(isHoriz===null){
+      if(Math.abs(dx)<5&&Math.abs(dy)<5)return;
+      isHoriz=Math.abs(dx)>Math.abs(dy)*0.8;
+    }
+    if(!isHoriz)return;
+    currentX=dx;
+    inner.style.transform='translateX('+Math.round(dx*0.4)+'px)';
+    inner.style.opacity=1-Math.min(0.3,Math.abs(dx)/500);
   },{passive:true});
+
   el.addEventListener('touchend',function(e){
-    if(!moved)return;
+    if(!isDragging)return;
+    isDragging=false;
     var dx=e.changedTouches[0].clientX-startX;
     var dy=e.changedTouches[0].clientY-startY;
-    if(Math.abs(dx)<40||Math.abs(dy)>Math.abs(dx)*0.8)return;
-    if(dx<0)onLeft();else onRight();
+    var dt=Date.now()-startTime;
+    var isFling=Math.abs(dx)>30&&dt<300&&Math.abs(dx)>Math.abs(dy);
+    var isSwipe=Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*0.8;
+
+    if(isFling||isSwipe){
+      var dir=dx<0?1:-1;
+      // スライドアウト
+      inner.style.transition='transform 0.18s ease,opacity 0.18s ease';
+      inner.style.transform='translateX('+(dir>0?-60:60)+'px)';
+      inner.style.opacity='0';
+      setTimeout(function(){
+        inner.style.transition='none';
+        inner.style.transform='translateX('+(dir>0?60:-60)+'px)';
+        if(dx<0)onLeft();else onRight();
+        // スライドイン
+        requestAnimationFrame(function(){
+          inner.style.transition='transform 0.18s ease,opacity 0.18s ease';
+          inner.style.transform='translateX(0)';
+          inner.style.opacity='1';
+        });
+      },180);
+    } else {
+      // 戻す
+      inner.style.transition='transform 0.12s ease,opacity 0.12s ease';
+      inner.style.transform='translateX(0)';
+      inner.style.opacity='1';
+    }
   },{passive:true});
 }
 
@@ -2078,17 +2123,13 @@ function buildHomePage(){
     currentUnkiTab='day';
     unkiOffset=0;
     renderCalendar();
-    // 運気ウィジェットにスワイプ追加（今日←→今月←→今年）
-    var unkiTabs=['day','month','year'];
+    // 運気ウィジェットにスワイプ追加（前後の日/月/年に移動）
     var unkiBody=document.querySelector('.unki-widget-body');
-    addSwipeListener(unkiBody,function(){
-      var i=unkiTabs.indexOf(currentUnkiTab||'day');
-      if(i<unkiTabs.length-1)switchUnkiTab(unkiTabs[i+1]);
-    },function(){
-      var i=unkiTabs.indexOf(currentUnkiTab||'day');
-      if(i>0)switchUnkiTab(unkiTabs[i-1]);
-    });
-    // カレンダーにスワイプ追加
+    addSwipeListener(unkiBody,
+      function(){changeUnkiOffset(1);},   // 左スワイプ→次へ
+      function(){changeUnkiOffset(-1);}   // 右スワイプ→前へ
+    );
+    // カレンダーにスワイプ追加（月切り替え）
     var calCard=document.getElementById('home-calendar-card');
     addSwipeListener(calCard,function(){calNextMonth();},function(){calPrevMonth();});
   },50);
