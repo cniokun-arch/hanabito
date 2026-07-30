@@ -4154,7 +4154,7 @@ function redrawManualPage(){
 function renderTimeline(ld){
   var Graw=getCurrentTargetG();
   if(!Graw)return '';
-  var G=doCalc(Graw.y,Graw.m,Graw.d,Graw.gender||'男');
+  var G=doCalc(parseInt(Graw.y,10),parseInt(Graw.m,10),parseInt(Graw.d,10),Graw.gender||'男');
   if(!G)return '';
   var html='<div style="margin-bottom:1.2rem">';
   html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">◆ 運気×人生設計タイムライン</div>';
@@ -4203,19 +4203,21 @@ function renderTimeline(ld){
 }
 
 function getDaiunJuForYear(year,G){
+  if(!G)return '';
   try{
+    if(!G.DL||!G.sa){
+      if(G.y&&G.m&&G.d){G=doCalc(G.y,G.m,G.d,G.gender||'男');}
+      else return '';
+    }
     var daiunRows=getDaiunRows(G);
-    if(year===2026&&console)console.log('DBG 2026: G.y='+G.y+' G.ht='+G.ht+' rows='+daiunRows.length+' sa='+G.sa);
+    if(!daiunRows||!daiunRows.length)return '';
     for(var i=0;i<daiunRows.length;i++){
       var r=daiunRows[i];
-      var startY=G.y+r.age;
-      var endY=startY+r.sp;
-      if(year===2026&&console)console.log('DBG row'+i+': '+r.ks+' age='+r.age+' sp='+r.sp+' startY='+startY+' endY='+endY+' ju='+r.ju);
-      if(year>=startY&&year<endY){
-        return r.ju||'';
-      }
+      var startY=r.startY!==undefined?r.startY:G.y+r.age;
+      var endY=r.endY!==undefined?r.endY:startY+(r.sp||10);
+      if(year>=startY&&year<endY){return r.ju||'';}
     }
-  }catch(e){if(console)console.log('DBG err:'+e);}
+  }catch(e){}
   return '';
 }
 
