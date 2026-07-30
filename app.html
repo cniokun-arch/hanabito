@@ -30,7 +30,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 }
 #screen-login.active{display:flex}
 .login-box{width:min(380px,100%);text-align:center}
-.login-logo{font-family:'Zen Old Mincho',serif;font-size:2.2rem;letter-spacing:0.4em;color:#e8d9b0;font-weight:700;margin-bottom:0.3rem}
+.login-logo{font-family:\'Zen Old Mincho\',serif;font-size:2.2rem;letter-spacing:0.4em;color:#e8d9b0;font-weight:700;margin-bottom:0.3rem}
 .login-sub{font-size:1rem;color:rgba(232,217,176,0.6);letter-spacing:0.25em;margin-bottom:2.5rem}
 .login-card{background:rgba(255,255,255,0.06);border:1px solid rgba(184,134,11,0.35);border-radius:16px;padding:2rem 1.8rem;backdrop-filter:blur(8px)}
 .login-tabs{display:flex;border-bottom:1px solid rgba(184,134,11,0.3);margin-bottom:1.5rem}
@@ -44,7 +44,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .login-field select option{background:#2a1a4a;color:#e8d9b0}
 .login-date-row{display:flex;gap:0.4rem}
 .login-date-row select{flex:1;font-size:1rem;padding:0.55rem 0.3rem}
-.btn-login{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:10px;font-family:'Zen Old Mincho',serif;font-size:1rem;letter-spacing:0.2em;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s}
+.btn-login{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:10px;font-family:sans-serif;font-size:1rem;letter-spacing:0.2em;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s}
 .btn-login:hover{opacity:0.88}
 .login-note{font-size:0.94rem;color:rgba(232,217,176,0.4);margin-top:1rem;line-height:1.8}
 .login-err{background:rgba(180,40,40,0.2);border:1px solid rgba(180,40,40,0.5);color:#ffaaaa;border-radius:6px;padding:0.6rem 0.9rem;font-size:1rem;margin-bottom:0.8rem;display:none}
@@ -4197,7 +4197,16 @@ function renderTimeline(ld){
     var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
 
     // 大運の薄い背景色
-    var daiunBg=grade>=3?'rgba(42,140,74,0.12)':grade>=2?'rgba(42,140,74,0.08)':grade>=1?'rgba(90,156,122,0.08)':grade<0?'rgba(184,50,50,0.08)':'rgba(184,134,11,0.06)';
+    function daiunBgFromGrade(g){return g>=3?'rgba(42,140,74,0.12)':g>=2?'rgba(42,140,74,0.08)':g>=1?'rgba(90,156,122,0.08)':g<0?'rgba(184,50,50,0.08)':'rgba(184,134,11,0.06)';}
+    var daiunBg=daiunBgFromGrade(grade);
+    // 前年と大運が変わる場合は2色グラデーション
+    var prevDaiunJu=getDaiunJuForYear(y-1,G);
+    var isTransition=(prevDaiunJu&&prevDaiunJu!==daiunJu);
+    if(isTransition){
+      var prevGrade=UNKI_GRADE[prevDaiunJu]||0;
+      var prevBg=daiunBgFromGrade(prevGrade);
+      daiunBg='linear-gradient(to bottom,'+prevBg+' 50%,'+daiunBg+' 50%)';
+    }
     var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(184,134,11,0.2)';
 
     html+='<div style="min-width:110px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
@@ -4209,6 +4218,12 @@ function renderTimeline(ld){
     var daiunColor=getJuniColor(daiunJu);
     html+='<div style="background:'+daiunBg+';padding:0.5rem 0.5rem;border-bottom:1px solid rgba(184,134,11,0.2)">';
     html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">大運（10年ごと）</div>';
+    if(isTransition){
+      var prevDaiunColor=getJuniColor(prevDaiunJu);
+      var prevGrade2=UNKI_GRADE[prevDaiunJu]||0;
+      var prevLabel2=prevGrade2>=3?'◎':prevGrade2>=2?'○':prevGrade2>=1?'△':prevGrade2<0?'×':'―';
+      html+='<div style="font-size:0.7rem;color:'+prevDaiunColor+';text-decoration:line-through;opacity:0.7">'+prevLabel2+' '+prevDaiunJu+'→</div>';
+    }
     html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700;margin-bottom:2px">'+ks+'　'+age+'歳</div>';
     html+='<div style="font-size:0.88rem;font-weight:700;color:'+daiunColor+'">'+label+'　'+daiunJu+'</div>';
     html+='</div>';
@@ -4218,10 +4233,14 @@ function renderTimeline(ld){
     html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">年運（毎年）</div>';
     html+='<div style="font-size:1.3rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
     html+='<div style="font-size:0.86rem;font-weight:700;color:'+yrColor+';margin-top:2px">'+yrJu+'</div>';
-    if(memo){
-      html+='<div style="margin-top:0.3rem;font-size:0.68rem;color:var(--ink3);line-height:1.3;word-break:break-all">'+memo+'</div>';
+    var tdata=ld.timeline&&ld.timeline[y]?ld.timeline[y]:null;
+    var hasGoal=tdata&&(tdata.goal||(tdata.months&&tdata.months.some(function(m){return m;})));
+    if(hasGoal){
+      if(tdata.goal)html+='<div style="margin-top:0.3rem;font-size:0.68rem;color:var(--ink);font-weight:700;line-height:1.3">📌 '+tdata.goal+'</div>';
+      var filledMonths=tdata.months?tdata.months.filter(function(m){return m;}).length:0;
+      if(filledMonths>0)html+='<div style="font-size:0.62rem;color:var(--ink3)">月別: '+filledMonths+'か月入力済</div>';
     } else {
-      html+='<div style="margin-top:0.25rem;font-size:0.68rem;color:var(--ink3)">＋ メモ</div>';
+      html+='<div style="margin-top:0.25rem;font-size:0.68rem;color:var(--ink3)">＋ 目標を追加</div>';
     }
     html+='</div>';
 
@@ -4839,15 +4858,59 @@ function editTimelineMemo(year){
   var ld=getLifeDesignData();
   if(!ld)return;
   if(!ld.timeline)ld.timeline={};
-  var current=ld.timeline[year]||'';
-  openInlineModal(year+'年の目標・メモ',current,function(val){
-    var ld2=getLifeDesignData();
-    if(!ld2)return;
-    if(!ld2.timeline)ld2.timeline={};
-    ld2.timeline[year]=val;
-    saveLifeDesignData(ld2);
-    redrawManualPage();
-  });
+  var tdata=ld.timeline[year]||{goal:'',months:Array(12).fill('')};
+  if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
+  if(!tdata.months)tdata.months=Array(12).fill('');
+
+  var modal=document.createElement('div');
+  modal.id='timeline-edit-modal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
+
+  var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:1rem">'+year+'年の目標設定</div>';
+
+  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
+  html+='<textarea id="tl-goal" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+( tdata.goal||'')+'</textarea>';
+
+  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（任意）</div>';
+  for(var mi=0;mi<12;mi++){
+    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">';
+    html+='<div style="font-size:0.78rem;color:var(--ink3);min-width:2.5rem">'+MONTH_NAMES[mi]+'</div>';
+    html+='<input id="tl-m'+mi+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標を入力..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
+    html+='</div>';
+  }
+
+  html+='<div style="display:flex;gap:0.5rem;margin-top:1rem">';
+  html+='<button onclick="saveTimelineData('+year+')" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
+  html+='<button onclick="closeTimelineModal()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
+  html+='</div></div>';
+
+  modal.innerHTML=html;
+  document.body.appendChild(modal);
+  setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
+}
+
+function saveTimelineData(year){
+  var goalEl=document.getElementById('tl-goal');
+  var goal=goalEl?goalEl.value.trim():'';
+  var months=[];
+  for(var mi=0;mi<12;mi++){
+    var el=document.getElementById('tl-m'+mi);
+    months.push(el?el.value.trim():'');
+  }
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  if(!ld.timeline)ld.timeline={};
+  ld.timeline[year]={goal:goal,months:months};
+  saveLifeDesignData(ld);
+  closeTimelineModal();
+  redrawManualPage();
+}
+
+function closeTimelineModal(){
+  var m=document.getElementById('timeline-edit-modal');
+  if(m)m.remove();
 }
 
 function copyToClipboard(text){
