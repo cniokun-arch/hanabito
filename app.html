@@ -4094,7 +4094,10 @@ function renderChapter5(){
 
 function renderMandala(ld){
   var html='<div style="margin-bottom:1.2rem">';
-  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">◆ あなたの9マス目標シート</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem">';
+  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold)">◆ あなたの9マス目標シート</div>';
+  html+='<button onclick="editLifeDesign()" style="background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.25rem 0.6rem;font-size:0.72rem;cursor:pointer">✏️ 編集</button>';
+  html+='</div>';
   html+='<p style="font-size:0.76rem;color:var(--ink3);margin-bottom:0.5rem">中央をタップして大目標を設定。周囲8マスをタップして要素を設定・詳細展開できます。</p>';
   html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.15),rgba(42,140,74,0.08));border:1px solid rgba(42,140,74,0.3);border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.5rem">';
   html+='<span style="font-size:1rem">✅</span>';
@@ -4158,7 +4161,7 @@ function renderMandala(ld){
   }
   html+='</div>';
 
-  html+='<button onclick="editLifeDesign()" style="margin-top:0.4rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer">✏️ 目標全体を編集</button>';
+
   html+='</div>';
   return html;
 }
