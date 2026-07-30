@@ -4202,24 +4202,61 @@ var BUCKET_ICONS=['🌸','✈️','🏠','🎯','💪','💰','❤️','📚','�
 function showBucketEditor(buckets,editIdx){
   var modal=document.createElement('div');
   modal.id='bucket-editor-modal';
-  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.72);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.72);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0';
 
-  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
-  html+='<div style="font-size:1rem;font-weight:700;color:var(--gold)">✨ あなたの人生で叶えたいこと</div>';
-  html+='<button onclick="closeBucketEditor()" style="background:transparent;border:none;font-size:1.3rem;color:var(--ink3);cursor:pointer;line-height:1">✕</button>';
+  var filled=buckets.filter(function(b){return b&&b.text;}).length;
+  var total=100;
+
+  var html='<div style="background:var(--bg);min-height:100%;max-width:500px;margin:0 auto;padding:1.4rem 1.2rem 2rem">';
+
+  // タイトル行
+  html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.8rem">';
+  html+='<div style="font-family:\'Noto Serif JP\',serif;font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1.4;flex:1;padding-right:0.5rem">✨ 夢のカケラをカタチにする100のリスト<br><span style="font-size:0.85rem;color:var(--ink3);font-weight:400">（バケットリスト）</span></div>';
+  html+='<button onclick="closeBucketEditor()" style="background:transparent;border:none;font-size:1.4rem;color:var(--ink3);cursor:pointer;flex-shrink:0;padding:0.2rem">✕</button>';
   html+='</div>';
-  html+='<p style="font-size:0.78rem;color:var(--ink3);line-height:1.6;margin-bottom:0.8rem">大きな夢から小さなやりたいことまで自由に書こう！設定した時期は「人生設計タイムライン」に反映されます。</p>';
-  html+='<div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.8rem">';
-  for(var ci=0;ci<BUCKET_CAT_LABELS.length;ci++){
-    html+='<button onclick="addBucketHint(this.dataset.hint)" data-hint="'+BUCKET_CATEGORIES[ci].hint+'" style="background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.2);border-radius:20px;padding:0.25rem 0.6rem;font-size:0.74rem;color:var(--ink);cursor:pointer">'+BUCKET_CAT_LABELS[ci]+'</button>';
+
+  // 説明文
+  html+='<p style="font-size:0.88rem;color:var(--ink);line-height:1.8;margin-bottom:1.2rem">日常の小さな「やりたい」から、一生に一度の大きな夢まで。制限をかけずに、自由にあなたの想いを書き出してみましょう。具体的な時期を設定すると、未来の人生設計タイムラインに組み込まれます。</p>';
+
+  // カテゴリカード（3列グリッド）
+  var cats=[
+    {emoji:'✈️',label:'日本中・世界中を旅する',hint:'行きたい場所・旅行・移住など'},
+    {emoji:'🏠',label:'理想の住まいを叶える',hint:'引っ越し・マイホーム・インテリアなど'},
+    {emoji:'🧘',label:'健康で美しいカラダを作る',hint:'ダイエット・筋トレ・ヨガなど'},
+    {emoji:'💡',label:'ひらめきヒント',hint:'もし時間とお金が無限にあったら？'},
+    {emoji:'💰',label:'お金・仕事の夢',hint:'収入・起業・副業・投資など'},
+    {emoji:'💖',label:'人との絆・愛',hint:'結婚・家族・友人・出会いなど'}
+  ];
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1.2rem">';
+  for(var ci=0;ci<cats.length;ci++){
+    var cat=cats[ci];
+    html+='<button onclick="addBucketHint(this.dataset.hint)" data-hint="'+cat.hint+'" style="background:var(--bg2);border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:0.7rem 0.4rem;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.3rem">';
+    html+='<span style="font-size:1.6rem">'+cat.emoji+'</span>';
+    html+='<span style="font-size:0.7rem;color:var(--ink);font-weight:700;line-height:1.3">'+cat.label+'</span>';
+    html+='</button>';
   }
   html+='</div>';
-  html+='<div style="border-top:1px solid rgba(184,134,11,0.15);padding-top:0.8rem">';
+
+  // リスト
   html+='<div id="bucket-list-items">'+buildBucketItems(buckets)+'</div>';
+
+  // 追加ボタン
+  html+='<button onclick="addNewBucketItem()" style="width:100%;padding:0.9rem;background:transparent;border:2px dashed rgba(184,134,11,0.35);border-radius:12px;font-size:0.92rem;color:var(--gold);cursor:pointer;margin-top:0.7rem;font-weight:700">＋ 新しい「やりたいこと」を追加する</button>';
+
+  // プログレスバー
+  html+='<div style="margin-top:1.2rem;background:rgba(184,134,11,0.08);border-radius:10px;padding:0.7rem 0.8rem">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">';
+  html+='<span style="font-size:0.8rem;color:var(--ink3)">🎯 あなたの夢、見つかった？</span>';
+  html+='<span style="font-size:0.8rem;font-weight:700;color:var(--gold)">'+filled+' / '+total+'</span>';
   html+='</div>';
-  html+='<button onclick="addNewBucketItem()" style="width:100%;padding:0.7rem;background:transparent;border:2px dashed rgba(184,134,11,0.3);border-radius:10px;font-size:0.86rem;color:var(--gold);cursor:pointer;margin-top:0.6rem">＋ 新しい「やりたいこと」を追加する</button>';
-  html+='<button onclick="saveBucketEditor()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.85rem;font-size:0.95rem;cursor:pointer;margin-top:0.8rem;font-weight:700">保存してタイムラインに反映</button>';
+  var pct=Math.min(100,Math.round(filled/total*100));
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:4px;height:6px">';
+  html+='<div style="background:linear-gradient(90deg,#b8860b,#d4a017);border-radius:4px;height:6px;width:'+pct+'%;transition:width 0.3s"></div>';
+  html+='</div></div>';
+
+  // 保存ボタン
+  html+='<button onclick="saveBucketEditor()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:12px;padding:1rem;font-size:1rem;cursor:pointer;margin-top:1rem;font-weight:700;letter-spacing:0.05em">保存してタイムラインに反映</button>';
+
   html+='</div>';
   modal.innerHTML=html;
   document.body.appendChild(modal);
