@@ -1973,6 +1973,27 @@ function initDaiunChart(){
 // ============================================================
 // HOME PAGE
 // ============================================================
+
+function addSwipeListener(el,onLeft,onRight){
+  if(!el)return;
+  var startX=0,startY=0,moved=false;
+  el.addEventListener('touchstart',function(e){
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    moved=false;
+  },{passive:true});
+  el.addEventListener('touchmove',function(e){
+    moved=true;
+  },{passive:true});
+  el.addEventListener('touchend',function(e){
+    if(!moved)return;
+    var dx=e.changedTouches[0].clientX-startX;
+    var dy=e.changedTouches[0].clientY-startY;
+    if(Math.abs(dx)<40||Math.abs(dy)>Math.abs(dx)*0.8)return;
+    if(dx<0)onLeft();else onRight();
+  },{passive:true});
+}
+
 function buildHomePage(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
@@ -2057,6 +2078,19 @@ function buildHomePage(){
     currentUnkiTab='day';
     unkiOffset=0;
     renderCalendar();
+    // 運気ウィジェットにスワイプ追加（今日←→今月←→今年）
+    var unkiTabs=['day','month','year'];
+    var unkiBody=document.querySelector('.unki-widget-body');
+    addSwipeListener(unkiBody,function(){
+      var i=unkiTabs.indexOf(currentUnkiTab||'day');
+      if(i<unkiTabs.length-1)switchUnkiTab(unkiTabs[i+1]);
+    },function(){
+      var i=unkiTabs.indexOf(currentUnkiTab||'day');
+      if(i>0)switchUnkiTab(unkiTabs[i-1]);
+    });
+    // カレンダーにスワイプ追加
+    var calCard=document.getElementById('home-calendar-card');
+    addSwipeListener(calCard,function(){calNextMonth();},function(){calPrevMonth();});
   },50);
   return html;
 }
