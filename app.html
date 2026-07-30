@@ -4131,27 +4131,199 @@ function renderMandala(ld){
   html+='</div>';
 
   // バケットリスト表示
+  html+='<div style="margin-top:0.8rem;margin-bottom:0.5rem">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem">';
+  html+='<div style="font-size:0.88rem;font-weight:700;color:var(--gold)">◆ やりたいことリスト</div>';
+  html+='<button onclick="openBucketListEditor()" style="font-size:0.72rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;padding:0.25rem 0.7rem;cursor:pointer">＋ 追加・編集</button>';
+  html+='</div>';
+
   if(ld.buckets&&ld.buckets.length>0){
     var filled=ld.buckets.filter(function(b){return b&&b.text;});
     if(filled.length>0){
-      html+='<div style="margin-top:0.8rem;margin-bottom:0.5rem">';
-      html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">◆ やりたいことリスト</div>';
       for(var bii=0;bii<filled.length;bii++){
         var b=filled[bii];
-        var copyText=b.text+(b.age?'（'+b.age+'歳までに）':'');
-        html+='<div style="display:flex;align-items:center;gap:0.4rem;padding:0.35rem 0;border-bottom:1px solid rgba(184,134,11,0.1)">';
-        html+='<span style="font-size:0.8rem;color:var(--ink);flex:1">・'+b.text+'</span>';
-        if(b.age)html+='<span style="font-size:0.68rem;color:var(--gold);white-space:nowrap">→'+b.age+'歳</span>';
-        html+='<button onclick="copyToClipboard(\''+copyText.replace(/'/g,"\\'")+'\')" style="background:transparent;border:1px solid rgba(184,134,11,0.25);border-radius:4px;padding:0.15rem 0.35rem;font-size:0.65rem;color:var(--ink3);cursor:pointer;white-space:nowrap;flex-shrink:0">📋</button>';
+        html+='<div style="background:var(--bg2);border:1px solid rgba(184,134,11,0.15);border-radius:8px;padding:0.5rem 0.6rem;margin-bottom:0.4rem;cursor:pointer" onclick="editBucketItem('+bii+')">';
+        html+='<div style="font-size:0.86rem;color:var(--ink);font-weight:700;margin-bottom:0.25rem">'+b.text+'</div>';
+        html+='<div style="display:flex;gap:0.6rem;flex-wrap:wrap">';
+        if(b.age)html+='<span style="font-size:0.7rem;color:var(--gold)">🎯 '+b.age+'歳までに達成</span>';
+        if(b.startDate)html+='<span style="font-size:0.7rem;color:var(--ink3)">📅 '+b.startDate+'から開始</span>';
+        html+='</div>';
         html+='</div>';
       }
-      html+='</div>';
+    } else {
+      html+=bucketEmptyHtml();
+    }
+  } else {
+    html+=bucketEmptyHtml();
+  }
+  html+='</div>';
+
+  html+='<button onclick="editLifeDesign()" style="margin-top:0.4rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer">✏️ 目標全体を編集</button>';
+  html+='</div>';
+  return html;
+}
+
+
+function bucketEmptyHtml(){
+  return '<div style="background:rgba(184,134,11,0.04);border:2px dashed rgba(184,134,11,0.2);border-radius:10px;padding:1rem;text-align:center;cursor:pointer" onclick="openBucketListEditor()">'
+    +'<div style="font-size:1.5rem;margin-bottom:0.4rem">🌱</div>'
+    +'<div style="font-size:0.88rem;color:var(--gold);font-weight:700;margin-bottom:0.3rem">やりたいことを書き出してみましょう</div>'
+    +'<div style="font-size:0.76rem;color:var(--ink3);line-height:1.7">人生でやりたいこと、なりたい自分、<br>手に入れたいものを自由に追加できます。<br>達成したい年齢や開始日も設定できます。</div>'
+    +'<div style="margin-top:0.7rem;font-size:0.82rem;color:var(--gold);font-weight:700">＋ タップして追加</div>'
+    +'</div>';
+}
+
+function openBucketListEditor(){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  var buckets=ld.buckets||[];
+  showBucketEditor(buckets,-1);
+}
+
+function editBucketItem(idx){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  showBucketEditor(ld.buckets||[],idx);
+}
+
+function showBucketEditor(buckets,editIdx){
+  var modal=document.createElement('div');
+  modal.id='bucket-editor-modal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.72);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
+
+  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
+  html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">🌱 やりたいことリスト</div>';
+  html+='<p style="font-size:0.8rem;color:var(--ink3);line-height:1.7;margin-bottom:1rem">人生でやりたいこと・なりたい自分を自由に書き出してください。達成年齢や開始日を設定するとカレンダーと人生設計タイムラインに反映されます。</p>';
+
+  // リスト一覧
+  html+='<div id="bucket-list-items">';
+  html+=buildBucketItems(buckets);
+  html+='</div>';
+
+  html+='<button onclick="addNewBucketItem()" style="width:100%;padding:0.6rem;background:transparent;border:2px dashed rgba(184,134,11,0.3);border-radius:8px;font-size:0.84rem;color:var(--gold);cursor:pointer;margin-top:0.5rem">＋ 新しく追加</button>';
+
+  html+='<div style="display:flex;gap:0.5rem;margin-top:1rem">';
+  html+='<button onclick="saveBucketEditor()" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
+  html+='<button onclick="closeBucketEditor()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
+  html+='</div></div>';
+
+  modal.innerHTML=html;
+  document.body.appendChild(modal);
+  if(editIdx>=0)setTimeout(function(){
+    var el=document.getElementById('bucket-text-'+editIdx);
+    if(el)el.focus();
+  },100);
+}
+
+function buildBucketItems(buckets){
+  var html='';
+  var today=new Date();
+  var cy=today.getFullYear(),cm=today.getMonth()+1,cd=today.getDate();
+  for(var bi=0;bi<buckets.length;bi++){
+    var b=typeof buckets[bi]==='string'?{text:buckets[bi],age:'',startDate:''}:buckets[bi];
+    html+='<div style="background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.15);border-radius:10px;padding:0.7rem;margin-bottom:0.6rem">';
+    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem">';
+    html+='<textarea id="bucket-text-'+bi+'" maxlength="60" placeholder="例：世界一周旅行をする" style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-size:0.86rem;background:var(--bg2);color:var(--ink);resize:none;height:52px;font-family:inherit">'+( b.text||'')+'</textarea>';
+    html+='<button onclick="removeBucketItem('+bi+')" style="background:transparent;border:none;font-size:1.2rem;color:rgba(184,50,50,0.5);cursor:pointer;flex-shrink:0;padding:0.2rem">×</button>';
+    html+='</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">';
+    // 達成年齢
+    html+='<div>';
+    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:2px">🎯 何歳までに達成？</div>';
+    html+='<input id="bucket-age-'+bi+'" type="number" min="0" max="120" value="'+(b.age||'')+'" placeholder="歳" style="width:100%;box-sizing:border-box;padding:0.4rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.82rem;background:var(--bg2);color:var(--ink)">';
+    html+='</div>';
+    // 開始日
+    html+='<div>';
+    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:2px">📅 いつから取り組む？</div>';
+    html+='<input id="bucket-start-'+bi+'" type="date" value="'+(b.startDate||'')+'" style="width:100%;box-sizing:border-box;padding:0.4rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.78rem;background:var(--bg2);color:var(--ink)">';
+    html+='</div>';
+    html+='</div>';
+    html+='</div>';
+  }
+  return html;
+}
+
+function addNewBucketItem(){
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  // 現在の入力内容を収集
+  var current=collectBucketItems();
+  current.push({text:'',age:'',startDate:''});
+  if(!ld.buckets)ld.buckets=[];
+  ld.buckets=current;
+  saveLifeDesignData(ld);
+  var listEl=document.getElementById('bucket-list-items');
+  if(listEl)listEl.innerHTML=buildBucketItems(current);
+  setTimeout(function(){
+    var el=document.getElementById('bucket-text-'+(current.length-1));
+    if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}
+  },100);
+}
+
+function removeBucketItem(idx){
+  var items=collectBucketItems();
+  items.splice(idx,1);
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  ld.buckets=items;
+  saveLifeDesignData(ld);
+  var listEl=document.getElementById('bucket-list-items');
+  if(listEl)listEl.innerHTML=buildBucketItems(items);
+}
+
+function collectBucketItems(){
+  var items=[];
+  var bi=0;
+  while(true){
+    var tel=document.getElementById('bucket-text-'+bi);
+    if(!tel)break;
+    var ael=document.getElementById('bucket-age-'+bi);
+    var sel=document.getElementById('bucket-start-'+bi);
+    items.push({
+      text:tel.value.trim(),
+      age:ael?ael.value.trim():'',
+      startDate:sel?sel.value:''
+    });
+    bi++;
+  }
+  return items;
+}
+
+function saveBucketEditor(){
+  var items=collectBucketItems().filter(function(b){return b.text;});
+  var ld=getLifeDesignData();
+  if(!ld)return;
+  ld.buckets=items;
+  saveLifeDesignData(ld);
+
+  // 開始日があるものをカレンダーに登録
+  for(var bi=0;bi<items.length;bi++){
+    var b=items[bi];
+    if(b.startDate&&b.text){
+      var parts=b.startDate.split('-');
+      if(parts.length===3){
+        var sy=parseInt(parts[0]),sm=parseInt(parts[1]),sd=parseInt(parts[2]);
+        var dk='sched_'+sy+'_'+sm+'_'+sd;
+        var schedKey=calDateKey(sy,sm,sd);
+        var data=S.load();
+        if(!data)continue;
+        if(!data.schedules)data.schedules={};
+        if(!data.schedules[schedKey])data.schedules[schedKey]=[];
+        // 既存の同じテキストを削除して更新
+        data.schedules[schedKey]=data.schedules[schedKey].filter(function(s){return s.bucketText!==b.text;});
+        data.schedules[schedKey].push({text:'🌱 '+b.text+(b.age?' ('+b.age+'歳までに)':''),mark:'🌱',bucketText:b.text});
+        S.save(data);
+      }
     }
   }
 
-  html+='<button onclick="editLifeDesign()" style="margin-top:0.8rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer">✏️ 目標・リストを編集</button>';
-  html+='</div>';
-  return html;
+  closeBucketEditor();
+  redrawManualPage();
+}
+
+function closeBucketEditor(){
+  var m=document.getElementById('bucket-editor-modal');
+  if(m)m.remove();
 }
 
 function editMandalaCenter(){
