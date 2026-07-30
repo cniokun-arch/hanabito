@@ -4912,7 +4912,7 @@ function initScrollNav(){
     _isDragging=true;
     thumb.style.cursor='grabbing';
     _startY=e.touches?e.touches[0].clientY:e.clientY;
-    _startScroll=window.scrollY;
+    _startScroll=window.scrollY||document.documentElement.scrollTop||0;
     clearTimeout(hideTimer);
     overlay.style.display='block';
     e.preventDefault();
@@ -4922,7 +4922,10 @@ function initScrollNav(){
     if(!_isDragging)return;
     var clientY=e.touches?e.touches[0].clientY:e.clientY;
     var delta=(clientY-_startY)*6;
-    window.scrollTo(0,_startScroll+delta);
+    var newPos=_startScroll+delta;
+    window.scrollTo(0,newPos);
+    document.documentElement.scrollTop=newPos;
+    document.body.scrollTop=newPos;
     var label=getCurrentChapter();
     if(label)overlay.textContent=label;
     e.preventDefault();
