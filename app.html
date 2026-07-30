@@ -4200,27 +4200,28 @@ function renderTimeline(ld){
     var daiunBg=grade>=3?'rgba(42,140,74,0.12)':grade>=2?'rgba(42,140,74,0.08)':grade>=1?'rgba(90,156,122,0.08)':grade<0?'rgba(184,50,50,0.08)':'rgba(184,134,11,0.06)';
     var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(184,134,11,0.2)';
 
-    html+='<div style="min-width:84px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
+    html+='<div style="min-width:110px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
     html+='<div style="font-size:0.7rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:2px;font-weight:'+(isCurrentYear?'700':'400')+'">';
     html+=y+(isCurrentYear?' ◀':'')+'</div>';
     html+='<div style="border-radius:8px;border:'+borderStyle+';box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden">';
 
     // 上半分: 大運（薄い背景色）
     var daiunColor=getJuniColor(daiunJu);
-    html+='<div style="background:'+daiunBg+';padding:0.35rem 0.4rem;border-bottom:1px solid rgba(184,134,11,0.15)">';
-    html+='<div style="font-size:0.62rem;color:var(--ink3);margin-bottom:1px">大運（10年）</div>';
-    html+='<div style="font-size:0.78rem;color:var(--ink);font-weight:700">'+ks+'　'+age+'歳</div>';
-    html+='<div style="font-size:0.72rem;font-weight:700;color:'+daiunColor+'">'+label+' '+daiunJu+'</div>';
+    html+='<div style="background:'+daiunBg+';padding:0.5rem 0.5rem;border-bottom:1px solid rgba(184,134,11,0.2)">';
+    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">大運（10年ごと）</div>';
+    html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700;margin-bottom:2px">'+ks+'　'+age+'歳</div>';
+    html+='<div style="font-size:0.88rem;font-weight:700;color:'+daiunColor+'">'+label+'　'+daiunJu+'</div>';
     html+='</div>';
 
-    // 下半分: 年運（白背景、はっきり）
-    html+='<div style="background:var(--bg);padding:0.35rem 0.4rem">';
-    html+='<div style="font-size:1.1rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
-    html+='<div style="font-size:0.72rem;font-weight:700;color:'+yrColor+';margin-top:1px">'+yrJu+'</div>';
+    // 下半分: 年運（白背景）
+    html+='<div style="background:var(--bg);padding:0.5rem 0.5rem">';
+    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">年運（毎年）</div>';
+    html+='<div style="font-size:1.3rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
+    html+='<div style="font-size:0.86rem;font-weight:700;color:'+yrColor+';margin-top:2px">'+yrJu+'</div>';
     if(memo){
-      html+='<div style="margin-top:0.25rem;font-size:0.6rem;color:var(--ink3);line-height:1.3;word-break:break-all">'+memo+'</div>';
+      html+='<div style="margin-top:0.3rem;font-size:0.68rem;color:var(--ink3);line-height:1.3;word-break:break-all">'+memo+'</div>';
     } else {
-      html+='<div style="margin-top:0.2rem;font-size:0.6rem;color:var(--ink3)">＋ メモ</div>';
+      html+='<div style="margin-top:0.25rem;font-size:0.68rem;color:var(--ink3)">＋ メモ</div>';
     }
     html+='</div>';
 
@@ -4898,83 +4899,92 @@ function initScrollNav(){
     {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'},
     {id:'nav-ch5',label:'CHAPTER V\nあなたの人生設計'}
   ];
+  var nums=['I','II','III','IV','V'];
 
-  // ガイドパネル（右端・固定）
-  var guide=document.createElement('div');
-  guide.id='scroll-nav';
-  guide.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:3px;padding:4px 0';
+  // 折りたたみトグルボタン
+  var toggle=document.createElement('div');
+  toggle.id='scroll-nav-toggle';
+  toggle.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:601;width:28px;height:40px;background:rgba(184,134,11,0.75);border-radius:8px 0 0 8px;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:0.9rem;color:#fff;box-shadow:-2px 0 8px rgba(0,0,0,0.15)';
+  toggle.textContent='📖';
+  document.body.appendChild(toggle);
+
+  // 展開パネル（I〜V ボタン群）
+  var panel=document.createElement('div');
+  panel.id='scroll-nav';
+  panel.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:3px;padding:4px 0';
 
   chaps.forEach(function(c,idx){
     var el=document.getElementById(c.id);
     if(!el)return;
     var btn=document.createElement('div');
-    btn.style.cssText='width:32px;height:32px;background:rgba(184,134,11,0.85);border-radius:6px 0 0 6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.6rem;color:#fff;font-weight:700;font-family:"Zen Old Mincho",serif;transition:all 0.15s';
-    btn.textContent='I II III IV V'.split(' ')[idx];
-    btn.title=c.label.replace('\n',' ');
-
-    // タップでジャンプ
+    btn.style.cssText='width:36px;height:36px;background:rgba(184,134,11,0.88);border-radius:8px 0 0 8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.65rem;color:#fff;font-weight:700;font-family:"Zen Old Mincho",serif;box-shadow:-2px 0 6px rgba(0,0,0,0.12)';
+    btn.textContent=nums[idx];
     btn.onclick=function(){
-      var target=document.getElementById(c.id);
-      if(target){
-        target.scrollIntoView({behavior:'smooth',block:'start'});
-        // ラベル表示
-        showChapterLabel(c.label);
-      }
-      scheduleHide();
+      document.getElementById(c.id).scrollIntoView({behavior:'smooth',block:'start'});
+      collapsePanel();
     };
-    guide.appendChild(btn);
+    panel.appendChild(btn);
   });
+  document.body.appendChild(panel);
 
-  document.body.appendChild(guide);
-
-  // チャプター名オーバーレイ
+  // 章名オーバーレイ
   var overlay=document.createElement('div');
   overlay.id='scroll-chapter-overlay';
-  overlay.style.cssText='position:fixed;right:38px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.5rem 0.9rem;border-radius:10px;font-size:0.76rem;line-height:1.6;text-align:right;display:none;pointer-events:none;white-space:pre-line;max-width:190px';
+  overlay.style.cssText='position:fixed;right:42px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.5rem 0.9rem;border-radius:10px;font-size:0.76rem;line-height:1.6;text-align:right;display:none;pointer-events:none;white-space:pre-line;max-width:190px';
   document.body.appendChild(overlay);
 
   var hideTimer=null;
+  var isExpanded=false;
 
-  function showChapterLabel(label){
-    overlay.textContent=label;
+  function expandPanel(){
+    isExpanded=true;
+    toggle.style.display='none';
+    panel.style.display='flex';
     overlay.style.display='block';
-  }
-
-  function scheduleHide(){
-    clearTimeout(hideTimer);
-    hideTimer=setTimeout(function(){
-      guide.style.display='none';
-      overlay.style.display='none';
-    },2500);
-  }
-
-  // スクロール中にガイドを表示
-  var lastScrollY=0;
-  function onScroll(){
-    var sy=window.pageYOffset||document.documentElement.scrollTop||0;
-    if(Math.abs(sy-lastScrollY)<5)return;
-    lastScrollY=sy;
-    guide.style.display='flex';
-    // 現在の章を特定してラベル表示
     var label='';
     chaps.forEach(function(c){
       var el=document.getElementById(c.id);
       if(!el)return;
       if(el.getBoundingClientRect().top<=200)label=c.label;
     });
-    if(label)showChapterLabel(label);
-    scheduleHide();
+    if(label)overlay.textContent=label;
+    clearTimeout(hideTimer);
+    hideTimer=setTimeout(collapsePanel,4000);
   }
 
+  function collapsePanel(){
+    isExpanded=false;
+    panel.style.display='none';
+    overlay.style.display='none';
+    toggle.style.display='none';
+    clearTimeout(hideTimer);
+  }
+
+  toggle.onclick=function(){expandPanel();};
+
+  // スクロールでトグルボタンだけ表示
+  var scrollTimer=null;
+  var lastScrollY=0;
+  function onScroll(){
+    var sy=window.pageYOffset||document.documentElement.scrollTop||0;
+    if(Math.abs(sy-lastScrollY)<10)return;
+    lastScrollY=sy;
+    if(!isExpanded){
+      toggle.style.display='flex';
+      clearTimeout(scrollTimer);
+      scrollTimer=setTimeout(function(){
+        if(!isExpanded)toggle.style.display='none';
+      },2500);
+    }
+  }
   window.addEventListener('scroll',onScroll,{passive:true});
   document.addEventListener('scroll',onScroll,{passive:true});
 }
 
 function removeScrollNav(){
-  var nav=document.getElementById('scroll-nav');
-  if(nav)nav.remove();
-  var ov=document.getElementById('scroll-chapter-overlay');
-  if(ov)ov.remove();
+  ['scroll-nav','scroll-nav-toggle','scroll-chapter-overlay'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.remove();
+  });
 }
 
 async function generateManual(){
