@@ -429,6 +429,16 @@ body.theme-dark .ai-input-area{background:#1c1914}
 .ub-blk.sk{background:rgba(139,26,26,0.06)}.ub-blk:last-child{border-right:none}
 /* グラフ */
 .chart-wrap-inner{position:relative;width:100%;height:220px}
+
+/* カスタムスクロールバー（あなたの本ページ用） */
+html::-webkit-scrollbar { width: 8px; }
+html::-webkit-scrollbar-track { background: rgba(184,134,11,0.08); border-radius: 4px; }
+html::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.55); border-radius: 4px; }
+html::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
+body::-webkit-scrollbar { width: 8px; }
+body::-webkit-scrollbar-track { background: rgba(184,134,11,0.08); border-radius: 4px; }
+body::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.55); border-radius: 4px; }
+body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
 </style>
 </head>
 <body>
@@ -4186,24 +4196,33 @@ function renderTimeline(ld){
     var yrColor=getJuniColor(yrJu);
     var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
 
-    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(0,0,0,0.08)';
+    // 大運の薄い背景色
+    var daiunBg=grade>=3?'rgba(42,140,74,0.12)':grade>=2?'rgba(42,140,74,0.08)':grade>=1?'rgba(90,156,122,0.08)':grade<0?'rgba(184,50,50,0.08)':'rgba(184,134,11,0.06)';
+    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(184,134,11,0.2)';
+
     html+='<div style="min-width:84px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
     html+='<div style="font-size:0.7rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:2px;font-weight:'+(isCurrentYear?'700':'400')+'">';
     html+=y+(isCurrentYear?' ◀':'')+'</div>';
-    // 大運ブロック（背景色）
-    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:8px;padding:0.4rem 0.3rem;border:'+borderStyle+';box-shadow:0 2px 6px rgba(0,0,0,0.1)">';
-    html+='<div style="font-size:0.7rem;opacity:0.8;margin-bottom:1px">大運'+label+'</div>';
-    html+='<div style="font-size:0.68rem">'+ks+'　'+age+'歳</div>';
-    // 年運（目立つ表示）
-    html+='<div style="margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid rgba(255,255,255,0.35)">';
-    html+='<div style="font-size:1rem;font-weight:700;color:'+yrColor+'">'+yrLabel+'</div>';
-    html+='<div style="font-size:0.72rem;font-weight:700;color:'+yrColor+'">'+yrJu+'</div>';
+    html+='<div style="border-radius:8px;border:'+borderStyle+';box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden">';
+
+    // 上半分: 大運（薄い背景色）
+    html+='<div style="background:'+daiunBg+';padding:0.35rem 0.4rem;border-bottom:1px solid rgba(184,134,11,0.15)">';
+    html+='<div style="font-size:0.65rem;color:var(--ink3);margin-bottom:1px">大運 '+label+'</div>';
+    html+='<div style="font-size:0.7rem;color:var(--ink);font-weight:700">'+ks+'</div>';
+    html+='<div style="font-size:0.65rem;color:var(--ink3)">'+age+'歳</div>';
     html+='</div>';
+
+    // 下半分: 年運（白背景、はっきり）
+    html+='<div style="background:var(--bg);padding:0.35rem 0.4rem">';
+    html+='<div style="font-size:1.1rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
+    html+='<div style="font-size:0.72rem;font-weight:700;color:'+yrColor+';margin-top:1px">'+yrJu+'</div>';
     if(memo){
-      html+='<div style="margin-top:0.25rem;font-size:0.6rem;line-height:1.3;border-top:1px solid rgba(255,255,255,0.25);padding-top:0.2rem;word-break:break-all;opacity:0.9">'+memo+'</div>';
+      html+='<div style="margin-top:0.25rem;font-size:0.6rem;color:var(--ink3);line-height:1.3;word-break:break-all">'+memo+'</div>';
     } else {
-      html+='<div style="margin-top:0.2rem;font-size:0.62rem;opacity:0.6">＋ メモ</div>';
+      html+='<div style="margin-top:0.2rem;font-size:0.6rem;color:var(--ink3)">＋ メモ</div>';
     }
+    html+='</div>';
+
     html+='</div>';
     html+='</div>';
   }
@@ -4865,7 +4884,7 @@ function initManualPage(){
   if(!saved||!saved.chara){
     generateManual();
   }
-  setTimeout(initScrollNav,300);
+  // scrollbar via CSS only
 }
 
 function initScrollNav(){
