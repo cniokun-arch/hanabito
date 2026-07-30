@@ -4065,13 +4065,12 @@ function saveTimelineEntry(year,entry){
   var tlKey='timeline_'+G.y+'_'+G.m+'_'+G.d;
   if(!data.lifeDesign[tlKey])data.lifeDesign[tlKey]={};
   data.lifeDesign[tlKey][year]=entry;
-  // ldにも同期
   var key='ld_'+G.y+'_'+G.m+'_'+G.d;
   if(data.lifeDesign[key]){
     if(!data.lifeDesign[key].timeline)data.lifeDesign[key].timeline={};
     data.lifeDesign[key].timeline[year]=entry;
   }
-  S.save(data);
+  // S.saveはcallerに任せる（既にsaveしている場合に二重にならないよう）
 }
 
 function renderChapter5(){
@@ -4216,6 +4215,11 @@ function showBucketEditor(buckets,editIdx){
   html+='</div>';
 
   // 説明文
+  // バケットリストとは何か
+  html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(184,134,11,0.03));border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:0.8rem 0.9rem;margin-bottom:1rem">';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">🪣 バケットリストとは？</div>';
+  html+='<div style="font-size:0.8rem;color:var(--ink);line-height:1.7">「死ぬまでにやりたいことリスト」のこと。書き出すことで夢が明確になり、行動に移しやすくなります。花人占術では、あなたの運気に合わせた最適なタイミングも設定できます。</div>';
+  html+='</div>';
   html+='<p style="font-size:0.88rem;color:var(--ink);line-height:1.8;margin-bottom:1.2rem">日常の小さな「やりたい」から、一生に一度の大きな夢まで。制限をかけずに、自由にあなたの想いを書き出してみましょう。具体的な時期を設定すると、未来の人生設計タイムラインに組み込まれます。</p>';
 
   // カテゴリカード（3列グリッド）
@@ -4297,9 +4301,11 @@ function buildBucketItems(buckets){
     html+='<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:0.6rem\">';
     html+='<div style=\"background:rgba(184,134,11,0.08);border-radius:8px;padding:0.5rem\">';
     html+='<div style=\"font-size:0.7rem;color:var(--gold);font-weight:700;margin-bottom:4px\">🎯 何歳までに？</div>';
-    html+='<div style=\"display:flex;align-items:center;gap:0.3rem\">';
-    html+='<input id=\"bucket-age-'+bi+'\" type=\"number\" min=\"0\" max=\"120\" value=\"'+(b.age||'')+'\" placeholder=\"50\" style=\"flex:1;padding:0.4rem;border:1px solid rgba(184,134,11,0.25);border-radius:6px;font-size:0.88rem;background:var(--bg);color:var(--ink);font-weight:700\">';
-    html+='<span style=\"font-size:0.76rem;color:var(--ink3)\">歳</span>';
+    var curAge=getCurrentTargetG()?new Date().getFullYear()-getCurrentTargetG().y:20;
+    html+='<select id=\"bucket-age-'+bi+'\" style=\"width:100%;padding:0.4rem;border:1px solid rgba(184,134,11,0.25);border-radius:6px;font-size:0.88rem;background:var(--bg);color:var(--ink);font-weight:700\">';
+    html+='<option value=\"\">歳を選ぶ</option>';
+    for(var aa=curAge;aa<=100;aa++){html+='<option value=\"'+aa+'\"'+((b.age&&parseInt(b.age)===aa)?' selected':'')+'>'+aa+'歳</option>';}
+    html+='</select>';
     html+='</div></div>';
     var sdParts=(b.startDate||'').split('-');
     var sdY=sdParts[0]||'';var sdM=sdParts[1]||'';
@@ -4378,25 +4384,38 @@ function saveBucketEditor(){
   ld.buckets=items;
   saveLifeDesignData(ld);
 
-  // 開始日があるものをカレンダーに登録
-  for(var bi=0;bi<items.length;bi++){
-    var b=items[bi];
-    if(b.startDate&&b.text){
+  // 開始日があるものをカレンダー＋タイムラインに登録
+  var data=S.load();
+  if(data){
+    if(!data.schedules)data.schedules={};
+    for(var bi=0;bi<items.length;bi++){
+      var b=items[bi];
+      if(!b.startDate||!b.text)continue;
       var parts=b.startDate.split('-');
-      if(parts.length===3){
-        var sy=parseInt(parts[0]),sm=parseInt(parts[1]),sd=parseInt(parts[2]);
-        var dk='sched_'+sy+'_'+sm+'_'+sd;
-        var schedKey=calDateKey(sy,sm,sd);
-        var data=S.load();
-        if(!data)continue;
-        if(!data.schedules)data.schedules={};
-        if(!data.schedules[schedKey])data.schedules[schedKey]=[];
-        // 既存の同じテキストを削除して更新
-        data.schedules[schedKey]=data.schedules[schedKey].filter(function(s){return s.bucketText!==b.text;});
-        data.schedules[schedKey].push({text:'🌱 '+b.text+(b.age?' ('+b.age+'歳までに)':''),mark:'🌱',bucketText:b.text});
-        S.save(data);
-      }
+      if(parts.length<2)continue;
+      var sy=parseInt(parts[0]),sm=parseInt(parts[1]);
+      if(!sy||!sm)continue;
+      // カレンダーに登録（月初め1日）
+      var schedKey=calDateKey(sy,sm,1);
+      if(!data.schedules[schedKey])data.schedules[schedKey]=[];
+      data.schedules[schedKey]=data.schedules[schedKey].filter(function(s){return s.bucketText!==b.text;});
+      data.schedules[schedKey].push({text:'🌱 '+b.text+(b.age?' ('+b.age+'歳までに)':''),mark:'🌱',bucketText:b.text});
+      // タイムラインにも登録（その年のメモに追加）
+      saveTimelineEntry(sy,function(year,bItem){
+        var tlData=getTimelineData();
+        var existing=tlData[year]||{goal:'',months:Array(12).fill('')};
+        if(typeof existing==='string')existing={goal:existing,months:Array(12).fill('')};
+        if(!existing.months)existing.months=Array(12).fill('');
+        var monthIdx=sm-1;
+        var mGoal=existing.months[monthIdx]||'';
+        var newEntry='🌱 '+bItem.text;
+        if(mGoal.indexOf(newEntry)<0){
+          existing.months[monthIdx]=mGoal?(mGoal+'・'+newEntry):newEntry;
+        }
+        return existing;
+      }(sy,b));
     }
+    S.save(data);
   }
 
   closeBucketEditor();
