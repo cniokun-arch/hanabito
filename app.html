@@ -4179,25 +4179,36 @@ function renderTimeline(ld){
 
     var memo=ld.timeline&&ld.timeline[y]?ld.timeline[y]:'';
     var isCurrentYear=(y===new Date().getFullYear());
-    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.8)':'1px solid rgba(0,0,0,0.08)';
-    // ブロック全体をタップエリアに
-    html+='<div style="min-width:80px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
-    html+='<div style="font-size:0.72rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:3px;font-weight:'+(isCurrentYear?'700':'400')+'">';
+    // 年運（毎年の十二支から計算）
+    var yrShi=JUNISHI[((y-1984)%12+12)%12];
+    var yrJu=getJuniUnki(G.ht,yrShi);
+    var yrGrade=UNKI_GRADE[yrJu]||0;
+    var yrColor=getJuniColor(yrJu);
+    var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
+
+    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(0,0,0,0.08)';
+    html+='<div style="min-width:84px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
+    html+='<div style="font-size:0.7rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:2px;font-weight:'+(isCurrentYear?'700':'400')+'">';
     html+=y+(isCurrentYear?' ◀':'')+'</div>';
-    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:8px;padding:0.5rem 0.3rem;border:'+borderStyle+';box-shadow:0 2px 6px rgba(0,0,0,0.1)">';
-    html+='<div style="font-size:0.88rem;font-weight:700;margin-bottom:0.1rem">'+label+'</div>';
-    html+='<div style="font-size:0.7rem">'+ks+'</div>';
-    html+='<div style="font-size:0.68rem;opacity:0.85">'+age+'歳</div>';
+    // 大運ブロック（背景色）
+    html+='<div style="background:'+bgColor+';color:'+textColor+';border-radius:8px;padding:0.4rem 0.3rem;border:'+borderStyle+';box-shadow:0 2px 6px rgba(0,0,0,0.1)">';
+    html+='<div style="font-size:0.7rem;opacity:0.8;margin-bottom:1px">大運'+label+'</div>';
+    html+='<div style="font-size:0.68rem">'+ks+'　'+age+'歳</div>';
+    // 年運（目立つ表示）
+    html+='<div style="margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid rgba(255,255,255,0.35)">';
+    html+='<div style="font-size:1rem;font-weight:700;color:'+yrColor+'">'+yrLabel+'</div>';
+    html+='<div style="font-size:0.72rem;font-weight:700;color:'+yrColor+'">'+yrJu+'</div>';
+    html+='</div>';
     if(memo){
-      html+='<div style="margin-top:0.3rem;font-size:0.62rem;line-height:1.4;border-top:1px solid rgba(255,255,255,0.3);padding-top:0.2rem;word-break:break-all">'+memo+'</div>';
+      html+='<div style="margin-top:0.25rem;font-size:0.6rem;line-height:1.3;border-top:1px solid rgba(255,255,255,0.25);padding-top:0.2rem;word-break:break-all;opacity:0.9">'+memo+'</div>';
     } else {
-      html+='<div style="margin-top:0.3rem;font-size:0.68rem;opacity:0.7">＋ メモ</div>';
+      html+='<div style="margin-top:0.2rem;font-size:0.62rem;opacity:0.6">＋ メモ</div>';
     }
     html+='</div>';
     html+='</div>';
   }
   html+='</div></div>';
-  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">◎好運気／○良好／△普通／×注意<br>各ブロックをタップしてメモを追加できます</p>';
+  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">背景色=大運（10年）の運気　記号と色=年運（その年）の運気<br>◎好運気／○良好／△普通／×注意　各ブロックをタップしてメモを追加</p>';
   html+='</div>';
   return html;
 }
@@ -4870,81 +4881,81 @@ function initScrollNav(){
 
   var thumb=document.createElement('div');
   thumb.id='scroll-nav';
-  thumb.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;width:28px;height:52px;background:rgba(30,30,30,0.65);border-radius:8px 0 0 8px;display:none;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;flex-direction:column;gap:3px';
-  thumb.innerHTML='<div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div><div style="width:14px;height:2px;background:#fff;border-radius:2px"></div>';
+  thumb.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;width:28px;height:56px;background:rgba(30,30,30,0.7);border-radius:10px 0 0 10px;display:none;align-items:center;justify-content:center;flex-direction:column;gap:4px;touch-action:none;cursor:grab';
+  for(var li=0;li<3;li++){var line=document.createElement('div');line.style.cssText='width:12px;height:2px;background:#fff;border-radius:2px';thumb.appendChild(line);}
   document.body.appendChild(thumb);
 
   var overlay=document.createElement('div');
   overlay.id='scroll-chapter-overlay';
-  overlay.style.cssText='position:fixed;right:34px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.78);color:#fff;padding:0.4rem 0.8rem;border-radius:8px;font-size:0.76rem;line-height:1.5;text-align:right;display:none;pointer-events:none;max-width:180px;white-space:nowrap';
+  overlay.style.cssText='position:fixed;right:34px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.45rem 1rem;border-radius:10px;font-size:0.78rem;display:none;pointer-events:none;white-space:nowrap;max-width:200px';
   document.body.appendChild(overlay);
 
   var hideTimer=null;
-  var _isDragging=false;
+  var isDrag=false;
+  var startClientY=0;
+  var startScrollY=0;
+
+  function getScrollY(){return window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;}
+  function setScrollY(y){window.scrollTo(0,y);document.documentElement.scrollTop=y;document.body.scrollTop=y;}
 
   function getCurrentChapter(){
+    var sy=getScrollY();
     var label='';
     chaps.forEach(function(c){
       var el=document.getElementById(c.id);
       if(!el)return;
-      var rect=el.getBoundingClientRect();
-      if(rect.top<=200)label=c.label;
+      if(el.getBoundingClientRect().top<=150)label=c.label;
     });
     return label;
   }
 
+  var hideDelay=2000;
   function showThumb(){
     thumb.style.display='flex';
-    var label=getCurrentChapter();
-    if(label){overlay.textContent=label;overlay.style.display='block';}
     clearTimeout(hideTimer);
-    hideTimer=setTimeout(function(){
-      if(!_isDragging){thumb.style.display='none';overlay.style.display='none';}
-    },2000);
+    hideTimer=setTimeout(function(){if(!isDrag){thumb.style.display='none';overlay.style.display='none';}},hideDelay);
   }
 
-  window.addEventListener('scroll',showThumb,{passive:true});
+  // スクロール検知（全パターン）
+  ['scroll','touchmove'].forEach(function(ev){
+    window.addEventListener(ev,showThumb,{passive:true});
+    document.addEventListener(ev,showThumb,{passive:true});
+  });
 
-  var _startY=0;
-  var _startScroll=0;
-
-  function onDragStart(e){
-    _isDragging=true;
+  // ドラッグ開始
+  function dragStart(clientY){
+    isDrag=true;
+    startClientY=clientY;
+    startScrollY=getScrollY();
     thumb.style.cursor='grabbing';
-    _startY=e.touches?e.touches[0].clientY:e.clientY;
-    _startScroll=window.scrollY||document.documentElement.scrollTop||0;
-    clearTimeout(hideTimer);
     overlay.style.display='block';
-    e.preventDefault();
-  }
-
-  function onDragMove(e){
-    if(!_isDragging)return;
-    var clientY=e.touches?e.touches[0].clientY:e.clientY;
-    var delta=(clientY-_startY)*6;
-    var newPos=_startScroll+delta;
-    window.scrollTo(0,newPos);
-    document.documentElement.scrollTop=newPos;
-    document.body.scrollTop=newPos;
     var label=getCurrentChapter();
     if(label)overlay.textContent=label;
-    e.preventDefault();
+    clearTimeout(hideTimer);
   }
 
-  function onDragEnd(){
-    _isDragging=false;
+  // ドラッグ中
+  function dragMove(clientY){
+    if(!isDrag)return;
+    var delta=(clientY-startClientY)*7;
+    setScrollY(startScrollY+delta);
+    var label=getCurrentChapter();
+    if(label)overlay.textContent=label;
+  }
+
+  // ドラッグ終了
+  function dragEnd(){
+    isDrag=false;
     thumb.style.cursor='grab';
-    hideTimer=setTimeout(function(){
-      thumb.style.display='none';overlay.style.display='none';
-    },1500);
+    hideTimer=setTimeout(function(){thumb.style.display='none';overlay.style.display='none';},1500);
   }
 
-  thumb.addEventListener('touchstart',onDragStart,{passive:false});
-  thumb.addEventListener('touchmove',onDragMove,{passive:false});
-  thumb.addEventListener('touchend',onDragEnd);
-  thumb.addEventListener('mousedown',onDragStart);
-  document.addEventListener('mousemove',function(e){if(_isDragging)onDragMove(e);});
-  document.addEventListener('mouseup',function(){if(_isDragging)onDragEnd();});
+  thumb.addEventListener('touchstart',function(e){dragStart(e.touches[0].clientY);e.preventDefault();},{passive:false});
+  thumb.addEventListener('touchmove',function(e){dragMove(e.touches[0].clientY);e.preventDefault();},{passive:false});
+  thumb.addEventListener('touchend',dragEnd);
+  thumb.addEventListener('mousedown',function(e){dragStart(e.clientY);});
+  document.addEventListener('mousemove',function(e){if(isDrag)dragMove(e.clientY);});
+  document.addEventListener('mouseup',function(){if(isDrag)dragEnd();});
 }
 
 function removeScrollNav(){
