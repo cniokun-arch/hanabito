@@ -2036,73 +2036,6 @@ function buildHomePage(){
 
   html+='</div>';
 
-  // ===== 人生設計サマリーカード =====
-  var tlDataHome=getTimelineData();
-  var cy2=new Date().getFullYear();
-  var cm2=new Date().getMonth()+1;
-  var tdataHome=tlDataHome[cy2];
-  var G2=doCalc(parseInt(G.y),parseInt(G.m),parseInt(G.d),G.gender||'男');
-  if(G2){
-    var yrShiHome=JUNISHI[((cy2-1984)%12+12)%12];
-    var yrJuHome=getJuniUnki(G2.ht,yrShiHome);
-    var yrGradeHome=UNKI_GRADE[yrJuHome]||0;
-    var yrLabelHome=yrGradeHome>=3?'◎':yrGradeHome>=2?'○':yrGradeHome>=1?'△':yrGradeHome<0?'×':'―';
-    var yrColorHome=getJuniColor(yrJuHome);
-    var daiunJuHome=getDaiunJuForYear(cy2,G2);
-    var daiunGradeHome=UNKI_GRADE[daiunJuHome]||0;
-    var daiunLabelHome=daiunGradeHome>=3?'◎':daiunGradeHome>=2?'○':daiunGradeHome>=1?'△':daiunGradeHome<0?'×':'―';
-    var daiunColorHome=getJuniColor(daiunJuHome);
-    var mks2=getMonthKS(cy2,cm2,15);
-    var monJuHome=getJuniUnki(G2.ht,mks2[1]);
-    var monGradeHome=UNKI_GRADE[monJuHome]||0;
-    var monLabelHome=monGradeHome>=3?'◎':monGradeHome>=2?'○':monGradeHome>=1?'△':monGradeHome<0?'×':'―';
-    var monColorHome=getJuniColor(monJuHome);
-    var drows2=getDaiunRows(G2);
-    var daiunYearStrHome='';
-    for(var dri=0;dri<drows2.length;dri++){if(drows2[dri].startY<=cy2&&cy2<=drows2[dri].endY){daiunYearStrHome=drows2[dri].startY+'〜'+drows2[dri].endY+'年';break;}}
-
-    html+='<div class="card" style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(184,134,11,0.03));border:1px solid rgba(184,134,11,0.25)">';
-    html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">🌸 '+cy2+'年の運気と目標</div>';
-
-    // 大運・年運・月運を横並び
-    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:0.8rem">';
-    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
-    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">大運（'+daiunYearStrHome+'）</div>';
-    html+='<div style="font-size:1.1rem;font-weight:700;color:'+daiunColorHome+'">'+daiunLabelHome+'</div>';
-    html+='<div style="font-size:0.76rem;font-weight:700;color:'+daiunColorHome+'">'+daiunJuHome+'</div>';
-    html+='</div>';
-    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
-    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">年運（'+cy2+'年）</div>';
-    html+='<div style="font-size:1.1rem;font-weight:700;color:'+yrColorHome+'">'+yrLabelHome+'</div>';
-    html+='<div style="font-size:0.76rem;font-weight:700;color:'+yrColorHome+'">'+yrJuHome+'</div>';
-    html+='</div>';
-    html+='<div style="background:var(--bg);border-radius:8px;padding:0.5rem;text-align:center">';
-    html+='<div style="font-size:0.64rem;color:var(--ink3);margin-bottom:2px">月運（'+cm2+'月）</div>';
-    html+='<div style="font-size:1.1rem;font-weight:700;color:'+monColorHome+'">'+monLabelHome+'</div>';
-    html+='<div style="font-size:0.76rem;font-weight:700;color:'+monColorHome+'">'+monJuHome+'</div>';
-    html+='</div>';
-    html+='</div>';
-
-    // 今年の目標
-    if(tdataHome&&tdataHome.goal){
-      html+='<div style="background:var(--bg);border-radius:8px;padding:0.6rem;margin-bottom:0.5rem">';
-      html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">📌 今年の目標</div>';
-      html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700">'+tdataHome.goal+'</div>';
-      html+='</div>';
-    }
-    // 今月の目標
-    if(tdataHome&&tdataHome.months&&tdataHome.months[cm2-1]){
-      html+='<div style="background:var(--bg);border-radius:8px;padding:0.6rem">';
-      html+='<div style="font-size:0.7rem;color:var(--ink3);margin-bottom:2px">📌 今月（'+cm2+'月）の目標</div>';
-      html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700">'+tdataHome.months[cm2-1]+'</div>';
-      html+='</div>';
-    }
-    if(!tdataHome||(!tdataHome.goal&&!(tdataHome.months&&tdataHome.months.some(function(m){return m;})))){
-      html+='<div style="font-size:0.78rem;color:var(--ink3);text-align:center;padding:0.3rem 0">「あなたの本」→ CHAPTER V から目標を設定してください</div>';
-    }
-    html+='</div>';
-  }
-
   // ===== 月間カレンダー =====
   html+='<div class="card" id="home-calendar-card">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">'
@@ -2209,6 +2142,26 @@ function renderCalendar(){
     +'<span style="font-size:0.82rem;font-weight:700;color:'+getJuniColor(u.daiJu)+';margin-left:0.3rem">'+u.daiJu+'</span>'
     +'<span style="font-size:0.75rem;color:var(--ink3);margin-left:0.3rem">（'+u.age+'歳）</span>'
     +'</div>';
+
+  // 今月・今年の目標をカレンダーに表示
+  var tlDataCal=getTimelineData();
+  var tdataCal=tlDataCal[calYear]||null;
+  if(typeof tdataCal==='string')tdataCal={goal:tdataCal,months:Array(12).fill('')};
+  var yrGoal=tdataCal&&tdataCal.goal?tdataCal.goal:'';
+  var monGoal=tdataCal&&tdataCal.months&&tdataCal.months[calMonth]?tdataCal.months[calMonth]:'';
+  html+='<div style="border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.7rem;background:rgba(184,134,11,0.04)">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.2rem">';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700">📌 '+calYear+'年の目標</div>';
+  html+='<button onclick="editTimelineMemo('+calYear+')" style="font-size:0.65rem;color:var(--gold);background:transparent;border:1px solid rgba(184,134,11,0.3);border-radius:4px;padding:0.1rem 0.4rem;cursor:pointer">編集</button>';
+  html+='</div>';
+  html+='<div style="font-size:0.84rem;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
+  if(monGoal||true){
+    html+='<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.1)">';
+    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.1rem">'+(calMonth+1)+'月の目標</div>';
+    html+='<div style="font-size:0.84rem;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
   // 曜日ヘッダー
   var DOW=['日','月','火','水','木','金','土'];
   html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
@@ -4987,7 +4940,10 @@ function editTimelineMemo(year){
   var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   var monthJus=[];
   for(var mi=0;mi<12;mi++){
-    var mks=getMonthKS(year,mi+1,15);
+    // 節入り後の日（節入り翌日または月中の20日）で月支を確定
+    var setsuD=getSetsuDate(year,mi+1);
+    var repDay=Math.min(setsuD.getDate()+2,28); // 節入り翌々日、最大28日
+    var mks=getMonthKS(year,mi+1,repDay);
     monthJus.push(G?getJuniUnki(G.ht,mks[1]):'');
   }
 
