@@ -2268,7 +2268,7 @@ function renderCalendar(){
     var pm=calMonth+panelIdx+1,py=calYear;
     while(pm>12){pm-=12;py++;}
     while(pm<1){pm+=12;py--;}
-    html+='<div class="cal-panel">'+buildCalGridHTML(G,py,pm-1,schedules,today)+'</div>';
+    if(G)html+='<div class="cal-panel">'+buildCalGridHTML(G,py,pm-1,schedules,today)+'</div>';else html+='<div class="cal-panel"></div>';
   }
   html+='</div></div>';
   // ダミー変数（以下のコードのために必要な変数を定義）
@@ -2391,7 +2391,8 @@ function buildCalGridHTML(G,py,pm,schedules,today){
     var isSelected=(dk===calSelectedDate);
     var dayScheds=schedules[dk]||[];
     var dayKS=getDayKS(py,pm+1,d);
-    var ju=G?getJuniUnki(G.ht,dayKS[1]):'';
+    if(!dayKS)continue;
+    var ju=G?getJuniUnki(G.ht,dayKS[1]||''):'—';
     var juColor=getJuniColor(ju);
     var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
     var setsuDate=getSetsuDate(py,pm+1);
@@ -2729,6 +2730,7 @@ function renderUnkiBody(tab){
     periodLabel=getYearPeriodLabel(od.y,od.m,od.d);
   }
   // 将来の拡張用：干と支を分けて保持
+  if(!ks){body.innerHTML='';return;}
   var kanStr=ks[0]||''; // 干（天干）
   var shiStr=ks[1]||''; // 支（地支）← 現在はこちらだけで運気計算
 
