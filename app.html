@@ -2271,53 +2271,6 @@ function renderCalendar(){
     if(G)html+='<div class="cal-panel">'+buildCalGridHTML(G,py,pm-1,schedules,today)+'</div>';else html+='<div class="cal-panel"></div>';
   }
   html+='</div></div>';
-  // ダミー変数（以下のコードのために必要な変数を定義）
-  var startDow=0,days=0; // 使われないがエラー防止
-  if(false){
-    var dt=new Date(calYear,calMonth,d);
-    var dow=dt.getDay();
-    var isToday=(dt.getFullYear()===today.getFullYear()&&dt.getMonth()===today.getMonth()&&dt.getDate()===today.getDate());
-    var dk=calDateKey(calYear,calMonth+1,d);
-    var isSelected=(dk===calSelectedDate);
-    var dayScheds=schedules[dk]||[];
-
-    var dayKS=getDayKS(calYear,calMonth+1,d);
-    var ju=getJuniUnki(G.ht,dayKS[1]);
-    var juColor=getJuniColor(ju);
-    var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
-
-    // 節入り判定：その日が節入り日かどうか、また前月扱いかどうか
-    var setsuDate=getSetsuDate(calYear,calMonth+1);
-    var setsuDay=new Date(setsuDate.getFullYear(),setsuDate.getMonth(),setsuDate.getDate());
-    var isBeforeSetsu=(dt<setsuDay); // 節入り前＝前月扱い
-    var isSetsuDay=(dt.getTime()===setsuDay.getTime()); // 節入り当日
-
-    // 背景色：前月扱いは薄いグレー、節入り後は通常
-    var bg=isSelected?'rgba(124,58,237,0.18)':isToday?'rgba(124,58,237,0.07)':isBeforeSetsu?'rgba(150,150,150,0.06)':'rgba(184,134,11,0.03)';
-    var border=isSelected?'1.5px solid rgba(124,58,237,0.7)':isToday?'1px solid rgba(124,58,237,0.4)':isSetsuDay?'1.5px solid rgba(184,134,11,0.5)':'1px solid rgba(184,134,11,0.12)';
-    // 前月扱いは運気名も薄く
-    var juOpacity=isBeforeSetsu?'opacity:0.45;':'';
-
-    // マーク表示（常に同じ高さを確保）
-    var markHtml='';
-    if(dayScheds.length>0){
-      var marks=dayScheds.slice(0,2).map(function(s){return s.mark||'🌸';}).join('');
-      markHtml='<div style="font-size:1rem;line-height:1;height:1.2rem;display:flex;align-items:center;justify-content:center">'+marks+'</div>';
-    } else {
-      markHtml='<div style="height:1.2rem"></div>';
-    }
-
-    // 節入り日に縦線マーカーを表示
-    var setsuMarker=isSetsuDay?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:rgba(184,134,11,0.6);border-radius:6px 0 0 6px"></div>':'';
-
-    html+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:6px;padding:0.3rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
-      +setsuMarker
-      +'<div style="font-size:0.72rem;font-weight:'+(isToday||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
-      +'<div style="font-size:0.9rem;color:'+juColor+';font-weight:700;line-height:1.2;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
-      +markHtml
-      +'</div>';
-  }
-  } // end if(false)
 
   // 凡例
   html+='<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.7rem;padding-top:0.5rem;border-top:1px solid rgba(184,134,11,0.15)">';
@@ -2365,9 +2318,8 @@ function renderCalendar(){
   html+='</div>';
 
   body.innerHTML=html;
-  body.innerHTML=html;
   setTimeout(initCalSwipe,50);
-
+}
 
 function buildCalGridHTML(G,py,pm,schedules,today){
   var firstDay=new Date(py,pm,1);
