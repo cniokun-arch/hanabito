@@ -2374,18 +2374,27 @@ function initCalSwipe(){
   var isDragging=false,isHoriz=null;
   var W=wrap.offsetWidth||360;
 
-  // 初期位置を中央パネルに
+  // 初期位置を中央パネルに（表示前にセット）
   track.style.transition='none';
   track.style.transform='translateX(-'+W+'px)';
+  // 確実に中央にセットしてから表示
+  requestAnimationFrame(function(){
+    var sw=wrap.parentElement&&wrap.parentElement.id==='cal-slider-wrap'?wrap:wrap;
+    if(wrap)wrap.style.visibility='visible';
+  });
 
   function updatePanels(dir){
     if(dir>0){calMonth++;if(calMonth>11){calMonth=0;calYear++;}}
     else{calMonth--;if(calMonth<0){calMonth=11;calYear--;}}
-    // 再描画前にラッパーを不可視に
-    if(wrap)wrap.style.visibility='hidden';
+    // 再描画前にスライダーラップを不可視に
+    var slWrap=document.getElementById('cal-slider-wrap');
+    if(slWrap)slWrap.style.visibility='hidden';
     renderCalendar();
-    // 描画後に再表示
-    setTimeout(function(){if(wrap)wrap.style.visibility='visible';},30);
+    // initCalSwipe(50ms後)が完了してから表示(さらに30ms後)
+    setTimeout(function(){
+      var slWrap2=document.getElementById('cal-slider-wrap');
+      if(slWrap2)slWrap2.style.visibility='visible';
+    },100);
   }
 
   wrap.addEventListener('touchstart',function(e){
