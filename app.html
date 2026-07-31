@@ -439,6 +439,23 @@ body::-webkit-scrollbar { width: 8px; }
 body::-webkit-scrollbar-track { background: rgba(184,134,11,0.08); border-radius: 4px; }
 body::-webkit-scrollbar-thumb { background: rgba(184,134,11,0.55); border-radius: 4px; }
 body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
+
+/* 3パネルスワイプカレンダー */
+#cal-slider-wrap{
+  overflow:hidden;
+  position:relative;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#cal-slider-track{
+  display:flex;
+  will-change:transform;
+}
+.cal-panel{
+  flex:0 0 100%;
+  width:100%;
+}
 </style>
 </head>
 <body>
@@ -2129,9 +2146,7 @@ function buildHomePage(){
       function(){changeUnkiOffset(1);},   // 左スワイプ→次へ
       function(){changeUnkiOffset(-1);}   // 右スワイプ→前へ
     );
-    // カレンダーにスワイプ追加（月切り替え）
-    var calCard=document.getElementById('home-calendar-card');
-    addSwipeListener(calCard,function(){calNextMonth();},function(){calPrevMonth();});
+    // カレンダースワイプはinitCalSwipeが担当
   },50);
   return html;
 }
@@ -2246,11 +2261,19 @@ function renderCalendar(){
   });
   html+='</div>';
 
-  // グリッド
-  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
-  for(var i=0;i<startDow;i++) html+='<div></div>';
-
-  for(var d=1;d<=days;d++){
+  // グリッドを別関数で生成してスライダーに設置
+  html+='<div id="cal-slider-wrap"><div id="cal-slider-track">';
+  // 前月・当月・次月の3パネル
+  for(var panelIdx=-1;panelIdx<=1;panelIdx++){
+    var pm=calMonth+panelIdx+1,py=calYear;
+    while(pm>12){pm-=12;py++;}
+    while(pm<1){pm+=12;py--;}
+    html+='<div class="cal-panel">'+buildCalGridHTML(G,py,pm-1,schedules,today)+'</div>';
+  }
+  html+='</div></div>';
+  // ダミー変数（以下のコードのために必要な変数を定義）
+  var startDow=0,days=0; // 使われないがエラー防止
+  if(false){
     var dt=new Date(calYear,calMonth,d);
     var dow=dt.getDay();
     var isToday=(dt.getFullYear()===today.getFullYear()&&dt.getMonth()===today.getMonth()&&dt.getDate()===today.getDate());
@@ -2294,7 +2317,7 @@ function renderCalendar(){
       +markHtml
       +'</div>';
   }
-  html+='</div>';
+  } // end if(false)
 
   // 凡例
   html+='<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.7rem;padding-top:0.5rem;border-top:1px solid rgba(184,134,11,0.15)">';
@@ -2342,6 +2365,127 @@ function renderCalendar(){
   html+='</div>';
 
   body.innerHTML=html;
+  body.innerHTML=html;
+  setTimeout(initCalSwipe,50);
+
+
+function buildCalGridHTML(G,py,pm,schedules,today){
+  var firstDay=new Date(py,pm,1);
+  var lastDay=new Date(py,pm+1,0);
+  var startDow=firstDay.getDay();
+  var days=lastDay.getDate();
+  var DOW=['日','月','火','水','木','金','土'];
+  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
+  DOW.forEach(function(d,i){
+    var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
+    h+='<div style="text-align:center;font-size:0.72rem;font-weight:700;color:'+c+';padding:0.2rem 0">'+d+'</div>';
+  });
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  for(var i=0;i<startDow;i++) h+='<div></div>';
+  for(var d=1;d<=days;d++){
+    var dt=new Date(py,pm,d);
+    var dow=dt.getDay();
+    var isToday2=(dt.getFullYear()===today.getFullYear()&&dt.getMonth()===today.getMonth()&&dt.getDate()===today.getDate());
+    var dk=calDateKey(py,pm+1,d);
+    var isSelected=(dk===calSelectedDate);
+    var dayScheds=schedules[dk]||[];
+    var dayKS=getDayKS(py,pm+1,d);
+    var ju=G?getJuniUnki(G.ht,dayKS[1]):'';
+    var juColor=getJuniColor(ju);
+    var dayColor=dow===0?'#c04040':dow===6?'#1a4a9a':'var(--ink)';
+    var setsuDate=getSetsuDate(py,pm+1);
+    var setsuDay=new Date(setsuDate.getFullYear(),setsuDate.getMonth(),setsuDate.getDate());
+    var isBeforeSetsu=(dt<setsuDay);
+    var isSetsuDay=(dt.getTime()===setsuDay.getTime());
+    var bg=isSelected?'rgba(124,58,237,0.18)':isToday2?'rgba(124,58,237,0.07)':isBeforeSetsu?'rgba(150,150,150,0.06)':'rgba(184,134,11,0.03)';
+    var border=isSelected?'1.5px solid rgba(124,58,237,0.7)':isToday2?'1px solid rgba(124,58,237,0.4)':isSetsuDay?'1.5px solid rgba(184,134,11,0.5)':'1px solid rgba(184,134,11,0.12)';
+    var juOpacity=isBeforeSetsu?'opacity:0.45;':'';
+    var markHtml='';
+    if(dayScheds.length>0){
+      var marks=dayScheds.slice(0,2).map(function(s){return s.mark||'🌸';}).join('');
+      markHtml='<div style="font-size:1rem;line-height:1;height:1.2rem;display:flex;align-items:center;justify-content:center">'+marks+'</div>';
+    } else {
+      markHtml='<div style="height:1.2rem"></div>';
+    }
+    var setsuMarker=isSetsuDay?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:rgba(184,134,11,0.6);border-radius:6px 0 0 6px"></div>':'';
+    h+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:6px;padding:0.3rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
+      +setsuMarker
+      +'<div style="font-size:0.72rem;font-weight:'+(isToday2||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
+      +'<div style="font-size:0.9rem;color:'+juColor+';font-weight:700;line-height:1.2;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
+      +markHtml
+      +'</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+// カレンダースワイプ初期化
+function initCalSwipe(){
+  var wrap=document.getElementById('cal-slider-wrap');
+  var track=document.getElementById('cal-slider-track');
+  if(!wrap||!track)return;
+
+  var startX=0,startY=0,curX=0;
+  var isDragging=false,isHoriz=null;
+  var W=wrap.offsetWidth||360;
+
+  // 初期位置を中央パネルに
+  track.style.transition='none';
+  track.style.transform='translateX(-'+W+'px)';
+
+  function updatePanels(dir){
+    // 前月・当月・次月を再生成
+    if(dir>0){calMonth++;if(calMonth>11){calMonth=0;calYear++;}}
+    else{calMonth--;if(calMonth<0){calMonth=11;calYear--;}}
+    var label=document.getElementById('cal-month-label');
+    if(label)label.textContent=calYear+'年'+(calMonth+1)+'月';
+    renderCalendar();
+  }
+
+  wrap.addEventListener('touchstart',function(e){
+    W=wrap.offsetWidth||360;
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    isDragging=true;isHoriz=null;curX=0;
+    track.style.transition='none';
+  },{passive:true});
+
+  wrap.addEventListener('touchmove',function(e){
+    if(!isDragging)return;
+    var dx=e.touches[0].clientX-startX;
+    var dy=e.touches[0].clientY-startY;
+    if(isHoriz===null){
+      if(Math.abs(dx)<5&&Math.abs(dy)<5)return;
+      isHoriz=Math.abs(dx)>Math.abs(dy)*0.8;
+    }
+    if(!isHoriz)return;
+    curX=dx;
+    track.style.transform='translateX('+(-W+dx)+'px)';
+  },{passive:true});
+
+  wrap.addEventListener('touchend',function(e){
+    if(!isDragging)return;
+    isDragging=false;
+    var dx=e.changedTouches[0].clientX-startX;
+    var THRESH=W*0.3;
+    if(Math.abs(curX)<5){return;} // タップ
+    if(curX<-THRESH){
+      // 左スワイプ→次月
+      track.style.transition='transform 0.22s ease';
+      track.style.transform='translateX('+(-(W*2))+'px)';
+      setTimeout(function(){updatePanels(1);},230);
+    } else if(curX>THRESH){
+      // 右スワイプ→前月
+      track.style.transition='transform 0.22s ease';
+      track.style.transform='translateX(0px)';
+      setTimeout(function(){updatePanels(-1);},230);
+    } else {
+      // 戻す
+      track.style.transition='transform 0.18s ease';
+      track.style.transform='translateX(-'+W+'px)';
+    }
+  },{passive:true});
 }
 
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
