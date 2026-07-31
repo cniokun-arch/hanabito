@@ -451,10 +451,12 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
 #cal-slider-track{
   display:flex;
   will-change:transform;
+  align-items:flex-start;
 }
 .cal-panel{
   flex:0 0 100%;
   width:100%;
+  align-self:stretch;
 }
 </style>
 </head>
@@ -2377,6 +2379,12 @@ function initCalSwipe(){
   // 初期位置を中央パネルに（表示前にセット）
   track.style.transition='none';
   track.style.transform='translateX(-'+W+'px)';
+  // 中央パネルの高さにwrapを合わせる
+  function syncHeight(){
+    var panels=wrap.querySelectorAll('.cal-panel');
+    if(panels[1]){wrap.style.height=panels[1].offsetHeight+'px';}
+  }
+  requestAnimationFrame(syncHeight);
   // 確実に中央にセットしてから表示
 
 
@@ -2456,12 +2464,12 @@ function initCalSwipe(){
       // 左スワイプ→次月
       track.style.transition='transform 0.22s ease';
       track.style.transform='translateX('+(-(W*2))+'px)';
-      setTimeout(function(){updatePanels(1);},230);
+      setTimeout(function(){updatePanels(1);syncHeight();},230);
     } else if(curX>THRESH){
       // 右スワイプ→前月
       track.style.transition='transform 0.22s ease';
       track.style.transform='translateX(0px)';
-      setTimeout(function(){updatePanels(-1);},230);
+      setTimeout(function(){updatePanels(-1);syncHeight();},230);
     } else {
       // 戻す
       track.style.transition='transform 0.18s ease';
