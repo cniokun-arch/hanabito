@@ -2244,11 +2244,11 @@ function renderCalendar(){
   html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700">📌 '+calYear+'年の目標</div>';
   html+='<button onclick="editTimelineMemo('+calYear+')" style="font-size:0.65rem;color:var(--gold);background:transparent;border:1px solid rgba(184,134,11,0.3);border-radius:4px;padding:0.1rem 0.4rem;cursor:pointer">編集</button>';
   html+='</div>';
-  html+='<div style="font-size:0.84rem;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
+  html+='<div data-cal-yr-goal style="font-size:0.84rem;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
   if(monGoal||true){
     html+='<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.1)">';
-    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.1rem">'+(calMonth+1)+'月の目標</div>';
-    html+='<div style="font-size:0.84rem;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
+    html+='<div data-cal-mon-label style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.1rem">'+(calMonth+1)+'月の目標</div>';
+    html+='<div data-cal-mon-goal style="font-size:0.84rem;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
     html+='</div>';
   }
   html+='</div>';
@@ -2378,23 +2378,51 @@ function initCalSwipe(){
   track.style.transition='none';
   track.style.transform='translateX(-'+W+'px)';
   // 確実に中央にセットしてから表示
-  requestAnimationFrame(function(){
-    var sw=wrap.parentElement&&wrap.parentElement.id==='cal-slider-wrap'?wrap:wrap;
-    if(wrap)wrap.style.visibility='visible';
-  });
+
 
   function updatePanels(dir){
     if(dir>0){calMonth++;if(calMonth>11){calMonth=0;calYear++;}}
     else{calMonth--;if(calMonth<0){calMonth=11;calYear--;}}
-    // 再描画前にスライダーラップを不可視に
-    var slWrap=document.getElementById('cal-slider-wrap');
-    if(slWrap)slWrap.style.visibility='hidden';
-    renderCalendar();
-    // initCalSwipe(50ms後)が完了してから表示(さらに30ms後)
-    setTimeout(function(){
-      var slWrap2=document.getElementById('cal-slider-wrap');
-      if(slWrap2)slWrap2.style.visibility='visible';
-    },100);
+
+    // ヘッダーのラベルだけ更新
+    var lbl=document.getElementById('cal-month-label');
+    if(lbl)lbl.textContent=calYear+'年'+(calMonth+1)+'月';
+
+    // スライダーの3パネルだけ差し替え（cal-body全体は再描画しない）
+    var panels=document.querySelectorAll('.cal-panel');
+    if(panels.length===3){
+      var G2=getCurrentTargetG();
+      var today2=new Date();
+      var scheds2=calGetSchedules();
+      for(var pi=0;pi<3;pi++){
+        var pm2=calMonth+(pi-1)+1, py2=calYear;
+        while(pm2>12){pm2-=12;py2++;}
+        while(pm2<1){pm2+=12;py2--;}
+        panels[pi].innerHTML=G2?buildCalGridHTML(G2,py2,pm2-1,scheds2,today2):'';
+      }
+      // トラックを中央に戻す（アニメーションなし）
+      var tr=document.getElementById('cal-slider-track');
+      if(tr){
+        tr.style.transition='none';
+        tr.style.transform='translateX(-'+W+'px)';
+      }
+    } else {
+      // パネルが見つからない場合のみ全体再描画
+      renderCalendar();
+    }
+
+    // 目標エリアだけ更新
+    var tlDataU=getTimelineData();
+    var tdataU=tlDataU[calYear]||null;
+    if(typeof tdataU==='string')tdataU={goal:tdataU,months:Array(12).fill('')};
+    var yrGoalU=tdataU&&tdataU.goal?tdataU.goal:'';
+    var monGoalU=tdataU&&tdataU.months&&tdataU.months[calMonth]?tdataU.months[calMonth]:'';
+    var yrGoalEl=document.querySelector('[data-cal-yr-goal]');
+    var monGoalEl=document.querySelector('[data-cal-mon-goal]');
+    if(yrGoalEl)yrGoalEl.textContent=yrGoalU||'（未設定）';
+    if(monGoalEl)monGoalEl.textContent=monGoalU||'（未設定）';
+    var monLblEl=document.querySelector('[data-cal-mon-label]');
+    if(monLblEl)monLblEl.textContent=(calMonth+1)+'月の目標';
   }
 
   wrap.addEventListener('touchstart',function(e){
