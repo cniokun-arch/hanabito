@@ -2252,15 +2252,6 @@ function renderCalendar(){
     html+='</div>';
   }
   html+='</div>';
-  // 曜日ヘッダー
-  var DOW=['日','月','火','水','木','金','土'];
-  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
-  DOW.forEach(function(d,i){
-    var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
-    html+='<div style="text-align:center;font-size:0.72rem;font-weight:700;color:'+c+';padding:0.2rem 0">'+d+'</div>';
-  });
-  html+='</div>';
-
   // グリッドを別関数で生成してスライダーに設置
   html+='<div id="cal-slider-wrap"><div id="cal-slider-track">';
   // 前月・当月・次月の3パネル
@@ -2388,12 +2379,13 @@ function initCalSwipe(){
   track.style.transform='translateX(-'+W+'px)';
 
   function updatePanels(dir){
-    // 前月・当月・次月を再生成
     if(dir>0){calMonth++;if(calMonth>11){calMonth=0;calYear++;}}
     else{calMonth--;if(calMonth<0){calMonth=11;calYear--;}}
-    var label=document.getElementById('cal-month-label');
-    if(label)label.textContent=calYear+'年'+(calMonth+1)+'月';
+    // 再描画前にラッパーを不可視に
+    if(wrap)wrap.style.visibility='hidden';
     renderCalendar();
+    // 描画後に再表示
+    setTimeout(function(){if(wrap)wrap.style.visibility='visible';},30);
   }
 
   wrap.addEventListener('touchstart',function(e){
