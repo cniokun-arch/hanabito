@@ -937,6 +937,19 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
+  <!-- 合言葉（アクセス制限）ゲート：名刺などでURLのみが広まった場合の抑止用。ACCESS_PASSWORDを変更して使う -->
+  <div id="password-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a0830,#2a1050 60%,#3a2410);z-index:495;overflow-y:auto">
+    <div style="max-width:420px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
+      <div style="text-align:center;margin-bottom:1.8rem">
+        <div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:#fff;letter-spacing:0.2em;margin-bottom:0.5rem">花　人　占　術</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);letter-spacing:0.1em">合言葉を入力してください</div>
+      </div>
+      <input type="text" id="password-gate-input" placeholder="合言葉" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;padding:0.9rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.1);color:#fff;font-size:1rem;text-align:center;margin-bottom:0.9rem;letter-spacing:0.1em">
+      <div id="password-gate-error" style="display:none;text-align:center;color:#ff8a8a;font-size:0.8rem;margin-bottom:0.9rem">合言葉が違います</div>
+      <button onclick="checkAccessPassword()" style="width:100%;background:#b8860b;color:#fff;border:none;border-radius:10px;padding:0.9rem;font-size:0.95rem;font-weight:700;cursor:pointer">入る</button>
+    </div>
+  </div>
+
   <!-- 初回起動時の利用規約同意ゲート（未同意の場合、アプリ全体をブロック表示） -->
   <div id="consent-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a0830,#2a1050 60%,#3a2410);z-index:490;overflow-y:auto">
     <div style="max-width:480px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
@@ -6291,6 +6304,45 @@ function stopPetals(){
 // INIT
 // ============================================================
 // ============================================================
+// 合言葉（アクセス制限）ゲート
+// ============================================================
+// ↓falseにすると合言葉ゲート自体を無効化できます（テスト公開の終了・再開の切り替え用）
+var ACCESS_GATE_ENABLED=true;
+// ↓この文字列を変更すると合言葉を差し替えられます（名刺に印刷するものと一致させてください）
+var ACCESS_PASSWORD='hanabito2026';
+
+function checkAccessPassword(){
+  var input=document.getElementById('password-gate-input');
+  var val=input?input.value.trim():'';
+  if(val===ACCESS_PASSWORD){
+    try{localStorage.setItem('hanabito_pw_ok',ACCESS_PASSWORD);}catch(e){}
+    var gate=document.getElementById('password-gate');
+    if(gate)gate.style.display='none';
+  } else {
+    var err=document.getElementById('password-gate-error');
+    if(err)err.style.display='block';
+  }
+}
+function showPasswordGateIfNeeded(){
+  if(!ACCESS_GATE_ENABLED)return;
+  var ok=false;
+  try{ok=localStorage.getItem('hanabito_pw_ok')===ACCESS_PASSWORD;}catch(e){}
+  if(!ok){
+    var gate=document.getElementById('password-gate');
+    if(gate){
+      gate.style.display='block';
+      setTimeout(function(){
+        var input=document.getElementById('password-gate-input');
+        if(input){
+          input.focus();
+          input.addEventListener('keydown',function(e){if(e.key==='Enter')checkAccessPassword();});
+        }
+      },100);
+    }
+  }
+}
+
+// ============================================================
 // 利用規約 同意ゲート
 // ============================================================
 function agreeToTerms(){
@@ -6332,6 +6384,8 @@ function showConsentGateIfNeeded(){
 
   // 利用規約に未同意なら、起動時に同意ゲートを表示
   showConsentGateIfNeeded();
+  // 合言葉が未入力なら、起動時にアクセスゲートを表示（同意ゲートより手前に重なる）
+  showPasswordGateIfNeeded();
 })();
 </script>
 </body>
