@@ -4537,6 +4537,11 @@ function showBucketEditor(buckets,editIdx){
 
   var html='<div style="max-width:500px;margin:0 auto;padding:1.4rem 1.2rem 2rem">';
 
+  if(window._lifeWizardMode){
+    html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 2 / 3　・　やりたいことを決めよう</div>';
+    html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:90%"></div></div>';
+  }
+
   // タイトル行
   html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.8rem">';
   html+='<div style="font-family:\'Noto Serif JP\',serif;font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1.4;flex:1;padding-right:0.5rem">✨ 夢のカケラをカタチにする100のリスト<br><span style="font-size:0.85rem;color:var(--ink3);font-weight:400">（バケットリスト）</span></div>';
@@ -4750,15 +4755,20 @@ function saveBucketEditor(){
 
   closeBucketEditor();
   redrawManualPage();
+  if(window._lifeWizardMode){
+    window._lifeWizardMode=false;
+    showSchedulerStep();
+  }
 }
 
 function closeBucketEditor(){
   var m=document.getElementById('bucket-editor-modal');
   if(m)m.remove();
+  window._lifeWizardMode=false;
 }
 
 function editMandalaCenter(){
-  openInlineModal('大目標（中心テーマ）を入力してください','textarea',getCurrentLifeDesign().purpose||'',function(val){
+  openInlineModal('大目標（中心テーマ）を入力してください',getCurrentLifeDesign().purpose||'',function(val){
     var ld=getLifeDesignData();
     ld.purpose=val.slice(0,30);
     saveLifeDesignData(ld);
@@ -4768,16 +4778,6 @@ function editMandalaCenter(){
 
 function getCurrentLifeDesign(){
   return getLifeDesignData()||{};
-}
-
-function editLifeDesign(){
-  var ld=getLifeDesignData();
-  if(!ld)return;
-  var modal=document.createElement('div');
-  modal.id='life-design-modal';
-  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;padding:1rem';
-  modal.innerHTML=buildBucketListHTML(ld);
-  document.body.appendChild(modal);
 }
 
 function openInlineModal(label,current,onSave){
@@ -4824,7 +4824,7 @@ function renderTimeline(ld){
   if(!Graw)return '';
   var G=doCalc(parseInt(Graw.y,10),parseInt(Graw.m,10),parseInt(Graw.d,10),Graw.gender||'男');
   if(!G)return '';
-  var html='<div style="margin-bottom:1.2rem">';
+  var html='<div id="ld-timeline-section" style="margin-bottom:1.2rem">';
   html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 2　花人占術スケジューラー</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>各年をタップすると年間・月別の目標を設定でき、ホーム画面のカレンダーに反映されます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気に動く・×低運気は慎重に、が基本です。</span></div>';
 
@@ -4944,11 +4944,11 @@ function buildIntroHTML(){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
   html+='<div style="text-align:center;margin-bottom:1.2rem">';
   html+='<div style="font-size:2rem;margin-bottom:0.4rem">🌸</div>';
-  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">9マス目標シート＋心理学＋花人占術で<br>あなただけの人生設計を</div>';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">心理学＋花人占術で<br>あなただけの人生設計を</div>';
   html+='</div>';
 
   html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.05));border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:1rem;margin-bottom:1.2rem">';
-  html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin-bottom:0.8rem">花人占術では、目標達成に有効な<strong>9マス目標シート</strong>と<strong>心理テスト</strong>を組み合わせ、あなたが一番叶えたいことを明確にした上で、<strong>あなたの運気に合わせて「動くべき年・備える年」を設計</strong>します。</p>';
+  html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin-bottom:0.8rem">花人占術では、<strong>心理テスト</strong>と<strong>AI</strong>を組み合わせ、あなたが一番叶えたいことを明確にした上で、<strong>あなたの運気に合わせて「動くべき年・備える年」を設計</strong>します。</p>';
   html+='<p style="font-size:0.84rem;color:var(--ink);line-height:1.9;margin:0">運気の流れを知り、自分の力を最大限に発揮できるタイミングで行動することで、より実り豊かな人生を実現していきましょう。</p>';
   html+='</div>';
 
@@ -4957,13 +4957,11 @@ function buildIntroHTML(){
   html+='</div>';
 
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:1rem;margin-bottom:1.2rem">';
-  html+='<div style="font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:0.6rem">📋 これから行うこと（5ステップ）</div>';
+  html+='<div style="font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:0.6rem">📋 これから行うこと（3ステップ）</div>';
   var steps=[
-    ['💬','心理テスト','あなたの価値観・欲求を12問で確認します'],
-    ['🎯','大目標を決める','AIが整理した内容から、一番叶えたいことを選びます'],
-    ['🌿','8要素をAIが提案','大目標を実現するために必要な要素をAIが考えます'],
-    ['⚡','具体行動をAIが提案','各要素の具体的行動をAIがまとめます'],
-    ['📅','スケジュールを立てる','あなたの運気と照合して、いつ動くかを決めます']
+    ['🎯','あなたが一番叶えたい目標','心理テストとAIで、大目標・必要な要素・具体行動を整理します'],
+    ['📝','やりたいことを決めよう','大目標以外にも、人生でやりたいことを自由に書き出します'],
+    ['📅','運気カレンダーに予定を入れよう','あなたの運気と照合して、いつ動くかを決めます']
   ];
   for(var i=0;i<steps.length;i++){
     var s=steps[i];
@@ -4989,8 +4987,8 @@ function showQuiz(){
 
 function buildQuizHTML(){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 5</div>';
-  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:20%"></div></div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:15%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">💬 心理テスト</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:1rem">';
   html+='<p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">このテストは、あなたが本当に大切にしていることや、心の奥にある願いを引き出すためのものです。正解・不正解はありません。直感で、今の自分に一番近いものを選んでください。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 全部で12問です。答えにくい質問はスキップしても大丈夫です。</span></p>';
@@ -5075,8 +5073,8 @@ async function submitQuiz(){
 function showStep1(ld,wishText){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 5</div>';
-  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:20%"></div></div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:35%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🎯 一番叶えたいことは何ですか？</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIがあなたの回答を分析しました。下の結果を参考に、一番叶えたいことを入力してください。<br><span style="font-size:0.75rem;color:var(--ink3)">※ AIの提案と違っても大丈夫です。あなたが本当に望むことを書いてください。</span></p></div>';
   html+='<div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.8rem;font-size:0.84rem;line-height:1.8;color:var(--ink);margin-bottom:1rem;white-space:pre-wrap">'+wishText+'</div>';
@@ -5131,10 +5129,10 @@ async function submitStep1(){
 function showStep2(ld){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 2 / 5</div>';
-  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:40%"></div></div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:55%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌿 大目標に必要な8要素</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIが「'+( ld.purpose||'')+'」を実現するために必要な8つの要素を考えました。これが9マス目標シートの外側8マスになります。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 内容を自由に変えて大丈夫です。ピンと来なければ書き直してください。</span></p></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIが「'+( ld.purpose||'')+'」を実現するために必要な8つの要素を考えました。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 内容を自由に変えて大丈夫です。ピンと来なければ書き直してください。</span></p></div>';
   html+='<div style="text-align:center;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:8px;padding:0.5rem;font-size:0.9rem;font-weight:700;margin-bottom:0.8rem">大目標: '+ld.purpose+'</div>';
   html+='<p style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.6rem">AIが提案した8要素です。内容を確認・編集してください。</p>';
   for(var fi=0;fi<8;fi++){
@@ -5212,10 +5210,10 @@ async function submitStep2(){
 function showStep3(ld){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 3 / 5</div>';
-  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:60%"></div></div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:75%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">⚡ 各要素の具体的行動</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">各要素を実現するための具体的な行動をAIが提案しました。9マス目標シートの各マスをタップすると、後からいつでも編集できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 今は内容を確認するだけで大丈夫です。</span></p></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">各要素を実現するための具体的な行動をAIが提案しました。ホーム画面の「必要な8つの要素」カードから、後からいつでも編集できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 今は内容を確認するだけで大丈夫です。</span></p></div>';
 
   for(var fi=0;fi<8;fi++){
     var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
@@ -5236,109 +5234,45 @@ function showStep3(ld){
   html+='<div style="font-size:0.88rem;color:var(--ink)">😊 お疲れ様です！もう少しで完成です。</div>';
   html+='<div style="font-size:0.76rem;color:var(--ink3);margin-top:0.3rem">次は「やりたいことリスト」を自由に書くだけ。難しく考えなくて大丈夫です。</div>';
   html+='</div>';
-  html+='<button onclick="showStep4()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-bottom:0.5rem">次へ → やりたいことリストを作る</button>';
+  html+='<button onclick="goToBucketStep()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%;margin-bottom:0.5rem">次へ → やりたいことを決めよう</button>';
   html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
   html+='</div>';
   modal.innerHTML=html;
 }
 
-function showStep4(){
+// STEP 2/3: やりたいことを決めよう（実際のバケットリスト編集画面に直接つなぐ）
+function goToBucketStep(){
   var ld=getLifeDesignData()||{};
   ld.step=4;
   saveLifeDesignData(ld);
-  var modal=document.getElementById('life-design-modal');
-  modal.innerHTML=buildBucketListHTML(ld);
-}
-
-
-function buildBucketListHTML(ld){
-  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 4 / 5</div>';
-  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:80%"></div></div>';
-  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">📝 やりたいことリスト</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:1rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">大目標以外にも、人生でやりたいこと・手に入れたいもの・なりたい自分を自由に書いてください。「何歳までに」も設定できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 書けない場合は空欄のまま次へ進んでも大丈夫です。</span></p></div>';
-
-  // 人生の目的
-  html+='<div style="margin-bottom:1rem">';
-  html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">◆ 人生の目的（中心テーマ）</div>';
-  html+='<input id="bl-purpose" type="text" value="'+( ld.purpose||'').replace(/"/g,'&quot;')+'" maxlength="20" style="width:100%;box-sizing:border-box;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:6px;font-size:0.88rem;background:var(--bg2);color:var(--ink)">';
-  html+='</div>';
-
-  // 8分野の目標
-  html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">◆ 8分野の目標</div>';
-  for(var fi=0;fi<MANDALA_FIELDS.length;fi++){
-    var goal=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
-    html+='<div style="margin-bottom:0.5rem">';
-    html+='<div style="font-size:0.72rem;color:var(--ink3);margin-bottom:0.2rem">'+MANDALA_FIELDS[fi]+'</div>';
-    html+='<input id="bl-f'+fi+'" type="text" value="'+goal.replace(/"/g,'&quot;')+'" maxlength="30" placeholder="目標を入力..." style="width:100%;box-sizing:border-box;padding:0.45rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.82rem;background:var(--bg2);color:var(--ink)">';
-    html+='</div>';
-  }
-
-  // バケットリスト（後から独立して編集できる旨を案内）
-  html+='<div style="margin-top:1rem;padding:0.8rem;background:rgba(184,134,11,0.05);border:1px dashed rgba(184,134,11,0.25);border-radius:10px;text-align:center">';
-  html+='<div style="font-size:0.82rem;color:var(--ink);font-weight:700;margin-bottom:0.3rem">🌱 やりたいことリスト</div>';
-  html+='<div style="font-size:0.76rem;color:var(--ink3);line-height:1.7;margin-bottom:0.6rem">完成後にいつでも「あなたの本」から<br>自由に追加・編集できます。<br>今は空欄のまま次へ進んでも大丈夫です。</div>';
-  if(ld.buckets&&ld.buckets.filter(function(b){return b&&b.text;}).length>0){
-    html+='<div style="font-size:0.78rem;color:var(--gold)">✓ '+ld.buckets.filter(function(b){return b&&b.text;}).length+'件登録済み</div>';
-  }
-  html+='</div>';
-
-  html+='<button onclick="saveBucketList()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.95rem;cursor:pointer;width:100%;margin-top:1rem">人生設計を完成させる →</button>';
-  html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.8rem;cursor:pointer;width:100%;margin-top:0.5rem;padding:0.4rem">キャンセル</button>';
-  html+='</div>';
-  return html;
-}
-
-function addBucketRow(){
-  var ld=getLifeDesignData();
-  if(!ld)return;
-  if(!ld.buckets)ld.buckets=[];
-  // 現在の入力内容を先に保存
-  var bi=0;
-  var currentBuckets=[];
-  while(true){
-    var btel=document.getElementById('bl-bt'+bi);
-    if(!btel)break;
-    var bael=document.getElementById('bl-ba'+bi);
-    currentBuckets.push({text:btel.value.trim(),age:bael?bael.value.trim():''});
-    bi++;
-  }
-  if(currentBuckets.length>0)ld.buckets=currentBuckets;
-  ld.buckets.push({text:'',age:''});
-  saveLifeDesignData(ld);
-  var modal=document.getElementById('life-design-modal');
-  if(modal)modal.innerHTML=buildBucketListHTML(ld);
-  // 最後の入力欄にフォーカス
-  setTimeout(function(){
-    var last=document.getElementById('bl-bt'+(ld.buckets.length-1));
-    if(last)last.focus();
-  },100);
-}
-
-function saveBucketList(){
-  var ld=getLifeDesignData();
-  if(!ld)return;
-
-  // 入力値を収集（マンダラ・目的のみ）
-  var purposeEl=document.getElementById('bl-purpose');
-  if(purposeEl)ld.purpose=purposeEl.value.trim();
-
-  if(!ld.mandala)ld.mandala={};
-  for(var fi=0;fi<MANDALA_FIELDS.length;fi++){
-    var el=document.getElementById('bl-f'+fi);
-    if(el)ld.mandala[fi]=el.value.trim();
-  }
-
-  ld.step=4;
-  saveLifeDesignData(ld);
   closeLifeModal();
-
-  // ページ再描画
-  var ca=document.getElementById('content-area');
-  if(ca)ca.innerHTML=buildManualPage();
-  var el=document.querySelector('#manual-ai-card');
-  if(el)el.scrollIntoView({behavior:'smooth',block:'end'});
+  window._lifeWizardMode=true;
+  showBucketEditor(ld.buckets||[],-1);
 }
+
+// STEP 3/3: 運気カレンダーに予定を入れよう
+function showSchedulerStep(){
+  var modal=document.createElement('div');
+  modal.id='life-design-modal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
+  var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 3 / 3　・　運気カレンダーに予定を入れよう</div>';
+  html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:100%"></div></div>';
+  html+='<div style="text-align:center;font-size:2rem;margin-bottom:0.4rem">📅</div>';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">お疲れ様でした！</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.8rem;margin-bottom:1rem"><p style="font-size:0.84rem;color:var(--ink);line-height:1.8;margin:0">大目標・必要な要素・やりたいことが整理できました。最後に「花人占術スケジューラー」で、あなたの運気を見ながら、いつ動くかを決めましょう。<br><span style="font-size:0.75rem;color:var(--ink3)">◎好運気に動く・×低運気は慎重に、が基本です。</span></p></div>';
+  html+='<button onclick="finishLifeWizard()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%">運気カレンダーを見る →</button>';
+  html+='</div>';
+  modal.innerHTML=html;
+  document.body.appendChild(modal);
+}
+
+function finishLifeWizard(){
+  closeLifeModal();
+  var el=document.getElementById('ld-timeline-section');
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 
 // 要素カード（開閉・編集）
 var MC_BG=['#ff7f7f','#ffb347','#ffd700','#90ee90','#87ceeb','#dda0dd','#f4a9c0','#b0c4de'];
