@@ -4375,6 +4375,15 @@ function renderStepHeader(num,title){
   return h;
 }
 
+// リスト一覧のプレビュー展開状態（redraw後も維持）
+window._bucketPreviewExpanded=window._bucketPreviewExpanded||false;
+var BUCKET_PREVIEW_COUNT=5;
+
+function toggleBucketPreview(){
+  window._bucketPreviewExpanded=!window._bucketPreviewExpanded;
+  redrawManualPage();
+}
+
 function renderBucketSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
   html+=renderStepHeader(2,'やりたいことリスト');
@@ -4389,7 +4398,19 @@ function renderBucketSection(ld){
   if(ld&&ld.buckets&&ld.buckets.length>0){
     var filled=ld.buckets.filter(function(b){return b&&b.text;});
     if(filled.length>0){
-      for(var bii=0;bii<filled.length;bii++){
+      // 進捗メーター（🎯 あなたの夢、見つかった？ X/100）
+      var pct=Math.min(100,Math.round(filled.length/100*100));
+      html+='<div style="background:rgba(184,134,11,0.08);border-radius:10px;padding:0.6rem 0.8rem;margin-bottom:0.7rem">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem">';
+      html+='<span style="font-size:0.76rem;color:var(--ink3)">🎯 あなたの夢、見つかった？</span>';
+      html+='<span style="font-size:0.76rem;font-weight:700;color:var(--gold)">'+filled.length+' / 100</span>';
+      html+='</div>';
+      html+='<div style="background:rgba(184,134,11,0.15);border-radius:4px;height:5px"><div style="background:linear-gradient(90deg,#b8860b,#d4a017);border-radius:4px;height:5px;width:'+pct+'%"></div></div>';
+      html+='</div>';
+
+      var showAll=window._bucketPreviewExpanded||filled.length<=BUCKET_PREVIEW_COUNT;
+      var visibleCount=showAll?filled.length:BUCKET_PREVIEW_COUNT;
+      for(var bii=0;bii<visibleCount;bii++){
         var b=filled[bii];
         html+='<div style="background:var(--bg2);border:1px solid rgba(184,134,11,0.18);border-radius:10px;padding:0.6rem 0.8rem;margin-bottom:0.5rem;cursor:pointer" onclick="editBucketItem('+bii+')">';
         html+='<div style="display:flex;align-items:baseline;gap:0.4rem;margin-bottom:0.2rem">';
@@ -4401,6 +4422,13 @@ function renderBucketSection(ld){
         if(b.startDate){var sd=b.startDate.replace(/-01$/,'').replace('-','年')+'月';html+='<span style="font-size:0.7rem;color:var(--ink3)">📅 '+sd+'〜</span>';}
         html+='</div>';
         html+='</div>';
+      }
+      if(filled.length>BUCKET_PREVIEW_COUNT){
+        if(showAll){
+          html+='<button onclick="toggleBucketPreview()" style="width:100%;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem;font-size:0.78rem;cursor:pointer;margin-top:0.2rem">▲ 少なく表示</button>';
+        } else {
+          html+='<button onclick="toggleBucketPreview()" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem;font-size:0.78rem;cursor:pointer;margin-top:0.2rem">▼ 全部見る（あと'+(filled.length-BUCKET_PREVIEW_COUNT)+'件）</button>';
+        }
       }
     } else {
       html+=bucketEmptyHtml();
