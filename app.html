@@ -4606,7 +4606,7 @@ function showBucketEditor(buckets,editIdx){
   html+='<div style="font-size:0.82rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">🪣 バケットリストとは？</div>';
   html+='<div style="font-size:0.8rem;color:var(--ink);line-height:1.7">「死ぬまでにやりたいことリスト」のこと。書き出すことで夢が明確になり、行動に移しやすくなります。花人占術では、あなたの運気に合わせた最適なタイミングも設定できます。</div>';
   html+='</div>';
-  html+='<p style="font-size:0.88rem;color:var(--ink);line-height:1.8;margin-bottom:1.2rem">日常の小さな「やりたい」から、一生に一度の大きな夢まで。制限をかけずに、自由にあなたの想いを書き出してみましょう。具体的な時期を設定すると、未来の人生設計タイムラインに組み込まれます。</p>';
+  html+='<p style="font-size:0.88rem;color:var(--ink);line-height:1.8;margin-bottom:1.2rem">日常の小さな「やりたい」から、一生に一度の大きな夢まで。制限をかけずに、自由にあなたの想いを書き出してみましょう。具体的な時期を設定すると、ホーム画面の運気カレンダーや花人占術スケジューラーに組み込まれます。</p>';
 
   // カテゴリカード（3列グリッド）
   var cats=[
@@ -5544,12 +5544,13 @@ async function generateYearAdvice(year){
       +(juniDesc2(daiunJu2)?'十二運気『'+daiunJu2+'』の特徴：'+juniDesc2(daiunJu2)+'\n':'')
       +'【年運（'+year+'年）】十二運気='+yrJu+'\n'
       +(juniDesc2(yrJu)?'十二運気『'+yrJu+'』の特徴：'+juniDesc2(yrJu)+'\n':'')
-      +'\n■ 書き方\n'
-      +'・まず、大運の通変星『'+daiunTh+'』の特徴と十二運気『'+daiunJu2+'』の特徴を掛け合わせると、どんな傾向が生まれるかを具体的に解釈する（通変星＝根本的な気質・欲求、十二運気＝それがどんな質で表れるかのフィルター、として組み合わせて読む）\n'
-      +'・その上で、年運『'+yrJu+'』が加わることで、'+year+'年がどんな年になりやすいかをまとめる\n'
-      +'・最後に、今年の目標を立てる上で「結局どうすればいいのか」を具体的な行動レベルでアドバイスする\n'
+      +'\n■ 書き方（この順番・構成を必ず守ること）\n'
+      +'①まず、通変星『'+daiunTh+'』そのものの特徴を、渡された説明を要約して1〜2文で必ず書く。名前を出すだけで済ませず、どんな気質・欲求を持つ星かを具体的に説明すること\n'
+      +'②次に、十二運気『'+daiunJu2+'』がその『'+daiunTh+'』の性質をどう彩るか（強めるか、発揮のされ方を変えるか）を掛け合わせて解釈する\n'
+      +'③その上で、年運『'+yrJu+'』が加わることで、'+year+'年がどんな年になりやすいかをまとめる\n'
+      +'④最後に、今年の目標を立てる上で「結局どうすればいいのか」を具体的な行動レベルでアドバイスする\n'
       +'・通変星名（比肩など）や十二運気名（豊穣など）はそのまま使ってよい。これらは公開されている占術用語、またはアプリ内で既に表示されている名称なので、隠す必要はない\n'
-      +'・思いやりのある前向きな言葉で。Markdown禁止。300〜350文字程度。';
+      +'・思いやりのある前向きな言葉で。Markdown禁止。380〜450文字程度。';
     var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'あなたは占術カウンセラーです。通変星・十二運気の特徴を踏まえて具体的に解釈し、専門用語で終わらせず誰にでも分かる温かい言葉でアドバイスしてください。',engine:AI_ENGINE})});
     var json=await res.json();
