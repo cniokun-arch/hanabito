@@ -4358,9 +4358,20 @@ function renderChapter5(){
   return html;
 }
 
+// STEP見出し：番号バッジ＋帯で強調表示
+function renderStepHeader(num,title){
+  var h='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">';
+  h+='<div style="flex-shrink:0;width:2.1rem;height:2.1rem;border-radius:50%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.95rem;font-weight:900;box-shadow:0 2px 6px rgba(184,134,11,0.4)">'+num+'</div>';
+  h+='<div style="flex:1;background:linear-gradient(90deg,rgba(184,134,11,0.14),rgba(184,134,11,0.02));border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:0.4rem 0.7rem">';
+  h+='<div style="font-size:0.66rem;color:var(--ink3);letter-spacing:0.12em;font-weight:700">STEP '+num+'</div>';
+  h+='<div style="font-size:1rem;font-weight:800;color:var(--ink)">'+title+'</div>';
+  h+='</div></div>';
+  return h;
+}
+
 function renderBucketSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
-  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 2　やりたいことリスト</div>';
+  html+=renderStepHeader(2,'やりたいことリスト');
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">';
   html+='あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！</div>';
 
@@ -4397,7 +4408,7 @@ function renderBucketSection(ld){
 
 function renderGoalToolSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
-  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 1　あなたが今一番叶えたいこと</div>';
+  html+=renderStepHeader(1,'あなたが今一番叶えたいこと');
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、あなたが今一番叶えたいこと・必要な8つの要素・具体的な行動を整理します。</div>';
   if(ld&&ld.step>=4){
     html+=renderGoalList(ld);
@@ -4470,7 +4481,7 @@ function renderGoalList(ld){
     html+='<span style="font-size:0.9rem;font-weight:700">'+(elem||'タップして要素を設定')+'</span>';
     html+='</div>';
     html+='<div style="display:flex;align-items:center;gap:0.5rem">';
-    if(filledActs>0)html+='<span style="font-size:0.68rem;opacity:0.85">✓ '+doneCount+'/'+filledActs+'</span>';
+    if(filledActs>0)html+='<span style="font-size:0.8rem;font-weight:800;color:'+tc+';background:rgba(255,255,255,0.6);border-radius:10px;padding:0.15rem 0.55rem">✓ '+doneCount+'/'+filledActs+'</span>';
     html+='<span style="font-size:0.8rem">'+(isOpen?'▲':'▼')+'</span>';
     html+='</div></div>';
 
@@ -4827,7 +4838,7 @@ function renderTimeline(ld){
   var G=doCalc(parseInt(Graw.y,10),parseInt(Graw.m,10),parseInt(Graw.d,10),Graw.gender||'男');
   if(!G)return '';
   var html='<div id="ld-timeline-section" style="margin-bottom:1.2rem">';
-  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 3　花人占術スケジューラー</div>';
+  html+=renderStepHeader(3,'花人占術スケジューラー');
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>各年をタップすると年間・月別の目標を設定でき、ホーム画面のカレンダーに反映されます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
 
   var currentYear=new Date().getFullYear();
