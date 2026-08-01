@@ -4408,7 +4408,7 @@ function renderGoalToolSection(ld){
   html+='</div>';
   html+='<div id="goal-tool-body" style="display:'+(hasData?'block':'none')+';margin-top:0.8rem">';
   if(ld&&ld.step>=4){
-    html+=renderMandala(ld);
+    html+=renderGoalList(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">🔄 やり直す</button>';
   } else {
     html+='<p style="font-size:0.82rem;color:var(--ink3);line-height:1.7;margin-bottom:0.8rem">心理テスト・AIアドバイスを使って大目標と8つの要素、具体行動を設定します。</p>';
@@ -4428,49 +4428,67 @@ function toggleGoalTool(){
   if(arrow)arrow.textContent=isOpen?'▼':'▲';
 }
 
-function renderMandala(ld){
+// 展開中の要素カードindexを保持（再描画をまたいで開閉状態を維持）
+window._goalExpanded=window._goalExpanded||{};
+
+function renderGoalList(ld){
   var html='<div style="margin-bottom:1rem">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
-  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">大目標と8つの要素</div>';
-  html+='<button onclick="editLifeDesign()" style="background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.2rem 0.5rem;font-size:0.7rem;cursor:pointer">✏️ 編集</button>';
-  html+='</div>';
-  html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.12),rgba(42,140,74,0.06));border:1px solid rgba(42,140,74,0.25);border-radius:8px;padding:0.45rem 0.6rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.4rem">';
-  html+='<span style="font-size:0.9rem">✅</span>';
-  html+='<span style="font-size:0.74rem;color:#1a5c1a;font-weight:700">達成・取り組めている行動をタップして完了チェック！</span>';
+
+  // 大目標カード（ゴールド背景）
+  html+='<div onclick="editMandalaCenter()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:12px;padding:1rem;text-align:center;margin-bottom:0.8rem;cursor:pointer;box-shadow:0 3px 10px rgba(184,134,11,0.3)">';
+  html+='<div style="font-size:0.68rem;letter-spacing:0.15em;opacity:0.85;margin-bottom:0.3rem">🎯 大目標</div>';
+  html+='<div style="font-size:1.05rem;font-weight:700;line-height:1.5">'+(ld.purpose||'タップして大目標を入力')+'</div>';
   html+='</div>';
 
-  // 第1層：中央=大目標、周囲8=要素
-  var order=[0,1,2,3,8,4,5,6,7];
-  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:0.5rem">';
-  for(var i=0;i<9;i++){
-    var fi=order[i];
-    if(fi===8){
-      html+='<div style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;padding:0.5rem 0.3rem;text-align:center;border-radius:4px;font-size:0.72rem;font-weight:700;min-height:70px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="editMandalaCenter()">';
-      html+=(ld.purpose||'大目標を入力')+'</div>';
-    } else {
-      var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
-      var hasDetail=ld.mandalaDetail&&ld.mandalaDetail[fi]&&ld.mandalaDetail[fi].some(function(d){return d&&d.trim();});
-      var bg=elem?MC_BG[fi%8]:'rgba(184,134,11,0.05)';
-      var tc=elem?MC_TC[fi%8]:'var(--ink3)';
-      var border=hasDetail?'2px solid rgba(0,0,0,0.25)':'1px solid rgba(255,255,255,0.5)';
-      html+='<div style="background:'+bg+';border:'+border+';padding:0.5rem 0.3rem;text-align:center;border-radius:6px;min-height:80px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1)" onclick="openMandalaDetail('+fi+')">';
-      var doneCount=0;
-      if(ld.mandalaChecks&&ld.mandalaChecks[fi])doneCount=ld.mandalaChecks[fi].filter(function(c){return c;}).length;
-      if(elem){
-        html+='<div style="font-size:0.84rem;color:'+tc+';line-height:1.4;font-weight:700">'+elem+'</div>';
-        if(hasDetail&&doneCount>0)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.8;margin-top:0.2rem">✓ '+doneCount+'/4</div>';
-        else if(hasDetail)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.7;margin-top:0.2rem">▶ 詳細あり</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">必要な8つの要素</div>';
+  html+='</div>';
+  html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.12),rgba(42,140,74,0.06));border:1px solid rgba(42,140,74,0.25);border-radius:8px;padding:0.45rem 0.6rem;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem">';
+  html+='<span style="font-size:0.9rem">✅</span>';
+  html+='<span style="font-size:0.74rem;color:#1a5c1a;font-weight:700">カードをタップして開き、達成した行動をチェック！</span>';
+  html+='</div>';
+
+  for(var fi=0;fi<8;fi++){
+    var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
+    var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','',''];
+    var checks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false];
+    var doneCount=checks.slice(0,4).filter(function(c){return c;}).length;
+    var filledActs=details.slice(0,4).filter(function(d){return d&&d.trim();}).length;
+    var bg=elem?MC_BG[fi%8]:'rgba(184,134,11,0.05)';
+    var tc=elem?MC_TC[fi%8]:'var(--ink3)';
+    var isOpen=!!window._goalExpanded[fi];
+
+    html+='<div style="border-radius:10px;overflow:hidden;margin-bottom:0.6rem;box-shadow:0 2px 6px rgba(0,0,0,0.1)">';
+    html+='<div onclick="toggleGoalCard('+fi+')" style="background:'+bg+';color:'+tc+';padding:0.7rem 0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between">';
+    html+='<div style="display:flex;align-items:center;gap:0.5rem">';
+    html+='<span style="font-size:0.72rem;opacity:0.8;font-weight:700">'+(fi+1)+'</span>';
+    html+='<span style="font-size:0.9rem;font-weight:700">'+(elem||'タップして要素を設定')+'</span>';
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:0.5rem">';
+    if(filledActs>0)html+='<span style="font-size:0.68rem;opacity:0.85">✓ '+doneCount+'/'+filledActs+'</span>';
+    html+='<span style="font-size:0.8rem">'+(isOpen?'▲':'▼')+'</span>';
+    html+='</div></div>';
+
+    if(isOpen){
+      html+='<div style="background:var(--bg2);padding:0.7rem 0.8rem">';
+      if(filledActs>0){
+        for(var di=0;di<4;di++){
+          var d=details[di];
+          if(!d||!d.trim())continue;
+          var chk=!!checks[di];
+          html+='<div onclick="toggleMandalaCheck('+fi+','+di+')" style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.3rem;border-bottom:1px solid rgba(184,134,11,0.1);cursor:pointer">';
+          html+='<span style="font-size:1rem;line-height:1.4;color:'+(chk?'#2a8c4a':'var(--ink3)')+'">'+(chk?'☑':'☐')+'</span>';
+          html+='<span style="font-size:0.84rem;line-height:1.5;flex:1;color:'+(chk?'var(--ink3)':'var(--ink)')+';text-decoration:'+(chk?'line-through':'none')+'">'+d+'</span>';
+          html+='</div>';
+        }
       } else {
-        html+='<div style="font-size:0.7rem;color:var(--ink3)">タップして<br>設定</div>';
+        html+='<div style="font-size:0.78rem;color:var(--ink3);padding:0.4rem 0.3rem 0.8rem">まだ具体的な行動が設定されていません。</div>';
       }
+      html+='<button onclick="openGoalElementEdit('+fi+')" style="width:100%;margin-top:0.4rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem;font-size:0.78rem;cursor:pointer">✏️ 要素名・行動を編集</button>';
       html+='</div>';
     }
+    html+='</div>';
   }
-  html+='</div>';
-
-
-  html+='</div>';
-
 
   html+='</div>';
   return html;
@@ -5322,82 +5340,13 @@ function saveBucketList(){
   if(el)el.scrollIntoView({behavior:'smooth',block:'end'});
 }
 
-// マンダラ詳細（第2層）表示
-// カラーパレット（マンダラ用）
+// 要素カード（開閉・編集）
 var MC_BG=['#ff7f7f','#ffb347','#ffd700','#90ee90','#87ceeb','#dda0dd','#f4a9c0','#b0c4de'];
 var MC_TC=['#8b0000','#8b4500','#8b6500','#1a5c1a','#1a4a6b','#5c1a6b','#8b1a4a','#2a3a5c'];
-var MC_LT=['rgba(255,127,127,0.18)','rgba(255,179,71,0.18)','rgba(255,215,0,0.18)','rgba(144,238,144,0.18)','rgba(135,206,235,0.18)','rgba(221,160,221,0.18)','rgba(244,169,192,0.18)','rgba(176,196,222,0.18)'];
 
-function openMandalaDetail(fi){
-  var ld=getLifeDesignData();
-  if(!ld)return;
-  var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
-  var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','','','','','',''];
-  var checks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false];
-  var bg=MC_BG[fi%8], tc=MC_TC[fi%8], lt=MC_LT[fi%8];
-
-  var modal=document.createElement('div');
-  modal.id='mandala-detail-modal';
-  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
-
-  // 編集モードかビューモードかをトグル
-  window._mdMode='view'; // 初期はビューモード
-  window._mdFi=fi;
-
-  function buildDetailView(){
-    var h='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1rem">';
-    var dChecks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false,false,false,false,false];
-    // 3x3グリッド: 位置→データインデックスのマッピング
-    // 位置: 0=左上 1=上中 2=右上 3=左中 4=中央(要素名) 5=右中 6=左下 7=下中 8=右下
-    // データ: details[0]〜[7]を左上から時計回りに配置
-    //   0=左上, 1=上中, 2=右上, 3=右中, 4=右下, 5=下中, 6=左下, 7=左中
-    // 4行動を上段3つ+右中1つに配置、下段は空
-    // pos: 0=左上 1=上中 2=右上 3=左中 4=中央 5=右中 6=左下 7=下中 8=右下
-    var posToData=[-2,-2,-2,-2,-1,-2,-2,-2,-2]; // -1=中央,-2=空
-    posToData[0]=0; posToData[1]=1; posToData[2]=2; posToData[5]=3;
-
-    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.7rem">';
-    for(var pos=0;pos<9;pos++){
-      if(posToData[pos]===-2){
-        html+='<div style="border-radius:8px;min-height:76px"></div>';
-        continue;
-      }
-      if(pos===4){
-        // 中央セル: 要素名
-        h+='<div style="background:'+bg+';color:'+tc+';padding:0.5rem;text-align:center;border-radius:8px;min-height:76px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.86rem;box-shadow:0 2px 8px rgba(0,0,0,0.2);line-height:1.4" onclick="editMandalaElemName()">';
-        h+=(elem||'要素名')+'</div>';
-      } else {
-        var di=posToData[pos];
-        var d=(di>=0&&details[di])?details[di]:'';
-        var chk=(di>=0&&dChecks[di])||false;
-        var cellBg=chk?'rgba(42,140,74,0.85)':lt;
-        var cellTc=chk?'#fff':'var(--ink)';
-        var cellBorder=chk?'2px solid #1a6b3a':'1px solid rgba(200,200,200,0.4)';
-        h+='<div style="background:'+cellBg+';border:'+cellBorder+';padding:0.4rem;text-align:center;border-radius:8px;min-height:76px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)" onclick="'+(di>=0&&d?'toggleMandalaCheck('+fi+','+di+')':'openMandalaEdit('+fi+')')+'">';
-        if(d){
-          if(chk)h+='<div style="font-size:1rem;margin-bottom:0.1rem">✓</div>';
-          h+='<div style="font-size:0.72rem;color:'+cellTc+';line-height:1.4;word-break:break-all">'+d+'</div>';
-        } else {
-          h+='<div style="font-size:0.62rem;color:var(--ink3);line-height:1.5">未設定<br>✏️</div>';
-        }
-        h+='</div>';
-      }
-    }
-    h+='</div>';
-    // 達成状況
-    var doneCount=dChecks.slice(0,4).filter(function(c){return c;}).length;
-    h+='<div style="text-align:center;font-size:0.78rem;color:var(--ink3);margin-bottom:0.8rem">'+doneCount+' / 4 達成</div>';
-    h+='<div style="display:flex;gap:0.5rem">';
-    h+='<button onclick="openMandalaEdit('+fi+')" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">✏️ 編集</button>';
-    h+='<button onclick="closeMandalaDetail()" style="flex:1;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
-    h+='</div></div>';
-    return h;
-  }
-
-  modal.innerHTML=buildDetailView();
-  document.body.appendChild(modal);
-  // グローバルに参照できるようにする
-  window._buildDetailView=buildDetailView;
+function toggleGoalCard(fi){
+  window._goalExpanded[fi]=!window._goalExpanded[fi];
+  redrawManualPage();
 }
 
 function toggleMandalaCheck(fi,di){
@@ -5407,39 +5356,27 @@ function toggleMandalaCheck(fi,di){
   var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:[];
   if(!details[di]||!details[di].trim())return; // 内容が空のセルは無視
   if(!ld.mandalaChecks)ld.mandalaChecks={};
-  if(!ld.mandalaChecks[fi])ld.mandalaChecks[fi]=[false,false,false,false,false,false,false,false];
+  if(!ld.mandalaChecks[fi])ld.mandalaChecks[fi]=[false,false,false,false];
   ld.mandalaChecks[fi][di]=!ld.mandalaChecks[fi][di];
   saveLifeDesignData(ld);
-  // モーダルを閉じて再度開く（クロージャ問題を回避）
-  closeMandalaDetail();
-  openMandalaDetail(fi);
+  window._goalExpanded[fi]=true;
   redrawManualPage();
 }
 
-function editMandalaElemName(){
-  var ld0=getLifeDesignData();
-  var cur0=ld0&&ld0.mandala&&ld0.mandala[window._mdFi]?ld0.mandala[window._mdFi]:'';
-  openInlineModal('要素名を編集してください',cur0,function(val){
-    var ld=getLifeDesignData();
-    if(!ld||!val.trim())return;
-    if(!ld.mandala)ld.mandala={};
-    ld.mandala[window._mdFi]=val.trim().slice(0,20);
-    saveLifeDesignData(ld);
-    openMandalaDetail(window._mdFi);
-  });
-}
-
-function openMandalaEdit(fi){
+function openGoalElementEdit(fi){
   var ld=getLifeDesignData();
   if(!ld)return;
   var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
-  var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','','','','','',''];
+  var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','',''];
 
-  var modal=document.getElementById('mandala-detail-modal');
+  var modal=document.createElement('div');
+  modal.id='goal-edit-modal';
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
+
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
   html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.3rem">要素名</div>';
   html+='<input id="md-elem" type="text" value="'+elem.replace(/"/g,'&quot;')+'" maxlength="20" style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);margin-bottom:1rem">';
-  html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.5rem">具体的行動（8つ）</div>';
+  html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.5rem">具体的行動（4つ）</div>';
   for(var di=0;di<4;di++){
     html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.5rem">';
     html+='<div style="font-size:0.72rem;color:var(--ink3);padding-top:0.5rem;min-width:1.2rem">'+(di+1)+'.</div>';
@@ -5447,19 +5384,20 @@ function openMandalaEdit(fi){
     html+='</div>';
   }
   html+='<div style="display:flex;gap:0.5rem;margin-top:0.8rem">';
-  html+='<button onclick="saveMandalaDetail('+fi+')" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
-  html+='<button onclick="closeMandalaDetail()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
+  html+='<button onclick="saveGoalElementEdit('+fi+')" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
+  html+='<button onclick="closeGoalElementEdit()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
   html+='</div></div>';
   modal.innerHTML=html;
-  setTimeout(function(){document.getElementById('md-elem').focus();},100);
+  document.body.appendChild(modal);
+  setTimeout(function(){var el=document.getElementById('md-elem');if(el)el.focus();},100);
 }
 
-function closeMandalaDetail(){
-  var m=document.getElementById('mandala-detail-modal');
+function closeGoalElementEdit(){
+  var m=document.getElementById('goal-edit-modal');
   if(m)m.remove();
 }
 
-function saveMandalaDetail(fi){
+function saveGoalElementEdit(fi){
   var ld=getLifeDesignData();
   if(!ld)return;
   if(!ld.mandala)ld.mandala={};
@@ -5473,9 +5411,8 @@ function saveMandalaDetail(fi){
   }
   ld.mandalaDetail[fi]=details;
   saveLifeDesignData(ld);
-  closeMandalaDetail();
-  // 保存後にビューモードで再度開く
-  openMandalaDetail(fi);
+  closeGoalElementEdit();
+  window._goalExpanded[fi]=true;
   redrawManualPage();
 }
 
