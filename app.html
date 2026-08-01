@@ -4458,7 +4458,7 @@ function renderMandala(ld){
       if(ld.mandalaChecks&&ld.mandalaChecks[fi])doneCount=ld.mandalaChecks[fi].filter(function(c){return c;}).length;
       if(elem){
         html+='<div style="font-size:0.84rem;color:'+tc+';line-height:1.4;font-weight:700">'+elem+'</div>';
-        if(hasDetail&&doneCount>0)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.8;margin-top:0.2rem">✓ '+doneCount+'/8</div>';
+        if(hasDetail&&doneCount>0)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.8;margin-top:0.2rem">✓ '+doneCount+'/4</div>';
         else if(hasDetail)html+='<div style="font-size:0.62rem;color:'+tc+';opacity:0.7;margin-top:0.2rem">▶ 詳細あり</div>';
       } else {
         html+='<div style="font-size:0.7rem;color:var(--ink3)">タップして<br>設定</div>';
@@ -5149,10 +5149,10 @@ async function submitStep2(){
 
   try{
     // STEP3: 各要素の具体行動を番号形式でAIが提案
-    var p3='「'+ld.purpose+'」を実現するための以下の8要素について、各要素ごとに具体的行動を8つ提案してください。\n\n';
+    var p3='「'+ld.purpose+'」を実現するための以下の8要素について、各要素ごとに具体的行動を4つ提案してください。\n\n';
     for(var pi=0;pi<elems.length;pi++)p3+=(pi+1)+'. '+elems[pi]+'\n';
     p3+='\n出力形式（必ず守ること）:\n';
-    p3+='要素1: 行動A / 行動B / 行動C / 行動D / 行動E / 行動F / 行動G / 行動H\n';
+    p3+='要素1: 行動A / 行動B / 行動C / 行動D\n';
     p3+='（要素8まで同形式で続ける）\n';
     p3+='各行動は15字以内。スラッシュで区切る。';
     var detailText=await aiChat(p3);
@@ -5178,7 +5178,9 @@ async function submitStep2(){
     }
     // パースできなかった要素は空で初期化
     for(var fi=0;fi<8;fi++){
-      if(!mandalaDetail[fi])mandalaDetail[fi]=Array(8).fill('');
+      if(!mandalaDetail[fi])mandalaDetail[fi]=Array(4).fill('');
+      else while(mandalaDetail[fi].length<4)mandalaDetail[fi].push('');
+      mandalaDetail[fi]=mandalaDetail[fi].slice(0,4);
     }
 
     ld.mandalaDetail=mandalaDetail;
@@ -5331,7 +5333,7 @@ function openMandalaDetail(fi){
   if(!ld)return;
   var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
   var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:['','','','','','','',''];
-  var checks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false,false,false,false,false];
+  var checks=ld.mandalaChecks&&ld.mandalaChecks[fi]?ld.mandalaChecks[fi]:[false,false,false,false];
   var bg=MC_BG[fi%8], tc=MC_TC[fi%8], lt=MC_LT[fi%8];
 
   var modal=document.createElement('div');
@@ -5349,13 +5351,17 @@ function openMandalaDetail(fi){
     // 位置: 0=左上 1=上中 2=右上 3=左中 4=中央(要素名) 5=右中 6=左下 7=下中 8=右下
     // データ: details[0]〜[7]を左上から時計回りに配置
     //   0=左上, 1=上中, 2=右上, 3=右中, 4=右下, 5=下中, 6=左下, 7=左中
-    var posToData=[-1,-1,-1,-1,-1,-1,-1,-1,-1]; // -1=中央
-    // 時計回り: 上左=0, 上中=1, 上右=2, 右中=3, 下右=4, 下中=5, 下左=6, 左中=7
-    var clockwise=[0,1,2,5,8,7,6,3]; // グリッド位置インデックス(0=左上〜8=右下)
-    for(var ci=0;ci<8;ci++)posToData[clockwise[ci]]=ci;
+    // 4行動を上段3つ+右中1つに配置、下段は空
+    // pos: 0=左上 1=上中 2=右上 3=左中 4=中央 5=右中 6=左下 7=下中 8=右下
+    var posToData=[-2,-2,-2,-2,-1,-2,-2,-2,-2]; // -1=中央,-2=空
+    posToData[0]=0; posToData[1]=1; posToData[2]=2; posToData[5]=3;
 
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:0.7rem">';
     for(var pos=0;pos<9;pos++){
+      if(posToData[pos]===-2){
+        html+='<div style="border-radius:8px;min-height:76px"></div>';
+        continue;
+      }
       if(pos===4){
         // 中央セル: 要素名
         h+='<div style="background:'+bg+';color:'+tc+';padding:0.5rem;text-align:center;border-radius:8px;min-height:76px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:0.86rem;box-shadow:0 2px 8px rgba(0,0,0,0.2);line-height:1.4" onclick="editMandalaElemName()">';
@@ -5379,8 +5385,8 @@ function openMandalaDetail(fi){
     }
     h+='</div>';
     // 達成状況
-    var doneCount=(dChecks).filter(function(c){return c;}).length;
-    h+='<div style="text-align:center;font-size:0.78rem;color:var(--ink3);margin-bottom:0.8rem">'+doneCount+' / 8 達成</div>';
+    var doneCount=dChecks.slice(0,4).filter(function(c){return c;}).length;
+    h+='<div style="text-align:center;font-size:0.78rem;color:var(--ink3);margin-bottom:0.8rem">'+doneCount+' / 4 達成</div>';
     h+='<div style="display:flex;gap:0.5rem">';
     h+='<button onclick="openMandalaEdit('+fi+')" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">✏️ 編集</button>';
     h+='<button onclick="closeMandalaDetail()" style="flex:1;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.6rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
@@ -5395,7 +5401,7 @@ function openMandalaDetail(fi){
 }
 
 function toggleMandalaCheck(fi,di){
-  if(di<0||di>7)return; // 未設定セルは無視
+  if(di<0||di>3)return; // 未設定セルは無視
   var ld=getLifeDesignData();
   if(!ld)return;
   var details=ld.mandalaDetail&&ld.mandalaDetail[fi]?ld.mandalaDetail[fi]:[];
@@ -5434,7 +5440,7 @@ function openMandalaEdit(fi){
   html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.3rem">要素名</div>';
   html+='<input id="md-elem" type="text" value="'+elem.replace(/"/g,'&quot;')+'" maxlength="20" style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);margin-bottom:1rem">';
   html+='<div style="font-size:0.82rem;color:var(--ink3);margin-bottom:0.5rem">具体的行動（8つ）</div>';
-  for(var di=0;di<8;di++){
+  for(var di=0;di<4;di++){
     html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.5rem">';
     html+='<div style="font-size:0.72rem;color:var(--ink3);padding-top:0.5rem;min-width:1.2rem">'+(di+1)+'.</div>';
     html+='<textarea id="md-d'+di+'" maxlength="50" placeholder="具体的な行動..." style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.82rem;background:var(--bg2);color:var(--ink);resize:none;height:50px;font-family:inherit;line-height:1.5">'+(details[di]||'')+'</textarea>';
@@ -5461,7 +5467,7 @@ function saveMandalaDetail(fi){
   var elemEl=document.getElementById('md-elem');
   if(elemEl)ld.mandala[fi]=elemEl.value.trim();
   var details=[];
-  for(var di=0;di<8;di++){
+  for(var di=0;di<4;di++){
     var el=document.getElementById('md-d'+di);
     details[di]=el?el.value.trim():'';
   }
