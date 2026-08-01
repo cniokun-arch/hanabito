@@ -4346,7 +4346,7 @@ function renderChapter5(){
 
   var ld=getLifeDesignData();
 
-  // STEP 1: あなたが一番叶えたい目標（常に表示・最初に来る）
+  // STEP 1: あなたが今一番叶えたいこと（常に表示・最初に来る）
   html+=renderGoalToolSection(ld);
 
   // STEP 2: やりたいことリスト（常に表示）
@@ -4397,8 +4397,8 @@ function renderBucketSection(ld){
 
 function renderGoalToolSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
-  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 1　あなたが一番叶えたい目標</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、大目標・必要な8つの要素・具体的な行動を整理します。</div>';
+  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 1　あなたが今一番叶えたいこと</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、あなたが今一番叶えたいこと・必要な8つの要素・具体的な行動を整理します。</div>';
   if(ld&&ld.step>=4){
     html+=renderGoalList(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">🔄 やり直す</button>';
@@ -4415,19 +4415,16 @@ window._goalExpanded=window._goalExpanded||{};
 function renderGoalList(ld){
   var html='<div style="margin-bottom:1rem">';
 
-  // 大目標カード（ゴールド背景）
+  // ラベル（枠の外）＋ゴールドカード（本文のみ）
+  html+='<div style="font-size:0.72rem;color:var(--ink3);letter-spacing:0.15em;margin-bottom:0.4rem;padding-left:0.1rem">🎯 あなたが今一番叶えたいこと</div>';
   html+='<div onclick="editMandalaCenter()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:12px;padding:1rem;text-align:center;margin-bottom:0.8rem;cursor:pointer;box-shadow:0 3px 10px rgba(184,134,11,0.3)">';
-  html+='<div style="font-size:0.68rem;letter-spacing:0.15em;opacity:0.85;margin-bottom:0.3rem">🎯 大目標</div>';
-  html+='<div style="font-size:1.05rem;font-weight:700;line-height:1.5">'+(ld.purpose||'タップして大目標を入力')+'</div>';
+  html+='<div style="font-size:1.05rem;font-weight:700;line-height:1.5">'+(ld.purpose||'タップして入力')+'</div>';
   html+='</div>';
 
   html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
   html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">必要な8つの要素</div>';
   html+='</div>';
-  html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.12),rgba(42,140,74,0.06));border:1px solid rgba(42,140,74,0.25);border-radius:8px;padding:0.45rem 0.6rem;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem">';
-  html+='<span style="font-size:0.9rem">✅</span>';
-  html+='<span style="font-size:0.74rem;color:#1a5c1a;font-weight:700">カードをタップして開き、達成した行動をチェック！</span>';
-  html+='</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.7rem;font-size:0.8rem;color:var(--ink);line-height:1.8">ここには、あなたが叶えたいことを実現するための8つの要素が並んでいます。タップすると、それぞれを実現するための行動がリストで表示されます。達成したもの・取り組めているものにチェックをつけましょう。<br>1つずつ達成して、あなたの願いの実現に近づいていきましょう！</div>';
 
   for(var fi=0;fi<8;fi++){
     var elem=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
@@ -4457,9 +4454,11 @@ function renderGoalList(ld){
           var d=details[di];
           if(!d||!d.trim())continue;
           var chk=!!checks[di];
-          html+='<div onclick="toggleMandalaCheck('+fi+','+di+')" style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.5rem 0.3rem;border-bottom:1px solid rgba(184,134,11,0.1);cursor:pointer">';
+          var rowBg=chk?'rgba(42,140,74,0.1)':'transparent';
+          html+='<div onclick="toggleMandalaCheck('+fi+','+di+')" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.5rem;margin-bottom:2px;border-radius:8px;background:'+rowBg+';border-bottom:1px solid rgba(184,134,11,0.1);cursor:pointer">';
           html+='<span style="font-size:1rem;line-height:1.4;color:'+(chk?'#2a8c4a':'var(--ink3)')+'">'+(chk?'☑':'☐')+'</span>';
-          html+='<span style="font-size:0.84rem;line-height:1.5;flex:1;color:'+(chk?'var(--ink3)':'var(--ink)')+';text-decoration:'+(chk?'line-through':'none')+'">'+d+'</span>';
+          html+='<span style="font-size:0.84rem;line-height:1.5;flex:1;color:'+(chk?'#1a5c1a':'var(--ink)')+';font-weight:'+(chk?'700':'400')+'">'+d+'</span>';
+          if(chk)html+='<span style="font-size:0.66rem;color:#2a8c4a;background:rgba(42,140,74,0.15);border-radius:6px;padding:0.1rem 0.4rem;flex-shrink:0">達成</span>';
           html+='</div>';
         }
       } else {
@@ -4749,7 +4748,7 @@ function closeBucketEditor(){
 }
 
 function editMandalaCenter(){
-  openInlineModal('大目標（中心テーマ）を入力してください',getCurrentLifeDesign().purpose||'',function(val){
+  openInlineModal('あなたが今一番叶えたいことを入力してください',getCurrentLifeDesign().purpose||'',function(val){
     var ld=getLifeDesignData();
     ld.purpose=val.slice(0,30);
     saveLifeDesignData(ld);
@@ -4940,8 +4939,8 @@ function buildIntroHTML(){
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:1rem;margin-bottom:1.2rem">';
   html+='<div style="font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:0.6rem">📋 これから行うこと（3ステップ）</div>';
   var steps=[
-    ['🎯','あなたが一番叶えたい目標','心理テストとAIで、大目標・必要な要素・具体行動を整理します'],
-    ['📝','やりたいことを決めよう','大目標以外にも、人生でやりたいことを自由に書き出します'],
+    ['🎯','あなたが今一番叶えたいこと','心理テストとAIで、目標・必要な要素・具体行動を整理します'],
+    ['📝','やりたいことを決めよう','それ以外にも、人生でやりたいことを自由に書き出します'],
     ['📅','運気カレンダーに予定を入れよう','あなたの運気と照合して、いつ動くかを決めます']
   ];
   for(var i=0;i<steps.length;i++){
@@ -4968,7 +4967,7 @@ function showQuiz(){
 
 function buildQuizHTML(){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが今一番叶えたいこと</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:15%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">💬 心理テスト</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:1rem">';
@@ -5054,7 +5053,7 @@ async function submitQuiz(){
 function showStep1(ld,wishText){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが今一番叶えたいこと</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:35%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🎯 一番叶えたいことは何ですか？</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIがあなたの回答を分析しました。下の結果を参考に、一番叶えたいことを入力してください。<br><span style="font-size:0.75rem;color:var(--ink3)">※ AIの提案と違っても大丈夫です。あなたが本当に望むことを書いてください。</span></p></div>';
@@ -5110,11 +5109,11 @@ async function submitStep1(){
 function showStep2(ld){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが今一番叶えたいこと</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:55%"></div></div>';
-  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌿 大目標に必要な8要素</div>';
+  html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">🌿 必要な8つの要素</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">AIが「'+( ld.purpose||'')+'」を実現するために必要な8つの要素を考えました。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 内容を自由に変えて大丈夫です。ピンと来なければ書き直してください。</span></p></div>';
-  html+='<div style="text-align:center;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:8px;padding:0.5rem;font-size:0.9rem;font-weight:700;margin-bottom:0.8rem">大目標: '+ld.purpose+'</div>';
+  html+='<div style="text-align:center;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border-radius:8px;padding:0.5rem;font-size:0.9rem;font-weight:700;margin-bottom:0.8rem">あなたが今一番叶えたいこと: '+ld.purpose+'</div>';
   html+='<p style="font-size:0.78rem;color:var(--ink3);margin-bottom:0.6rem">AIが提案した8要素です。内容を確認・編集してください。</p>';
   for(var fi=0;fi<8;fi++){
     var val=ld.mandala&&ld.mandala[fi]?ld.mandala[fi]:'';
@@ -5191,7 +5190,7 @@ async function submitStep2(){
 function showStep3(ld){
   var modal=document.getElementById('life-design-modal');
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.4rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが一番叶えたい目標</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);text-align:center;margin-bottom:0.3rem">STEP 1 / 3　・　あなたが今一番叶えたいこと</div>';
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:75%"></div></div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.5rem">⚡ 各要素の具体的行動</div>';
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem;margin-bottom:0.8rem"><p style="font-size:0.82rem;color:var(--ink);line-height:1.7;margin:0">各要素を実現するための具体的な行動をAIが提案しました。ホーム画面の「必要な8つの要素」カードから、後からいつでも編集できます。<br><span style="font-size:0.75rem;color:var(--ink3)">※ 今は内容を確認するだけで大丈夫です。</span></p></div>';
@@ -5241,7 +5240,7 @@ function showSchedulerStep(){
   html+='<div style="background:rgba(184,134,11,0.15);border-radius:6px;height:6px;margin-bottom:1rem"><div style="background:var(--gold);border-radius:6px;height:6px;width:100%"></div></div>';
   html+='<div style="text-align:center;font-size:2rem;margin-bottom:0.4rem">📅</div>';
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">お疲れ様でした！</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.8rem;margin-bottom:1rem"><p style="font-size:0.84rem;color:var(--ink);line-height:1.8;margin:0">大目標・必要な要素・やりたいことが整理できました。最後に「花人占術スケジューラー」で、あなたの運気を見ながら、いつ動くかを決めましょう。<br><span style="font-size:0.75rem;color:var(--ink3)">◎好運気に動く・×低運気は慎重に、が基本です。</span></p></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.8rem;margin-bottom:1rem"><p style="font-size:0.84rem;color:var(--ink);line-height:1.8;margin:0">あなたが今一番叶えたいこと・必要な要素・やりたいことが整理できました。最後に「花人占術スケジューラー」で、あなたの運気を見ながら、いつ動くかを決めましょう。<br><span style="font-size:0.75rem;color:var(--ink3)">◎好運気に動く・×低運気は慎重に、が基本です。</span></p></div>';
   html+='<button onclick="finishLifeWizard()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%">運気カレンダーを見る →</button>';
   html+='</div>';
   modal.innerHTML=html;
