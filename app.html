@@ -4336,7 +4336,7 @@ function saveTimelineEntry(year,entry){
     if(!data.lifeDesign[key].timeline)data.lifeDesign[key].timeline={};
     data.lifeDesign[key].timeline[year]=entry;
   }
-  // S.saveはcallerに任せる（既にsaveしている場合に二重にならないよう）
+  S.save(data);
 }
 
 function renderChapter5(){
@@ -4727,38 +4727,33 @@ function saveBucketEditor(){
   saveLifeDesignData(ld);
 
   // 開始日があるものをカレンダー＋タイムラインに登録
-  var data=S.load();
-  if(data){
-    if(!data.schedules)data.schedules={};
-    for(var bi=0;bi<items.length;bi++){
-      var b=items[bi];
-      if(!b.startDate||!b.text)continue;
-      var parts=b.startDate.split('-');
-      if(parts.length<2)continue;
-      var sy=parseInt(parts[0]),sm=parseInt(parts[1]);
-      if(!sy||!sm)continue;
-      // カレンダーに登録（月初め1日）
-      var schedKey=calDateKey(sy,sm,1);
-      if(!data.schedules[schedKey])data.schedules[schedKey]=[];
-      data.schedules[schedKey]=data.schedules[schedKey].filter(function(s){return s.bucketText!==b.text;});
-      data.schedules[schedKey].push({text:'🌱 '+b.text+(b.age?' ('+b.age+'歳までに)':''),mark:'🌱',bucketText:b.text});
-      // タイムラインにも登録（その年のメモに追加）
-      saveTimelineEntry(sy,function(year,bItem){
-        var tlData=getTimelineData();
-        var existing=tlData[year]||{goal:'',months:Array(12).fill('')};
-        if(typeof existing==='string')existing={goal:existing,months:Array(12).fill('')};
-        if(!existing.months)existing.months=Array(12).fill('');
-        var monthIdx=sm-1;
-        var mGoal=existing.months[monthIdx]||'';
-        var newEntry='🌱 '+bItem.text;
-        if(mGoal.indexOf(newEntry)<0){
-          existing.months[monthIdx]=mGoal?(mGoal+'・'+newEntry):newEntry;
-        }
-        return existing;
-      }(sy,b));
+  var calData=calGetSchedules();
+  for(var bi=0;bi<items.length;bi++){
+    var b=items[bi];
+    if(!b.startDate||!b.text)continue;
+    var parts=b.startDate.split('-');
+    if(parts.length<2)continue;
+    var sy=parseInt(parts[0]),sm=parseInt(parts[1]);
+    if(!sy||!sm)continue;
+    // カレンダーに登録（月初め1日・ホーム画面が実際に読む保存先へ）
+    var schedKey=calDateKey(sy,sm,1);
+    if(!calData[schedKey])calData[schedKey]=[];
+    calData[schedKey]=calData[schedKey].filter(function(s){return s.bucketText!==b.text;});
+    calData[schedKey].push({mark:'🌱',title:b.text+(b.age?'（'+b.age+'歳までに）':''),memo:'やりたいことリストより',bucketText:b.text});
+    // タイムラインにも登録（その年のメモに追加）
+    var tlData=getTimelineData();
+    var existing=tlData[sy]||{goal:'',months:Array(12).fill('')};
+    if(typeof existing==='string')existing={goal:existing,months:Array(12).fill('')};
+    if(!existing.months)existing.months=Array(12).fill('');
+    var monthIdx=sm-1;
+    var mGoal=existing.months[monthIdx]||'';
+    var newEntry='🌱 '+b.text;
+    if(mGoal.indexOf(newEntry)<0){
+      existing.months[monthIdx]=mGoal?(mGoal+'・'+newEntry):newEntry;
     }
-    S.save(data);
+    saveTimelineEntry(sy,existing);
   }
+  calSaveSchedules(calData);
 
   closeBucketEditor();
   redrawManualPage();
