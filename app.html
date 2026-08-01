@@ -4345,30 +4345,98 @@ function renderChapter5(){
   html+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.08em">あなたの人生設計</div></div>';
 
   var ld=getLifeDesignData();
-  if(ld&&ld.step>=4){
-    // 完成済み: マンダラ+タイムライン表示
-    html+=renderMandala(ld);
-    html+=renderTimeline(ld);
-    html+='<button onclick="startLifeDesign()" style="margin-top:1rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.5rem 1rem;font-size:0.8rem;cursor:pointer;width:100%">🔄 人生設計をやり直す</button>';
-  } else {
-    html+='<p style="font-size:0.88rem;color:var(--ink3);line-height:1.8;margin-bottom:1rem">心理テスト・AIアドバイス・9マス目標シートを使って、あなただけの人生設計を作ります。</p>';
-    html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.95rem;cursor:pointer;width:100%">🌸 人生設計を始める</button>';
-  }
+
+  // STEP 1: やりたいことリスト（常に表示）
+  html+=renderBucketSection(ld);
+
+  // STEP 2: 花人占術スケジューラー（常に表示）
+  html+=renderTimeline(ld);
+
+  // オプション: 目標設定ツール（折りたたみ）
+  html+=renderGoalToolSection(ld);
+
   return html;
 }
 
+function renderBucketSection(ld){
+  var html='<div style="margin-bottom:1.4rem">';
+  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 1　やりたいことリスト</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">';
+  html+='あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！</div>';
+
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink3)">リスト一覧</div>';
+  html+='<button onclick="openBucketListEditor()" style="font-size:0.78rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.35rem 0.9rem;cursor:pointer">＋ 追加・編集</button>';
+  html+='</div>';
+
+  if(ld&&ld.buckets&&ld.buckets.length>0){
+    var filled=ld.buckets.filter(function(b){return b&&b.text;});
+    if(filled.length>0){
+      for(var bii=0;bii<filled.length;bii++){
+        var b=filled[bii];
+        html+='<div style="background:var(--bg2);border:1px solid rgba(184,134,11,0.18);border-radius:10px;padding:0.6rem 0.8rem;margin-bottom:0.5rem;cursor:pointer" onclick="editBucketItem('+bii+')">';
+        html+='<div style="display:flex;align-items:baseline;gap:0.4rem;margin-bottom:0.2rem">';
+        html+='<span style="font-size:0.72rem;color:var(--gold);font-weight:700;min-width:1.4rem">'+(bii+1)+'.</span>';
+        html+='<span style="font-size:0.88rem;color:var(--ink);font-weight:700">'+b.text+'</span>';
+        html+='</div>';
+        html+='<div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-left:1.8rem">';
+        if(b.age)html+='<span style="font-size:0.7rem;color:var(--gold)">🎯 '+b.age+'歳までに</span>';
+        if(b.startDate){var sd=b.startDate.replace(/-01$/,'').replace('-','年')+'月';html+='<span style="font-size:0.7rem;color:var(--ink3)">📅 '+sd+'〜</span>';}
+        html+='</div>';
+        html+='</div>';
+      }
+    } else {
+      html+=bucketEmptyHtml();
+    }
+  } else {
+    html+=bucketEmptyHtml();
+  }
+  html+='</div>';
+  return html;
+}
+
+function renderGoalToolSection(ld){
+  // アコーディオン形式の目標設定ツール
+  var hasData=ld&&ld.purpose;
+  var html='<div style="margin-top:0.5rem;border-top:1px solid rgba(184,134,11,0.2);padding-top:1rem">';
+  html+='<div onclick="toggleGoalTool()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:0.3rem 0">';
+  html+='<div>';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink3)">🎯 目標設定ツール（オプション）</div>';
+  html+='<div style="font-size:0.72rem;color:var(--ink3);margin-top:0.1rem">大目標・8要素・具体行動を整理したい方向け</div>';
+  html+='</div>';
+  html+='<span id="goal-tool-arrow" style="font-size:0.9rem;color:var(--ink3);transition:transform 0.2s">'+(hasData?'▲':'▼')+'</span>';
+  html+='</div>';
+  html+='<div id="goal-tool-body" style="display:'+(hasData?'block':'none')+';margin-top:0.8rem">';
+  if(ld&&ld.step>=4){
+    html+=renderMandala(ld);
+    html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">🔄 やり直す</button>';
+  } else {
+    html+='<p style="font-size:0.82rem;color:var(--ink3);line-height:1.7;margin-bottom:0.8rem">心理テスト・AIアドバイスを使って大目標と8つの要素、具体行動を設定します。</p>';
+    html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.88rem;cursor:pointer;width:100%">🌸 目標設定を始める</button>';
+  }
+  html+='</div>';
+  html+='</div>';
+  return html;
+}
+
+function toggleGoalTool(){
+  var body=document.getElementById('goal-tool-body');
+  var arrow=document.getElementById('goal-tool-arrow');
+  if(!body)return;
+  var isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if(arrow)arrow.textContent=isOpen?'▼':'▲';
+}
+
 function renderMandala(ld){
-  var html='<div style="margin-bottom:1.2rem">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem">';
-  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold)">STEP 1　あなたが今叶えたい願い</div>';
-  html+='<button onclick="editLifeDesign()" style="background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.25rem 0.6rem;font-size:0.72rem;cursor:pointer">✏️ 編集</button>';
+  var html='<div style="margin-bottom:1rem">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
+  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink)">大目標と8つの要素</div>';
+  html+='<button onclick="editLifeDesign()" style="background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:0.2rem 0.5rem;font-size:0.7rem;cursor:pointer">✏️ 編集</button>';
   html+='</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.7rem;font-size:0.78rem;color:var(--ink);line-height:1.7">';
-  html+='あなたが今叶えたい願いを中心に置き、それを叶えるための要素が周りに並んでいます。<br>それぞれをタップすると、さらにその要素を達成するための「具体的行動」が現れます。<br><span style="color:var(--ink3);font-size:0.72rem">※ 本機能は独自の9マス目標シートです。</span>';
-  html+='</div>';
-  html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.15),rgba(42,140,74,0.08));border:1px solid rgba(42,140,74,0.3);border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.5rem">';
-  html+='<span style="font-size:1rem">✅</span>';
-  html+='<span style="font-size:0.78rem;color:#1a5c1a;font-weight:700;line-height:1.5">達成・取り組めている行動はタップして完了チェックしましょう！</span>';
+  html+='<div style="background:linear-gradient(135deg,rgba(42,140,74,0.12),rgba(42,140,74,0.06));border:1px solid rgba(42,140,74,0.25);border-radius:8px;padding:0.45rem 0.6rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.4rem">';
+  html+='<span style="font-size:0.9rem">✅</span>';
+  html+='<span style="font-size:0.74rem;color:#1a5c1a;font-weight:700">達成・取り組めている行動をタップして完了チェック！</span>';
   html+='</div>';
 
   // 第1層：中央=大目標、周囲8=要素
@@ -4400,34 +4468,7 @@ function renderMandala(ld){
   }
   html+='</div>';
 
-  // バケットリスト表示
-  html+='<div style="margin-top:0.8rem;margin-bottom:0.5rem">';
-  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 2　やりたいことリスト</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.6rem;font-size:0.78rem;color:var(--ink);line-height:1.7">あなたが思いつくやりたいことを思いつくままに並べ、実現したい時期を決めましょう。運気カレンダーに予定を組み込み、良い時期を見越して実現に向けて動きましょう！</div>';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem">';
-  html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink3)">リスト一覧</div>';
-  html+='<button onclick="openBucketListEditor()" style="font-size:0.72rem;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:6px;padding:0.25rem 0.7rem;cursor:pointer">＋ 追加・編集</button>';
-  html+='</div>';
 
-  if(ld.buckets&&ld.buckets.length>0){
-    var filled=ld.buckets.filter(function(b){return b&&b.text;});
-    if(filled.length>0){
-      for(var bii=0;bii<filled.length;bii++){
-        var b=filled[bii];
-        html+='<div style="background:var(--bg2);border:1px solid rgba(184,134,11,0.15);border-radius:8px;padding:0.5rem 0.6rem;margin-bottom:0.4rem;cursor:pointer" onclick="editBucketItem('+bii+')">';
-        html+='<div style="font-size:0.86rem;color:var(--ink);font-weight:700;margin-bottom:0.25rem">'+b.text+'</div>';
-        html+='<div style="display:flex;gap:0.6rem;flex-wrap:wrap">';
-        if(b.age)html+='<span style="font-size:0.7rem;color:var(--gold)">🎯 '+b.age+'歳までに達成</span>';
-        if(b.startDate)html+='<span style="font-size:0.7rem;color:var(--ink3)">📅 '+b.startDate+'から開始</span>';
-        html+='</div>';
-        html+='</div>';
-      }
-    } else {
-      html+=bucketEmptyHtml();
-    }
-  } else {
-    html+=bucketEmptyHtml();
-  }
   html+='</div>';
 
 
@@ -4766,8 +4807,8 @@ function renderTimeline(ld){
   var G=doCalc(parseInt(Graw.y,10),parseInt(Graw.m,10),parseInt(Graw.d,10),Graw.gender||'男');
   if(!G)return '';
   var html='<div style="margin-bottom:1.2rem">';
-  html+='<div style="font-size:0.9rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 3　花人占術スケジューラー</div>';
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.78rem;color:var(--ink);line-height:1.7">あなたのやりたいことを、運気を見据えながら運気カレンダーに予定を組み込みましょう！<br>出来るだけ好運気に動けると、良い結果に繋がる可能性が高まります。低運気の時は注意しながら行動しましょう。<br><span style="font-size:0.72rem;color:var(--ink3)">各年をタップして予定を入力できます。入力された予定はホーム画面のカレンダーに組み込まれます。</span></div>';
+  html+='<div style="font-size:0.95rem;font-weight:700;color:var(--gold);margin-bottom:0.4rem">STEP 2　花人占術スケジューラー</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>各年をタップすると年間・月別の目標を設定でき、ホーム画面のカレンダーに反映されます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気に動く・×低運気は慎重に、が基本です。</span></div>';
 
   var currentYear=new Date().getFullYear();
   var endYear=currentYear+15;
