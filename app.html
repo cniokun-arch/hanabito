@@ -5433,8 +5433,16 @@ function editTimelineMemo(year){
   var daiunLabel=daiunGrade>=3?'◎':daiunGrade>=2?'○':daiunGrade>=1?'△':daiunGrade<0?'×':'―';
   var daiunColor=getJuniColor(daiunJu);
 
+  var daiunAdviceKey=daiunStartY?('daiun'+daiunStartY):null;
+  var daiunCached=daiunAdviceKey&&tlData2[daiunAdviceKey]?tlData2[daiunAdviceKey]:null;
+
   function juniDesc(ju){
     var d=(KB['十二運気']||{})[ju];
+    if(!d)return '';
+    return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+  }
+  function thDesc(th){
+    var d=(KB['通変星']||{})[th];
     if(!d)return '';
     return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
   }
@@ -5464,8 +5472,8 @@ function editTimelineMemo(year){
     html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+daiunYearStr+'</span>';
     html+='<span style="font-size:1.15rem;font-weight:900;color:'+daiunColor+'">'+daiunLabel+' '+(daiunTh?daiunTh+'×':'')+daiunJu+'</span>';
     html+='</div>';
-    var dd=juniDesc(daiunJu);
-    if(dd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7;margin-bottom:0.6rem">'+dd+'</div>';
+    html+='<div id="daiun-advice-box" style="font-size:0.8rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(daiunCached&&daiunCached.text?daiunCached.text.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">『'+daiunTh+'』と『'+daiunJu+'』、2つを掛け合わせるとどうなるかをAIが解説します。</span>')+'</div>';
+    html+='<button id="daiun-advice-btn" onclick="generateDaiunAdvice('+daiunStartY+','+daiunEndY+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.45rem;font-size:0.76rem;cursor:pointer;margin-bottom:0.6rem">'+(daiunCached&&daiunCached.text?'🔄 再生成する':'✨ '+daiunTh+'×'+daiunJu+'を統合して解説する')+'</button>';
   }
   if(yrJu){
     html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.15)">年運（その年）</div>';
@@ -5510,6 +5518,55 @@ function editTimelineMemo(year){
   modal.innerHTML=html;
   document.body.appendChild(modal);
   setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
+}
+
+async function generateDaiunAdvice(startY,endY){
+  var btn=document.getElementById('daiun-advice-btn');
+  var box=document.getElementById('daiun-advice-box');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 生成中...';}
+  if(box)box.innerHTML='<span style="color:var(--ink3)">AIが考えています...</span>';
+  try{
+    var Graw=getCurrentTargetG();
+    var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+    if(!G)throw new Error('データがありません');
+    var drows=getDaiunRows(G);
+    var daiunRow=null;
+    for(var i=0;i<drows.length;i++){if(drows[i].startY===startY){daiunRow=drows[i];break;}}
+    if(!daiunRow)throw new Error('大運データが見つかりません');
+    var th=daiunRow.th,ju=daiunRow.ju;
+    function juniDesc3(j){
+      var d=(KB['十二運気']||{})[j];
+      if(!d)return '';
+      return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+    }
+    function thDesc3(t){
+      var d=(KB['通変星']||{})[t];
+      if(!d)return '';
+      return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+    }
+    var prompt='以下の2つの占術要素を、別々にではなく1つに統合して解釈してください。\n\n'
+      +'【通変星『'+th+'』】'+(thDesc3(th)||'（データなし）')+'\n'
+      +'【十二運気『'+ju+'』】'+(juniDesc3(ju)||'（データなし）')+'\n\n'
+      +'■ 書き方\n'
+      +'・2つを別々に説明するのではなく、『'+th+'』という気質・欲求が『'+ju+'』という形・質で表れるとどうなるか、を1つの統合された人物像として描写する\n'
+      +'・'+startY+'〜'+endY+'年のこの10年間、この人がどんな傾向を持ちやすいかが伝わるようにする\n'
+      +'・通変星名・十二運気名はそのまま使ってよい（公開用語／アプリ内で既に表示済みの名称のため隠す必要はない）\n'
+      +'・思いやりのある前向きな言葉で。Markdown禁止。150〜200文字程度。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'あなたは占術カウンセラーです。2つの要素を別々に説明するのではなく、必ず1つの統合された解釈として書いてください。専門用語で終わらせず誰にでも分かる温かい言葉で。',engine:AI_ENGINE})});
+    var json=await res.json();
+    var text=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+
+    var tlData=getTimelineData();
+    var key='daiun'+startY;
+    saveTimelineEntry(key,{th:th,ju:ju,text:text});
+
+    if(box)box.innerHTML=text.replace(/\n/g,'<br>');
+    if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
+  }catch(e){
+    if(box)box.innerHTML='<span style="color:#c04040">通信エラー：'+e.message+'</span>';
+    if(btn){btn.textContent='✨ 統合して解説する';btn.disabled=false;}
+  }
 }
 
 async function generateYearAdvice(year){
