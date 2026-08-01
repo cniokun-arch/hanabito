@@ -5371,7 +5371,19 @@ function editTimelineMemo(year){
   var yrGrade=UNKI_GRADE[yrJu]||0;
   var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
   var yrColor=getJuniColor(yrJu);
-  var daiunJu=G?getDaiunJuForYear(year,G):'';
+
+  // 大運（該当する行を1回のループで特定し、通変星・十二運気・開始終了年をまとめて取得）
+  var daiunRow=null;
+  if(G){
+    var drows=getDaiunRows(G);
+    for(var di2=0;di2<drows.length;di2++){
+      if(drows[di2].startY<=year&&year<=drows[di2].endY){daiunRow=drows[di2];break;}
+    }
+  }
+  var daiunJu=daiunRow?daiunRow.ju:'';
+  var daiunTh=daiunRow?daiunRow.th:'';
+  var daiunStartY=daiunRow?daiunRow.startY:'';
+  var daiunEndY=daiunRow?daiunRow.endY:'';
   var daiunGrade=UNKI_GRADE[daiunJu]||0;
   var daiunLabel=daiunGrade>=3?'◎':daiunGrade>=2?'○':daiunGrade>=1?'△':daiunGrade<0?'×':'―';
   var daiunColor=getJuniColor(daiunJu);
@@ -5399,35 +5411,34 @@ function editTimelineMemo(year){
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
   html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">'+year+'年の目標設定</div>';
 
-  // 大運の開始・終了年を取得
-  var daiunStartY='',daiunEndY='';
-  if(G){
-    var drows=getDaiunRows(G);
-    for(var di2=0;di2<drows.length;di2++){
-      if(drows[di2].startY<=year&&year<=drows[di2].endY){
-        daiunStartY=drows[di2].startY;daiunEndY=drows[di2].endY;break;
-      }
-    }
-  }
-
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
   if(daiunJu){
     var daiunYearStr=daiunStartY?(daiunStartY+'〜'+daiunEndY+'年'):'';
-    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;flex-wrap:wrap">';
-    html+='<span style="font-size:0.76rem;color:var(--ink3);white-space:nowrap">大運（'+daiunYearStr+'）</span>';
-    html+='<span style="font-size:0.92rem;font-weight:700;color:'+daiunColor+'">'+daiunLabel+' '+daiunJu+'</span>';
+    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem">大運（10年サイクル）</div>';
+    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">';
+    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+daiunYearStr+'</span>';
+    html+='<span style="font-size:1.15rem;font-weight:900;color:'+daiunColor+'">'+daiunLabel+' '+(daiunTh?daiunTh+'×':'')+daiunJu+'</span>';
     html+='</div>';
     var dd=juniDesc(daiunJu);
     if(dd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7;margin-bottom:0.6rem">'+dd+'</div>';
   }
   if(yrJu){
-    html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
-    html+='<span style="font-size:0.76rem;color:var(--ink3);white-space:nowrap">年運（'+year+'年）</span>';
-    html+='<span style="font-size:0.92rem;font-weight:700;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
+    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.15)">年運（その年）</div>';
+    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.35rem">';
+    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+year+'年</span>';
+    html+='<span style="font-size:1.15rem;font-weight:900;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
     html+='</div>';
     var yd=juniDesc(yrJu);
     if(yd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7">'+yd+'</div>';
   }
+  html+='</div>';
+
+  // AIアドバイス（大運×年運を踏まえて、結局どうすればいいか）
+  html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.04));border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
+  html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">💡 この年、結局どうすればいい？</div>';
+  var cachedAdvice=(tdata.advice&&tdata.advice.text)?tdata.advice.text:'';
+  html+='<div id="tl-advice-box" style="font-size:0.82rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(cachedAdvice?cachedAdvice.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">大運と年運を掛け合わせて、AIが今年の動き方をアドバイスします。</span>')+'</div>';
+  html+='<button id="tl-advice-btn" onclick="generateYearAdvice('+year+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.5rem;font-size:0.8rem;cursor:pointer">'+(cachedAdvice?'🔄 再生成する':'✨ AIにアドバイスをもらう')+'</button>';
   html+='</div>';
 
   html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
@@ -5456,6 +5467,58 @@ function editTimelineMemo(year){
   setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
 }
 
+async function generateYearAdvice(year){
+  var btn=document.getElementById('tl-advice-btn');
+  var box=document.getElementById('tl-advice-box');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 生成中...';}
+  if(box)box.innerHTML='<span style="color:var(--ink3)">AIが考えています...</span>';
+  try{
+    var Graw=getCurrentTargetG();
+    var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+    if(!G)throw new Error('データがありません');
+    var drows=getDaiunRows(G);
+    var daiunRow=null;
+    for(var i=0;i<drows.length;i++){if(drows[i].startY<=year&&year<=drows[i].endY){daiunRow=drows[i];break;}}
+    var yrShi=JUNISHI[((year-1984)%12+12)%12];
+    var yrJu=getJuniUnki(G.ht,yrShi);
+    function juniDesc2(ju){
+      var d=(KB['十二運気']||{})[ju];
+      if(!d)return '';
+      return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+    }
+    var daiunTh=daiunRow?daiunRow.th:'—';
+    var daiunJu2=daiunRow?daiunRow.ju:'';
+    var prompt='以下の運気データを踏まえて、'+year+'年をどう過ごすと良いか、具体的で実践的なアドバイスを書いてください。\n\n'
+      +'【大運（10年サイクル・'+(daiunRow?daiunRow.startY+'〜'+daiunRow.endY+'年':'')+'）】通変星='+daiunTh+'　十二運気='+daiunJu2+'\n'
+      +(juniDesc2(daiunJu2)?'説明：'+juniDesc2(daiunJu2)+'\n':'')
+      +'【年運（'+year+'年）】十二運気='+yrJu+'\n'
+      +(juniDesc2(yrJu)?'説明：'+juniDesc2(yrJu)+'\n':'')
+      +'\n■ 書き方\n'
+      +'・大運と年運を掛け合わせると、この年がどんな年になりやすいかを最初に一言でまとめる\n'
+      +'・それを踏まえて、今年の目標を立てる上で「結局どうすればいいのか」を具体的な行動レベルでアドバイスする\n'
+      +'・十二運気名（豊穣・芽吹など）や通変星名（比肩など）はそのまま出さず、日常の言葉に置き換える\n'
+      +'・思いやりのある前向きな言葉で。Markdown禁止。250文字程度。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'あなたは占術カウンセラーです。専門用語を使わず、誰にでも分かる温かい言葉でアドバイスしてください。',engine:AI_ENGINE})});
+    var json=await res.json();
+    var text=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+
+    // タイムラインの年データにキャッシュとして保存
+    var tlData=getTimelineData();
+    var entry=tlData[year]||{goal:'',months:Array(12).fill('')};
+    if(typeof entry==='string')entry={goal:entry,months:Array(12).fill('')};
+    if(!entry.months)entry.months=Array(12).fill('');
+    entry.advice={th:daiunTh,ju:daiunJu2,yrJu:yrJu,text:text};
+    saveTimelineEntry(year,entry);
+
+    if(box)box.innerHTML=text.replace(/\n/g,'<br>');
+    if(btn){btn.textContent='🔄 再生成する';btn.disabled=false;}
+  }catch(e){
+    if(box)box.innerHTML='<span style="color:#c04040">通信エラー：'+e.message+'</span>';
+    if(btn){btn.textContent='✨ AIにアドバイスをもらう';btn.disabled=false;}
+  }
+}
+
 function showJuniPopup(ju,label){
   if(ju&&ju.dataset){label=ju.dataset.lb;ju=ju.dataset.ju;}
   var desc=(KB['十二運気']||{})[ju];
@@ -5474,7 +5537,13 @@ function saveTimelineData(year){
     var el=document.getElementById('tl-m'+mi);
     months.push(el?el.value.trim():'');
   }
-  saveTimelineEntry(year,{goal:goal,months:months});
+  var tlData=getTimelineData();
+  var existing=tlData[year];
+  if(existing&&typeof existing==='object'&&existing.advice){
+    saveTimelineEntry(year,{goal:goal,months:months,advice:existing.advice});
+  } else {
+    saveTimelineEntry(year,{goal:goal,months:months});
+  }
   closeTimelineModal();
   redrawManualPage();
 }
