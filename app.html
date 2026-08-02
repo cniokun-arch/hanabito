@@ -29,6 +29,21 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   display:none;align-items:center;justify-content:center;padding:2rem 1rem
 }
 #screen-login.active{display:flex}
+
+/* ===== パスワード / 使い方ガイド（screen-loginと同じ確実な方式） ===== */
+#screen-password{
+  background:linear-gradient(160deg,#fdf9f0 0%,#f6ead2 55%,#f0deae 100%);
+  position:fixed;inset:0;z-index:9000;overflow-y:auto;
+  display:none;align-items:center;justify-content:center;padding:2rem 1rem
+}
+#screen-password.active{display:flex}
+#screen-guide{
+  background:linear-gradient(160deg,#fdf9f0 0%,#f6ead2 55%,#f0deae 100%);
+  position:fixed;inset:0;z-index:9000;overflow-y:auto;
+  display:none;padding:0
+}
+#screen-guide.active{display:block}
+
 .login-box{width:min(380px,100%);text-align:center}
 .login-logo{font-family:'Zen Old Mincho',serif;font-size:2.2rem;letter-spacing:0.4em;color:#8a5a00;font-weight:700;margin-bottom:0.3rem}
 .login-sub{font-size:1rem;color:#8a7a5c;letter-spacing:0.25em;margin-bottom:2.5rem}
@@ -493,6 +508,7 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
 
       <!-- 新規登録 -->
       <div id="register-form" style="display:none">
+        <p style="font-size:0.92rem;color:#3a2c18;text-align:center;line-height:1.7;margin:0 0 1.2rem">あなたの情報を登録してください。</p>
         <div class="login-field">
           <label>ニックネーム</label>
           <input type="text" id="reg-nick" placeholder="あなたの呼び名" autocomplete="username">
@@ -516,6 +532,10 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
             <option value="女">女（陰）</option>
           </select>
         </div>
+        <label style="display:flex;align-items:flex-start;gap:0.55rem;margin:1rem 0 1.1rem;cursor:pointer;text-align:left">
+          <input type="checkbox" id="reg-consent" style="margin-top:0.2rem;width:1.05rem;height:1.05rem;flex-shrink:0">
+          <span style="font-size:0.82rem;color:#3a2c18;line-height:1.7"><a href="javascript:void(0)" onclick="event.preventDefault();document.getElementById('terms-overlay').classList.add('show')" style="color:#8a5a00;text-decoration:underline">利用規約・免責事項</a>に同意します</span>
+        </label>
         <button class="btn-login" onclick="doRegister()">登録してはじめる</button>
       </div>
       <div class="login-note">データはこのブラウザのみに保存されます。<br>サーバーへの個人情報送信はありません。</div>
@@ -958,104 +978,102 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
-  <div id="onboarding-guide" style="display:none;position:fixed;inset:0;background:rgba(90,60,20,0.55);z-index:480;overflow-y:auto">
-    <div style="max-width:520px;margin:0 auto;padding:1.6rem 1rem 2.4rem;box-sizing:border-box">
-      <div style="background:var(--bg,#faf6ef);border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.4)">
-        <div style="background:linear-gradient(135deg,#b8860b,#d4a017);padding:1.6rem 1.3rem 1.3rem;text-align:center">
-          <div style="font-size:1.8rem;margin-bottom:0.3rem">🌸</div>
-          <div style="font-family:'Zen Old Mincho',serif;font-size:1.15rem;color:#fff;letter-spacing:0.08em">花人占術（はなびとせんじゅつ）へようこそ！</div>
+  <div id="screen-guide" class="screen">
+    <div style="max-width:560px;margin:0 auto;padding:0 0 2.4rem;box-sizing:border-box">
+      <div style="background:linear-gradient(135deg,#b8860b,#d4a017);padding:2rem 1.3rem 1.6rem;text-align:center">
+        <div style="font-size:2.4rem;margin-bottom:0.4rem">🌸</div>
+        <div style="font-family:'Zen Old Mincho',serif;font-size:1.35rem;color:#fff;letter-spacing:0.06em;line-height:1.5">花人占術（はなびとせんじゅつ）<br>へようこそ！</div>
+      </div>
+      <div style="padding:1.6rem 1.3rem 1.8rem">
+        <p style="font-size:1rem;color:#3a2c18;line-height:2;margin:0 0 1.6rem">『花人占術』は、東洋の伝統的な占い（四柱推命・算命学・易経・九星気学）をベースに、<strong style="color:#8a5a00">「あなただけの才能」と「理想の人生」</strong>を引き出すためのセルフケア＆目標達成Webアプリです。まずは気になる画面から、自由に使ってみてくださいね！</p>
+
+        <div style="font-family:'Zen Old Mincho',serif;font-size:1.15rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:1rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.5rem">🔰 5つのメニューでできること</div>
+
+        <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:0.9rem">
+          <div style="font-size:1.05rem;font-weight:700;color:#3a2c18;margin-bottom:0.45rem">🏠 ホーム｜きょうの運気とあなたのタイプ</div>
+          <div style="font-size:0.95rem;color:#5a4c34;line-height:1.9">・あなたの「花タイプ」（天・風・水・離・白・仙の6分類）が分かります<br>・運気カレンダーで今日の運気（◎○△×）が一目で確認でき、メモ帳としても使えます</div>
         </div>
-        <div style="padding:1.3rem 1.2rem 1.6rem">
-          <p style="font-size:0.86rem;color:#3a2c18;line-height:1.9;margin:0 0 1.3rem">『花人占術』は、東洋の伝統的な占い（四柱推命・算命学・易経・九星気学）をベースに、<strong style="color:#8a5a00">「あなただけの才能」と「理想の人生」</strong>を引き出すためのセルフケア＆目標達成Webアプリです。まずは気になる画面から、自由に使ってみてくださいね！</p>
 
-          <div style="font-family:'Zen Old Mincho',serif;font-size:0.98rem;color:#8a5a00;letter-spacing:0.05em;margin-bottom:0.8rem;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.4rem">🔰 5つのメニューでできること</div>
-
-          <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-            <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">🏠 ホーム｜きょうの運気とあなたのタイプ</div>
-            <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">・あなたの「花タイプ」（天・風・水・離・白・仙の6分類）が分かります<br>・運気カレンダーで今日の運気（◎○△×）が一目で確認でき、メモ帳としても使えます</div>
+        <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:0.9rem">
+          <div style="font-size:1.05rem;font-weight:700;color:#3a2c18;margin-bottom:0.45rem">🀄 命式｜あなただけの「人生の設計図」</div>
+          <div style="font-size:0.95rem;color:#5a4c34;line-height:1.9;margin-bottom:0.7rem">生年月日から導き出した、生まれ持った性質や運気の波のデータです。専門用語も、あなたの隠れた魅力を教えてくれる大切なシグナルです。</div>
+          <div style="background:#fff;border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:0.75rem 0.9rem">
+            <div style="font-size:0.9rem;color:#8a5a00;font-weight:700;margin-bottom:0.4rem">💡 ちょこっと専門用語メモ</div>
+            <div style="font-size:0.9rem;color:#5a4c34;line-height:1.9">通変星＝あなたの「性格」や「才能のクセ」<br>十二運気＝あなたが出せる「エネルギーの強さ・行動パターン」<br>大運＝10年ごとにガラリと変わる「人生の大きなテーマ・運気の波」</div>
           </div>
-
-          <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-            <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">🀄 命式｜あなただけの「人生の設計図」</div>
-            <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8;margin-bottom:0.6rem">生年月日から導き出した、生まれ持った性質や運気の波のデータです。専門用語も、あなたの隠れた魅力を教えてくれる大切なシグナルです。</div>
-            <div style="background:#fff;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:0.6rem 0.75rem">
-              <div style="font-size:0.74rem;color:#8a5a00;font-weight:700;margin-bottom:0.3rem">💡 ちょこっと専門用語メモ</div>
-              <div style="font-size:0.76rem;color:#5a4c34;line-height:1.8">通変星＝あなたの「性格」や「才能のクセ」<br>十二運気＝あなたが出せる「エネルギーの強さ・行動パターン」<br>大運＝10年ごとにガラリと変わる「人生の大きなテーマ・運気の波」</div>
-            </div>
-          </div>
-
-          <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-            <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">💬 AI相談｜専属の占い師にいつでもチャット</div>
-            <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">「今年の恋愛運は？」「転職のタイミングに悩んでいる…」など、何でも気軽に聞いてみてください。命式データを踏まえてAIが親身にアドバイスします（音声入力・読み上げも対応）</div>
-          </div>
-
-          <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-            <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">💞 相性｜気になる人との「絆」を占う</div>
-            <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">ご家族、お友達、パートナーの生年月日を入力するだけで、相性や関わり方のコツが分かります</div>
-          </div>
-
-          <div style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:1.2rem">
-            <div style="font-size:0.88rem;font-weight:700;color:#8a5a00;margin-bottom:0.3rem">📖 あなたの本｜【おすすめ！】人生を整えるセルフワーク</div>
-            <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8;margin-bottom:0.4rem">アプリのメイン機能です！AIがあなた専用の分析本を書き上げます。</div>
-            <div style="font-size:0.78rem;color:#5a4c34;line-height:1.9">
-              <strong>CHAPTER I〜IV（自己分析）</strong>：あなたの本質や人生のテーマをAIがじっくり読み解きます<br>
-              <strong>CHAPTER V（人生設計ウィザード）</strong><br>
-              　STEP1：心理テストに答えるだけで、叶えたいこと＆32個の行動リストをAIが提案<br>
-              　STEP2：やってみたい「バケットリスト」を自由に整理<br>
-              　STEP3：運気の波を見ながら、年間の目標スケジュールを作成
-            </div>
-          </div>
-
-          <div style="font-family:'Zen Old Mincho',serif;font-size:0.98rem;color:#8a5a00;letter-spacing:0.05em;margin-bottom:0.8rem;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.4rem">🔒 安心・安全にお使いいただくために</div>
-          <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:1.5rem">
-            <div style="font-size:0.82rem;color:#3a2c18;line-height:1.85"><strong>プライバシーの保護</strong>：ご入力いただいた生年月日などのデータは、お使いの端末（ブラウザ）内だけに安全に保存されます。外部サーバーに送信・蓄積されることはありません。<br><br><strong>ログイン・PINコードについて</strong>：現在は限定テスト版のため、簡易的なログイン（ニックネームと4桁の暗証番号）をお願いしています。メールアドレス等の個人情報の登録は一切不要です。</div>
-          </div>
-
-          <button onclick="closeOnboardingGuide()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.85rem;font-size:0.92rem;font-weight:700;cursor:pointer">はじめる</button>
         </div>
+
+        <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:0.9rem">
+          <div style="font-size:1.05rem;font-weight:700;color:#3a2c18;margin-bottom:0.45rem">💬 AI相談｜専属の占い師にいつでもチャット</div>
+          <div style="font-size:0.95rem;color:#5a4c34;line-height:1.9">「今年の恋愛運は？」「転職のタイミングに悩んでいる…」など、何でも気軽に聞いてみてください。命式データを踏まえてAIが親身にアドバイスします（音声入力・読み上げも対応）</div>
+        </div>
+
+        <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:0.9rem">
+          <div style="font-size:1.05rem;font-weight:700;color:#3a2c18;margin-bottom:0.45rem">💞 相性｜気になる人との「絆」を占う</div>
+          <div style="font-size:0.95rem;color:#5a4c34;line-height:1.9">ご家族、お友達、パートナーの生年月日を入力するだけで、相性や関わり方のコツが分かります</div>
+        </div>
+
+        <div style="background:rgba(184,134,11,0.1);border:2px solid rgba(184,134,11,0.3);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:1.4rem">
+          <div style="font-size:1.05rem;font-weight:700;color:#8a5a00;margin-bottom:0.45rem">📖 あなたの本｜【おすすめ！】人生を整えるセルフワーク</div>
+          <div style="font-size:0.95rem;color:#5a4c34;line-height:1.9;margin-bottom:0.5rem">アプリのメイン機能です！AIがあなた専用の分析本を書き上げます。</div>
+          <div style="font-size:0.93rem;color:#5a4c34;line-height:2">
+            <strong>CHAPTER I〜IV（自己分析）</strong>：あなたの本質や人生のテーマをAIがじっくり読み解きます<br>
+            <strong>CHAPTER V（人生設計ウィザード）</strong><br>
+            　STEP1：心理テストに答えるだけで、叶えたいこと＆32個の行動リストをAIが提案<br>
+            　STEP2：やってみたい「バケットリスト」を自由に整理<br>
+            　STEP3：運気の波を見ながら、年間の目標スケジュールを作成
+          </div>
+        </div>
+
+        <div style="font-family:'Zen Old Mincho',serif;font-size:1.15rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:1rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.5rem">🔒 安心・安全にお使いいただくために</div>
+        <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1.1rem 1.15rem;margin-bottom:1.8rem">
+          <div style="font-size:0.95rem;color:#3a2c18;line-height:1.95"><strong>プライバシーの保護</strong>：ご入力いただいた生年月日などのデータは、お使いの端末（ブラウザ）内だけに安全に保存されます。外部サーバーに送信・蓄積されることはありません。<br><br><strong>ログイン・PINコードについて</strong>：現在は限定テスト版のため、簡易的なログイン（ニックネームと4桁の暗証番号）をお願いしています。メールアドレス等の個人情報の登録は一切不要です。</div>
+        </div>
+
+        <button onclick="closeOnboardingGuide()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:12px;padding:1rem;font-size:1.05rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,0.3)">はじめる</button>
       </div>
     </div>
   </div>
 
-  <!-- 使い方ガイド（メニューからいつでも見返せる版・内容はonboarding-guideと同じ） -->
+  <!-- 使い方ガイド（メニューからいつでも見返せる版・内容はscreen-guideと同じ） -->
   <div class="about-overlay-wrap" id="usage-guide-overlay">
     <div style="background:linear-gradient(135deg,#b8860b,#d4a017);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.1em;margin:0">🌸 花人占術の使い方</h2>
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.1rem;letter-spacing:0.1em;margin:0">🌸 花人占術の使い方</h2>
       <button onclick="document.getElementById('usage-guide-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
     </div>
-    <div style="padding:1.3rem 1.2rem 2.5rem">
-      <p style="font-size:0.86rem;color:#3a2c18;line-height:1.9;margin:0 0 1.3rem">『花人占術』は、東洋の伝統的な占い（四柱推命・算命学・易経・九星気学）をベースに、<strong style="color:#8a5a00">「あなただけの才能」と「理想の人生」</strong>を引き出すためのセルフケア＆目標達成Webアプリです。まずは気になる画面から、自由に使ってみてくださいね！</p>
+    <div style="padding:1.5rem 1.3rem 2.5rem">
+      <p style="font-size:1rem;color:#3a2c18;line-height:2;margin:0 0 1.5rem">『花人占術』は、東洋の伝統的な占い（四柱推命・算命学・易経・九星気学）をベースに、<strong style="color:#8a5a00">「あなただけの才能」と「理想の人生」</strong>を引き出すためのセルフケア＆目標達成Webアプリです。まずは気になる画面から、自由に使ってみてくださいね！</p>
 
-      <div style="font-family:'Zen Old Mincho',serif;font-size:0.98rem;color:#8a5a00;letter-spacing:0.05em;margin-bottom:0.8rem;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.4rem">🔰 5つのメニューでできること</div>
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">🔰 5つのメニューでできること</div>
 
-      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-        <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">🏠 ホーム｜きょうの運気とあなたのタイプ</div>
-        <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">・あなたの「花タイプ」（天・風・水・離・白・仙の6分類）が分かります<br>・運気カレンダーで今日の運気（◎○△×）が一目で確認でき、メモ帳としても使えます</div>
+      <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <div style="font-size:1rem;font-weight:700;color:#3a2c18;margin-bottom:0.4rem">🏠 ホーム｜きょうの運気とあなたのタイプ</div>
+        <div style="font-size:0.92rem;color:#5a4c34;line-height:1.9">・あなたの「花タイプ」（天・風・水・離・白・仙の6分類）が分かります<br>・運気カレンダーで今日の運気（◎○△×）が一目で確認でき、メモ帳としても使えます</div>
       </div>
 
-      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-        <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">🀄 命式｜あなただけの「人生の設計図」</div>
-        <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8;margin-bottom:0.6rem">生年月日から導き出した、生まれ持った性質や運気の波のデータです。専門用語も、あなたの隠れた魅力を教えてくれる大切なシグナルです。</div>
-        <div style="background:#fff;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:0.6rem 0.75rem">
-          <div style="font-size:0.74rem;color:#8a5a00;font-weight:700;margin-bottom:0.3rem">💡 ちょこっと専門用語メモ</div>
-          <div style="font-size:0.76rem;color:#5a4c34;line-height:1.8">通変星＝あなたの「性格」や「才能のクセ」<br>十二運気＝あなたが出せる「エネルギーの強さ・行動パターン」<br>大運＝10年ごとにガラリと変わる「人生の大きなテーマ・運気の波」</div>
+      <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <div style="font-size:1rem;font-weight:700;color:#3a2c18;margin-bottom:0.4rem">🀄 命式｜あなただけの「人生の設計図」</div>
+        <div style="font-size:0.92rem;color:#5a4c34;line-height:1.9;margin-bottom:0.65rem">生年月日から導き出した、生まれ持った性質や運気の波のデータです。専門用語も、あなたの隠れた魅力を教えてくれる大切なシグナルです。</div>
+        <div style="background:#fff;border-left:4px solid var(--gold);border-radius:0 8px 8px 0;padding:0.7rem 0.85rem">
+          <div style="font-size:0.88rem;color:#8a5a00;font-weight:700;margin-bottom:0.35rem">💡 ちょこっと専門用語メモ</div>
+          <div style="font-size:0.88rem;color:#5a4c34;line-height:1.9">通変星＝あなたの「性格」や「才能のクセ」<br>十二運気＝あなたが出せる「エネルギーの強さ・行動パターン」<br>大運＝10年ごとにガラリと変わる「人生の大きなテーマ・運気の波」</div>
         </div>
       </div>
 
-      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-        <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">💬 AI相談｜専属の占い師にいつでもチャット</div>
-        <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">「今年の恋愛運は？」「転職のタイミングに悩んでいる…」など、何でも気軽に聞いてみてください。命式データを踏まえてAIが親身にアドバイスします（音声入力・読み上げも対応）</div>
+      <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <div style="font-size:1rem;font-weight:700;color:#3a2c18;margin-bottom:0.4rem">💬 AI相談｜専属の占い師にいつでもチャット</div>
+        <div style="font-size:0.92rem;color:#5a4c34;line-height:1.9">「今年の恋愛運は？」「転職のタイミングに悩んでいる…」など、何でも気軽に聞いてみてください。命式データを踏まえてAIが親身にアドバイスします（音声入力・読み上げも対応）</div>
       </div>
 
-      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:0.7rem">
-        <div style="font-size:0.88rem;font-weight:700;color:#3a2c18;margin-bottom:0.3rem">💞 相性｜気になる人との「絆」を占う</div>
-        <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8">ご家族、お友達、パートナーの生年月日を入力するだけで、相性や関わり方のコツが分かります</div>
+      <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem">
+        <div style="font-size:1rem;font-weight:700;color:#3a2c18;margin-bottom:0.4rem">💞 相性｜気になる人との「絆」を占う</div>
+        <div style="font-size:0.92rem;color:#5a4c34;line-height:1.9">ご家族、お友達、パートナーの生年月日を入力するだけで、相性や関わり方のコツが分かります</div>
       </div>
 
-      <div style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:1.2rem">
-        <div style="font-size:0.88rem;font-weight:700;color:#8a5a00;margin-bottom:0.3rem">📖 あなたの本｜【おすすめ！】人生を整えるセルフワーク</div>
-        <div style="font-size:0.8rem;color:#5a4c34;line-height:1.8;margin-bottom:0.4rem">アプリのメイン機能です！AIがあなた専用の分析本を書き上げます。</div>
-        <div style="font-size:0.78rem;color:#5a4c34;line-height:1.9">
+      <div style="background:rgba(184,134,11,0.1);border:2px solid rgba(184,134,11,0.3);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.3rem">
+        <div style="font-size:1rem;font-weight:700;color:#8a5a00;margin-bottom:0.4rem">📖 あなたの本｜【おすすめ！】人生を整えるセルフワーク</div>
+        <div style="font-size:0.92rem;color:#5a4c34;line-height:1.9;margin-bottom:0.5rem">アプリのメイン機能です！AIがあなた専用の分析本を書き上げます。</div>
+        <div style="font-size:0.9rem;color:#5a4c34;line-height:2">
           <strong>CHAPTER I〜IV（自己分析）</strong>：あなたの本質や人生のテーマをAIがじっくり読み解きます<br>
           <strong>CHAPTER V（人生設計ウィザード）</strong><br>
           　STEP1：心理テストに答えるだけで、叶えたいこと＆32個の行動リストをAIが提案<br>
@@ -1064,9 +1082,9 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
         </div>
       </div>
 
-      <div style="font-family:'Zen Old Mincho',serif;font-size:0.98rem;color:#8a5a00;letter-spacing:0.05em;margin-bottom:0.8rem;border-bottom:1px solid rgba(184,134,11,0.25);padding-bottom:0.4rem">🔒 安心・安全にお使いいただくために</div>
-      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.85rem 0.95rem;margin-bottom:1.5rem">
-        <div style="font-size:0.82rem;color:#3a2c18;line-height:1.85"><strong>プライバシーの保護</strong>：ご入力いただいた生年月日などのデータは、お使いの端末（ブラウザ）内だけに安全に保存されます。外部サーバーに送信・蓄積されることはありません。<br><br><strong>ログイン・PINコードについて</strong>：現在は限定テスト版のため、簡易的なログイン（ニックネームと4桁の暗証番号）をお願いしています。メールアドレス等の個人情報の登録は一切不要です。</div>
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">🔒 安心・安全にお使いいただくために</div>
+      <div style="background:rgba(184,134,11,0.06);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.6rem">
+        <div style="font-size:0.92rem;color:#3a2c18;line-height:1.95"><strong>プライバシーの保護</strong>：ご入力いただいた生年月日などのデータは、お使いの端末（ブラウザ）内だけに安全に保存されます。外部サーバーに送信・蓄積されることはありません。<br><br><strong>ログイン・PINコードについて</strong>：現在は限定テスト版のため、簡易的なログイン（ニックネームと4桁の暗証番号）をお願いしています。メールアドレス等の個人情報の登録は一切不要です。</div>
       </div>
 
       <div style="text-align:center">
@@ -1075,38 +1093,16 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
-
   <!-- パスワード（アクセス制限）ゲート：名刺などでURLのみが広まった場合の抑止用。ACCESS_PASSWORDを変更して使う -->
-  <div id="password-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#fdf9f0,#f6ead2 55%,#f0deae);z-index:9700;overflow-y:auto">
-    <div style="max-width:420px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
-      <div style="text-align:center;margin-bottom:1.8rem">
-        <div style="font-size:2.2rem;margin-bottom:0.4rem">🌸</div>
-        <div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:#8a5a00;letter-spacing:0.2em;margin-bottom:0.5rem">花　人　占　術</div>
-        <div style="font-size:0.82rem;color:#7a6a4a;letter-spacing:0.05em">教えていただいたパスワードを入力してください</div>
-      </div>
-      <input type="text" id="password-gate-input" placeholder="パスワード" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;padding:0.9rem 1rem;border-radius:10px;border:1px solid rgba(184,134,11,0.4);background:#fff;color:#3a2c18;font-size:1rem;text-align:center;margin-bottom:0.9rem;letter-spacing:0.1em">
-      <div id="password-gate-error" style="display:none;text-align:center;color:#c0392b;font-size:0.8rem;margin-bottom:0.9rem">パスワードが違うようです。もう一度お試しください</div>
-      <button onclick="checkAccessPassword()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.9rem;font-size:0.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,0.3)">入る</button>
-    </div>
-  </div>
-
-  <!-- 初回起動時の利用規約同意ゲート（未同意の場合、アプリ全体をブロック表示） -->
-  <div id="consent-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#fdf9f0,#f6ead2 55%,#f0deae);z-index:9600;overflow-y:auto">
-    <div style="max-width:480px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
-      <div style="text-align:center;margin-bottom:1.6rem">
-        <div style="font-size:2.2rem;margin-bottom:0.4rem">🌸</div>
-        <div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:#8a5a00;letter-spacing:0.2em;margin-bottom:0.5rem">花　人　占　術</div>
-        <div style="font-size:0.82rem;color:#7a6a4a;letter-spacing:0.05em">ようこそ。ご利用の前に少しだけお付き合いください</div>
-      </div>
-      <div style="background:#fff;border:1px solid rgba(184,134,11,0.25);border-radius:12px;padding:1.2rem;margin-bottom:1.3rem">
-        <p style="font-size:0.85rem;color:#3a2c18;line-height:1.9;margin:0 0 0.9rem">本サービスは、東洋占術の考え方をもとにした独自の占術体系による、娯楽・教養目的のWebアプリケーションです。ご利用の前に、利用規約・免責事項を必ずご確認ください。</p>
-        <button onclick="document.getElementById('terms-overlay').classList.add('show')" style="width:100%;background:rgba(184,134,11,0.1);color:#8a5a00;border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.7rem;font-size:0.85rem;cursor:pointer">📋 利用規約・免責事項を読む</button>
-      </div>
-      <label style="display:flex;align-items:flex-start;gap:0.6rem;margin-bottom:1.5rem;cursor:pointer">
-        <input type="checkbox" id="consent-checkbox" onchange="var b=document.getElementById('consent-agree-btn');b.disabled=!this.checked;b.style.opacity=this.checked?'1':'0.5';" style="margin-top:0.25rem;width:1.15rem;height:1.15rem;flex-shrink:0">
-        <span style="font-size:0.82rem;color:#3a2c18;line-height:1.75">利用規約・免責事項の内容を読み、同意します。本サービスが提供する情報を参考にした判断・行動の結果について、運営者が責任を負わないことを理解しました。</span>
-      </label>
-      <button id="consent-agree-btn" onclick="agreeToTerms()" disabled style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.9rem;font-size:0.95rem;font-weight:700;cursor:pointer;opacity:0.5;transition:opacity 0.2s;box-shadow:0 4px 14px rgba(184,134,11,0.3)">同意して始める</button>
+  <div id="screen-password" class="screen">
+    <div style="max-width:420px;width:100%;text-align:center;padding:2rem 1.4rem;box-sizing:border-box">
+      <div style="font-size:2.6rem;margin-bottom:0.7rem">🌸</div>
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.5rem;color:#8a5a00;letter-spacing:0.1em;margin-bottom:1.3rem;line-height:1.5">花人占術アプリへ<br>ようこそ！</div>
+      <div style="font-size:1.05rem;color:#3a2c18;line-height:1.9;margin-bottom:0.5rem">アプリを初回起動するための<br>パスワードを入力してください。</div>
+      <div style="font-size:0.85rem;color:#8a7a5c;margin-bottom:1.8rem">（※次回以降は省略されます）</div>
+      <input type="text" id="password-gate-input" placeholder="パスワード" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;padding:1rem;border-radius:12px;border:1px solid rgba(184,134,11,0.4);background:#fff;color:#3a2c18;font-size:1.15rem;text-align:center;margin-bottom:1rem;letter-spacing:0.1em">
+      <div id="password-gate-error" style="display:none;text-align:center;color:#c0392b;font-size:0.9rem;margin-bottom:1rem">パスワードが違うようです。もう一度お試しください</div>
+      <button onclick="checkAccessPassword()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:12px;padding:1rem;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,0.3)">次へ</button>
     </div>
   </div>
 
@@ -1829,6 +1825,9 @@ function doRegister(){
   if(!nick){err.textContent='ニックネームを入力してください';err.style.display='block';return;}
   if(!pin||pin.length!==4||!/^\d{4}$/.test(pin)){err.textContent='PINコードは4桁の数字で設定してください';err.style.display='block';return;}
   if(!y||!m||!d){err.textContent='生年月日を入力してください';err.style.display='block';return;}
+  var consentEl=document.getElementById('reg-consent');
+  if(consentEl&&!consentEl.checked){err.textContent='利用規約・免責事項への同意が必要です';err.style.display='block';return;}
+  try{localStorage.setItem('hanabito_terms_agreed','1');}catch(e){}
   var data=initData(nick,y,m,d,gender);
   data.account.pin=pin;
   S.save(data);
@@ -1875,7 +1874,6 @@ function startApp(data){
   loadKB();
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
-  showOnboardingGuideIfNeeded();
 }
 </script>
 <script>
@@ -6590,29 +6588,10 @@ function checkAccessPassword(){
   var val=input?input.value.trim():'';
   if(val===ACCESS_PASSWORD){
     try{localStorage.setItem('hanabito_pw_ok',ACCESS_PASSWORD);}catch(e){}
-    var gate=document.getElementById('password-gate');
-    if(gate)gate.style.display='none';
+    goToNextInitialScreen();
   } else {
     var err=document.getElementById('password-gate-error');
     if(err)err.style.display='block';
-  }
-}
-function showPasswordGateIfNeeded(){
-  if(!ACCESS_GATE_ENABLED)return;
-  var ok=false;
-  try{ok=localStorage.getItem('hanabito_pw_ok')===ACCESS_PASSWORD;}catch(e){}
-  if(!ok){
-    var gate=document.getElementById('password-gate');
-    if(gate){
-      gate.style.display='block';
-      setTimeout(function(){
-        var input=document.getElementById('password-gate-input');
-        if(input){
-          input.focus();
-          input.addEventListener('keydown',function(e){if(e.key==='Enter')checkAccessPassword();});
-        }
-      },100);
-    }
   }
 }
 
@@ -6633,39 +6612,48 @@ function doAppReset(){
 }
 
 // ============================================================
-// 初回の使い方ガイド（ホーム画面に初めて入った時に1回だけ）
+// 起動シーケンス：①パスワード → ②使い方ガイド → ③ログイン/新規登録
+// 「screen」クラス方式（1つだけが確実にactiveになる）で管理し、z-index競合が起きないようにする
 // ============================================================
+function passwordOk(){
+  if(!ACCESS_GATE_ENABLED)return true;
+  try{return localStorage.getItem('hanabito_pw_ok')===ACCESS_PASSWORD;}catch(e){return false;}
+}
+function guideSeen(){
+  try{return localStorage.getItem('hanabito_onboarding_seen')==='1';}catch(e){return false;}
+}
+function activateScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el=document.getElementById(id);
+  if(el)el.classList.add('active');
+}
+// 起動直後、あるいはパスワード通過直後に「次に見せるべき画面」を決めて切り替える
+function decideInitialScreen(){
+  if(!passwordOk()){
+    activateScreen('screen-password');
+    setTimeout(function(){
+      var input=document.getElementById('password-gate-input');
+      if(input){
+        input.focus();
+        input.addEventListener('keydown',function(e){if(e.key==='Enter')checkAccessPassword();});
+      }
+    },100);
+  } else if(!guideSeen()){
+    activateScreen('screen-guide');
+  }
+  // どちらも通過済みならHTML初期状態のままscreen-loginを表示（何もしない）
+}
+// パスワード通過ボタン等から呼ぶ「次へ進む」
+function goToNextInitialScreen(){
+  if(!guideSeen()){
+    activateScreen('screen-guide');
+  } else {
+    activateScreen('screen-login');
+  }
+}
 function closeOnboardingGuide(){
   try{localStorage.setItem('hanabito_onboarding_seen','1');}catch(e){}
-  var g=document.getElementById('onboarding-guide');
-  if(g)g.style.display='none';
-}
-function showOnboardingGuideIfNeeded(){
-  var seen=false;
-  try{seen=localStorage.getItem('hanabito_onboarding_seen')==='1';}catch(e){}
-  if(!seen){
-    var g=document.getElementById('onboarding-guide');
-    if(g)g.style.display='block';
-  }
-}
-
-// ============================================================
-// 利用規約 同意ゲート
-// ============================================================
-function agreeToTerms(){
-  try{localStorage.setItem('hanabito_terms_agreed','1');}catch(e){}
-  var gate=document.getElementById('consent-gate');
-  if(gate)gate.style.display='none';
-  var overlay=document.getElementById('terms-overlay');
-  if(overlay)overlay.classList.remove('show');
-}
-function showConsentGateIfNeeded(){
-  var agreed=false;
-  try{agreed=localStorage.getItem('hanabito_terms_agreed')==='1';}catch(e){}
-  if(!agreed){
-    var gate=document.getElementById('consent-gate');
-    if(gate)gate.style.display='block';
-  }
+  activateScreen('screen-login');
 }
 
 (function(){
@@ -6689,10 +6677,9 @@ function showConsentGateIfNeeded(){
     try{startApp(data);}catch(e){localStorage.removeItem(STORAGE_KEY);}
   }
 
-  // 利用規約に未同意なら、起動時に同意ゲートを表示
-  showConsentGateIfNeeded();
-  // パスワードが未入力なら、起動時にアクセスゲートを表示（同意ゲートより手前に重なる）
-  showPasswordGateIfNeeded();
+  // 起動シーケンス：パスワード→使い方ガイド→ログイン、の順で必要な画面だけを表示
+  // （自動ログインでscreen-mainが表示されていても、未通過のゲートがあればここで正しく上書きされる）
+  decideInitialScreen();
 })();
 </script>
 </body>
