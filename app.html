@@ -979,16 +979,16 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
-  <!-- 合言葉（アクセス制限）ゲート：名刺などでURLのみが広まった場合の抑止用。ACCESS_PASSWORDを変更して使う -->
+  <!-- パスワード（アクセス制限）ゲート：名刺などでURLのみが広まった場合の抑止用。ACCESS_PASSWORDを変更して使う -->
   <div id="password-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#fdf9f0,#f6ead2 55%,#f0deae);z-index:9700;overflow-y:auto">
     <div style="max-width:420px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
       <div style="text-align:center;margin-bottom:1.8rem">
         <div style="font-size:2.2rem;margin-bottom:0.4rem">🌸</div>
         <div style="font-family:'Zen Old Mincho',serif;font-size:1.4rem;color:#8a5a00;letter-spacing:0.2em;margin-bottom:0.5rem">花　人　占　術</div>
-        <div style="font-size:0.82rem;color:#7a6a4a;letter-spacing:0.05em">教えていただいた合言葉を入力してください</div>
+        <div style="font-size:0.82rem;color:#7a6a4a;letter-spacing:0.05em">教えていただいたパスワードを入力してください</div>
       </div>
-      <input type="text" id="password-gate-input" placeholder="合言葉" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;padding:0.9rem 1rem;border-radius:10px;border:1px solid rgba(184,134,11,0.4);background:#fff;color:#3a2c18;font-size:1rem;text-align:center;margin-bottom:0.9rem;letter-spacing:0.1em">
-      <div id="password-gate-error" style="display:none;text-align:center;color:#c0392b;font-size:0.8rem;margin-bottom:0.9rem">合言葉が違うようです。もう一度お試しください</div>
+      <input type="text" id="password-gate-input" placeholder="パスワード" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;padding:0.9rem 1rem;border-radius:10px;border:1px solid rgba(184,134,11,0.4);background:#fff;color:#3a2c18;font-size:1rem;text-align:center;margin-bottom:0.9rem;letter-spacing:0.1em">
+      <div id="password-gate-error" style="display:none;text-align:center;color:#c0392b;font-size:0.8rem;margin-bottom:0.9rem">パスワードが違うようです。もう一度お試しください</div>
       <button onclick="checkAccessPassword()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.9rem;font-size:0.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,0.3)">入る</button>
     </div>
   </div>
@@ -6481,11 +6481,11 @@ function stopPetals(){
 // INIT
 // ============================================================
 // ============================================================
-// 合言葉（アクセス制限）ゲート
+// パスワード（アクセス制限）ゲート
 // ============================================================
-// ↓falseにすると合言葉ゲート自体を無効化できます（テスト公開の終了・再開の切り替え用）
+// ↓falseにするとパスワードゲート自体を無効化できます（テスト公開の終了・再開の切り替え用）
 var ACCESS_GATE_ENABLED=true;
-// ↓この文字列を変更すると合言葉を差し替えられます（名刺に印刷するものと一致させてください）
+// ↓この文字列を変更するとパスワードを差し替えられます（名刺に印刷するものと一致させてください）
 var ACCESS_PASSWORD='hanabito2026';
 
 function checkAccessPassword(){
@@ -6594,7 +6594,7 @@ function showConsentGateIfNeeded(){
 
   // 利用規約に未同意なら、起動時に同意ゲートを表示
   showConsentGateIfNeeded();
-  // 合言葉が未入力なら、起動時にアクセスゲートを表示（同意ゲートより手前に重なる）
+  // パスワードが未入力なら、起動時にアクセスゲートを表示（同意ゲートより手前に重なる）
   showPasswordGateIfNeeded();
 })();
 </script>
