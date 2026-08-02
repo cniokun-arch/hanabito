@@ -561,6 +561,9 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <div class="hmenu-item" onclick="closeHmenu();showTermsOverlay()">
         <span class="hmenu-item-icon">📋</span>利用規約
       </div>
+      <div class="hmenu-item" onclick="closeHmenu();showResetConfirm()" style="color:#a83232">
+        <span class="hmenu-item-icon">🔄</span>アプリをリセット
+      </div>
       <div class="hmenu-item" onclick="closeHmenu();doLogout()">
         <span class="hmenu-item-icon">🚪</span>ログアウト
       </div>
@@ -938,6 +941,20 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
   </div>
 
   <!-- 初回のみ表示する使い方ガイド（1画面・要点だけ・長文にしない） -->
+  <div id="reset-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(20,15,8,0.55);z-index:9500;overflow-y:auto">
+    <div style="max-width:420px;margin:0 auto;padding:2.4rem 1.4rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
+      <div style="background:#fff;border-radius:16px;padding:1.6rem 1.3rem;box-shadow:0 8px 30px rgba(0,0,0,0.25)">
+        <div style="text-align:center;margin-bottom:1rem">
+          <div style="font-size:2rem;margin-bottom:0.4rem">🔄</div>
+          <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.05em">アプリをリセットしますか？</div>
+        </div>
+        <p style="font-size:0.84rem;color:#3a2c18;line-height:1.8;margin:0 0 1.3rem">表示が崩れる・うまく動かない時にお試しください。<br><strong style="color:#a83232">この端末に保存されているデータはすべて消え、ニックネーム登録からやり直しになります。</strong>元には戻せません。</p>
+        <button onclick="doAppReset()" style="width:100%;background:#a83232;color:#fff;border:none;border-radius:10px;padding:0.85rem;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:0.6rem">リセットする</button>
+        <button onclick="closeResetConfirm()" style="width:100%;background:transparent;color:#7a6a4a;border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.7rem;font-size:0.85rem;cursor:pointer">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <div id="onboarding-guide" style="display:none;position:fixed;inset:0;background:rgba(90,60,20,0.55);z-index:480;overflow-y:auto">
     <div style="max-width:440px;margin:0 auto;padding:2.4rem 1.4rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
       <div style="background:var(--bg,#faf6ef);border-radius:18px;padding:1.6rem 1.3rem;box-shadow:0 8px 30px rgba(0,0,0,0.4)">
@@ -6500,6 +6517,22 @@ function showPasswordGateIfNeeded(){
       },100);
     }
   }
+}
+
+// ============================================================
+// アプリをリセット（表示崩れ・不具合時に、手動でのサイトデータ削除の代わりに使う）
+// ============================================================
+function showResetConfirm(){
+  var m=document.getElementById('reset-confirm-modal');
+  if(m)m.style.display='block';
+}
+function closeResetConfirm(){
+  var m=document.getElementById('reset-confirm-modal');
+  if(m)m.style.display='none';
+}
+function doAppReset(){
+  try{localStorage.clear();}catch(e){}
+  location.reload();
 }
 
 // ============================================================
