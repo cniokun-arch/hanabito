@@ -332,6 +332,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .dots span:nth-child(2){animation-delay:0.2s}
 .dots span:nth-child(3){animation-delay:0.4s}
 @keyframes dot{0%,80%,100%{opacity:0.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+@keyframes fadeInHint{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ===== GRAPH LINK BUTTON ===== */
 .graph-link-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0.8rem 1rem;background:#fff;border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-family:'Zen Old Mincho',serif;font-size:0.97rem;cursor:pointer;text-decoration:none;margin-top:0.5rem}
@@ -1880,6 +1881,7 @@ function startApp(data){
   loadKB();
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
+  maybeShowAddMemberHint();
 }
 </script>
 <script>
@@ -1918,7 +1920,8 @@ function renderMemberTabs(){
   var addBtn=document.createElement('button');
   addBtn.className='member-tab-add';
   addBtn.textContent='＋ 追加';
-  addBtn.onclick=function(){openMemberModal(-1);};
+  addBtn.id='add-member-btn';
+  addBtn.onclick=function(){dismissAddMemberHint();openMemberModal(-1);};
   bar.appendChild(addBtn);
 }
 function switchMember(idx){
@@ -6660,6 +6663,46 @@ function goToNextInitialScreen(){
 function closeOnboardingGuide(){
   try{localStorage.setItem('hanabito_onboarding_seen','1');}catch(e){}
   activateScreen('screen-login');
+}
+
+// ============================================================
+// 「気になる人を追加してみよう」吹き出し
+// 誰も登録していない場合のみ・初回だけ・ホーム到達後しばらくして表示し、自動で消える
+// ============================================================
+function maybeShowAddMemberHint(){
+  var data=S.load();
+  if(!data)return;
+  if(data.people&&data.people.length>0)return; // 既に誰か登録済みなら出さない
+  var already=false;
+  try{already=localStorage.getItem('hanabito_add_hint_seen')==='1';}catch(e){}
+  if(already)return;
+  setTimeout(function(){
+    // タイマーが走る間に登録されたり画面遷移した場合は出さない
+    var data2=S.load();
+    if(!data2||(data2.people&&data2.people.length>0))return;
+    var btn=document.getElementById('add-member-btn');
+    if(!btn||document.getElementById('add-member-hint'))return;
+    var rect=btn.getBoundingClientRect();
+    var bubble=document.createElement('div');
+    bubble.id='add-member-hint';
+    bubble.style.cssText='position:fixed;z-index:600;background:#fff;border:2px solid var(--gold);border-radius:12px;padding:0.6rem 0.9rem;font-size:0.82rem;color:#3a2c18;box-shadow:0 4px 14px rgba(184,134,11,0.3);max-width:200px;line-height:1.6;cursor:pointer;animation:fadeInHint 0.3s ease';
+    bubble.textContent='🌸 気になる人を追加してみよう';
+    var tail=document.createElement('div');
+    tail.style.cssText='position:absolute;top:-8px;left:20px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--gold)';
+    bubble.appendChild(tail);
+    document.body.appendChild(bubble);
+    var top=rect.bottom+8;
+    var left=Math.max(8,Math.min(rect.left,window.innerWidth-208));
+    bubble.style.top=top+'px';
+    bubble.style.left=left+'px';
+    bubble.onclick=function(){dismissAddMemberHint();};
+    setTimeout(dismissAddMemberHint,6000);
+  },3000);
+}
+function dismissAddMemberHint(){
+  try{localStorage.setItem('hanabito_add_hint_seen','1');}catch(e){}
+  var el=document.getElementById('add-member-hint');
+  if(el)el.remove();
 }
 
 (function(){
