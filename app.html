@@ -937,6 +937,31 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
+  <!-- 初回のみ表示する使い方ガイド（1画面・要点だけ・長文にしない） -->
+  <div id="onboarding-guide" style="display:none;position:fixed;inset:0;background:rgba(20,10,5,0.88);z-index:480;overflow-y:auto">
+    <div style="max-width:440px;margin:0 auto;padding:2.4rem 1.4rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
+      <div style="background:var(--bg,#faf6ef);border-radius:18px;padding:1.6rem 1.3rem;box-shadow:0 8px 30px rgba(0,0,0,0.4)">
+        <div style="text-align:center;margin-bottom:1.3rem">
+          <div style="font-family:'Zen Old Mincho',serif;font-size:1.15rem;color:#b8860b;letter-spacing:0.1em">花人占術の使い方</div>
+          <div style="font-size:0.72rem;color:#8a7a5c;margin-top:0.2rem">たった3ステップです</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1rem;background:rgba(184,134,11,0.07);border-radius:12px;padding:0.8rem 0.9rem">
+          <div style="font-size:1.6rem;flex-shrink:0">🔮</div>
+          <div><div style="font-size:0.9rem;font-weight:700;color:#3a2c18">① 命式を見る</div><div style="font-size:0.76rem;color:#6a5c44;margin-top:0.1rem">あなたの生まれ持った性質が分かります</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1rem;background:rgba(184,134,11,0.07);border-radius:12px;padding:0.8rem 0.9rem">
+          <div style="font-size:1.6rem;flex-shrink:0">💬</div>
+          <div><div style="font-size:0.9rem;font-weight:700;color:#3a2c18">② AI相談で聞いてみる</div><div style="font-size:0.76rem;color:#6a5c44;margin-top:0.1rem">気になることを何でも質問できます</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1.4rem;background:rgba(184,134,11,0.07);border-radius:12px;padding:0.8rem 0.9rem">
+          <div style="font-size:1.6rem;flex-shrink:0">📖</div>
+          <div><div style="font-size:0.9rem;font-weight:700;color:#3a2c18">③ あなたの本で目標を整理</div><div style="font-size:0.76rem;color:#6a5c44;margin-top:0.1rem">やりたいことと運気カレンダーがつながります</div></div>
+        </div>
+        <button onclick="closeOnboardingGuide()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.85rem;font-size:0.92rem;font-weight:700;cursor:pointer">はじめる</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 合言葉（アクセス制限）ゲート：名刺などでURLのみが広まった場合の抑止用。ACCESS_PASSWORDを変更して使う -->
   <div id="password-gate" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a0830,#2a1050 60%,#3a2410);z-index:495;overflow-y:auto">
     <div style="max-width:420px;margin:0 auto;padding:3rem 1.4rem 3rem;min-height:100%;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box">
@@ -1734,6 +1759,7 @@ function startApp(data){
   loadKB();
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
+  showOnboardingGuideIfNeeded();
 }
 </script>
 <script>
@@ -4420,7 +4446,7 @@ function renderBucketSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
   html+=renderStepHeader(2,'やりたいことリスト');
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">';
-  html+='あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！</div>';
+  html+='あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！<br><span style="display:inline-block;margin-top:0.4rem;font-size:0.7rem;color:#8b4500;background:rgba(255,179,71,0.18);border-radius:6px;padding:0.15rem 0.5rem">🎯 行動タイプ：転職・結婚・引っ越しなど、動くタイミングがあるもの</span></div>';
 
   html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
   html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink3)">リスト一覧</div>';
@@ -4450,7 +4476,8 @@ function renderBucketSection(ld){
         html+='<span style="font-size:0.88rem;color:var(--ink);font-weight:700">'+b.text+'</span>';
         html+='</div>';
         html+='<div style="display:flex;gap:0.6rem;flex-wrap:wrap;padding-left:1.8rem">';
-        if(b.age)html+='<span style="font-size:0.7rem;color:var(--gold)">🎯 '+b.age+'歳までに</span>';
+        if(b.type)html+='<span style="font-size:0.7rem;color:'+(b.type==='習慣'?'#1a5c1a':'#8b4500')+';background:'+(b.type==='習慣'?'rgba(42,140,74,0.12)':'rgba(255,179,71,0.18)')+';border-radius:6px;padding:0.1rem 0.4rem">'+(b.type==='習慣'?'🔁':'🎯')+' '+b.type+'</span>';
+        if(b.age)html+='<span style="font-size:0.7rem;color:var(--gold)">⏰ '+b.age+'歳までに</span>';
         if(b.startDate){var sd=b.startDate.replace(/-01$/,'').replace('-','年')+'月';html+='<span style="font-size:0.7rem;color:var(--ink3)">📅 '+sd+'〜</span>';}
         html+='</div>';
         html+='</div>';
@@ -4475,7 +4502,7 @@ function renderBucketSection(ld){
 function renderGoalToolSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
   html+=renderStepHeader(1,'あなたが今一番叶えたいこと');
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、あなたが今一番叶えたいこと・必要な8つの要素・具体的な行動を整理します。</div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、あなたが今一番叶えたいこと・必要な8つの要素・具体的な行動を整理します。<br><span style="display:inline-block;margin-top:0.4rem;font-size:0.7rem;color:#1a5c1a;background:rgba(42,140,74,0.12);border-radius:6px;padding:0.15rem 0.5rem">🔁 習慣タイプ：普段から積み重ねる行い</span></div>';
   if(ld&&ld.step>=4){
     html+=renderGoalList(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">🔄 やり直す</button>';
@@ -4562,6 +4589,8 @@ function renderGoalList(ld){
           html+='<div onclick="toggleMandalaCheck('+fi+','+di+')" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.5rem;margin-bottom:2px;border-radius:8px;background:'+rowBg+';border-bottom:1px solid rgba(184,134,11,0.1);cursor:pointer">';
           html+='<span style="font-size:1rem;line-height:1.4;color:'+(chk?'#2a8c4a':'var(--ink3)')+'">'+(chk?'☑':'☐')+'</span>';
           html+='<span style="font-size:0.84rem;line-height:1.5;flex:1;color:'+(chk?'#1a5c1a':'var(--ink)')+';font-weight:'+(chk?'700':'400')+'">'+d+'</span>';
+          var typ=(ld.mandalaDetailType&&ld.mandalaDetailType[fi]&&ld.mandalaDetailType[fi][di])||'';
+          if(typ)html+='<span style="font-size:0.62rem;color:'+(typ==='習慣'?'#1a5c1a':'#8b4500')+';background:'+(typ==='習慣'?'rgba(42,140,74,0.12)':'rgba(255,179,71,0.18)')+';border-radius:6px;padding:0.1rem 0.4rem;flex-shrink:0">'+(typ==='習慣'?'🔁':'🎯')+' '+typ+'</span>';
           if(chk)html+='<span style="font-size:0.66rem;color:#2a8c4a;background:rgba(42,140,74,0.15);border-radius:6px;padding:0.1rem 0.4rem;flex-shrink:0">達成</span>';
           html+='</div>';
         }
@@ -4800,6 +4829,10 @@ function saveBucketEditor(){
   var items=collectBucketItems().filter(function(b){return b.text;});
   var ld=getLifeDesignData();
   if(!ld)return;
+  // 既存の習慣/行動タイプを、テキストが変わっていない項目だけ引き継ぐ（変更・新規項目は再判定させる）
+  var oldTypeByText={};
+  (ld.buckets||[]).forEach(function(b){if(b&&b.text&&b.type)oldTypeByText[b.text]=b.type;});
+  items.forEach(function(b){if(oldTypeByText[b.text])b.type=oldTypeByText[b.text];});
   ld.buckets=items;
   saveLifeDesignData(ld);
 
@@ -4838,6 +4871,40 @@ function saveBucketEditor(){
     window._lifeWizardMode=false;
     showSchedulerStep();
   }
+  classifyBucketTypes();
+}
+
+// 「やりたいことリスト」の各項目をAIで習慣/行動に自動分類（type未設定の項目のみ、まとめて1回のAI呼び出しで判定）
+async function classifyBucketTypes(){
+  try{
+    var ld=getLifeDesignData();
+    if(!ld||!ld.buckets||!ld.buckets.length)return;
+    var targets=[];
+    ld.buckets.forEach(function(b,i){if(b&&b.text&&!b.type)targets.push({i:i,text:b.text});});
+    if(targets.length===0)return;
+    var listText=targets.map(function(t,idx){return (idx+1)+'. '+t.text;}).join('\n');
+    var prompt='以下は「やりたいことリスト」の項目です。それぞれが次のどちらに近いか判定してください。\n\n'
+      +'・習慣：普段から継続的に積み重ねる行い（日々の努力・継続的な取り組み）\n'
+      +'・行動：転職・結婚・引っ越しなど、特定のタイミングで実行する一度きりの物事\n\n'
+      +listText+'\n\n'
+      +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)return;
+    var dat=await res.json();
+    var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(txt);
+    var types=parsed.types||[];
+    var ld2=getLifeDesignData();
+    if(!ld2||!ld2.buckets)return;
+    targets.forEach(function(t,idx){
+      var v=types[idx];
+      if((v==='習慣'||v==='行動')&&ld2.buckets[t.i])ld2.buckets[t.i].type=v;
+    });
+    saveLifeDesignData(ld2);
+    redrawManualPage();
+  }catch(e){}
 }
 
 function closeBucketEditor(){
@@ -5283,6 +5350,7 @@ async function submitStep2(){
     saveLifeDesignData(ld);
 
     showStep3(ld);
+    classifyAllElementActionsBulk();
   }catch(e){modalError(e);}
 }
 
@@ -5416,6 +5484,7 @@ function saveGoalElementEdit(fi){
   if(!ld)return;
   if(!ld.mandala)ld.mandala={};
   if(!ld.mandalaDetail)ld.mandalaDetail={};
+  var oldDetails=ld.mandalaDetail[fi]||['','','',''];
   var elemEl=document.getElementById('md-elem');
   if(elemEl)ld.mandala[fi]=elemEl.value.trim();
   var details=[];
@@ -5424,10 +5493,99 @@ function saveGoalElementEdit(fi){
     details[di]=el?el.value.trim():'';
   }
   ld.mandalaDetail[fi]=details;
+  // テキストが変わった行動だけ判定タイプをリセット（そこだけ再判定させる）
+  if(!ld.mandalaDetailType)ld.mandalaDetailType={};
+  if(!ld.mandalaDetailType[fi])ld.mandalaDetailType[fi]=['','','',''];
+  for(var dj=0;dj<4;dj++){
+    if(details[dj]!==oldDetails[dj])ld.mandalaDetailType[fi][dj]='';
+  }
   saveLifeDesignData(ld);
   closeGoalElementEdit();
   window._goalExpanded[fi]=true;
   redrawManualPage();
+  classifyElementActions(fi);
+}
+
+// 要素の行動をAIで習慣/行動に自動分類（type未設定の行動のみ、まとめて1回のAI呼び出しで判定）
+// ウィザードでの初回一括生成後に、8要素ぶんの行動をまとめて1回のAI呼び出しで習慣/行動判定する
+async function classifyAllElementActionsBulk(){
+  try{
+    var ld=getLifeDesignData();
+    if(!ld||!ld.mandalaDetail)return;
+    var targets=[];
+    for(var fi=0;fi<8;fi++){
+      var details=ld.mandalaDetail[fi]||[];
+      var curType=(ld.mandalaDetailType&&ld.mandalaDetailType[fi])||['','','',''];
+      for(var di=0;di<4;di++){
+        if(details[di]&&details[di].trim()&&!curType[di])targets.push({fi:fi,di:di,text:details[di]});
+      }
+    }
+    if(targets.length===0)return;
+    var listText=targets.map(function(t,idx){return (idx+1)+'. '+t.text;}).join('\n');
+    var prompt='以下は目標達成のための具体的な行動リストです。それぞれが次のどちらに近いか判定してください。\n\n'
+      +'・習慣：普段から継続的に積み重ねる行い（日々の努力・継続的な取り組み）\n'
+      +'・行動：特定のタイミングで実行する一度きりの物事（計画する・申し込む・紹介するなど）\n\n'
+      +listText+'\n\n'
+      +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)return;
+    var dat=await res.json();
+    var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(txt);
+    var types=parsed.types||[];
+    var ld2=getLifeDesignData();
+    if(!ld2||!ld2.mandalaDetail)return;
+    if(!ld2.mandalaDetailType)ld2.mandalaDetailType={};
+    targets.forEach(function(t,idx){
+      var v=types[idx];
+      if(v==='習慣'||v==='行動'){
+        if(!ld2.mandalaDetailType[t.fi])ld2.mandalaDetailType[t.fi]=['','','',''];
+        ld2.mandalaDetailType[t.fi][t.di]=v;
+      }
+    });
+    saveLifeDesignData(ld2);
+    redrawManualPage();
+  }catch(e){}
+}
+
+async function classifyElementActions(fi){
+  try{
+    var ld=getLifeDesignData();
+    if(!ld||!ld.mandalaDetail||!ld.mandalaDetail[fi])return;
+    var details=ld.mandalaDetail[fi];
+    var curType=(ld.mandalaDetailType&&ld.mandalaDetailType[fi])||['','','',''];
+    var targets=[];
+    for(var di=0;di<4;di++){
+      if(details[di]&&details[di].trim()&&!curType[di])targets.push({di:di,text:details[di]});
+    }
+    if(targets.length===0)return;
+    var listText=targets.map(function(t,idx){return (idx+1)+'. '+t.text;}).join('\n');
+    var prompt='以下は目標達成のための具体的な行動リストです。それぞれが次のどちらに近いか判定してください。\n\n'
+      +'・習慣：普段から継続的に積み重ねる行い（日々の努力・継続的な取り組み）\n'
+      +'・行動：特定のタイミングで実行する一度きりの物事（計画する・申し込む・紹介するなど）\n\n'
+      +listText+'\n\n'
+      +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)return;
+    var dat=await res.json();
+    var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var parsed=JSON.parse(txt);
+    var types=parsed.types||[];
+    var ld2=getLifeDesignData();
+    if(!ld2||!ld2.mandalaDetail||!ld2.mandalaDetail[fi])return;
+    if(!ld2.mandalaDetailType)ld2.mandalaDetailType={};
+    if(!ld2.mandalaDetailType[fi])ld2.mandalaDetailType[fi]=['','','',''];
+    targets.forEach(function(t,idx){
+      var v=types[idx];
+      if(v==='習慣'||v==='行動')ld2.mandalaDetailType[fi][t.di]=v;
+    });
+    saveLifeDesignData(ld2);
+    redrawManualPage();
+  }catch(e){}
 }
 
 
@@ -6339,6 +6497,23 @@ function showPasswordGateIfNeeded(){
         }
       },100);
     }
+  }
+}
+
+// ============================================================
+// 初回の使い方ガイド（ホーム画面に初めて入った時に1回だけ）
+// ============================================================
+function closeOnboardingGuide(){
+  try{localStorage.setItem('hanabito_onboarding_seen','1');}catch(e){}
+  var g=document.getElementById('onboarding-guide');
+  if(g)g.style.display='none';
+}
+function showOnboardingGuideIfNeeded(){
+  var seen=false;
+  try{seen=localStorage.getItem('hanabito_onboarding_seen')==='1';}catch(e){}
+  if(!seen){
+    var g=document.getElementById('onboarding-guide');
+    if(g)g.style.display='block';
   }
 }
 
