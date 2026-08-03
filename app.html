@@ -6385,10 +6385,13 @@ async function generateManual(){
   var nenTH=(G.T||[])[JIKKAN.indexOf(G.nenKan)]||'—';
   var tsuTH=(G.T||[])[JIKKAN.indexOf(G.tsuKan)]||'—';
   var nichiTH=(G.T||[])[JIKKAN.indexOf(G.nichiKan)]||'—';
+  var daiunDirRaw=getDaiunDirection(G);
+  var daiunDirLabel=daiunDirRaw==='forward'?'順行（人生の後半に向けて好転していくタイプ）':daiunDirRaw==='backward'?'逆行（人生の前半に恵まれ、後半は落ち着いていくタイプ）':'';
 
   var p4='以下のデータを使って【第3層：現在の心理状態】と【第4層：まとめのアドバイス】を書いてください。\n\n'
     +baseData+'\n'
-    +'現在の大運：'+( currDaiun?(currDaiun.age+'〜'+(currDaiun.age+currDaiun.sp-1)+'歳  通変星='+currDaiun.th+'  従星='+currDaiun.jos+'  十二運気='+currDaiun.ju):'—')+'\n\n'
+    +'現在の大運：'+( currDaiun?(currDaiun.age+'〜'+(currDaiun.age+currDaiun.sp-1)+'歳  通変星='+currDaiun.th+'  従星='+currDaiun.jos+'  十二運気='+currDaiun.ju):'—')+'\n'
+    +'参考：大運の進行方向='+(daiunDirLabel||'不明')+'（無理に触れる必要はなく、自然に合う場合だけ軽く反映する程度でよい）\n\n'
     +'■ 第3層：現在の心理状態\n'
     +'・まず命式内部の通変星同士の関係（'+nenTH+'・'+tsuTH+'・'+nichiTH+'）から生まれる本来の心理状態（強め合い・抑え合いによるジレンマや傾向）を先に説明する\n'
     +'・次に現在の大運の通変星（'+currTH+'）が各柱の通変星にどう作用しているか（強めるか抑えるか）で今の心理状態を説明する\n'
