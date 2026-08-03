@@ -4345,7 +4345,7 @@ function buildManualPage(){
 
   html+='<div class="card"><div class="card-title">◆ あなたの基本性格</div>';
   if(savedChara){
-    html+='<div id="manual-chara-content" style="font-size:0.92rem;line-height:1.9;color:var(--ink)">'+savedChara.replace(/\n/g,'<br>')+'</div>';
+    html+='<div id="manual-chara-content" style="font-size:1.08rem;line-height:2;color:var(--ink)">'+linkifyTerms(savedChara)+'</div>';
   } else {
     html+='<div id="manual-chara-content" style="font-size:0.9rem;color:var(--ink3);line-height:1.8">下の「AIで詳細分析を生成する」ボタンを押すと、あなただけの性格分析が表示されます。</div>';
   }
@@ -4396,7 +4396,7 @@ function buildManualPage(){
   html+='<p style="font-size:0.85rem;color:var(--ink3);margin-bottom:0.8rem">納音・九星・大運の流れを含む、あなた専用の詳細プロフィールをAIが生成します。</p>';
 
   var saved=loadManualData();
-  var layerStyle='font-size:0.92rem;line-height:1.9;color:var(--ink);margin-bottom:1.2rem';
+  var layerStyle='font-size:1.08rem;line-height:2;color:var(--ink);margin-bottom:1.2rem';
   var dividerStyle='border:none;border-top:1px solid var(--gold);opacity:0.3;margin:1rem 0';
   if(saved&&saved.layer1){
     html+=renderChapterHeader(1,'あなたという人');
@@ -5942,19 +5942,33 @@ async function generateYearAdvice(year){
   }
 }
 
+// 専門用語の読み仮名（プロプライエタリな用語のため、確実な読みが必要な場合はKBの「読み」フィールドを優先し、なければこの対応表を使う）
+var TERM_READINGS={
+  '休眠':'きゅうみん','残雪':'ざんせつ','芽吹':'めぶき','青葉':'あおば','結蕾':'けつらい','静容':'せいよう',
+  '天華':'てんか','零花':'れいか','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'へいなぎ','引寒':'いんかん',
+  '比肩':'ひけん','劫財':'ごうざい','食神':'しょくじん','傷官':'しょうかん','偏財':'へんざい',
+  '正財':'せいざい','偏官':'へんかん','正官':'せいかん','偏印':'へんいん','正印':'せいいん',
+  '転化天蛹':'てんかてんよう'
+};
+function getTermReading(cat,term){
+  var d=(cat==='転化天蛹')?KB['転化天蛹']:(KB[cat]||{})[term];
+  if(d&&d['読み'])return d['読み'];
+  return TERM_READINGS[term]||'';
+}
 function showJuniPopup(ju,label){
   if(ju&&ju.dataset){label=ju.dataset.lb;ju=ju.dataset.ju;}
   var desc=(KB['十二運気']||{})[ju];
   var text=desc?(desc['説明']||'')+(desc['独自解釈']?' '+desc['独自解釈']:''):'説明がありません';
+  var reading=getTermReading('十二運気',ju);
   var popup=document.createElement('div');
-  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:12px;padding:1rem;max-width:300px;width:85%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  popup.innerHTML='<div style="font-weight:700;color:var(--gold);margin-bottom:0.5rem">'+label+' '+ju+'</div><div style="font-size:0.82rem;color:var(--ink);line-height:1.7">'+text+'</div><button onclick="this.parentNode.remove()" style="margin-top:0.8rem;width:100%;padding:0.5rem;background:rgba(184,134,11,0.15);border:none;border-radius:6px;cursor:pointer;font-size:0.82rem">閉じる</button>';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:14px;padding:1.3rem;max-width:340px;width:88%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  popup.innerHTML='<div style="font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:0.6rem">'+label+' '+ju+(reading?'（'+reading+'）':'')+'</div><div style="font-size:1.05rem;color:var(--ink);line-height:1.9">'+text+'</div><button onclick="this.parentNode.remove()" style="margin-top:1rem;width:100%;padding:0.75rem;background:rgba(184,134,11,0.15);border:none;border-radius:8px;cursor:pointer;font-size:1rem">閉じる</button>';
   document.body.appendChild(popup);
 }
 
 // ============================================================
 // 専門用語の自動リンク化（あなたの本のAI生成文用）
-// 十二運気・通変星・転化天蛹の名前が文中に出てきたら、タップで説明が出るリンクに変換する
+// 十二運気・通変星・転化天蛹の名前が文中に出てきたら、読み仮名（ルビ）付きでタップ可能なリンクに変換する
 // ============================================================
 function showTermPopup(cat,term){
   var desc;
@@ -5965,9 +5979,10 @@ function showTermPopup(cat,term){
     var d=(KB[cat]||{})[term];
     desc=d?(d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:''):'説明がありません';
   }
+  var reading=getTermReading(cat,term);
   var popup=document.createElement('div');
-  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:12px;padding:1rem;max-width:300px;width:85%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  popup.innerHTML='<div style="font-weight:700;color:var(--gold);margin-bottom:0.5rem">'+term+'</div><div style="font-size:0.82rem;color:var(--ink);line-height:1.7">'+desc+'</div><button onclick="this.parentNode.remove()" style="margin-top:0.8rem;width:100%;padding:0.5rem;background:rgba(184,134,11,0.15);border:none;border-radius:6px;cursor:pointer;font-size:0.82rem">閉じる</button>';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:14px;padding:1.3rem;max-width:340px;width:88%;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
+  popup.innerHTML='<div style="font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:0.6rem">'+term+(reading?'（'+reading+'）':'')+'</div><div style="font-size:1.05rem;color:var(--ink);line-height:1.9">'+desc+'</div><button onclick="this.parentNode.remove()" style="margin-top:1rem;width:100%;padding:0.75rem;background:rgba(184,134,11,0.15);border:none;border-radius:8px;cursor:pointer;font-size:1rem">閉じる</button>';
   document.body.appendChild(popup);
 }
 function linkifyTerms(text){
@@ -5984,7 +5999,9 @@ function linkifyTerms(text){
   var pattern=new RegExp('('+esc.join('|')+')','g');
   var html=text.replace(pattern,function(match){
     var cat=termMap[match];
-    return '<span onclick="showTermPopup(\''+cat+'\',\''+match+'\')" style="color:#8a5a00;font-weight:700;border-bottom:1px dotted #b8860b;cursor:pointer">'+match+'</span>';
+    var reading=getTermReading(cat,match);
+    var rubyHtml=reading?'<ruby>'+match+'<rt style="font-size:0.6em">'+reading+'</rt></ruby>':match;
+    return '<span onclick="showTermPopup(\''+cat+'\',\''+match+'\')" style="color:#8a5a00;font-weight:700;border-bottom:2px dotted #b8860b;cursor:pointer">'+rubyHtml+'</span>';
   });
   return html.replace(/\n/g,'<br>');
 }
