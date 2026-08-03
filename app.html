@@ -2287,6 +2287,20 @@ function buildHomePage(){
   var rokkaClass='rokka-'+htBase;
   var html='<div class="page active">';
 
+  // 案内バナー2つ（花人占術とは？／このアプリの利用方法）：初めての人がいつでも迷わず戻れる常設の入口
+  html+='<div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem">'
+    +'<div onclick="showAboutOverlay()" style="cursor:pointer;background:linear-gradient(135deg,#b8860b,#d4a017);border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.6rem;box-shadow:0 2px 8px rgba(184,134,11,0.25)">'
+    +'<span style="font-size:1.3rem">🌸</span>'
+    +'<span style="flex:1;color:#fff;font-size:0.92rem;font-weight:700">花人占術とは？</span>'
+    +'<span style="color:rgba(255,255,255,0.8);font-size:0.9rem">›</span>'
+    +'</div>'
+    +'<div onclick="document.getElementById(\'usage-guide-overlay\').classList.add(\'show\')" style="cursor:pointer;background:#fff;border:1px solid rgba(184,134,11,0.4);border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.6rem;box-shadow:0 2px 8px rgba(184,134,11,0.1)">'
+    +'<span style="font-size:1.3rem">📖</span>'
+    +'<span style="flex:1;color:#8a5a00;font-size:0.92rem;font-weight:700">このアプリの利用方法</span>'
+    +'<span style="color:#8a5a00;font-size:0.9rem">›</span>'
+    +'</div>'
+    +'</div>';
+
   // 六花人バナー
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
