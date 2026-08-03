@@ -6145,30 +6145,31 @@ function initScrollNav(){
   toggle.textContent='📖';
   document.body.appendChild(toggle);
 
-  // 展開パネル（I〜V ボタン群）
+  // 展開パネル：I〜V の番号＋章名ラベルを、常にセットで全部まとめて表示する
   var panel=document.createElement('div');
   panel.id='scroll-nav';
-  panel.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:3px;padding:4px 0';
+  panel.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:600;display:none;flex-direction:column;gap:0.9rem;padding:0.8rem 0.6rem 0.8rem 0;background:rgba(0,0,0,0.06);border-radius:16px 0 0 16px';
 
   chaps.forEach(function(c,idx){
     var el=document.getElementById(c.id);
     if(!el)return;
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:0.6rem;cursor:pointer';
     var btn=document.createElement('div');
-    btn.style.cssText='width:36px;height:36px;background:rgba(184,134,11,0.88);border-radius:8px 0 0 8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.65rem;color:#fff;font-weight:700;font-family:"Zen Old Mincho",serif;box-shadow:-2px 0 6px rgba(0,0,0,0.12)';
+    btn.style.cssText='width:44px;height:44px;flex-shrink:0;background:linear-gradient(135deg,#b8860b,#d4a017);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:#fff;font-weight:700;font-family:"Zen Old Mincho",serif;box-shadow:-2px 2px 8px rgba(0,0,0,0.2)';
     btn.textContent=nums[idx];
-    btn.onclick=function(){
-      document.getElementById(c.id).scrollIntoView({behavior:'smooth',block:'start'});
+    var label=document.createElement('div');
+    label.style.cssText='background:rgba(20,15,8,0.88);color:#fff;padding:0.7rem 1rem;border-radius:12px;font-size:0.98rem;line-height:1.6;white-space:pre-line;max-width:200px;box-shadow:0 3px 10px rgba(0,0,0,0.25)';
+    label.textContent=c.label;
+    row.appendChild(btn);
+    row.appendChild(label);
+    row.onclick=function(){
+      el.scrollIntoView({behavior:'smooth',block:'start'});
       collapsePanel();
     };
-    panel.appendChild(btn);
+    panel.appendChild(row);
   });
   document.body.appendChild(panel);
-
-  // 章名オーバーレイ
-  var overlay=document.createElement('div');
-  overlay.id='scroll-chapter-overlay';
-  overlay.style.cssText='position:fixed;right:42px;top:50%;transform:translateY(-50%);z-index:599;background:rgba(20,20,20,0.82);color:#fff;padding:0.5rem 0.9rem;border-radius:10px;font-size:0.76rem;line-height:1.6;text-align:right;display:none;pointer-events:none;white-space:pre-line;max-width:190px';
-  document.body.appendChild(overlay);
 
   var hideTimer=null;
   var isExpanded=false;
@@ -6177,14 +6178,6 @@ function initScrollNav(){
     isExpanded=true;
     toggle.style.display='none';
     panel.style.display='flex';
-    overlay.style.display='block';
-    var label='';
-    chaps.forEach(function(c){
-      var el=document.getElementById(c.id);
-      if(!el)return;
-      if(el.getBoundingClientRect().top<=200)label=c.label;
-    });
-    if(label)overlay.textContent=label;
     clearTimeout(hideTimer);
     hideTimer=setTimeout(collapsePanel,4000);
   }
@@ -6192,7 +6185,6 @@ function initScrollNav(){
   function collapsePanel(){
     isExpanded=false;
     panel.style.display='none';
-    overlay.style.display='none';
     toggle.style.display='none';
     clearTimeout(hideTimer);
   }
