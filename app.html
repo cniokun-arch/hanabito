@@ -1776,6 +1776,17 @@ var aiHistory=[];
 var KB={};
 var WORKER_BASE='https://polished-flower-2524.cniokun.workers.dev';
 
+// 開発者用：設定画面で入力したキーがあれば、Workerへのリクエストにこっそり添えて
+// 1日の利用回数制限をスキップしてもらう（一般利用者には見えない・関係ない仕組み）
+function getWorkerHeaders(){
+  var h={'Content-Type':'application/json'};
+  try{
+    var devKey=localStorage.getItem('hanabito_dev_key');
+    if(devKey)h['X-Dev-Key']=devKey;
+  }catch(e){}
+  return h;
+}
+
 // KB読み込み
 async function loadKB(){
   try{
@@ -3531,7 +3542,7 @@ async function runCompatAI(){
     +(customInfo?'【追加知識】\n'+customInfo+'\n\n':'')
     +'【絶対守ること】干支の漢字を回答に出さない。Markdown禁止。親しみやすい日本語。';
   try{
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sysPrompt,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),body:JSON.stringify({system:sysPrompt,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
     var text='';
     if(data.content)text=data.content.map(function(b){return b.text||'';}).join('');
@@ -3949,7 +3960,7 @@ async function speakText(text,btn){
   if(btn){btn.textContent='⏳ 読込中';btn.disabled=true;}
   try{
     var res=await fetch(WORKER_BASE+'/api/tts',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({text:t,gender:getVoiceGender()})
     });
     var data=await res.json();
@@ -4234,7 +4245,7 @@ async function sendAI(){
 
   try{
     var res=await fetch(WORKER_BASE+'/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({system:AI_PAGE_SYS,messages:aiHistory.slice(-10),engine:AI_ENGINE})
     });
 
@@ -4281,7 +4292,7 @@ async function updateProfileFromChat(userMsg,aiReply){
   }
   try{
     var prompt='以下の会話からユーザーの特徴をJSON形式のみで返してください。\nユーザー:'+userMsg+'\nAI:'+aiReply.slice(0,200)+'\n既存:'+JSON.stringify({personality:prof.personality,concerns:prof.concerns,lifestage:prof.lifestage})+'\n{"personality":[],"concerns":[],"preferences":[],"lifestage":"","summary":"20字以内","keywords":[],"changed":true}\nchangedは新情報があればtrue。JSONのみ返答。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
     var txt=dat.content?dat.content.map(function(b){return b.text||'';}).join('').trim():'';
@@ -5053,7 +5064,7 @@ async function classifyBucketTypes(){
       +'・行動：転職・結婚・引っ越しなど、特定のタイミングで実行する一度きりの物事\n\n'
       +listText+'\n\n'
       +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
@@ -5338,7 +5349,7 @@ function modalError(e){
 }
 
 async function aiChat(prompt,sys){
-  var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+  var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
     body:JSON.stringify({messages:[{role:'user',content:prompt}],system:sys||'Markdown禁止。占術用語は使わず誰でも分かる言葉で。'})});
   var json=await res.json();
   return (json.content&&json.content[0]?json.content[0].text:json.error||'').replace(/[#*]/g,'').trim();
@@ -5692,7 +5703,7 @@ async function classifyAllElementActionsBulk(){
       +'・行動：特定のタイミングで実行する一度きりの物事（計画する・申し込む・紹介するなど）\n\n'
       +listText+'\n\n'
       +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
@@ -5732,7 +5743,7 @@ async function classifyElementActions(fi){
       +'・行動：特定のタイミングで実行する一度きりの物事（計画する・申し込む・紹介するなど）\n\n'
       +listText+'\n\n'
       +'{"types":["習慣"または"行動を項目の順番通りに列挙"]} の形式で、JSON配列のみを返してください。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({system:'JSONのみ返答。',messages:[{role:'user',content:prompt}]})});
     if(!res.ok)return;
     var dat=await res.json();
@@ -5905,7 +5916,7 @@ async function generateDaiunAdvice(startY,endY){
       +'・'+startY+'〜'+endY+'年のこの10年間、この人がどんな傾向を持ちやすいかが伝わるようにする\n'
       +'・通変星名・十二運気名はそのまま使ってよい（公開用語／アプリ内で既に表示済みの名称のため隠す必要はない）\n'
       +'・思いやりのある前向きな言葉で。Markdown禁止。150〜200文字程度。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'あなたは占術カウンセラーです。2つの要素を別々に説明するのではなく、必ず1つの統合された解釈として書いてください。専門用語で終わらせず誰にでも分かる温かい言葉で。',engine:AI_ENGINE})});
     var json=await res.json();
     var text=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
@@ -5961,7 +5972,7 @@ async function generateYearAdvice(year){
       +'④最後に、今年の目標を立てる上で「結局どうすればいいのか」を具体的な行動レベルでアドバイスする\n'
       +'・通変星名（比肩など）や十二運気名（豊穣など）はそのまま使ってよい。これらは公開されている占術用語、またはアプリ内で既に表示されている名称なので、隠す必要はない\n'
       +'・思いやりのある前向きな言葉で。Markdown禁止。380〜450文字程度。';
-    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    var res=await fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'あなたは占術カウンセラーです。通変星・十二運気の特徴を踏まえて具体的に解釈し、専門用語で終わらせず誰にでも分かる温かい言葉でアドバイスしてください。',engine:AI_ENGINE})});
     var json=await res.json();
     var text=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
@@ -6394,7 +6405,7 @@ async function generateManual(){
     +'「第3層」「第4層」「通変星を見ると」などの内部用語・書き出しは一切使わない。占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
 
   function apiCall(prompt,overrideSys){
-    return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
       body:JSON.stringify({messages:[{role:'user',content:prompt}],system:overrideSys||sys,engine:AI_ENGINE})});
   }
   function getText(json){
@@ -6534,6 +6545,16 @@ function buildSettingPage(){
     html+='</div>';
   }
 
+  // 開発者オプション（開発者キーを入れると、AI利用回数制限がスキップされる）
+  var savedDevKey='';
+  try{savedDevKey=localStorage.getItem('hanabito_dev_key')||'';}catch(e){}
+  html+='<div class="setting-section"><h3>開発者オプション</h3>'
+    +'<p style="font-size:0.9rem;color:var(--ink3);margin-bottom:0.6rem">開発者キーを入力すると、この端末からのAI利用が回数制限の対象外になります。通常は空欄のままで問題ありません。</p>'
+    +'<input type="password" id="dev-key-input" value="'+savedDevKey.replace(/"/g,'&quot;')+'" placeholder="開発者キー" style="width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.95rem;background:var(--bg2);color:var(--ink);margin-bottom:0.6rem">'
+    +'<button class="btn-secondary" style="width:auto;padding:6px 16px;font-size:0.95rem" onclick="saveDevKey()">保存</button>'
+    +(savedDevKey?'<span style="margin-left:0.6rem;font-size:0.88rem;color:#2a8c4a">✓ 設定済み</span>':'')
+    +'</div>';
+
   // データリセット
   html+='<div class="setting-section"><h3>データ管理</h3>'
     +'<button class="btn-secondary btn-danger" style="width:auto;padding:6px 16px;font-size:1rem" onclick="resetAllData()">すべてのデータを削除</button>'
@@ -6544,6 +6565,16 @@ function buildSettingPage(){
   return html;
 }
 
+function saveDevKey(){
+  var input=document.getElementById('dev-key-input');
+  var val=input?input.value.trim():'';
+  try{
+    if(val)localStorage.setItem('hanabito_dev_key',val);
+    else localStorage.removeItem('hanabito_dev_key');
+  }catch(e){}
+  showToast(val?'開発者キーを保存しました':'開発者キーを削除しました');
+  renderCurrentPage();
+}
 function setTheme(theme){
   var data=S.load();if(!data)return;
   if(!data.settings)data.settings={};
