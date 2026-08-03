@@ -4313,6 +4313,36 @@ function renderChapterHeader(num,title){
   return h;
 }
 
+// 大運の十二運気が順行（休眠→残雪→芽吹…の順に進む）か逆行（その逆）かを判定
+function getDaiunDirection(G){
+  if(!G)return null;
+  var rows=getDaiunRows(G);
+  if(!rows||rows.length<2)return null;
+  var i0=JUNI_NAMES.indexOf(rows[0].ju);
+  var i1=JUNI_NAMES.indexOf(rows[1].ju);
+  if(i0<0||i1<0)return null;
+  var diff=((i1-i0)%12+12)%12;
+  if(diff===1)return 'forward';
+  if(diff===11)return 'backward';
+  return null;
+}
+function renderDaiunDirectionBadge(){
+  var Graw=getCurrentTargetG();
+  var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+  var dir=getDaiunDirection(G);
+  if(!dir)return '';
+  var isForward=dir==='forward';
+  var icon=isForward?'📈':'📉';
+  var title=isForward?'人生の後半に向けて好転していくタイプ':'人生の前半に恵まれ、後半は落ち着いていくタイプ';
+  var desc=isForward
+    ?'大運（10年ごとの運気の波）が若い頃から歳を重ねるにつれて徐々に上向いていく並びです。今が本領発揮の時期とは限らず、これから先により大きく開花していく可能性が高いタイプです。'
+    :'大運（10年ごとの運気の波）が若い頃に勢いがあり、歳を重ねるにつれて落ち着いていく並びです。若いうちの勢いを土台にしながら、後半は積み上げてきたものを守り育てる過ごし方が向いているタイプです。';
+  return '<div style="background:linear-gradient(135deg,rgba(184,134,11,0.12),rgba(184,134,11,0.04));border:1px solid rgba(184,134,11,0.3);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.2rem">'
+    +'<div style="font-size:1.05rem;font-weight:800;color:#8a5a00;margin-bottom:0.5rem">'+icon+' '+title+'</div>'
+    +'<div style="font-size:0.92rem;color:var(--ink);line-height:1.9">'+desc+'</div>'
+    +'</div>';
+}
+
 function buildManualPage(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
@@ -4404,6 +4434,7 @@ function buildManualPage(){
     html+=renderChapterHeader(2,'年齢とともに育つ人格');
     html+='<div id="manual-layer2" style="'+layerStyle+'">'+linkifyTerms(saved.layer2||'')+'</div>';
     html+=renderChapterHeader(3,'人生の大きな流れ');
+    html+=renderDaiunDirectionBadge();
     html+='<div id="manual-layer3" style="'+layerStyle+'">'+linkifyTerms(saved.layer3||'')+'</div>';
     html+=renderChapterHeader(4,'今のあなたへ');
     html+='<div id="manual-layer4" style="'+layerStyle+'">'+linkifyTerms(saved.layer4||'')+'</div>';
@@ -4415,6 +4446,7 @@ function buildManualPage(){
     html+=renderChapterHeader(2,'年齢とともに育つ人格');
     html+='<div id="manual-layer2"></div>';
     html+=renderChapterHeader(3,'人生の大きな流れ');
+    html+=renderDaiunDirectionBadge();
     html+='<div id="manual-layer3"></div>';
     html+=renderChapterHeader(4,'今のあなたへ');
     html+='<div id="manual-layer4"></div>';
