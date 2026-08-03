@@ -4445,7 +4445,7 @@ function buildManualPage(){
     html+='<div id="manual-layer2" style="'+layerStyle+'">'+linkifyTerms(saved.layer2||'')+'</div>';
     html+=renderChapterHeader(3,'人生の大きな流れ');
     html+=renderDaiunDirectionBadge();
-    html+='<div id="manual-layer3" style="'+layerStyle+'">'+linkifyTerms(saved.layer3||'')+'</div>';
+    html+='<div id="manual-layer3" style="'+layerStyle+'">'+renderLayer3Html(saved.layer3||'')+'</div>';
     html+=renderChapterHeader(4,'今のあなたへ');
     html+='<div id="manual-layer4" style="'+layerStyle+'">'+linkifyTerms(saved.layer4||'')+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
@@ -6053,6 +6053,15 @@ function linkifyTerms(text){
   });
   return html.replace(/\n/g,'<br>');
 }
+// CHAPTER III専用：AIが出力する「【現在の大運】」マーカーを目立つバッジに変換
+function highlightCurrentDaiunMarker(html){
+  if(!html)return html;
+  var badge='<span style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;font-weight:800;font-size:0.78em;border-radius:20px;padding:0.15em 0.7em;margin-left:0.3em;white-space:nowrap;box-shadow:0 2px 6px rgba(184,134,11,0.4)">⭐ 現在の大運</span>';
+  return html.replace(/【現在の大運】/g,badge);
+}
+function renderLayer3Html(text){
+  return highlightCurrentDaiunMarker(linkifyTerms(text));
+}
 
 function saveTimelineData(year){
   var goalEl=document.getElementById('tl-goal');
@@ -6360,6 +6369,7 @@ async function generateManual(){
     +'・0歳から最後まで全期間を省略せず均等な分量で書く\n'
     +'・各10年区間は必ず次の2段構成で書く：\n'
     +'  ①冒頭で必ず「○歳〜○歳（○年〜○年）：[通変星]×[十二運気]」の形で、その区間の運気を明示する（例：「26歳〜35歳（2025〜2034年）：比肩×豊穣」）。運気名を隠さず、そのまま出力すること\n'
+    +'  ・現在進行中の大運の区間だけ、①の行の末尾に半角スペースを空けて必ず「【現在の大運】」という文字列をそのまま付け加える（他の区間には絶対に付けない。表記ゆれ禁止、この4文字＋括弧をそのまま使うこと）\n'
     +'  ②続けて、その[通変星]の気質・欲求の性質と、[十二運気]がそれをどう彩るか（強めるか、発揮のされ方を変えるか）を1つに統合して解説する。2つを別々に説明するのではなく、掛け合わさるとどんな傾向になるかを一体の人物像として描写する\n'
     +'・現在の大運（★）は特に詳しく\n'
     +'・苦難の時期（静容）：心身のケアを最優先に、次のチャンスを静かに待つ時期\n'
@@ -6423,7 +6433,8 @@ async function generateManual(){
     if(l3El)l3El.innerHTML='<span style="color:var(--ink3)">大運の流れを生成中...</span>';
     var l3Json=await (await apiCall(p3)).json();
     var l3Text=getText(l3Json);
-    showLayer('manual-layer3','manual-div3',l3Text);
+    var l3ElNow=document.getElementById('manual-layer3');
+    if(l3ElNow)l3ElNow.innerHTML=renderLayer3Html(l3Text);
 
     var l4El=document.getElementById('manual-layer4');
     if(l4El)l4El.innerHTML='<span style="color:var(--ink3)">現在の心理状態・まとめを生成中...</span>';
@@ -6452,7 +6463,7 @@ async function generateManual(){
     var pl2=await proofText(l2Text);
     if(proofEl2)proofEl2.innerHTML=linkifyTerms(pl2);
     var pl3=await proofText(l3Text);
-    if(proofEl3)proofEl3.innerHTML=linkifyTerms(pl3);
+    if(proofEl3)proofEl3.innerHTML=renderLayer3Html(pl3);
     var pl4=await proofText(l4Text);
     if(proofEl4)proofEl4.innerHTML=linkifyTerms(pl4);
 
