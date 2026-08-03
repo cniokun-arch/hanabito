@@ -1784,6 +1784,10 @@ function getWorkerHeaders(){
     var devKey=localStorage.getItem('hanabito_dev_key');
     if(devKey)h['X-Dev-Key']=devKey;
   }catch(e){}
+  try{
+    var G=getCurrentTargetG();
+    if(G&&G.y&&G.m&&G.d)h['X-Member-Id']=encodeURIComponent(''+G.y+'-'+G.m+'-'+G.d+'-'+(G.gender||''));
+  }catch(e){}
   return h;
 }
 
