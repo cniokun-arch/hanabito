@@ -304,6 +304,24 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .nav-btn-ai .nav-lbl{font-size:0.94rem;color:var(--ink3);margin-top:2px;letter-spacing:0.05em}
 .nav-btn-ai.active .nav-lbl{color:var(--purple);font-weight:700}
 
+/* AI相談 浮きボタン（タブとは独立してバーの上に乗る） */
+.ai-float-btn{
+  position:fixed;right:14px;
+  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 10px);
+  z-index:250;
+  background:linear-gradient(135deg,var(--purple),#9333ea);
+  color:#fff;border-radius:28px;
+  padding:0.65rem 1.15rem;
+  display:flex;align-items:center;gap:0.45rem;
+  box-shadow:0 4px 14px rgba(124,58,237,0.45);
+  cursor:pointer;border:2px solid #fff;
+  font-family:'Noto Serif JP',serif;
+  transition:transform 0.15s;
+}
+.ai-float-btn:active{transform:scale(0.95)}
+.ai-float-btn .icon{font-size:1.25rem;line-height:1}
+.ai-float-btn .lbl{font-weight:700;font-size:0.88rem;letter-spacing:0.05em}
+
 /* ===== MEMBER MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:flex-end;justify-content:center}
 .modal-box{background:var(--bg);border-radius:16px 16px 0 0;padding:1.5rem 1.2rem 2rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
@@ -1134,6 +1152,11 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     <!-- JS でページ切替 -->
   </div>
 
+  <!-- AI相談：バーの上に浮かせた独立ボタン（楽天アプリのAI検索チップを参考） -->
+  <div class="ai-float-btn" id="ai-float-btn" onclick="switchNav('ai',null)">
+    <span class="icon">🌸</span><span class="lbl">AI相談</span>
+  </div>
+
   <!-- ボトムナビ -->
   <div class="bottom-nav">
     <button class="nav-btn active" onclick="switchNav('home',this)">
@@ -1144,10 +1167,6 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <span class="nav-icon">☯</span>
       <span class="nav-lbl">命式</span>
     </button>
-    <button class="nav-btn-ai" onclick="switchNav('ai',this)">
-      <div class="nav-btn-ai-circle">🌸</div>
-      <span class="nav-lbl">AI相談</span>
-    </button>
     <button class="nav-btn" onclick="switchNav('compat',this)">
       <span class="nav-icon">💞</span>
       <span class="nav-lbl">相性</span>
@@ -1155,6 +1174,10 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     <button class="nav-btn" onclick="switchNav('manual',this)">
       <span class="nav-icon">📖</span>
       <span class="nav-lbl">あなたの本</span>
+    </button>
+    <button class="nav-btn" onclick="switchNav('goals',this)">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-lbl">目標設定</span>
     </button>
   </div>
 </div>
@@ -2037,6 +2060,10 @@ function renderCurrentPage(){
   document.body.style.overflow='';
   document.getElementById('screen-main').style.overflow='';
 
+  // AI相談ページの間は浮きボタンを隠す（自分自身へのボタンなので不要）
+  var floatBtn=document.getElementById('ai-float-btn');
+  if(floatBtn)floatBtn.style.display=(currentNav==='ai')?'none':'flex';
+
   if(currentNav==='ai'){
     // AIページはbody直下にfixedオーバーレイとして挿入
     var overlay=document.createElement('div');
@@ -2055,6 +2082,7 @@ function renderCurrentPage(){
     else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
     else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
+    else if(currentNav==='goals')ca.innerHTML=buildGoalsPage();
   }
 }
 
@@ -3906,9 +3934,9 @@ function buildAIPage(){
   html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
     +'<button class="nav-btn" onclick="switchNav(\'home\',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
-    +'<button class="nav-btn-ai active" onclick="switchNav(\'ai\',this)"><div class="nav-btn-ai-circle">🌸</div><span class="nav-lbl">AI相談</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'manual\',this)"><span class="nav-icon">📖</span><span class="nav-lbl">あなたの本</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'goals\',this)"><span class="nav-icon">🎯</span><span class="nav-lbl">目標設定</span></button>'
     +'</div>';
 
   html+='</div>';
@@ -4497,7 +4525,6 @@ function buildManualPage(){
     html+=renderChapterHeader(4,'今のあなたへ');
     html+='<div id="manual-layer4" style="'+layerStyle+'">'+linkifyTerms(saved.layer4||'')+'</div>';
     html+='<button onclick="generateManual()" style="margin-top:1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:\'Noto Serif JP\',serif;font-size:0.85rem;cursor:pointer;width:100%">🔄 再生成する</button>';
-    html+=renderChapter5();
   } else {
     html+=renderChapterHeader(1,'あなたという人');
     html+='<div id="manual-layer1"></div>';
@@ -4509,7 +4536,6 @@ function buildManualPage(){
     html+=renderChapterHeader(4,'今のあなたへ');
     html+='<div id="manual-layer4"></div>';
     html+='<button id="manual-gen-btn" onclick="generateManual()" style="background:#b8860b;color:#fff;border:none;border-radius:8px;padding:0.7rem 1.5rem;font-family:\'Noto Serif JP\',serif;font-size:0.9rem;cursor:pointer;width:100%">✨ AIで詳細分析を生成する</button>';
-    html+=renderChapter5();
   }
   html+='</div>';
   html+='</div>';
@@ -4634,6 +4660,14 @@ function renderChapter5(){
   // STEP 3: 花人占術スケジューラー（常に表示）
   html+=renderTimeline(ld);
 
+  return html;
+}
+
+// 目標設定タブ（旧CHAPTER V を独立ページとして表示）
+function buildGoalsPage(){
+  var G=getCurrentTargetG();
+  if(!G)return '<div class="page active"><p style="color:var(--ink3);padding:2rem;text-align:center">データがありません</p></div>';
+  var html='<div class="page active">'+renderChapter5()+'</div>';
   return html;
 }
 
@@ -6197,10 +6231,9 @@ function initScrollNav(){
     {id:'nav-ch1',label:'CHAPTER I\nあなたという人'},
     {id:'nav-ch2',label:'CHAPTER II\n年齢とともに育つ人格'},
     {id:'nav-ch3',label:'CHAPTER III\n人生の大きな流れ'},
-    {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'},
-    {id:'nav-ch5',label:'CHAPTER V\nあなたの人生設計'}
+    {id:'nav-ch4',label:'CHAPTER IV\n今のあなたへ'}
   ];
-  var nums=['I','II','III','IV','V'];
+  var nums=['I','II','III','IV'];
 
   // 折りたたみトグルボタン
   var toggle=document.createElement('div');
