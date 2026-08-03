@@ -4307,7 +4307,7 @@ var _manualAIRunning=false;
 // 章の区切り（CHAPTER I〜V共通）：前セクションとの間隔を広く取り、太めの二重線で明確に区切る
 function renderChapterHeader(num,title){
   var roman=['I','II','III','IV','V'][num-1];
-  var h='<div id="nav-ch'+num+'" style="text-align:center;margin:2.4rem 0 1.2rem;padding:1rem 0;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.08),transparent);border-top:2px solid rgba(184,134,11,0.4);border-bottom:2px solid rgba(184,134,11,0.4)">';
+  var h='<div id="nav-ch'+num+'" style="scroll-margin-top:115px;text-align:center;margin:2.4rem 0 1.2rem;padding:1rem 0;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.08),transparent);border-top:2px solid rgba(184,134,11,0.4);border-bottom:2px solid rgba(184,134,11,0.4)">';
   h+='<div style="font-size:0.75rem;color:var(--gold);letter-spacing:0.3em;margin-bottom:0.4rem;font-weight:700">✦ CHAPTER '+roman+' ✦</div>';
   h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.1em">'+title+'</div>';
   h+='</div>';
@@ -5135,7 +5135,7 @@ function renderTimeline(ld){
   if(!Graw)return '';
   var G=doCalc(parseInt(Graw.y,10),parseInt(Graw.m,10),parseInt(Graw.d,10),Graw.gender||'男');
   if(!G)return '';
-  var html='<div id="ld-timeline-section" style="margin-bottom:1.2rem">';
+  var html='<div id="ld-timeline-section" style="scroll-margin-top:115px;margin-bottom:1.2rem">';
   html+=renderStepHeader(3,'花人占術スケジューラー');
   html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>各年をタップすると年間・月別の目標を設定でき、ホーム画面のカレンダーに反映されます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
 
