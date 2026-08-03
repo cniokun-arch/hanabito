@@ -2307,7 +2307,7 @@ function buildHomePage(){
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
     +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'さんに咲く花は</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBaseRuby(htBase)+'</div>'
-    +'<div style="font-size:1rem;color:rgba(255,255,255,0.8);margin-top:0.3rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>';
+    +'<div style="display:inline-block;background:rgba(255,255,255,0.28);border-radius:20px;padding:0.35rem 1.1rem;color:#fff;font-weight:700;font-size:1.05rem;margin-top:0.5rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>';
 
   // 六花人の共通土台：外面・内面の従星
   var rj=getRokkaJusei(G.ht);
@@ -2859,11 +2859,13 @@ function openJuseiOverlay(){
   var hinata=htDisplayHinataHikage(G.ht);
   var rj=getRokkaJusei(G.ht);
   if(!rj)return;
+  var targetName=getCurrentTargetName();
 
   // ヘッダーの色を六花人カラーに合わせる
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
+  var htColor=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   var hdr=document.getElementById('jusei-overlay-header');
-  if(hdr)hdr.style.background=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
+  if(hdr)hdr.style.background=htColor;
   var ttl=document.getElementById('jusei-overlay-title');
   if(ttl)ttl.textContent='✦ '+dispName+'に与えられた従星';
 
@@ -2876,52 +2878,45 @@ function openJuseiOverlay(){
   if(!body)return;
 
   var h='';
+  var isHinata=(hinata==='日向');
+  var myChara=isHinata?(jusei&&jusei['日向性格']):(jusei&&jusei['日陰性格']);
+  var icon=isHinata?'☀️':'🌙';
 
-  // 1. 導入文
-  h+='<div style="background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.15);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem;line-height:1.9;font-size:0.92rem;color:var(--ink2)">'
-    +'花人占術では、どんな人も六種類の性質（花）のひとつが与えられ、それが日向（ひなた）と日陰（ひかげ）にそれぞれ分けられていると考えます。そしてその花には2つの星（従星）が宿り、その性質により咲く花が決まる、という考え方をします。'
+  // 1. まず「あなたはコレ」を明確に表示
+  h+='<div style="background:'+htColor+';border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:0.9rem;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,0.2)">'
+    +'<div style="font-size:0.85rem;color:rgba(255,255,255,0.85);margin-bottom:0.3rem">'+(targetName?targetName+'さんは':'あなたは')+'</div>'
+    +'<div style="font-size:1.3rem;font-weight:800;color:#fff">'+icon+' '+hinata+'の'+dispName+'</div>'
     +'</div>';
-  h+='<div style="background:var(--bg);border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem;line-height:1.9;font-size:0.95rem;color:var(--ink)">'
-    +(jusei&&jusei['導入']?jusei['導入']:dispName+'には2つの従星が宿っています。'+rj.outer+'と'+rj.inner+'です。このふたつの星によって、'+dispName+'の基本的な性格・性質・運命の土台が決まります。')
+  if(myChara){
+    h+='<div style="background:#fff;border:2px solid rgba(184,134,11,0.35);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:0.9rem">'
+      +'<p style="font-size:0.95rem;color:var(--ink);line-height:1.9;margin:0">'+myChara+'</p>'
+      +'</div>';
+  }
+
+  // 2. 「六花人について」タップ説明
+  h+='<div style="text-align:center;margin-bottom:1.3rem">'
+    +'<span onclick="showTermPopup(\'special\',\'六花人について\')" style="display:inline-block;color:#8a5a00;font-size:0.85rem;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">🌸 花人占術の分類「六花人」について</span>'
     +'</div>';
 
-  // 2. 日向/日陰の説明
-  h+='<div style="background:rgba(184,134,11,0.06);border-left:3px solid #b8860b;padding:0.8rem 1rem;margin-bottom:1.2rem;border-radius:0 8px 8px 0;font-size:0.92rem;color:var(--ink);line-height:1.8">'
-    +(jusei&&jusei['日向内面外面']?jusei['日向内面外面']:'日向の人は'+rj.outer+'が外面（表に出る顔）として強く現れ、'+rj.inner+'が内面（奥にある性質）として見えにくく出ます。日陰の人はその逆で、'+rj.inner+'が外面として強く現れ、'+rj.outer+'が内面として見えにくく出ます。')
+  // 3. 従星の詳細（根拠として提示。あなたの外面/内面を明記）
+  h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:0.92rem;color:var(--gold);margin-bottom:0.7rem;letter-spacing:0.08em">◆ あなたに宿る2つの従星</div>';
+  h+='<div style="background:rgba(184,134,11,0.06);border-left:3px solid #b8860b;padding:0.8rem 1rem;margin-bottom:1rem;border-radius:0 8px 8px 0;font-size:0.88rem;color:var(--ink);line-height:1.8">'
+    +(jusei&&jusei['日向内面外面']?jusei['日向内面外面']:dispName+'には2つの従星、'+rj.outer+'と'+rj.inner+'が宿っています。'+hinata+'のあなたは、'+rj.outer+'が外面（表に出る顔）、'+rj.inner+'が内面（奥にある性質）として現れます。')
     +'</div>';
 
-  // 3. 各従星のキーワード・説明
-  var stars=[{name:rj.outer, kw:kwOuter, desc:jusei&&jusei[rj.outer+'説明']}, {name:rj.inner, kw:kwInner, desc:jusei&&jusei[rj.inner+'説明']}];
+  var stars=[{name:rj.outer,role:'外面（表に出る顔）',kw:kwOuter,desc:jusei&&jusei[rj.outer+'説明']},{name:rj.inner,role:'内面（奥にある性質）',kw:kwInner,desc:jusei&&jusei[rj.inner+'説明']}];
   stars.forEach(function(st){
     h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1rem">'
-      +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:#b8860b;margin-bottom:0.5rem">'+st.name+'</div>'
+      +'<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.5rem">'
+      +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;font-weight:700;color:#b8860b">'+st.name+'</span>'
+      +'<span style="font-size:0.74rem;color:var(--ink3)">'+st.role+'</span>'
+      +'</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem">'
       +st.kw.map(function(k){return '<span style="background:rgba(184,134,11,0.1);border:1px solid rgba(184,134,11,0.25);border-radius:12px;padding:2px 10px;font-size:0.78rem;color:#4a3c28">'+k+'</span>';}).join('')
       +'</div>'
       +(st.desc?'<p style="font-size:0.9rem;color:var(--ink2);line-height:1.8;margin:0">'+st.desc+'</p>':'')
       +'</div>';
   });
-
-  // 4. 性格まとめ（日向・日陰それぞれ）
-  var charaHinata=jusei&&jusei['日向性格'];
-  var charaHikage=jusei&&jusei['日陰性格'];
-  if(charaHinata||charaHikage){
-    h+='<div style="margin-top:0.5rem">';
-    h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:0.95rem;color:var(--gold);margin-bottom:0.8rem;letter-spacing:0.1em">◆ 日向・日陰の性格まとめ</div>';
-    if(charaHinata){
-      h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">'
-        +'<div style="font-size:0.82rem;color:var(--gold);font-weight:700;margin-bottom:0.4rem">☀️ 日向（ひなた）の'+dispName+'</div>'
-        +'<p style="font-size:0.9rem;color:var(--ink);line-height:1.8;margin:0">'+charaHinata+'</p>'
-        +'</div>';
-    }
-    if(charaHikage){
-      h+='<div style="background:#fff;border:1px solid rgba(184,134,11,0.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:0.8rem">'
-        +'<div style="font-size:0.82rem;color:#555;font-weight:700;margin-bottom:0.4rem">🌙 日陰（ひかげ）の'+dispName+'</div>'
-        +'<p style="font-size:0.9rem;color:var(--ink);line-height:1.8;margin:0">'+charaHikage+'</p>'
-        +'</div>';
-    }
-    h+='</div>';
-  }
 
   h+='<div style="text-align:center;margin-top:1.5rem">'
     +'<button onclick="document.getElementById(\'jusei-about-overlay\').classList.remove(\'show\')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:\'Noto Serif JP\',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>'
@@ -6074,6 +6069,10 @@ var SPECIAL_TERMS={
   '運命の谷':{
     reading:'うんめいのたに',
     desc:'静容→天華→零花（またはその逆順）と続く3つの大運が作る、谷底の中に山（チャンス）が挟まった特別な形。真ん中には人生最大級のチャンスがある一方、その前後は崖のように運気が落ち込む、特に大切に過ごしたい期間です。<br><br>アプリ下部の「命式」タブ→「大運の流れ」の中にある「大運グラフ」をタップすると、この形を実際にグラフで視覚的に確認できます。'
+  },
+  '六花人について':{
+    reading:'ろっかじんについて',
+    desc:'花人占術では、どんな人も六種類の性質（花）のひとつが与えられ、それが日向（ひなた）と日陰（ひかげ）にそれぞれ分けられていると考えます。そしてその花には2つの星（従星）が宿り、その性質により咲く花が決まる、という考え方をします。'
   }
 };
 function showTermPopup(cat,term){
