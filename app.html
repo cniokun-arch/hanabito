@@ -1935,7 +1935,7 @@ function startApp(data){
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
   maybeShowAddMemberHint();
-  scheduleAIFloatCollapse();
+  initAIFloatCollapseOnScroll();
 }
 </script>
 <script>
@@ -2068,14 +2068,28 @@ function positionAIFloatBtn(){
 }
 window.addEventListener('resize',positionAIFloatBtn);
 
-// AI相談 浮きボタン：しばらくしたらアイコンだけに縮小（楽天アプリのAIチップを参考）
+// AI相談 浮きボタン：何も操作しなければ文字付きのまま。スクロール等の操作があってから3秒で縮小（楽天アプリのAIチップと同じ挙動）
 var _aiFloatCollapseTimer=null;
 function scheduleAIFloatCollapse(){
   clearTimeout(_aiFloatCollapseTimer);
   _aiFloatCollapseTimer=setTimeout(function(){
     var btn=document.getElementById('ai-float-btn');
     if(btn)btn.classList.add('collapsed');
-  },4000);
+  },3000);
+}
+var _aiFloatScrollHooked=false;
+function initAIFloatCollapseOnScroll(){
+  if(_aiFloatScrollHooked)return;
+  _aiFloatScrollHooked=true;
+  function onFirstInteraction(){
+    document.removeEventListener('touchmove',onFirstInteraction);
+    document.removeEventListener('wheel',onFirstInteraction);
+    scheduleAIFloatCollapse();
+  }
+  // 'scroll'イベントは自前のscrollTo(0,0)（タブ切替時のリセット）でも発火してしまうため、
+  // 実際のユーザー操作に直結するtouchmove/wheelだけを見る
+  document.addEventListener('touchmove',onFirstInteraction,{passive:true});
+  document.addEventListener('wheel',onFirstInteraction,{passive:true});
 }
 
 function switchNav(nav,btn){
@@ -2120,6 +2134,10 @@ function renderCurrentPage(){
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
     else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
     else if(currentNav==='goals')ca.innerHTML=buildGoalsPage();
+    // タブ切替のたびにスクロール位置を先頭にリセット（前のページの位置が残るのを防ぐ）
+    window.scrollTo(0,0);
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
   }
 }
 
