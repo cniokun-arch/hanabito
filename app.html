@@ -307,7 +307,7 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 /* AI相談 浮きボタン（タブとは独立してバーの上に乗る） */
 .ai-float-btn{
   position:fixed;right:14px;
-  bottom:calc(64px + env(safe-area-inset-bottom,0px) + 10px);
+  bottom:64px;
   z-index:250;
   background:linear-gradient(135deg,var(--purple),#9333ea);
   color:#fff;border-radius:28px;
@@ -316,11 +316,14 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
   box-shadow:0 4px 14px rgba(124,58,237,0.45);
   cursor:pointer;border:2px solid #fff;
   font-family:'Noto Serif JP',serif;
-  transition:transform 0.15s;
+  transition:transform 0.15s,padding 0.35s ease,border-radius 0.35s ease;
+  overflow:hidden;
 }
 .ai-float-btn:active{transform:scale(0.95)}
-.ai-float-btn .icon{font-size:1.25rem;line-height:1}
-.ai-float-btn .lbl{font-weight:700;font-size:0.88rem;letter-spacing:0.05em}
+.ai-float-btn .icon{font-size:1.25rem;line-height:1;flex-shrink:0}
+.ai-float-btn .lbl{font-weight:700;font-size:0.88rem;letter-spacing:0.05em;white-space:nowrap;transition:opacity 0.25s,max-width 0.35s ease;max-width:100px;opacity:1}
+.ai-float-btn.collapsed{padding:0.65rem;border-radius:50%}
+.ai-float-btn.collapsed .lbl{max-width:0;opacity:0;margin:0}
 
 /* ===== MEMBER MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:flex-end;justify-content:center}
@@ -1920,6 +1923,7 @@ function startApp(data){
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
   maybeShowAddMemberHint();
+  scheduleAIFloatCollapse();
 }
 </script>
 <script>
@@ -2042,6 +2046,26 @@ function deleteMember(){
 // ============================================================
 // NAV / PAGE ROUTING
 // ============================================================
+// AI相談 浮きボタンの位置を、実際のタブバーの高さ（ラベル折り返し等で変動）に合わせて調整
+function positionAIFloatBtn(){
+  var btn=document.getElementById('ai-float-btn');
+  var nav=document.querySelector('.bottom-nav');
+  if(!btn||!nav)return;
+  var navH=nav.getBoundingClientRect().height;
+  if(navH>0)btn.style.bottom=(navH+10)+'px';
+}
+window.addEventListener('resize',positionAIFloatBtn);
+
+// AI相談 浮きボタン：しばらくしたらアイコンだけに縮小（楽天アプリのAIチップを参考）
+var _aiFloatCollapseTimer=null;
+function scheduleAIFloatCollapse(){
+  clearTimeout(_aiFloatCollapseTimer);
+  _aiFloatCollapseTimer=setTimeout(function(){
+    var btn=document.getElementById('ai-float-btn');
+    if(btn)btn.classList.add('collapsed');
+  },4000);
+}
+
 function switchNav(nav,btn){
   currentNav=nav;
   document.querySelectorAll('.nav-btn,.nav-btn-ai').forEach(function(b){b.classList.remove('active');});
@@ -2063,6 +2087,7 @@ function renderCurrentPage(){
   // AI相談ページの間は浮きボタンを隠す（自分自身へのボタンなので不要）
   var floatBtn=document.getElementById('ai-float-btn');
   if(floatBtn)floatBtn.style.display=(currentNav==='ai')?'none':'flex';
+  positionAIFloatBtn();
 
   if(currentNav==='ai'){
     // AIページはbody直下にfixedオーバーレイとして挿入
