@@ -4684,7 +4684,11 @@ function saveTimelineEntry(year,entry){
 }
 
 function renderChapter5(){
-  var html=renderChapterHeader(5,'あなたの人生設計');
+  var html='<div style="text-align:center;padding:1.6rem 1rem 1.4rem;background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.02));border-radius:16px;margin-bottom:1.4rem">'
+    +'<div style="font-size:2.2rem;margin-bottom:0.4rem">🌸</div>'
+    +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:800;color:var(--gold);letter-spacing:0.06em;line-height:1.5">あなたの願いを<br>実現しよう！</div>'
+    +'<div style="font-size:0.88rem;color:var(--ink3);margin-top:0.6rem">心理テストとAIで、目標・行動・タイミングを一緒に整理します</div>'
+    +'</div>';
 
   var ld=getLifeDesignData();
 
