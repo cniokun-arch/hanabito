@@ -4756,9 +4756,9 @@ function saveTimelineEntry(year,entry){
 
 function renderChapter5(){
   var html='<div style="text-align:center;padding:1.6rem 1rem 1.4rem;background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.02));border-radius:16px;margin-bottom:1.4rem">'
-    +'<div style="font-size:2.2rem;margin-bottom:0.4rem">🌸</div>'
+    +'<div style="font-size:2.2rem;margin-bottom:0.4rem">🎯</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.5rem;font-weight:800;color:var(--gold);letter-spacing:0.06em;line-height:1.5">あなたの願いを<br>実現しよう！</div>'
-    +'<div style="font-size:0.88rem;color:var(--ink3);margin-top:0.6rem">心理テストとAIで、目標・行動・タイミングを一緒に整理します</div>'
+    +'<div style="font-size:0.88rem;color:var(--ink3);margin-top:0.6rem;word-break:keep-all;overflow-wrap:break-word;line-height:1.7">心理テスト×AIが、<br>目標達成へのロードマップを描きます</div>'
     +'</div>';
 
   var ld=getLifeDesignData();
@@ -4779,7 +4779,7 @@ function renderChapter5(){
 function buildGoalsPage(){
   var G=getCurrentTargetG();
   if(!G)return '<div class="page active"><p style="color:var(--ink3);padding:2rem;text-align:center">データがありません</p></div>';
-  var html='<div class="page active">'+renderChapter5()+'</div>';
+  var html='<div class="page active">'+renderChapter5()+'<div style="height:70px"></div></div>';
   return html;
 }
 
@@ -4861,12 +4861,12 @@ function renderBucketSection(ld){
 function renderGoalToolSection(ld){
   var html='<div style="margin-bottom:1.4rem">';
   html+=renderStepHeader(1,'あなたが今一番叶えたいこと');
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">心理テストとAIを使って、あなたが今一番叶えたいこと・必要な8つの要素・具体的な行動を整理します。<br><span style="display:inline-block;margin-top:0.4rem;font-size:0.7rem;color:#1a5c1a;background:rgba(42,140,74,0.12);border-radius:6px;padding:0.15rem 0.5rem">🔁 習慣タイプ：普段から積み重ねる行い</span></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8;word-break:keep-all;overflow-wrap:break-word">質問に答えるだけで、必要な8つの要素と具体的な行動を自動で整理します。<br><span style="display:inline-block;margin-top:0.4rem;font-size:0.7rem;color:#1a5c1a;background:rgba(42,140,74,0.12);border-radius:6px;padding:0.15rem 0.5rem">🔁 習慣タイプ：普段から積み重ねる行い</span></div>';
   if(ld&&ld.step>=4){
     html+=renderGoalList(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">🔄 やり直す</button>';
   } else {
-    html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.88rem;cursor:pointer;width:100%">🌸 目標設定を始める</button>';
+    html+='<button onclick="startLifeDesign()" style="background:linear-gradient(135deg,#d4a017,#b8860b);color:#fff;border:none;border-radius:25px;padding:0.85rem;font-size:0.92rem;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(184,134,11,0.35);text-shadow:0 1px 2px rgba(0,0,0,0.15)">🎯 目標設定を始める</button>';
   }
   html+='</div>';
   return html;
