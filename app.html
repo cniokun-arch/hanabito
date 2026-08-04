@@ -2162,7 +2162,12 @@ function initAIFloatCollapseOnScroll(){
   document.addEventListener('wheel',onFirstInteraction,{passive:true});
 }
 
+var _navScrollPositions={};
 function switchNav(nav,btn){
+  // 今いるタブのスクロール位置を、そのタブ専用に保存しておく（別タブの位置と混ざらないように）
+  if(currentNav&&currentNav!=='ai'){
+    _navScrollPositions[currentNav]=window.scrollY||document.documentElement.scrollTop||0;
+  }
   currentNav=nav;
   document.querySelectorAll('.nav-btn,.nav-btn-ai').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
@@ -2209,6 +2214,9 @@ function renderCurrentPage(){
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
     else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
     else if(currentNav==='goals')ca.innerHTML=buildGoalsPage();
+    // このタブ自身が以前記憶していたスクロール位置に復元（記憶がなければ先頭）
+    var restoreY=_navScrollPositions[currentNav]||0;
+    window.scrollTo(0,restoreY);
   }
 }
 
@@ -4816,7 +4824,7 @@ var BUCKET_PREVIEW_COUNT=5;
 
 function toggleBucketPreview(){
   window._bucketPreviewExpanded=!window._bucketPreviewExpanded;
-  redrawManualPage();
+  redrawGoalsPage();
 }
 
 function renderBucketSection(ld){
@@ -5244,7 +5252,7 @@ function saveBucketEditor(){
   calSaveSchedules(calData);
 
   closeBucketEditor();
-  redrawManualPage();
+  redrawGoalsPage();
   if(window._lifeWizardMode){
     window._lifeWizardMode=false;
     showSchedulerStep();
@@ -5281,7 +5289,7 @@ async function classifyBucketTypes(){
       if((v==='習慣'||v==='行動')&&ld2.buckets[t.i])ld2.buckets[t.i].type=v;
     });
     saveLifeDesignData(ld2);
-    redrawManualPage();
+    redrawGoalsPage();
   }catch(e){}
 }
 
@@ -5296,7 +5304,7 @@ function editMandalaCenter(){
     var ld=getLifeDesignData();
     ld.purpose=val.slice(0,30);
     saveLifeDesignData(ld);
-    redrawManualPage();
+    redrawGoalsPage();
   });
 }
 
@@ -5338,9 +5346,9 @@ function closeInlineModal(){
   if(m)m.remove();
 }
 
-function redrawManualPage(){
+function redrawGoalsPage(){
   var ca=document.getElementById('content-area');
-  if(ca)ca.innerHTML=buildManualPage();
+  if(ca)ca.innerHTML=buildGoalsPage();
 }
 
 function renderTimeline(ld){
@@ -5806,7 +5814,7 @@ var MC_TC=['#8b0000','#8b4500','#8b6500','#1a5c1a','#1a4a6b','#5c1a6b','#8b1a4a'
 
 function toggleGoalCard(fi){
   window._goalExpanded[fi]=!window._goalExpanded[fi];
-  redrawManualPage();
+  redrawGoalsPage();
 }
 
 function toggleMandalaCheck(fi,di){
@@ -5820,7 +5828,7 @@ function toggleMandalaCheck(fi,di){
   ld.mandalaChecks[fi][di]=!ld.mandalaChecks[fi][di];
   saveLifeDesignData(ld);
   window._goalExpanded[fi]=true;
-  redrawManualPage();
+  redrawGoalsPage();
 }
 
 function openGoalElementEdit(fi){
@@ -5881,7 +5889,7 @@ function saveGoalElementEdit(fi){
   saveLifeDesignData(ld);
   closeGoalElementEdit();
   window._goalExpanded[fi]=true;
-  redrawManualPage();
+  redrawGoalsPage();
   classifyElementActions(fi);
 }
 
@@ -5925,7 +5933,7 @@ async function classifyAllElementActionsBulk(){
       }
     });
     saveLifeDesignData(ld2);
-    redrawManualPage();
+    redrawGoalsPage();
   }catch(e){}
 }
 
@@ -5963,7 +5971,7 @@ async function classifyElementActions(fi){
       if(v==='習慣'||v==='行動')ld2.mandalaDetailType[fi][t.di]=v;
     });
     saveLifeDesignData(ld2);
-    redrawManualPage();
+    redrawGoalsPage();
   }catch(e){}
 }
 
@@ -6308,7 +6316,7 @@ function saveTimelineData(year){
     saveTimelineEntry(year,{goal:goal,months:months});
   }
   closeTimelineModal();
-  redrawManualPage();
+  redrawGoalsPage();
 }
 
 function closeTimelineModal(){
