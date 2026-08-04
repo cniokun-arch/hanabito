@@ -324,12 +324,18 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-float-btn .lbl{font-weight:700;font-size:0.88rem;letter-spacing:0.05em;white-space:nowrap;transition:opacity 0.25s,max-width 0.35s ease;max-width:100px;opacity:1}
 .ai-float-btn.collapsed{padding:0;width:52px;height:52px;border-radius:50%;gap:0;justify-content:center;animation:aiFloatPulse 6s ease-in-out infinite}
 .ai-float-btn.collapsed .lbl{max-width:0;opacity:0;margin:0}
+.ai-float-btn.collapsed .icon{display:inline-block;animation:aiFloatIconSpin 6s ease-in-out infinite}
 @keyframes aiFloatPulse{
   0%,85%,100%{transform:scale(1);box-shadow:0 4px 14px rgba(124,58,237,0.45)}
   91%{transform:scale(1.14);box-shadow:0 4px 20px rgba(124,58,237,0.7)}
   96%{transform:scale(1)}
 }
+@keyframes aiFloatIconSpin{
+  0%,85%{transform:rotate(0deg)}
+  96%,100%{transform:rotate(360deg)}
+}
 .ai-float-btn.collapsed:active{animation:none}
+.ai-float-btn.collapsed:active .icon{animation:none}
 
 /* ===== MEMBER MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:flex-end;justify-content:center}
