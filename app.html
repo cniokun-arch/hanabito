@@ -1190,7 +1190,7 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
   </div>
 
   <!-- スクロール中だけ現れる「トップに戻る」矢印ボタン -->
-  <div class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+  <div class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTopGeneric()">↑</div>
 
   <!-- ボトムナビ -->
   <div class="bottom-nav">
@@ -2101,23 +2101,41 @@ window.addEventListener('resize',positionScrollTopBtn);
 // トップに戻るボタン：実際にスクロールしている間だけ表示し、止まったら少ししてフェードアウト
 var _scrollTopHideTimer=null;
 var _scrollTopHooked=false;
+function handleScrollTopVisibility(y){
+  var btn=document.getElementById('scroll-top-btn');
+  if(!btn)return;
+  if(y>150){
+    btn.classList.add('visible');
+    clearTimeout(_scrollTopHideTimer);
+    _scrollTopHideTimer=setTimeout(function(){btn.classList.remove('visible');},1200);
+  } else {
+    btn.classList.remove('visible');
+  }
+}
 function initScrollTopButton(){
   if(_scrollTopHooked)return;
   _scrollTopHooked=true;
-  function onScroll(){
+  window.addEventListener('scroll',function(){
     if(currentNav==='ai')return;
-    var btn=document.getElementById('scroll-top-btn');
-    if(!btn)return;
-    var y=window.scrollY||document.documentElement.scrollTop||0;
-    if(y>150){
-      btn.classList.add('visible');
-      clearTimeout(_scrollTopHideTimer);
-      _scrollTopHideTimer=setTimeout(function(){btn.classList.remove('visible');},1200);
-    } else {
-      btn.classList.remove('visible');
-    }
+    handleScrollTopVisibility(window.scrollY||document.documentElement.scrollTop||0);
+  },{passive:true});
+}
+// AI相談ページは #ai-messages が内部スクロールするため、専用に監視をつける（ページ生成のたびに呼び出す）
+function hookAIMessagesScroll(){
+  var msgs=document.getElementById('ai-messages');
+  if(!msgs||msgs._scrollTopHooked)return;
+  msgs._scrollTopHooked=true;
+  msgs.addEventListener('scroll',function(){
+    handleScrollTopVisibility(msgs.scrollTop);
+  },{passive:true});
+}
+function scrollToTopGeneric(){
+  if(currentNav==='ai'){
+    var msgs=document.getElementById('ai-messages');
+    if(msgs)msgs.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    window.scrollTo({top:0,behavior:'smooth'});
   }
-  window.addEventListener('scroll',onScroll,{passive:true});
 }
 
 // AI相談 浮きボタン：何も操作しなければ文字付きのまま。スクロール等の操作があってから3秒で縮小（楽天アプリのAIチップと同じ挙動）
@@ -4063,6 +4081,7 @@ function initAIPage(){
   var msgs=document.getElementById('ai-messages');
   if(!msgs)return;
   msgs.innerHTML='';
+  hookAIMessagesScroll();
 
   if(saved.length>0){
     // 日付区切りを挟みながら全履歴を表示
