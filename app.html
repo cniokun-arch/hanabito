@@ -337,6 +337,21 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .ai-float-btn.collapsed:active{animation:none}
 .ai-float-btn.collapsed:active .icon{animation:none}
 
+/* スクロール中だけ現れる「トップに戻る」ボタン */
+.scroll-top-btn{
+  position:fixed;left:50%;bottom:64px;
+  transform:translateX(-50%) translateY(8px);
+  z-index:240;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(74,60,40,0.8);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.25s,transform 0.25s;
+}
+.scroll-top-btn.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+
 /* ===== MEMBER MODAL ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:flex;align-items:flex-end;justify-content:center}
 .modal-box{background:var(--bg);border-radius:16px 16px 0 0;padding:1.5rem 1.2rem 2rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
@@ -1172,6 +1187,9 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     <span class="icon">🌸</span><span class="lbl">AI相談</span>
   </div>
 
+  <!-- スクロール中だけ現れる「トップに戻る」矢印ボタン -->
+  <div class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
   <!-- ボトムナビ -->
   <div class="bottom-nav">
     <button class="nav-btn active" onclick="switchNav('home',this)">
@@ -1182,13 +1200,13 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <span class="nav-icon">☯</span>
       <span class="nav-lbl">命式</span>
     </button>
-    <button class="nav-btn" onclick="switchNav('compat',this)">
-      <span class="nav-icon">💞</span>
-      <span class="nav-lbl">相性</span>
-    </button>
     <button class="nav-btn" onclick="switchNav('manual',this)">
       <span class="nav-icon">📖</span>
       <span class="nav-lbl">あなたの本</span>
+    </button>
+    <button class="nav-btn" onclick="switchNav('compat',this)">
+      <span class="nav-icon">💞</span>
+      <span class="nav-lbl">相性</span>
     </button>
     <button class="nav-btn" onclick="switchNav('goals',this)">
       <span class="nav-icon">🎯</span>
@@ -1936,6 +1954,7 @@ function startApp(data){
   switchNav('home',document.querySelector('.nav-btn'));
   maybeShowAddMemberHint();
   initAIFloatCollapseOnScroll();
+  initScrollTopButton();
 }
 </script>
 <script>
@@ -2068,6 +2087,37 @@ function positionAIFloatBtn(){
 }
 window.addEventListener('resize',positionAIFloatBtn);
 
+function positionScrollTopBtn(){
+  var btn=document.getElementById('scroll-top-btn');
+  var nav=document.querySelector('.bottom-nav');
+  if(!btn||!nav)return;
+  var navH=nav.getBoundingClientRect().height;
+  if(navH>0)btn.style.bottom=(navH+10)+'px';
+}
+window.addEventListener('resize',positionScrollTopBtn);
+
+// トップに戻るボタン：実際にスクロールしている間だけ表示し、止まったら少ししてフェードアウト
+var _scrollTopHideTimer=null;
+var _scrollTopHooked=false;
+function initScrollTopButton(){
+  if(_scrollTopHooked)return;
+  _scrollTopHooked=true;
+  function onScroll(){
+    if(currentNav==='ai')return;
+    var btn=document.getElementById('scroll-top-btn');
+    if(!btn)return;
+    var y=window.scrollY||document.documentElement.scrollTop||0;
+    if(y>150){
+      btn.classList.add('visible');
+      clearTimeout(_scrollTopHideTimer);
+      _scrollTopHideTimer=setTimeout(function(){btn.classList.remove('visible');},1200);
+    } else {
+      btn.classList.remove('visible');
+    }
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+}
+
 // AI相談 浮きボタン：何も操作しなければ文字付きのまま。スクロール等の操作があってから3秒で縮小（楽天アプリのAIチップと同じ挙動）
 var _aiFloatCollapseTimer=null;
 function scheduleAIFloatCollapse(){
@@ -2114,6 +2164,11 @@ function renderCurrentPage(){
   var floatBtn=document.getElementById('ai-float-btn');
   if(floatBtn)floatBtn.style.display=(currentNav==='ai')?'none':'flex';
   positionAIFloatBtn();
+  var scrollTopBtn=document.getElementById('scroll-top-btn');
+  if(scrollTopBtn){
+    if(currentNav==='ai')scrollTopBtn.classList.remove('visible');
+  }
+  positionScrollTopBtn();
 
   if(currentNav==='ai'){
     // AIページはbody直下にfixedオーバーレイとして挿入
@@ -2134,10 +2189,6 @@ function renderCurrentPage(){
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
     else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
     else if(currentNav==='goals')ca.innerHTML=buildGoalsPage();
-    // タブ切替のたびにスクロール位置を先頭にリセット（前のページの位置が残るのを防ぐ）
-    window.scrollTo(0,0);
-    document.documentElement.scrollTop=0;
-    document.body.scrollTop=0;
   }
 }
 
@@ -3989,8 +4040,8 @@ function buildAIPage(){
   html+='<div class="bottom-nav" style="position:relative;flex-shrink:0">'
     +'<button class="nav-btn" onclick="switchNav(\'home\',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'meishiki\',this)"><span class="nav-icon">☯</span><span class="nav-lbl">命式</span></button>'
-    +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'manual\',this)"><span class="nav-icon">📖</span><span class="nav-lbl">あなたの本</span></button>'
+    +'<button class="nav-btn" onclick="switchNav(\'compat\',this)"><span class="nav-icon">💞</span><span class="nav-lbl">相性</span></button>'
     +'<button class="nav-btn" onclick="switchNav(\'goals\',this)"><span class="nav-icon">🎯</span><span class="nav-lbl">目標設定</span></button>'
     +'</div>';
 
