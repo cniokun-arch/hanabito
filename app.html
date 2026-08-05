@@ -971,6 +971,24 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
     </div>
   </div>
 
+  <!-- 目標設定タブ 説明オーバーレイ -->
+  <div class="about-overlay-wrap" id="goals-about-overlay">
+    <div style="background:linear-gradient(135deg,#b8860b,#d4a017);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.05rem;letter-spacing:0.15em;margin:0">🌸 ここで何ができるの？</h2>
+      <button onclick="document.getElementById('goals-about-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.4rem 1.2rem 2.5rem">
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">花人占術では人生を成功に導くためには、運気の良いときを狙って行動し、運気の悪い時は慎重に行動する事が重要であると考えます。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">そこで花人占術と親和性の高い「心理学」を応用して、あなたの心の中で実現したいと願っていることを見つけ出し、それを形にします。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">その後にやりたい事と併せてリスト化し、運気カレンダーに予定を書き込んで行く作業を行います。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">こうすることで自分はいつ行動すれば良いのか、この時期は気をつけた方が良いのか、そういった人生における「行動すべき時」と「落とし穴」が事前に分かるのです。</p>
+      <p style="font-size:0.95rem;color:#8a5a00;font-weight:700;line-height:2.1;text-align:center;margin:1.4rem 0 0">幸せを実現するために、ぜひこの機能を活用してください。</p>
+      <div style="text-align:center;margin-top:1.8rem">
+        <button onclick="document.getElementById('goals-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 十二運気とは オーバーレイ -->
   <div class="about-overlay-wrap" id="juni-about-overlay">
     <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.4rem 1.2rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -2213,7 +2231,7 @@ function renderCurrentPage(){
     else if(currentNav==='compat')ca.innerHTML=buildCompatPage();
     else if(currentNav==='setting')ca.innerHTML=buildSettingPage();
     else if(currentNav==='manual'){ca.innerHTML=buildManualPage();initManualPage();}
-    else if(currentNav==='goals')ca.innerHTML=buildGoalsPage();
+    else if(currentNav==='goals'){ca.innerHTML=buildGoalsPage();showGoalsAboutIfFirstVisit();}
     // このタブ自身が以前記憶していたスクロール位置に復元（記憶がなければ先頭）
     var restoreY=_navScrollPositions[currentNav]||0;
     window.scrollTo(0,restoreY);
@@ -4182,6 +4200,15 @@ async function speakText(text,btn){
 function openHmenu(){document.getElementById('hmenuOv').classList.add('on');}
 function closeHmenu(){document.getElementById('hmenuOv').classList.remove('on');}
 function showAboutOverlay(){document.getElementById('hanabito-about-overlay').classList.add('show');}
+function showGoalsAboutOverlay(){document.getElementById('goals-about-overlay').classList.add('show');}
+function showGoalsAboutIfFirstVisit(){
+  var seen=false;
+  try{seen=localStorage.getItem('hanabito_goals_intro_seen')==='1';}catch(e){}
+  if(!seen){
+    try{localStorage.setItem('hanabito_goals_intro_seen','1');}catch(e){}
+    setTimeout(showGoalsAboutOverlay,200);
+  }
+}
 function showMagicOverlay(){document.getElementById('magic-about-wrap').classList.add('show');}
 function showAIGuide(){
   // ページ移動なし。今いるページの上にそのまま表示
@@ -4782,9 +4809,15 @@ function saveTimelineEntry(year,entry){
 }
 
 function renderChapter5(){
-  var html='<div style="text-align:center;padding:1rem 1rem 0.9rem;margin-bottom:1.2rem">'
+  var html='<div style="text-align:center;padding:1rem 1rem 0.9rem;margin-bottom:0.9rem">'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.7rem;font-weight:800;color:var(--gold);letter-spacing:0.06em;line-height:1.5">あなたの願いを<br>実現しよう</div>'
     +'<div style="width:48px;height:2px;background:var(--gold);margin:0.7rem auto 0;opacity:0.6"></div>'
+    +'</div>';
+
+  html+='<div onclick="showGoalsAboutOverlay()" style="cursor:pointer;background:linear-gradient(135deg,#b8860b,#d4a017);border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.6rem;box-shadow:0 2px 8px rgba(184,134,11,0.25);margin-bottom:1.3rem">'
+    +'<span style="font-size:1.3rem">🌸</span>'
+    +'<span style="flex:1;color:#fff;font-size:0.92rem;font-weight:700">ここで何ができるの？</span>'
+    +'<span style="color:rgba(255,255,255,0.8);font-size:0.9rem">›</span>'
     +'</div>';
 
   var ld=getLifeDesignData();
