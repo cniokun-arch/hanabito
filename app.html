@@ -5099,7 +5099,7 @@ function showBucketEditor(buckets,editIdx){
   modal.innerHTML=html;
   modal.scrollTop=0;
   document.body.appendChild(modal);
-  if(editIdx>=0)setTimeout(function(){var el=document.getElementById('bucket-text-'+editIdx);if(el)el.focus();},100);
+  if(editIdx>=0)setTimeout(function(){var el=document.getElementById('bucket-text-'+editIdx);if(el)el.focus({preventScroll:true});},100);
 }
 
 function addBucketHint(hint){
@@ -5332,7 +5332,7 @@ function openInlineModal(label,current,onSave){
   window._inlineModalCallback=onSave;
   setTimeout(function(){
     var el=document.getElementById('inline-edit-input');
-    if(el){el.focus();el.select();}
+    if(el){el.focus({preventScroll:true});el.select();}
   },100);
 }
 
@@ -5621,7 +5621,7 @@ function showStep1(ld,wishText){
   html+='</div>';
   modal.innerHTML=html;
   modal.scrollTop=0;
-  setTimeout(function(){var el=document.getElementById('s1-goal');if(el)el.focus();},100);
+  setTimeout(function(){var el=document.getElementById('s1-goal');if(el)el.focus({preventScroll:true});},100);
 }
 
 async function submitStep1(){
@@ -5865,7 +5865,7 @@ function openGoalElementEdit(fi){
   modal.innerHTML=html;
   modal.scrollTop=0;
   document.body.appendChild(modal);
-  setTimeout(function(){var el=document.getElementById('md-elem');if(el)el.focus();},100);
+  setTimeout(function(){var el=document.getElementById('md-elem');if(el)el.focus({preventScroll:true});},100);
 }
 
 function closeGoalElementEdit(){
@@ -6100,7 +6100,7 @@ function editTimelineMemo(year){
   modal.innerHTML=html;
   modal.scrollTop=0;
   document.body.appendChild(modal);
-  setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
+  setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus({preventScroll:true});},100);
 }
 
 async function generateDaiunAdvice(startY,endY){
