@@ -5097,6 +5097,7 @@ function showBucketEditor(buckets,editIdx){
 
   html+='</div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
   document.body.appendChild(modal);
   if(editIdx>=0)setTimeout(function(){var el=document.getElementById('bucket-text-'+editIdx);if(el)el.focus();},100);
 }
@@ -5324,6 +5325,7 @@ function openInlineModal(label,current,onSave){
   html+='<button onclick="closeInlineModal()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.88rem;cursor:pointer">キャンセル</button>';
   html+='</div></div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
   modal.dataset.onSave='pending';
   document.body.appendChild(modal);
   // コールバックを保存
@@ -5515,7 +5517,7 @@ function buildIntroHTML(){
 
 function showQuiz(){
   var modal=document.getElementById('life-design-modal');
-  if(modal)modal.innerHTML=buildQuizHTML();
+  if(modal){modal.innerHTML=buildQuizHTML();modal.scrollTop=0;}
 }
 
 function buildQuizHTML(){
@@ -5551,12 +5553,12 @@ function closeLifeModal(){
 
 function showModalLoading(msg){
   var modal=document.getElementById('life-design-modal');
-  if(modal)modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><div style="font-size:1rem;color:var(--gold);font-family:\'Zen Old Mincho\',serif;margin-bottom:1rem">🌸 '+msg+'</div><p style="color:var(--ink3);font-size:0.85rem">しばらくお待ちください...</p></div>';
+  if(modal){modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><div style="font-size:1rem;color:var(--gold);font-family:\'Zen Old Mincho\',serif;margin-bottom:1rem">🌸 '+msg+'</div><p style="color:var(--ink3);font-size:0.85rem">しばらくお待ちください...</p></div>';modal.scrollTop=0;}
 }
 
 function modalError(e){
   var modal=document.getElementById('life-design-modal');
-  if(modal)modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><p style="color:#c04040">エラー: '+(e.message||e)+'</p><button onclick="closeLifeModal()" style="margin-top:1rem;padding:0.5rem 1rem;background:#b8860b;color:#fff;border:none;border-radius:6px;cursor:pointer">閉じる</button></div>';
+  if(modal){modal.innerHTML='<div style="background:var(--bg);border-radius:12px;max-width:500px;margin:2rem auto;padding:2rem;text-align:center"><p style="color:#c04040">エラー: '+(e.message||e)+'</p><button onclick="closeLifeModal()" style="margin-top:1rem;padding:0.5rem 1rem;background:#b8860b;color:#fff;border:none;border-radius:6px;cursor:pointer">閉じる</button></div>';modal.scrollTop=0;}
 }
 
 async function aiChat(prompt,sys){
@@ -5618,6 +5620,7 @@ function showStep1(ld,wishText){
   html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
   html+='</div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
   setTimeout(function(){var el=document.getElementById('s1-goal');if(el)el.focus();},100);
 }
 
@@ -5679,6 +5682,7 @@ function showStep2(ld){
   html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
   html+='</div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
 }
 
 async function submitStep2(){
@@ -5772,6 +5776,7 @@ function showStep3(ld){
   html+='<button onclick="closeLifeModal()" style="background:transparent;color:var(--ink3);border:none;font-size:0.78rem;cursor:pointer;width:100%;padding:0.3rem">キャンセル</button>';
   html+='</div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
 }
 
 // STEP 2/3: やりたいことを決めよう（実際のバケットリスト編集画面に直接つなぐ）
@@ -5798,6 +5803,7 @@ function showSchedulerStep(){
   html+='<button onclick="finishLifeWizard()" style="background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.8rem;font-size:0.9rem;cursor:pointer;width:100%">運気カレンダーを見る →</button>';
   html+='</div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
   document.body.appendChild(modal);
 }
 
@@ -5857,6 +5863,7 @@ function openGoalElementEdit(fi){
   html+='<button onclick="closeGoalElementEdit()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
   html+='</div></div>';
   modal.innerHTML=html;
+  modal.scrollTop=0;
   document.body.appendChild(modal);
   setTimeout(function(){var el=document.getElementById('md-elem');if(el)el.focus();},100);
 }
@@ -6091,6 +6098,7 @@ function editTimelineMemo(year){
   html+='</div></div>';
 
   modal.innerHTML=html;
+  modal.scrollTop=0;
   document.body.appendChild(modal);
   setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus();},100);
 }
