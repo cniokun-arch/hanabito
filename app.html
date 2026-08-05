@@ -5396,91 +5396,160 @@ function renderTimeline(ld){
   if(!G)return '';
   var html='<div id="ld-timeline-section" style="scroll-margin-top:115px;margin-bottom:1.2rem">';
   html+=renderStepHeader(3,'花人占術スケジューラー');
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>各年をタップすると年間・月別の目標を設定でき、ホーム画面のカレンダーに反映されます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>年をタップすると、その場で大運×年運のAI解説と月ごとの目標入力が開きます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
 
   var currentYear=new Date().getFullYear();
   var endYear=currentYear+15;
-  html+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">';
-  html+='<div style="display:flex;gap:6px;padding-bottom:0.5rem;min-width:max-content">';
+  var tlData=getTimelineData();
+  if(!window._tlExpanded)window._tlExpanded={};
 
   for(var y=currentYear;y<=endYear;y++){
-    // その年の干支計算
     var ks=ROKUJU[((y-1984)%60+60)%60];
-    // 六花人の運気（納音ベースの地運）
-    var nay=getNayin(ks);
     var age=y-G.y;
-    // 大運の通変星取得
     var daiunJu=getDaiunJuForYear(y,G);
     var grade=UNKI_GRADE[daiunJu]||0;
-    var bgColor=grade>=3?'rgba(26,107,58,0.85)':grade>=2?'rgba(42,140,74,0.75)':grade>=1?'rgba(90,156,122,0.65)':grade<=-1?'rgba(184,50,50,0.7)':'rgba(184,134,11,0.15)';
-    var textColor=grade!==0?'#fff':'var(--ink)';
+    var daiunColor=getJuniColor(daiunJu);
     var label=grade>=3?'◎':grade>=2?'○':grade>=1?'△':grade<=-1?'×':'―';
+    var isCurrentYear=(y===currentYear);
 
-    var tlData=getTimelineData();
-    var memo=tlData[y]||'';
-    var isCurrentYear=(y===new Date().getFullYear());
-    // 年運（毎年の十二支から計算）
     var yrShi=JUNISHI[((y-1984)%12+12)%12];
     var yrJu=getJuniUnki(G.ht,yrShi);
     var yrGrade=UNKI_GRADE[yrJu]||0;
     var yrColor=getJuniColor(yrJu);
     var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
 
-    // 大運の薄い背景色
-    function daiunBgFromGrade(g){return g>=3?'rgba(42,140,74,0.12)':g>=2?'rgba(42,140,74,0.08)':g>=1?'rgba(90,156,122,0.08)':g<0?'rgba(184,50,50,0.08)':'rgba(184,134,11,0.06)';}
-    var daiunBg=daiunBgFromGrade(grade);
-    // 前年と大運が変わる場合は2色グラデーション
-    var prevDaiunJu=getDaiunJuForYear(y-1,G);
-    var isTransition=(prevDaiunJu&&prevDaiunJu!==daiunJu);
-    if(isTransition){
-      var prevGrade=UNKI_GRADE[prevDaiunJu]||0;
-      var prevBg=daiunBgFromGrade(prevGrade);
-      daiunBg='linear-gradient(to bottom,'+prevBg+' 50%,'+daiunBg+' 50%)';
-    }
-    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.9)':'1px solid rgba(184,134,11,0.2)';
-
-    html+='<div style="min-width:110px;cursor:pointer" onclick="editTimelineMemo('+y+')">';
-    html+='<div style="font-size:0.7rem;color:'+(isCurrentYear?'var(--gold)':'var(--ink3)')+';margin-bottom:2px;font-weight:'+(isCurrentYear?'700':'400')+'">';
-    html+=y+(isCurrentYear?' ◀':'')+'</div>';
-    html+='<div style="border-radius:8px;border:'+borderStyle+';box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden">';
-
-    // 上半分: 大運（薄い背景色）
-    var daiunColor=getJuniColor(daiunJu);
-    html+='<div style="background:'+daiunBg+';padding:0.5rem 0.5rem;border-bottom:1px solid rgba(184,134,11,0.2)">';
-    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">大運（10年ごと）</div>';
-    if(isTransition){
-      var prevDaiunColor=getJuniColor(prevDaiunJu);
-      var prevGrade2=UNKI_GRADE[prevDaiunJu]||0;
-      var prevLabel2=prevGrade2>=3?'◎':prevGrade2>=2?'○':prevGrade2>=1?'△':prevGrade2<0?'×':'―';
-      html+='<div style="font-size:0.68rem;color:'+prevDaiunColor+';text-decoration:line-through;opacity:0.65;line-height:1.4;margin-bottom:1px">'+prevLabel2+' '+prevDaiunJu+'</div>';
-      html+='<div style="font-size:0.6rem;color:var(--ink3);line-height:1.3;margin-bottom:2px">↓ 切り替わり</div>';
-    }
-    html+='<div style="font-size:0.9rem;color:var(--ink);font-weight:700;margin-bottom:2px;line-height:1.3">'+ks+'　'+age+'歳</div>';
-    html+='<div style="font-size:0.88rem;font-weight:700;color:'+daiunColor+';line-height:1.3">'+label+'　'+daiunJu+'</div>';
-    html+='</div>';
-
-    // 下半分: 年運（白背景）
-    html+='<div style="background:var(--bg);padding:0.5rem 0.5rem">';
-    html+='<div style="font-size:0.68rem;color:var(--ink3);margin-bottom:3px;font-weight:700">年運（毎年）</div>';
-    html+='<div style="font-size:1.3rem;font-weight:700;color:'+yrColor+';line-height:1">'+yrLabel+'</div>';
-    html+='<div style="font-size:0.86rem;font-weight:700;color:'+yrColor+';margin-top:2px">'+yrJu+'</div>';
     var tdata=tlData[y]||null;
     var hasGoal=tdata&&(tdata.goal||(tdata.months&&tdata.months.some(function(m){return m;})));
-    if(hasGoal){
-      if(tdata.goal)html+='<div style="margin-top:0.3rem;font-size:0.68rem;color:var(--ink);font-weight:700;line-height:1.3">📌 '+tdata.goal+'</div>';
-      var filledMonths=tdata.months?tdata.months.filter(function(m){return m;}).length:0;
-      if(filledMonths>0)html+='<div style="font-size:0.62rem;color:var(--ink3)">月別: '+filledMonths+'か月入力済</div>';
-    } else {
-      html+='<div style="margin-top:0.25rem;font-size:0.68rem;color:var(--ink3)">＋ 目標を追加</div>';
-    }
+    var isExpanded=!!window._tlExpanded[y];
+
+    var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.7)':'1px solid rgba(184,134,11,0.18)';
+
+    html+='<div style="border:'+borderStyle+';border-radius:10px;margin-bottom:0.5rem;overflow:hidden">';
+    html+='<div onclick="toggleTimelineYear('+y+')" style="cursor:pointer;padding:0.7rem 0.8rem;background:'+(isCurrentYear?'rgba(184,134,11,0.08)':'var(--bg)')+';display:flex;align-items:center;gap:0.6rem">';
+    html+='<div style="min-width:3.4rem;flex-shrink:0"><div style="font-size:0.95rem;font-weight:800;color:'+(isCurrentYear?'var(--gold)':'var(--ink)')+'">'+y+(isCurrentYear?' ◀':'')+'</div><div style="font-size:0.64rem;color:var(--ink3)">'+ks+'　'+age+'歳</div></div>';
+    html+='<div style="display:flex;gap:0.35rem;flex:1;flex-wrap:wrap">';
+    html+='<span style="font-size:0.7rem;font-weight:700;color:'+daiunColor+';background:rgba(0,0,0,0.03);border-radius:5px;padding:2px 6px;white-space:nowrap">大運 '+label+' '+daiunJu+'</span>';
+    html+='<span style="font-size:0.7rem;font-weight:700;color:'+yrColor+';background:rgba(0,0,0,0.03);border-radius:5px;padding:2px 6px;white-space:nowrap">年運 '+yrLabel+' '+yrJu+'</span>';
+    html+='</div>';
+    if(hasGoal)html+='<span style="font-size:0.85rem;flex-shrink:0">📌</span>';
+    html+='<span style="font-size:0.75rem;color:var(--ink3);flex-shrink:0;display:inline-block;transition:transform 0.2s;transform:rotate('+(isExpanded?'180deg':'0deg')+')">▾</span>';
     html+='</div>';
 
-    html+='</div>';
+    if(isExpanded){
+      html+='<div style="padding:0.9rem;border-top:1px solid rgba(184,134,11,0.15)">'+buildTimelineEditorHTML(y)+'</div>';
+    }
     html+='</div>';
   }
-  html+='</div></div>';
-  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">背景色=大運（10年）の運気　記号と色=年運（その年）の運気<br>◎好運気／○良好／△普通／×注意　各ブロックをタップしてメモを追加</p>';
+  html+='<p style="font-size:0.72rem;color:var(--ink3);margin-top:0.5rem">年をタップすると、その場で開いたり閉じたりできます。複数の年を同時に開いて見比べることもできます。</p>';
   html+='</div>';
+  return html;
+}
+
+// 年をタップした時の開閉（複数年を同時に開いておける）
+function toggleTimelineYear(year){
+  if(!window._tlExpanded)window._tlExpanded={};
+  window._tlExpanded[year]=!window._tlExpanded[year];
+  redrawGoalsPage();
+}
+
+// 年を開いた時の中身（大運/年運のAI解説・年間目標・月別目標）を組み立てる
+function buildTimelineEditorHTML(year){
+  var tlData2=getTimelineData();
+  var tdata=tlData2[year]||{goal:'',months:Array(12).fill('')};
+  if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
+  if(!tdata.months)tdata.months=Array(12).fill('');
+
+  var Graw=getCurrentTargetG();
+  var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+
+  var yrShi=JUNISHI[((year-1984)%12+12)%12];
+  var yrJu=G?getJuniUnki(G.ht,yrShi):'';
+  var yrGrade=UNKI_GRADE[yrJu]||0;
+  var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
+  var yrColor=getJuniColor(yrJu);
+
+  var daiunRow=null;
+  if(G){
+    var drows=getDaiunRows(G);
+    for(var di2=0;di2<drows.length;di2++){
+      if(drows[di2].startY<=year&&year<=drows[di2].endY){daiunRow=drows[di2];break;}
+    }
+  }
+  var daiunJu=daiunRow?daiunRow.ju:'';
+  var daiunTh=daiunRow?daiunRow.th:'';
+  var daiunStartY=daiunRow?daiunRow.startY:'';
+  var daiunEndY=daiunRow?daiunRow.endY:'';
+  var daiunGrade=UNKI_GRADE[daiunJu]||0;
+  var daiunLabel=daiunGrade>=3?'◎':daiunGrade>=2?'○':daiunGrade>=1?'△':daiunGrade<0?'×':'―';
+  var daiunColor=getJuniColor(daiunJu);
+
+  var daiunAdviceKey=daiunStartY?('daiun'+daiunStartY):null;
+  var daiunCached=daiunAdviceKey&&tlData2[daiunAdviceKey]?tlData2[daiunAdviceKey]:null;
+
+  function juniDesc(ju){
+    var d=(KB['十二運気']||{})[ju];
+    if(!d)return '';
+    return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
+  }
+
+  var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var monthJus=[];
+  for(var mi=0;mi<12;mi++){
+    var setsuD=getSetsuDate(year,mi+1);
+    var repDay=Math.min(setsuD.getDate()+2,28);
+    var mks=getMonthKS(year,mi+1,repDay);
+    monthJus.push(G?getJuniUnki(G.ht,mks[1]):'');
+  }
+
+  var html='';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
+  if(daiunJu){
+    var daiunYearStr=daiunStartY?(daiunStartY+'〜'+daiunEndY+'年'):'';
+    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem">大運（10年サイクル）</div>';
+    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">';
+    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+daiunYearStr+'</span>';
+    html+='<span style="font-size:1.15rem;font-weight:900;color:'+daiunColor+'">'+daiunLabel+' '+(daiunTh?daiunTh+'×':'')+daiunJu+'</span>';
+    html+='</div>';
+    html+='<div id="daiun-advice-box-'+daiunStartY+'" style="font-size:0.8rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(daiunCached&&daiunCached.text?daiunCached.text.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">『'+daiunTh+'』と『'+daiunJu+'』、2つを掛け合わせるとどうなるかをAIが解説します。</span>')+'</div>';
+    html+='<button id="daiun-advice-btn-'+daiunStartY+'" onclick="generateDaiunAdvice('+daiunStartY+','+daiunEndY+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.45rem;font-size:0.76rem;cursor:pointer;margin-bottom:0.6rem">'+(daiunCached&&daiunCached.text?'🔄 再生成する':'✨ '+daiunTh+'×'+daiunJu+'を統合して解説する')+'</button>';
+  }
+  if(yrJu){
+    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.15)">年運（その年）</div>';
+    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.35rem">';
+    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+year+'年</span>';
+    html+='<span style="font-size:1.15rem;font-weight:900;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
+    html+='</div>';
+    var yd=juniDesc(yrJu);
+    if(yd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7">'+yd+'</div>';
+  }
+  html+='</div>';
+
+  // AIアドバイス（大運×年運を踏まえて、結局どうすればいいか）— 展開した瞬間に見える位置に配置
+  html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.04));border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
+  html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">💡 この年、結局どうすればいい？</div>';
+  var cachedAdvice=(tdata.advice&&tdata.advice.text)?tdata.advice.text:'';
+  html+='<div id="tl-advice-box-'+year+'" style="font-size:0.82rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(cachedAdvice?cachedAdvice.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">大運と年運を掛け合わせて、AIが今年の動き方をアドバイスします。</span>')+'</div>';
+  html+='<button id="tl-advice-btn-'+year+'" onclick="generateYearAdvice('+year+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.5rem;font-size:0.8rem;cursor:pointer">'+(cachedAdvice?'🔄 再生成する':'✨ AIにアドバイスをもらう')+'</button>';
+  html+='</div>';
+
+  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
+  html+='<textarea id="tl-goal-'+year+'" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+(tdata.goal||'')+'</textarea>';
+
+  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（運気をタップで説明）</div>';
+  for(var mi=0;mi<12;mi++){
+    var mju=monthJus[mi];
+    var mgrade=UNKI_GRADE[mju]||0;
+    var mlabel=mgrade>=3?'◎':mgrade>=2?'○':mgrade>=1?'△':mgrade<0?'×':'―';
+    var mcolor=getJuniColor(mju);
+    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">';
+    html+='<div style="font-size:0.76rem;color:var(--ink3);min-width:2.2rem">'+MONTH_NAMES[mi]+'</div>';
+    if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px">'+mlabel+' '+mju+'</div>';}
+    html+='<input id="tl-m'+mi+'-'+year+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
+    html+='</div>';
+  }
+
+  html+='<button onclick="saveTimelineData('+year+')" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer;margin-top:0.6rem">保存</button>';
+
   return html;
 }
 
@@ -6020,128 +6089,27 @@ async function classifyElementActions(fi){
 
 
 
+// ホーム画面のカレンダーから「編集」で開く場合は、同じ中身をモーダルに包んで表示する
 function editTimelineMemo(year){
-  var tlData2=getTimelineData();
-  var tdata=tlData2[year]||{goal:'',months:Array(12).fill('')};
-  if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
-  if(!tdata.months)tdata.months=Array(12).fill('');
-
-  var Graw=getCurrentTargetG();
-  var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
-
-  var yrShi=JUNISHI[((year-1984)%12+12)%12];
-  var yrJu=G?getJuniUnki(G.ht,yrShi):'';
-  var yrGrade=UNKI_GRADE[yrJu]||0;
-  var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
-  var yrColor=getJuniColor(yrJu);
-
-  // 大運（該当する行を1回のループで特定し、通変星・十二運気・開始終了年をまとめて取得）
-  var daiunRow=null;
-  if(G){
-    var drows=getDaiunRows(G);
-    for(var di2=0;di2<drows.length;di2++){
-      if(drows[di2].startY<=year&&year<=drows[di2].endY){daiunRow=drows[di2];break;}
-    }
-  }
-  var daiunJu=daiunRow?daiunRow.ju:'';
-  var daiunTh=daiunRow?daiunRow.th:'';
-  var daiunStartY=daiunRow?daiunRow.startY:'';
-  var daiunEndY=daiunRow?daiunRow.endY:'';
-  var daiunGrade=UNKI_GRADE[daiunJu]||0;
-  var daiunLabel=daiunGrade>=3?'◎':daiunGrade>=2?'○':daiunGrade>=1?'△':daiunGrade<0?'×':'―';
-  var daiunColor=getJuniColor(daiunJu);
-
-  var daiunAdviceKey=daiunStartY?('daiun'+daiunStartY):null;
-  var daiunCached=daiunAdviceKey&&tlData2[daiunAdviceKey]?tlData2[daiunAdviceKey]:null;
-
-  function juniDesc(ju){
-    var d=(KB['十二運気']||{})[ju];
-    if(!d)return '';
-    return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
-  }
-  function thDesc(th){
-    var d=(KB['通変星']||{})[th];
-    if(!d)return '';
-    return (d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:'');
-  }
-
-  var MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  var monthJus=[];
-  for(var mi=0;mi<12;mi++){
-    // 節入り後の日（節入り翌日または月中の20日）で月支を確定
-    var setsuD=getSetsuDate(year,mi+1);
-    var repDay=Math.min(setsuD.getDate()+2,28); // 節入り翌々日、最大28日
-    var mks=getMonthKS(year,mi+1,repDay);
-    monthJus.push(G?getJuniUnki(G.ht,mks[1]):'');
-  }
-
   var modal=document.createElement('div');
   modal.id='timeline-edit-modal';
   modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.8rem';
 
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
   html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">'+year+'年の目標設定</div>';
-
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
-  if(daiunJu){
-    var daiunYearStr=daiunStartY?(daiunStartY+'〜'+daiunEndY+'年'):'';
-    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem">大運（10年サイクル）</div>';
-    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem">';
-    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+daiunYearStr+'</span>';
-    html+='<span style="font-size:1.15rem;font-weight:900;color:'+daiunColor+'">'+daiunLabel+' '+(daiunTh?daiunTh+'×':'')+daiunJu+'</span>';
-    html+='</div>';
-    html+='<div id="daiun-advice-box" style="font-size:0.8rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(daiunCached&&daiunCached.text?daiunCached.text.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">『'+daiunTh+'』と『'+daiunJu+'』、2つを掛け合わせるとどうなるかをAIが解説します。</span>')+'</div>';
-    html+='<button id="daiun-advice-btn" onclick="generateDaiunAdvice('+daiunStartY+','+daiunEndY+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.45rem;font-size:0.76rem;cursor:pointer;margin-bottom:0.6rem">'+(daiunCached&&daiunCached.text?'🔄 再生成する':'✨ '+daiunTh+'×'+daiunJu+'を統合して解説する')+'</button>';
-  }
-  if(yrJu){
-    html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.15rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.15)">年運（その年）</div>';
-    html+='<div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.35rem">';
-    html+='<span style="font-size:1.05rem;font-weight:900;color:var(--gold)">'+year+'年</span>';
-    html+='<span style="font-size:1.15rem;font-weight:900;color:'+yrColor+'">'+yrLabel+' '+yrJu+'</span>';
-    html+='</div>';
-    var yd=juniDesc(yrJu);
-    if(yd)html+='<div style="font-size:0.78rem;color:var(--ink);line-height:1.7">'+yd+'</div>';
-  }
+  html+=buildTimelineEditorHTML(year);
+  html+='<button onclick="closeTimelineModal()" style="width:100%;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer;margin-top:0.6rem">閉じる</button>';
   html+='</div>';
-
-  // AIアドバイス（大運×年運を踏まえて、結局どうすればいいか）
-  html+='<div style="background:linear-gradient(135deg,rgba(184,134,11,0.1),rgba(184,134,11,0.04));border:1px solid rgba(184,134,11,0.25);border-radius:10px;padding:0.8rem;margin-bottom:1rem">';
-  html+='<div style="font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:0.5rem">💡 この年、結局どうすればいい？</div>';
-  var cachedAdvice=(tdata.advice&&tdata.advice.text)?tdata.advice.text:'';
-  html+='<div id="tl-advice-box" style="font-size:0.82rem;color:var(--ink);line-height:1.8;margin-bottom:0.5rem">'+(cachedAdvice?cachedAdvice.replace(/\n/g,'<br>'):'<span style="color:var(--ink3)">大運と年運を掛け合わせて、AIが今年の動き方をアドバイスします。</span>')+'</div>';
-  html+='<button id="tl-advice-btn" onclick="generateYearAdvice('+year+')" style="width:100%;background:transparent;color:var(--gold);border:1px solid rgba(184,134,11,0.4);border-radius:8px;padding:0.5rem;font-size:0.8rem;cursor:pointer">'+(cachedAdvice?'🔄 再生成する':'✨ AIにアドバイスをもらう')+'</button>';
-  html+='</div>';
-
-  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
-  html+='<textarea id="tl-goal" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+(tdata.goal||'')+'</textarea>';
-
-  html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（運気をタップで説明）</div>';
-  for(var mi=0;mi<12;mi++){
-    var mju=monthJus[mi];
-    var mgrade=UNKI_GRADE[mju]||0;
-    var mlabel=mgrade>=3?'◎':mgrade>=2?'○':mgrade>=1?'△':mgrade<0?'×':'―';
-    var mcolor=getJuniColor(mju);
-    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">';
-    html+='<div style="font-size:0.76rem;color:var(--ink3);min-width:2.2rem">'+MONTH_NAMES[mi]+'</div>';
-    if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px">'+mlabel+' '+mju+'</div>';}
-    html+='<input id="tl-m'+mi+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
-    html+='</div>';
-  }
-
-  html+='<div style="display:flex;gap:0.5rem;margin-top:1rem">';
-  html+='<button onclick="saveTimelineData('+year+')" style="flex:2;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer">保存</button>';
-  html+='<button onclick="closeTimelineModal()" style="flex:1;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer">閉じる</button>';
-  html+='</div></div>';
 
   modal.innerHTML=html;
   modal.scrollTop=0;
   document.body.appendChild(modal);
-  setTimeout(function(){var el=document.getElementById('tl-goal');if(el)el.focus({preventScroll:true});},100);
+  setTimeout(function(){var el=document.getElementById('tl-goal-'+year);if(el)el.focus({preventScroll:true});},100);
 }
 
 async function generateDaiunAdvice(startY,endY){
-  var btn=document.getElementById('daiun-advice-btn');
-  var box=document.getElementById('daiun-advice-box');
+  var btn=document.getElementById('daiun-advice-btn-'+startY);
+  var box=document.getElementById('daiun-advice-box-'+startY);
   if(btn){btn.disabled=true;btn.textContent='⏳ 生成中...';}
   if(box)box.innerHTML='<span style="color:var(--ink3)">AIが考えています...</span>';
   try{
@@ -6189,8 +6157,8 @@ async function generateDaiunAdvice(startY,endY){
 }
 
 async function generateYearAdvice(year){
-  var btn=document.getElementById('tl-advice-btn');
-  var box=document.getElementById('tl-advice-box');
+  var btn=document.getElementById('tl-advice-btn-'+year);
+  var box=document.getElementById('tl-advice-box-'+year);
   if(btn){btn.disabled=true;btn.textContent='⏳ 生成中...';}
   if(box)box.innerHTML='<span style="color:var(--ink3)">AIが考えています...</span>';
   try{
@@ -6345,11 +6313,11 @@ function renderLayer3Html(text){
 }
 
 function saveTimelineData(year){
-  var goalEl=document.getElementById('tl-goal');
+  var goalEl=document.getElementById('tl-goal-'+year);
   var goal=goalEl?goalEl.value.trim():'';
   var months=[];
   for(var mi=0;mi<12;mi++){
-    var el=document.getElementById('tl-m'+mi);
+    var el=document.getElementById('tl-m'+mi+'-'+year);
     months.push(el?el.value.trim():'');
   }
   var tlData=getTimelineData();
@@ -6360,6 +6328,7 @@ function saveTimelineData(year){
     saveTimelineEntry(year,{goal:goal,months:months});
   }
   closeTimelineModal();
+  showToast(year+'年の目標を保存しました');
   redrawGoalsPage();
 }
 
