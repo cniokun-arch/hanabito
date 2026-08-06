@@ -2592,9 +2592,9 @@ function buildHomePage(){
 
   // ===== 月間カレンダー =====
   html+='<div class="unki-widget" id="home-calendar-card">'
-    +'<div class="unki-widget-header">'
-    +'<span class="unki-widget-title">📅 運気カレンダー</span>'
-    +'<div style="display:flex;align-items:center;gap:0.35rem">'
+    +'<div class="unki-widget-header" style="flex-direction:column;gap:0.6rem">'
+    +'<span class="unki-widget-title" style="text-align:center">📅 運気カレンダー</span>'
+    +'<div style="display:flex;align-items:center;justify-content:center;gap:0.35rem">'
     +'<button onclick="calGoToday()" style="background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.6);color:#fff;border-radius:6px;padding:0.2rem 0.6rem;font-size:0.75rem;cursor:pointer;font-weight:700">今日</button>'
     +'<button onclick="calPrevMonth()" style="background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.6);color:#fff;border-radius:6px;padding:0.2rem 0.7rem;font-size:1rem;cursor:pointer">‹</button>'
     +'<span id="cal-month-label" style="font-size:0.95rem;font-weight:700;color:#fff;min-width:80px;text-align:center"></span>'
