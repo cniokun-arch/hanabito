@@ -782,6 +782,9 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <div class="hmenu-item" onclick="closeHmenu();showMagicOverlay()">
         <span class="hmenu-item-icon">✨</span>花人占術の魔法
       </div>
+      <div class="hmenu-item" onclick="closeHmenu();document.getElementById('tani-tenka-article-overlay').classList.add('show')">
+        <span class="hmenu-item-icon">🌌</span>運命の谷・転化天蛹について
+      </div>
       <div class="hmenu-item" onclick="closeHmenu();showAIGuide()">
         <span class="hmenu-item-icon">🤖</span>AI相談の使い方
       </div>
@@ -988,6 +991,55 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <p style="font-size:0.95rem;color:#8a5a00;font-weight:700;line-height:2.1;text-align:center;margin:1.4rem 0 0">あなたの夢や目標を最高のタイミングで叶えるために、<br>ぜひこのカレンダー機能を活用してみてください。</p>
       <div style="text-align:center;margin-top:1.8rem">
         <button onclick="document.getElementById('goals-about-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 運命の谷・転化天蛹 読み物オーバーレイ -->
+  <div class="about-overlay-wrap" id="tani-tenka-article-overlay">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.6rem 1.2rem 1.3rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1rem;letter-spacing:0.08em;margin:0;line-height:1.6">運命が変わる2つの壮大な時期<br><span style="font-size:1.15rem;font-weight:700">「運命の谷」と「転化天蛹」</span></h2>
+      <button onclick="document.getElementById('tani-tenka-article-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.5rem 1.3rem 2.5rem">
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">古代中国における最高の発明の一つである人間の運命を知る仕組み、四柱推命や算命学において、我々人間の人生は1人につき120年という時間が与えられているとされます。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">これはこの世界そのもの＝神が私たちに与えた、誰にでも平等な期間なのですが、その中で人生が大きく変わる局面というものが存在しています。それが「運命の谷」と「転化天蛹」の2つです。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">転化天蛹（てんかてんよう）は四柱推命における、運気が空亡にあたる20年間に起こる、人生が激変するとされる有名な現象に、イメージを付けるために私が改めて名前をつけたものですが、わたしは研究を重ねていくうちに、もうひとつ、大きな局面が起こる時期があることに気づきました。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">この期間はその人の120年間の人生の中で、花人占術における運気で言う「静容（せいよう）」「天華（てんか）」「零花（こぼればな）」にあたる期間に起きるものなのです。そしてこの期間は運気の変動が谷底から頂上へ、頂上から再び谷底へ落ちるように動くことから、私はこの期間を「運命の谷」と名付けました。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">この期間が重要な理由は、中央に来る「天華」の時期が、人生における「重要な方向転換期」だからなのです。そしてさらにその前後に谷底が配置されている、という極端な形をしているために、多くの人がハマりやすく、またチャンスを逃しやすい時期でもあるのです。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">そこで、花人占術ではあらかじめその時期を知っておき、対策を講じる手法を取ります。これにより、停滞して何故か上手くいかない、或いは何故か不幸が続いて振り回される、そんな環境から逃れ、流れを変えるチャンスが掴めるようになるのです。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.6rem">具体的には自分の運気に合った過ごし方をするのですが、「天華」に当たる10年だけは「一生に一度、10年間しかない特別な時期」と心得て、行動をすることが重要になります。各時期の過ごし方は以下に説明をします。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">① 静容（せいよう）の10年間　〜苦難の時期〜</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">この時期は別名「苦難の時期」とも呼びます。心身の健康に障害が起きやすく、様々なトラブルが頭を悩ませる時期になります。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">植物に例えるなら、育ってきた芽が葉を広げ、花を咲かせる前に、一旦蕾（つぼみ）を休ませて、開花のためのエネルギーを蓄えるような時期になります。花を咲かせる前の準備期間と捉えても良いでしょう。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">準備期間なのですから、当然無理がききません。自分の意思に反してエネルギーが蓄えられるほうに使われているのですから、この時に意図的に動こうとしても思うように行かないのです。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">この時期は心と体を休め、トラブルにも順当に対応していくようにしましょう。こうすることで、次に来る「天華」の時期にチャンスを掴むことができるのです。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">② 人生最大のチャンスの時期「天華（てんか）」</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">この10年間は自分の人生の中で「あらゆる抑圧から解放され、方向転換出来る」という、特別な期間になります。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">人間の人生には、実はチャンスというものはそうそう巡ってくるものではありません。この宇宙には開いている時間よりも閉じている時の方が多く、多くの人が経験する、運命に翻弄されて中々抜け出せない、というのは往々にしてあることなのです。しかし、この期間は別で、何故か縛られた鎖から解き放たれるような、あなたの為に特別に用意された時間帯なのです。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">放物線飛行（パラボリックフライト）というのをご存知でしょうか？これは飛行機が上昇した後に急降下すると、一時的に飛行機の中が無重力（微小重力）状態になる現象のことを言いますが、大運の中における天華の時間帯とは、まさしくそれに似た現象が起きる時なのです。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">それまで自分を縛っていた力＝重力から開放されることにより、あなたは自分の体の向きを変えたり、今まで行けなかった場所へすんなりと進むことができたりします。夢を叶える足掛かりを手にすることも出来るでしょう。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">しかし、パラボリックフライトと同じで、これが出来る無重力の時間はとても少なく、限られています。短時間で重力は元に戻り、また運命の波に戻らなければならなくなるのです。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">その為、指をくわえて何もしないのはとんでもないことで、それまで出来なかったこと、諦めていたこと、人生を変えたいと願っていたその想いを形にするために、動かなければならない期間にしなければ、あなたはとてつもない損をしていると言えるでしょう。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">ストレスから開放されるときでもあるので、心理的にほっと一息つける気がしてだらけてしまいがちですが、今がチャンスと捉えて、その後に来る運命の谷底に落ちる前に、流れを変える行動をしておくことを強くお勧めいたします。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">具体的には、結婚や希望の学校への進学・職種など半ば諦めていたことにチャレンジしておく、手がけていたプロジェクトなど未完成のものを完成するように働きかけておく、など自分の本当の願いが実現に向かうよう、働きかけて一応の形にしておく。これが肝要になります。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">③ 零花（こぼればな）の10年間　〜試練の時期〜</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">別名「試練の時期」とも呼びます。これは植物に例えるなら、文字通り「零（こぼ）れる花」、つまり「散り落ちる花弁」を意味しています。花は咲き誇った後、実をつけるために余計な花弁を落とさなければなりません。そうしなければ上手く実の形成ができないのでしょう。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">それと同じで、それまでの厄落としをする様な、夏バテに似た状態になるのがこの期間なのです。特徴としては「自分で自分のコントロールが思うように出来ない」というものになります。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">それまで咲いていた花を落とすのですから、それまで上手くいっていたセオリー、やり方が通じなくなります。また、ここで言う花は、花人占術では人間で言う頭を表します。頭の一部を失う、つまり精神的な不安定さを伴うことになります。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">これは精神を傷害すると言うより、次に進むために不必要になる部分を自然に落とす、自分の意思に反した生理現象になりますので、脳が過度になった情報を整理する段階であるとも言えるでしょう。自然に起こる生理現象なので、この時も無理に行動しようとしても上手くいくはずがありません。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">逆にそれまで上手くいっていたことがまだ続けられると思って行動すると、とんでもないしっぺ返しをくらい、ギャンブルで大金を溶かしたり、人間関係で一線を超えるようなことをやって信頼を失ったり、周囲に大迷惑をかけてしまうなど、トラブルの種が多く潜んでいる期間なのです。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">対策としては自分ではコントロールが難しいのですから、信頼できる人や心配してくれる人、運気の良い人などのアドバイスや協力を貰うようにすると、大きな失敗を防ぐことができるでしょう。ただし自分でも「何でもやりすぎてしまう危険性がある」という事を自覚して、程よいストレス発散をしながら、上手に自分をコントロール、セルフケア出来るように意識して行動してみましょう。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">まとめ</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">いかがでしょうか。一見すると大変な期間のようにも思えますが、この「運命の谷」を上手に攻略出来れば、あなたの人生はもっとずっとあなたの望みに近い形に変えていけることでしょう。「転化天蛹」も油断ならない期間ですが、こちらも必要な対策を知っておけば、それほど恐れるものではなくなると言えるでしょう。</p>
+      <p style="font-size:0.95rem;color:#8a5a00;font-weight:700;line-height:2.1;text-align:center;margin:1.4rem 0 0">あなたの運命を知り、自分の人生があなた次第でいかようにも変えていけることに気付いて、<br>豊かな人生を過ごせるようこころから願っています。</p>
+
+      <div style="text-align:center;margin-top:1.8rem">
+        <button onclick="document.getElementById('tani-tenka-article-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
       </div>
     </div>
   </div>
@@ -6262,11 +6314,14 @@ var SPECIAL_TERMS={
 };
 function showTermPopup(cat,term){
   var desc;
+  var showArticleLink=false;
   if(cat==='special'&&SPECIAL_TERMS[term]){
     desc=SPECIAL_TERMS[term].desc;
+    if(term==='運命の谷')showArticleLink=true;
   } else if(cat==='転化天蛹'){
     var d=KB['転化天蛹'];
     desc=d?(d['説明']||'')+(d['過ごし方']?' '+d['過ごし方']:''):'説明がありません';
+    showArticleLink=true;
   } else {
     var d=(KB[cat]||{})[term];
     desc=d?(d['説明']||'')+(d['独自解釈']?' '+d['独自解釈']:''):'説明がありません';
@@ -6277,7 +6332,9 @@ function showTermPopup(cat,term){
   overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
   var popup=document.createElement('div');
   popup.style.cssText='background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:14px;padding:1.3rem;max-width:340px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
-  popup.innerHTML='<div style="font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:0.6rem">'+term+(reading?'（'+reading+'）':'')+'</div><div style="font-size:1.05rem;color:var(--ink);line-height:1.9">'+desc+'</div><button onclick="this.parentNode.parentNode.remove()" style="margin-top:1rem;width:100%;padding:0.75rem;background:rgba(184,134,11,0.15);border:none;border-radius:8px;cursor:pointer;font-size:1rem">閉じる</button>';
+  popup.innerHTML='<div style="font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:0.6rem">'+term+(reading?'（'+reading+'）':'')+'</div><div style="font-size:1.05rem;color:var(--ink);line-height:1.9">'+desc+'</div>'
+    +(showArticleLink?'<div onclick="document.getElementById(\'tani-tenka-article-overlay\').classList.add(\'show\')" style="margin-top:1rem;text-align:center;color:#8a5a00;font-weight:700;font-size:0.92rem;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">📖 読み物「運命の谷と転化天蛹」を読む →</div>':'')
+    +'<button onclick="this.parentNode.parentNode.remove()" style="margin-top:1rem;width:100%;padding:0.75rem;background:rgba(184,134,11,0.15);border:none;border-radius:8px;cursor:pointer;font-size:1rem">閉じる</button>';
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
 }
