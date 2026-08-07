@@ -1617,7 +1617,7 @@ function htDisplayFullRuby(ht){
 
 
 function getDaiunStartAge(y,m,d,isFwd){var bd=new Date(y,m-1,d);var days=0;try{if(isFwd){var st=getSetsuDate(y,m),stD=new Date(st.getFullYear(),st.getMonth(),st.getDate());if(bd<stD)days=Math.round((stD-bd)/86400000);else{var nm=m+1,ny=y;if(nm>12){nm=1;ny++;}var ns=getSetsuDate(ny,nm),nsD=new Date(ns.getFullYear(),ns.getMonth(),ns.getDate());days=Math.round((nsD-bd)/86400000);}}else{var st2=getSetsuDate(y,m),stD2=new Date(st2.getFullYear(),st2.getMonth(),st2.getDate());if(bd>=stD2)days=Math.round((bd-stD2)/86400000);else{var pm=m-1,py=y;if(pm<1){pm=12;py--;}var ps=getSetsuDate(py,pm),psD=new Date(ps.getFullYear(),ps.getMonth(),ps.getDate());days=Math.round((bd-psD)/86400000);}}}catch(e){days=15;}return Math.max(1,Math.round(Math.abs(days)/3));}
-function getJuniColor(j){return({'結蕾':'#1a6b3a','豊穣':'#1a6b3a','青葉':'#2a8c4a','芽吹':'#3a9a5a','穂分':'#4aaa6a','平凪':'#5a9c7a','天華':'#6aaa8a','静容':'#2a7aaa','零花':'#cc6622','引寒':'#882222','休眠':'#550000','残雪':'#882222'})[j]||'#4a3c28';}
+function getJuniColor(j){return({'結蕾':'#1a6b3a','豊穣':'#8b4513','青葉':'#2a8c4a','芽吹':'#3a9a5a','穂分':'#a0622d','平凪':'#b8763f','天華':'#d32f2f','静容':'#2a7aaa','零花':'#cc6622','引寒':'#4a4a4a','休眠':'#6a6a6a','残雪':'#8a8a8a'})[j]||'#4a3c28';}
 
 // 魂のコア（人格核）：日干（核）×六花人の対応支2つ（外面・内面）から十二大従星を導く
 function getTamashiiNoCore(G){
@@ -2756,7 +2756,7 @@ function renderCalendar(){
   html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.9rem">';
   html+='<div>'
     +'<div style="font-size:0.95rem;font-weight:700;color:var(--ink3)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</div>'
-    +'<div style="font-size:2rem;font-weight:800;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+selJuColor+';line-height:1.3;margin-top:0.1rem">'+selJu+'</div>'
+    +'<div style="font-size:2rem;font-weight:800;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+selJuColor+';line-height:1.3;margin-top:0.1rem">'+(selJu?'<span onclick="showTermPopup(\'十二運気\',\''+selJu+'\')" style="cursor:pointer;border-bottom:3px dotted currentColor"><ruby>'+selJu+'<rt style="font-size:0.38em;font-family:\'Noto Serif JP\',serif;font-weight:400">'+(getTermReading('十二運気',selJu)||'')+'</rt></ruby></span>':'')+'</div>'
     +'</div>';
   html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-family:\'Noto Serif JP\',serif;font-weight:700;flex-shrink:0;margin-top:0.2rem">＋ 追加</button>';
   html+='</div>';
@@ -2996,7 +2996,7 @@ function updateCalSelectedArea(dk){
   var selJuColor=getJuniColor(selJu);
   var html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.9rem">';
   html+='<div><div style="font-size:0.95rem;font-weight:700;color:var(--ink3)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</div>';
-  if(selJu)html+='<div style="font-size:2rem;font-weight:800;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+selJuColor+';line-height:1.3;margin-top:0.1rem">'+selJu+'</div>';
+  if(selJu)html+='<div style="font-size:2rem;font-weight:800;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+selJuColor+';line-height:1.3;margin-top:0.1rem"><span onclick="showTermPopup(\'十二運気\',\''+selJu+'\')" style="cursor:pointer;border-bottom:3px dotted currentColor"><ruby>'+selJu+'<rt style="font-size:0.38em;font-family:\'Noto Serif JP\',serif;font-weight:400">'+(getTermReading('十二運気',selJu)||'')+'</rt></ruby></span></div>';
   html+='</div>';
   html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-weight:700;flex-shrink:0;margin-top:0.2rem">＋ 追加</button>';
   html+='</div>';
