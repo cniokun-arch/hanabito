@@ -2791,10 +2791,10 @@ function buildCalGridHTML(G,py,pm,schedules,today){
   var startDow=firstDay.getDay();
   var days=lastDay.getDate();
   var DOW=['日','月','火','水','木','金','土'];
-  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">';
+  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">';
   DOW.forEach(function(d,i){
     var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
-    h+='<div style="text-align:center;font-size:0.72rem;font-weight:700;color:'+c+';padding:0.2rem 0">'+d+'</div>';
+    h+='<div style="text-align:center;font-size:0.68rem;font-weight:700;color:'+c+';padding:0.15rem 0">'+d+'</div>';
   });
   h+='</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
@@ -2821,15 +2821,15 @@ function buildCalGridHTML(G,py,pm,schedules,today){
     var markHtml='';
     if(dayScheds.length>0){
       var marks=dayScheds.slice(0,2).map(function(s){return s.mark||'🌸';}).join('');
-      markHtml='<div style="font-size:1rem;line-height:1;height:1.2rem;display:flex;align-items:center;justify-content:center">'+marks+'</div>';
+      markHtml='<div style="font-size:0.8rem;line-height:1;height:0.85rem;display:flex;align-items:center;justify-content:center">'+marks+'</div>';
     } else {
-      markHtml='<div style="height:1.2rem"></div>';
+      markHtml='<div style="height:0.85rem"></div>';
     }
     var setsuMarker=isSetsuDay?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:rgba(184,134,11,0.6);border-radius:6px 0 0 6px"></div>':'';
-    h+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:6px;padding:0.3rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
+    h+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:5px;padding:0.18rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
       +setsuMarker
-      +'<div style="font-size:0.72rem;font-weight:'+(isToday2||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
-      +'<div style="font-size:0.9rem;color:'+juColor+';font-weight:700;line-height:1.2;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
+      +'<div style="font-size:0.65rem;font-weight:'+(isToday2||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
+      +'<div style="font-size:0.76rem;color:'+juColor+';font-weight:700;line-height:1.1;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
       +markHtml
       +'</div>';
   }
