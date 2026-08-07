@@ -2710,18 +2710,16 @@ function renderCalendar(){
   if(typeof tdataCal==='string')tdataCal={goal:tdataCal,months:Array(12).fill('')};
   var yrGoal=tdataCal&&tdataCal.goal?tdataCal.goal:'';
   var monGoal=tdataCal&&tdataCal.months&&tdataCal.months[calMonth]?tdataCal.months[calMonth]:'';
-  html+='<div style="border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.7rem;background:rgba(184,134,11,0.04)">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.2rem">';
-  html+='<div style="font-size:0.72rem;color:var(--ink3);font-weight:700">📌 '+calYear+'年の目標</div>';
-  html+='<button onclick="editTimelineMemo('+calYear+')" style="font-size:0.65rem;color:var(--gold);background:transparent;border:1px solid rgba(184,134,11,0.3);border-radius:4px;padding:0.1rem 0.4rem;cursor:pointer">編集</button>';
+  html+='<div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:0.5rem">';
+  html+='<button onclick="editTimelineMemo('+calYear+')" style="font-size:0.78rem;color:var(--gold);background:transparent;border:1px solid rgba(184,134,11,0.4);border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-weight:700">編集</button>';
   html+='</div>';
-  html+='<div data-cal-yr-goal style="font-size:0.84rem;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
-  if(monGoal||true){
-    html+='<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(184,134,11,0.1)">';
-    html+='<div data-cal-mon-label style="font-size:0.72rem;color:var(--ink3);font-weight:700;margin-bottom:0.1rem">'+(calMonth+1)+'月の目標</div>';
-    html+='<div data-cal-mon-goal style="font-size:0.84rem;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
-    html+='</div>';
-  }
+  html+='<div style="border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.7rem;background:#fff">';
+  html+='<div style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">📌 '+calYear+'年の目標</div>';
+  html+='<div data-cal-yr-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
+  html+='</div>';
+  html+='<div style="border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.7rem;background:#fff">';
+  html+='<div data-cal-mon-label style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">🌱 '+(calMonth+1)+'月の目標</div>';
+  html+='<div data-cal-mon-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
   html+='</div>';
   // グリッドを別関数で生成してスライダーに設置
   html+='<div id="cal-slider-wrap"><div id="cal-slider-track">';
