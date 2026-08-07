@@ -2794,7 +2794,7 @@ function buildCalGridHTML(G,py,pm,schedules,today){
   var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">';
   DOW.forEach(function(d,i){
     var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
-    h+='<div style="text-align:center;font-size:0.68rem;font-weight:700;color:'+c+';padding:0.15rem 0">'+d+'</div>';
+    h+='<div style="text-align:center;font-size:0.68rem;font-weight:700;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+c+';padding:0.15rem 0">'+d+'</div>';
   });
   h+='</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
@@ -2828,8 +2828,8 @@ function buildCalGridHTML(G,py,pm,schedules,today){
     var setsuMarker=isSetsuDay?'<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:rgba(184,134,11,0.6);border-radius:6px 0 0 6px"></div>':'';
     h+='<div onclick="calSelectDate(\''+dk+'\')" style="position:relative;border:'+border+';border-radius:5px;padding:0.18rem 0.05rem;text-align:center;background:'+bg+';cursor:pointer;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;box-sizing:border-box">'
       +setsuMarker
-      +'<div style="font-size:0.65rem;font-weight:'+(isToday2||isSelected?'700':'400')+';color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
-      +'<div style="font-size:0.76rem;color:'+juColor+';font-weight:700;line-height:1.1;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
+      +'<div style="font-size:0.68rem;font-weight:700;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+(isBeforeSetsu?'var(--ink3)':dayColor)+';line-height:1">'+d+'</div>'
+      +'<div style="font-size:0.76rem;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+juColor+';font-weight:700;line-height:1.1;letter-spacing:-0.03em;'+juOpacity+'">'+ju+'</div>'
       +markHtml
       +'</div>';
   }
