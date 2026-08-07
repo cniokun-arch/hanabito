@@ -2721,6 +2721,13 @@ function renderCalendar(){
   html+='<div data-cal-mon-label style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">🌱 '+(calMonth+1)+'月の目標</div>';
   html+='<div data-cal-mon-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
   html+='</div>';
+  // 曜日ヘッダー（色帯・スワイプ機構の外に固定表示）
+  html+='<div style="margin:0 -1rem;background:linear-gradient(180deg,rgba(184,134,11,0.16),rgba(184,134,11,0.06));border-top:2px solid rgba(184,134,11,0.35);border-bottom:2px solid rgba(184,134,11,0.35);padding:0.5rem 1rem;display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  ['日','月','火','水','木','金','土'].forEach(function(d,i){
+    var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink2)';
+    html+='<div style="text-align:center;font-size:0.72rem;font-weight:700;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+c+'">'+d+'</div>';
+  });
+  html+='</div>';
   // グリッドを別関数で生成してスライダーに設置
   html+='<div id="cal-slider-wrap"><div id="cal-slider-track">';
   // 前月・当月・次月の3パネル
@@ -2784,14 +2791,7 @@ function buildCalGridHTML(G,py,pm,schedules,today){
   var lastDay=new Date(py,pm+1,0);
   var startDow=firstDay.getDay();
   var days=lastDay.getDate();
-  var DOW=['日','月','火','水','木','金','土'];
-  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">';
-  DOW.forEach(function(d,i){
-    var c=i===0?'#c04040':i===6?'#1a4a9a':'var(--ink3)';
-    h+='<div style="text-align:center;font-size:0.68rem;font-weight:700;font-family:-apple-system,\'Hiragino Sans\',sans-serif;color:'+c+';padding:0.15rem 0">'+d+'</div>';
-  });
-  h+='</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  var h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:0.5rem 0 0">';
   for(var i=0;i<startDow;i++) h+='<div></div>';
   for(var d=1;d<=days;d++){
     var dt=new Date(py,pm,d);
