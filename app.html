@@ -2732,16 +2732,6 @@ function renderCalendar(){
   }
   html+='</div></div>';
 
-  // 凡例
-  html+='<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.7rem;padding-top:0.5rem;border-top:1px solid rgba(184,134,11,0.15)">';
-  [{name:'天華',desc:'チャンス'},{name:'零花',desc:'試練'},{name:'静容',desc:'苦難'},{name:'結蕾',desc:'増幅'}].forEach(function(it){
-    html+='<span style="font-size:0.68rem;color:'+getJuniColor(it.name)+';font-weight:700">'+it.name+'='+it.desc+'</span>';
-  });
-  html+='<span style="font-size:0.68rem;color:var(--ink3)">｜</span>';
-  html+='<span style="font-size:0.68rem;color:var(--ink3)">薄色=前月扱い</span>';
-  html+='<span style="font-size:0.68rem;color:rgba(184,134,11,0.8)">｜線=節入り日</span>';
-  html+='</div>';
-
   // 選択日の予定表示エリア（常に表示・初期値は今日）
   var dispDate=calSelectedDate||calDateKey(today.getFullYear(),today.getMonth()+1,today.getDate());
   var parts=dispDate.split('-');
