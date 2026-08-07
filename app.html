@@ -1642,7 +1642,9 @@ function kbEntryFullText(entry){
     var v=entry[k];
     if(typeof v==='string'&&v.trim())parts.push(v.trim());
   });
-  return parts.join(' ');
+  var full=parts.join(' ');
+  // プロンプトが際限なく膨らんで通信エラーになるのを防ぐための長さの上限
+  return full.length>250?full.slice(0,250)+'…':full;
 }
 
 // 魂のコア（人格核）：日干（核）×六花人の対応支2つ（外面・内面）から十二大従星を導く
@@ -6743,8 +6745,14 @@ async function generateManual(){
     +'「第3層」「第4層」「通変星を見ると」などの内部用語・書き出しは一切使わない。占術用語は使わず誰でも分かる言葉で。Markdown禁止。600〜800文字程度。';
 
   function apiCall(prompt,overrideSys){
-    return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
-      body:JSON.stringify({messages:[{role:'user',content:prompt}],system:overrideSys||sys,engine:AI_ENGINE})});
+    function attempt(){
+      return fetch(WORKER_BASE+'/api/chat',{method:'POST',headers:getWorkerHeaders(),
+        body:JSON.stringify({messages:[{role:'user',content:prompt}],system:overrideSys||sys,engine:AI_ENGINE})});
+    }
+    // 「Load failed」等の一時的な通信エラーに備え、失敗時は1.5秒待って1回だけ再試行する
+    return attempt().catch(function(){
+      return new Promise(function(resolve){setTimeout(resolve,1500);}).then(attempt);
+    });
   }
   function getText(json){
     var t=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
