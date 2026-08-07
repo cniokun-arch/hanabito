@@ -1604,6 +1604,19 @@ function htDisplayHinataHikage(ht){return (ht&&ht.indexOf('＋')>=0)?'日向':'�
 
 // ルビ付き表示用（読み仮名マップ）
 const HT_RUBY_MAP={'天人花':'てんにんか','珀人花':'はくじんか','麗人花':'れいじんか','風人花':'ふうじんか','仙人花':'せんにんか','水人花':'すいじんか'};
+// AIが六花人の名前に間違った読みを付けてしまうことがある（例：「風人花（ひゅうが）」）ための安全策。
+// 「ひゅうが」という誤読は日向の読み間違いとみられるため常に修正し、
+// 六花人の名前＋（正しい読み・日向・日陰 以外の何か）というパターンも矯正する
+function fixHanabitoTermReadings(text){
+  if(!text)return text;
+  text=text.replace(/ひゅうが/g,'日向');
+  Object.keys(HT_RUBY_MAP).forEach(function(name){
+    var correct=HT_RUBY_MAP[name];
+    var re=new RegExp(name+'（(?!'+correct+'|日向|日陰)[^）]*）','g');
+    text=text.replace(re,name);
+  });
+  return text;
+}
 const HINATA_HIKAGE_RUBY={'日向':'ひなた','日陰':'ひかげ'};
 function rubyHtml(kanji,yomi){return '<ruby>'+kanji+'<rt>'+yomi+'</rt></ruby>';}
 function htDisplayBaseRuby(htBase){var disp=htDisplayBase(htBase);return rubyHtml(disp,HT_RUBY_MAP[disp]||'');}
@@ -6728,7 +6741,8 @@ async function generateManual(){
       body:JSON.stringify({messages:[{role:'user',content:prompt}],system:overrideSys||sys,engine:AI_ENGINE})});
   }
   function getText(json){
-    return (json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+    var t=(json.content&&json.content[0]?json.content[0].text:json.error||'生成できませんでした').replace(/[#*]/g,'').trim();
+    return fixHanabitoTermReadings(t);
   }
   function showLayer(id,divId,text){
     var el=document.getElementById(id);
