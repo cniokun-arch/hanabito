@@ -2752,26 +2752,30 @@ function renderCalendar(){
   var selJu=getJuniUnki(G.ht,selDayKS[1]);
   var selJuColor=getJuniColor(selJu);
 
-  html+='<div id="cal-sched-area" style="margin-top:0.8rem;border-top:2px solid rgba(124,58,237,0.2);padding-top:0.8rem">';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">';
+  html+='<div id="cal-sched-area" style="margin-top:0.8rem;border-top:2px solid rgba(124,58,237,0.2);padding-top:0.8rem;padding-bottom:2rem;min-height:180px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem">';
   html+='<div>'
-    +'<span style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>'
-    +'<span style="font-size:0.8rem;color:'+selJuColor+';font-weight:700;margin-left:0.4rem">'+selJu+'</span>'
+    +'<span style="font-size:1.05rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>'
+    +'<span style="font-size:0.85rem;color:'+selJuColor+';font-weight:700;margin-left:0.4rem">'+selJu+'</span>'
     +'</div>';
-  html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.3rem 0.8rem;font-size:0.85rem;cursor:pointer;font-family:\'Noto Serif JP\',serif">＋ 追加</button>';
+  html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-family:\'Noto Serif JP\',serif;font-weight:700">＋ 追加</button>';
   html+='</div>';
 
   if(selScheds.length===0){
-    html+='<p style="font-size:0.85rem;color:var(--ink3);text-align:center;padding:0.4rem 0">予定はありません</p>';
+    html+='<div style="text-align:center;padding:1.8rem 0.5rem;color:var(--ink3)">'
+      +'<div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.5">🌸</div>'
+      +'<p style="font-size:0.92rem;margin:0">予定はありません</p>'
+      +'<p style="font-size:0.78rem;margin-top:0.3rem;opacity:0.8">「＋ 追加」からこの日の予定を書き込めます</p>'
+      +'</div>';
   } else {
     selScheds.forEach(function(s,idx){
-      html+='<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;background:rgba(184,134,11,0.05);border-radius:8px;margin-bottom:0.4rem">'
-        +'<span style="font-size:1.2rem">'+(s.mark||'🌸')+'</span>'
+      html+='<div style="display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.8rem;background:rgba(184,134,11,0.06);border-radius:10px;margin-bottom:0.6rem">'
+        +'<span style="font-size:1.35rem">'+(s.mark||'🌸')+'</span>'
         +'<div style="flex:1">'
-        +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</div>'
-        +(s.memo?'<div style="font-size:0.78rem;color:var(--ink2)">'+escHtml(s.memo)+'</div>':'')
+        +'<div style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</div>'
+        +(s.memo?'<div style="font-size:0.82rem;color:var(--ink2);margin-top:0.15rem">'+escHtml(s.memo)+'</div>':'')
         +'</div>'
-        +'<button onclick="calDeleteSchedule(\''+dispDate+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem">✕</button>'
+        +'<button onclick="calDeleteSchedule(\''+dispDate+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
         +'</div>';
     });
   }
@@ -2990,23 +2994,27 @@ function updateCalSelectedArea(dk){
   var selDayKS=getDayKS(sy,sm,sd);
   var selJu=selDayKS?getJuniUnki(G2.ht,selDayKS[1]):'';
   var selJuColor=getJuniColor(selJu);
-  var html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">';
-  html+='<div><span style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>';
-  if(selJu)html+='<span style="font-size:0.8rem;color:'+selJuColor+';font-weight:700;margin-left:0.4rem">'+selJu+'</span>';
+  var html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem">';
+  html+='<div><span style="font-size:1.05rem;font-weight:700;color:var(--ink)">'+sy+'年'+sm+'月'+sd+'日（'+selDow+'）</span>';
+  if(selJu)html+='<span style="font-size:0.85rem;color:'+selJuColor+';font-weight:700;margin-left:0.4rem">'+selJu+'</span>';
   html+='</div>';
-  html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.3rem 0.8rem;font-size:0.85rem;cursor:pointer">＋ 追加</button>';
+  html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-weight:700">＋ 追加</button>';
   html+='</div>';
   if(selScheds.length===0){
-    html+='<p style="font-size:0.85rem;color:var(--ink3);text-align:center;padding:0.4rem 0">予定はありません</p>';
+    html+='<div style="text-align:center;padding:1.8rem 0.5rem;color:var(--ink3)">'
+      +'<div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.5">🌸</div>'
+      +'<p style="font-size:0.92rem;margin:0">予定はありません</p>'
+      +'<p style="font-size:0.78rem;margin-top:0.3rem;opacity:0.8">「＋ 追加」からこの日の予定を書き込めます</p>'
+      +'</div>';
   } else {
     selScheds.forEach(function(s,idx){
-      html+='<div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;background:rgba(184,134,11,0.05);border-radius:8px;margin-bottom:0.4rem">'
-        +'<span style="font-size:1.2rem">'+(s.mark||'🌸')+'</span>'
+      html+='<div style="display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.8rem;background:rgba(184,134,11,0.06);border-radius:10px;margin-bottom:0.6rem">'
+        +'<span style="font-size:1.35rem">'+(s.mark||'🌸')+'</span>'
         +'<div style="flex:1">'
-        +'<div style="font-size:0.9rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||s.text||'')+'</div>'
-        +(s.memo?'<div style="font-size:0.78rem;color:var(--ink2)">'+escHtml(s.memo)+'</div>':'')
+        +'<div style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||s.text||'')+'</div>'
+        +(s.memo?'<div style="font-size:0.82rem;color:var(--ink2);margin-top:0.15rem">'+escHtml(s.memo)+'</div>':'')
         +'</div>'
-        +'<button onclick="calDeleteSchedule(\''+dk+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem">✕</button>'
+        +'<button onclick="calDeleteSchedule(\''+dk+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
         +'</div>';
     });
   }
