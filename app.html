@@ -1642,8 +1642,12 @@ function kbEntryFullText(entry){
     var v=entry[k];
     if(typeof v==='string'&&v.trim())parts.push(v.trim());
   });
-  var full=parts.join(' ');
-  // プロンプトが際限なく膨らんで通信エラーになるのを防ぐための長さの上限
+  return parts.join(' ');
+}
+// AIへ渡すプロンプトが際限なく膨らんで通信エラーになるのを防ぐための、プロンプト専用の長さ上限つき版。
+// ユーザーに見せる説明（ポップアップ等）はkbEntryFullText()をそのまま使うこと（省略しない）
+function kbEntryFullTextCapped(entry){
+  var full=kbEntryFullText(entry);
   return full.length>250?full.slice(0,250)+'…':full;
 }
 
@@ -3827,7 +3831,7 @@ async function runCompatAI(){
   // 通常AIと同じKBを使ってシステムプロンプトを構築
   var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
   var juniInfo=Object.keys(KB['十二運気']||{}).map(function(k){
-    return k+'：'+kbEntryFullText(KB['十二運気'][k]);
+    return k+'：'+kbEntryFullTextCapped(KB['十二運気'][k]);
   }).join('\n');
   var standardKeys=['_meta','星人','花人','十二運気','転化天蛹','十二大従星','大運','使い方ガイド'];
   var customInfo=Object.keys(KB).filter(function(k){return standardKeys.indexOf(k)<0;}).map(function(k){
@@ -3839,7 +3843,7 @@ async function runCompatAI(){
     }).join(' / ');
   }).join('\n');
   var daiInfo=KB['転化天蛹']
-    ?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間。命式の干支が転化天蛹の支でも転化天蛹ではない。'+kbEntryFullText(KB['転化天蛹'])
+    ?'【転化天蛹とは】大運干支がその人の転化天蛹の対象支にあたる10年間。命式の干支が転化天蛹の支でも転化天蛹ではない。'+kbEntryFullTextCapped(KB['転化天蛹'])
     :'';
   var sysPrompt='あなたは花人占術AIです。2人の命式データを使って相性鑑定を行います。\n\n'
     +'【六花人の名称について】回答内で六花人の名前を使う場合は必ず新名称と正しい読みを使うこと：天人花（てんにんか）、珀人花（はくじんか）、麗人花（れいじんか）、風人花（ふうじんか）、仙人花（せんにんか）、水人花（すいじんか）。陰陽（＋／－）は「日向（ひなた）」「日陰（ひかげ）」と表現する（＋＝日向、－＝日陰）。旧名称や記号（＋／－）、「陽」「陰」という単語は回答内で絶対に使わないこと。\n\n'
@@ -3897,7 +3901,7 @@ function buildSystemPromptFull(G){
   function kanDesc(kan){var d=JIKKAN_DESC[kan];return d?kan+'：'+(d['説明']||'').slice(0,80):'';} 
   function thDesc(th){var d=TSUHEN_DESC[th];return d?th+'（'+(d['説明']||'').slice(0,60)+'）':'';} 
   function josDesc(jos){var d=JUSEI_DESC[jos];return d?jos+'（'+(d['説明']||'').slice(0,60)+'）':'';} 
-  function juDesc(ju){var d=(KB['十二運気']||{})[ju];return d?ju+'：'+kbEntryFullText(d):'';} 
+  function juDesc(ju){var d=(KB['十二運気']||{})[ju];return d?ju+'：'+kbEntryFullTextCapped(d):'';} 
 
   // ── 地運（一生変わらない本質） ──
   // 通変星
@@ -3918,7 +3922,7 @@ function buildSystemPromptFull(G){
     var wave=JUNI_WAVE[ju]||0;
     var kikkyo=JUNI_KIKKYO[ju]||'';
     var juD=(KB['十二運気']||{})[ju];
-    var juTxt=kbEntryFullText(juD);
+    var juTxt=kbEntryFullTextCapped(juD);
     var tone=wave>=3?'この性質がプラスに発揮されやすく、'
       :wave>=0?'この性質が穏やかに作用し、'
       :'この性質が自家中毒になりやすく（自分の性格がトラブルを呼ぶ）、';
@@ -3982,12 +3986,12 @@ function buildSystemPromptFull(G){
   // ── 六花人の特徴 ──
   var starKey=KB['星人']?'星人':(KB['花人']?'花人':null);
   var starInfo=starKey&&KB[starKey]&&KB[starKey][htKey]
-    ?'【'+htDisplayFull(G.ht)+'の特徴】'+kbEntryFullText(KB[starKey][htKey])
+    ?'【'+htDisplayFull(G.ht)+'の特徴】'+kbEntryFullTextCapped(KB[starKey][htKey])
     :'';
 
   // ── 転化天蛹 ──
   var daiInfo=KB['転化天蛹']
-    ?'【転化天蛹】大運干支がその人の転化天蛹の対象支にあたる10年間のみ適用（命式の干支は関係ない）。'+kbEntryFullText(KB['転化天蛹'])
+    ?'【転化天蛹】大運干支がその人の転化天蛹の対象支にあたる10年間のみ適用（命式の干支は関係ない）。'+kbEntryFullTextCapped(KB['転化天蛹'])
     :'';
 
   // ── 追加知識（standardKeys以外のKBキーを自動反映） ──
@@ -6204,8 +6208,8 @@ async function generateDaiunAdvice(startY,endY){
     for(var i=0;i<drows.length;i++){if(drows[i].startY===startY){daiunRow=drows[i];break;}}
     if(!daiunRow)throw new Error('大運データが見つかりません');
     var th=daiunRow.th,ju=daiunRow.ju;
-    function juniDesc3(j){return kbEntryFullText((KB['十二運気']||{})[j]);}
-    function thDesc3(t){return kbEntryFullText((KB['通変星']||{})[t]);}
+    function juniDesc3(j){return kbEntryFullTextCapped((KB['十二運気']||{})[j]);}
+    function thDesc3(t){return kbEntryFullTextCapped((KB['通変星']||{})[t]);}
     var prompt='以下の2つの占術要素を、別々にではなく1つに統合して解釈してください。\n\n'
       +'【通変星『'+th+'』】'+(thDesc3(th)||'（データなし）')+'\n'
       +'【十二運気『'+ju+'』】'+(juniDesc3(ju)||'（データなし）')+'\n\n'
@@ -6245,8 +6249,8 @@ async function generateYearAdvice(year){
     for(var i=0;i<drows.length;i++){if(drows[i].startY<=year&&year<=drows[i].endY){daiunRow=drows[i];break;}}
     var yrShi=JUNISHI[((year-1984)%12+12)%12];
     var yrJu=getJuniUnki(G.ht,yrShi);
-    function juniDesc2(ju){return kbEntryFullText((KB['十二運気']||{})[ju]);}
-    function thDesc2(th){return kbEntryFullText((KB['通変星']||{})[th]);}
+    function juniDesc2(ju){return kbEntryFullTextCapped((KB['十二運気']||{})[ju]);}
+    function thDesc2(th){return kbEntryFullTextCapped((KB['通変星']||{})[th]);}
     var daiunTh=daiunRow?daiunRow.th:'—';
     var daiunJu2=daiunRow?daiunRow.ju:'';
     var prompt='以下の運気データを踏まえて、'+year+'年をどう過ごすと良いか、具体的で実践的なアドバイスを書いてください。\n\n'
@@ -6592,7 +6596,7 @@ async function generateManual(){
   }
   var daiunText=daiunRows.map(function(r,ridx){
     var label=DAIUN_LABELS[r.ju]?' '+DAIUN_LABELS[r.ju]:'';
-    var josDesc=kbEntryFullText(KB['十二大従星']&&KB['十二大従星'][r.jos]);
+    var josDesc=kbEntryFullTextCapped(KB['十二大従星']&&KB['十二大従星'][r.jos]);
     return r.age+'〜'+(r.age+r.sp-1)+'歳（'+r.startY+'〜'+r.endY+'年）'+(r.isCurr?'★現在 ':'')+r.ks
       +' 通変:'+r.th
       +' 従星:'+r.jos+(josDesc?' ['+josDesc+']':'')
@@ -6624,13 +6628,13 @@ async function generateManual(){
   var nenJos=G.nJus||'—';
   var tsuJos=G.tJus||'—';
   var nichiJos=G.niJus||'—';
-  var nenJosDesc=kbEntryFullText(KB['十二大従星']&&KB['十二大従星'][nenJos]);
-  var tsuJosDesc=kbEntryFullText(KB['十二大従星']&&KB['十二大従星'][tsuJos]);
-  var nichiJosDesc=kbEntryFullText(KB['十二大従星']&&KB['十二大従星'][nichiJos]);
+  var nenJosDesc=kbEntryFullTextCapped(KB['十二大従星']&&KB['十二大従星'][nenJos]);
+  var tsuJosDesc=kbEntryFullTextCapped(KB['十二大従星']&&KB['十二大従星'][tsuJos]);
+  var nichiJosDesc=kbEntryFullTextCapped(KB['十二大従星']&&KB['十二大従星'][nichiJos]);
   // 命式（各柱）に宿る十二運気は、大運・年運とは異なる「性質として働く作用」の意味を持つため、
   // 専用KBセクション「各柱に宿る十二運気の作用」から、そこにある項目を全部読んで説明を取得する（時期の説明ではない）
   function pillarJuniDesc(term){
-    return kbEntryFullText(KB['各柱に宿る十二運気の作用']&&KB['各柱に宿る十二運気の作用'][term]);
+    return kbEntryFullTextCapped(KB['各柱に宿る十二運気の作用']&&KB['各柱に宿る十二運気の作用'][term]);
   }
   var nenJuDesc=pillarJuniDesc(getJuniUnki(G.ht,G.nenShi));
   var tsuJuDesc=pillarJuniDesc(getJuniUnki(G.ht,G.tsuShi));
