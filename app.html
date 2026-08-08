@@ -16,7 +16,7 @@
   --green:#1a6b3a;--red:#8b1a1a;
 }
 html{font-size:18px}
-html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;color:var(--ink)}
+html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;color:var(--ink);overflow-anchor:none}
 
 /* ===== SCREENS ===== */
 .screen{display:none}
@@ -5569,7 +5569,7 @@ function renderTimeline(ld){
     var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.7)':'1px solid rgba(184,134,11,0.18)';
 
     html+='<div style="border:'+borderStyle+';border-radius:10px;margin-bottom:0.5rem;overflow:hidden">';
-    html+='<div data-tl-year-header="'+y+'" onclick="toggleTimelineYear('+y+')" style="cursor:pointer;padding:0.7rem 0.8rem;background:'+(isCurrentYear?'rgba(184,134,11,0.08)':'var(--bg)')+';display:flex;align-items:center;gap:0.6rem">';
+    html+='<div data-tl-year-header="'+y+'" onclick="toggleTimelineYear('+y+')" style="cursor:pointer;padding:0.7rem 0.8rem;background:'+(isCurrentYear?'rgba(184,134,11,0.08)':'var(--bg)')+';display:flex;align-items:center;gap:0.6rem;scroll-margin-top:115px">';
     html+='<div style="min-width:3.4rem;flex-shrink:0"><div style="font-size:0.95rem;font-weight:800;color:'+(isCurrentYear?'var(--gold)':'var(--ink)')+'">'+y+(isCurrentYear?' ◀':'')+'</div><div style="font-size:0.64rem;color:var(--ink3)">'+ks+'　'+age+'歳</div></div>';
     html+='<div style="display:flex;gap:0.35rem;flex:1;flex-wrap:wrap">';
     html+='<span style="font-size:1rem;font-weight:700;color:'+daiunColor+';background:rgba(0,0,0,0.03);border-radius:8px;padding:5px 10px;white-space:nowrap">大運 '+label+' '+daiunJu+'</span>';
@@ -5591,24 +5591,17 @@ function renderTimeline(ld){
 
 // 年をタップした時の開閉（複数年を同時に開いておける）
 function toggleTimelineYear(year){
-  // 開閉した年の見出し行が、再描画の前後で画面上の同じ位置に留まるよう、
-  // 再描画前の画面上の位置を記録しておき、あとでスクロール位置を調整する
-  var headerEl=document.querySelector('[data-tl-year-header="'+year+'"]');
-  var beforeTop=headerEl?headerEl.getBoundingClientRect().top:null;
-
   if(!window._tlExpanded)window._tlExpanded={};
   window._tlExpanded[year]=!window._tlExpanded[year];
   redrawGoalsPage();
-
-  if(beforeTop!==null){
+  // 独自のピクセル計算による位置補正は実機でズレが大きく出たため、
+  // ブラウザ標準のscrollIntoView()でその年の見出し行を確実に画面内に戻す
+  requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       var newHeaderEl=document.querySelector('[data-tl-year-header="'+year+'"]');
-      if(newHeaderEl){
-        var afterTop=newHeaderEl.getBoundingClientRect().top;
-        window.scrollBy(0,afterTop-beforeTop);
-      }
+      if(newHeaderEl)newHeaderEl.scrollIntoView({block:'start',behavior:'instant'});
     });
-  }
+  });
 }
 
 // 年を開いた時の中身（大運/年運のAI解説・年間目標・月別目標）を組み立てる
