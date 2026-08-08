@@ -5597,7 +5597,8 @@ function toggleTimelineYear(year){
 }
 
 // 年を開いた時の中身（大運/年運のAI解説・年間目標・月別目標）を組み立てる
-function buildTimelineEditorHTML(year){
+function buildTimelineEditorHTML(year,isAccordion){
+  if(isAccordion===undefined)isAccordion=true;
   var tlData2=getTimelineData();
   var tdata=tlData2[year]||{goal:'',months:Array(12).fill('')};
   if(typeof tdata==='string')tdata={goal:tdata,months:Array(12).fill('')};
@@ -5689,6 +5690,9 @@ function buildTimelineEditorHTML(year){
   }
 
   html+='<button onclick="saveTimelineData('+year+')" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer;margin-top:0.6rem">保存</button>';
+  if(isAccordion){
+    html+='<button onclick="toggleTimelineYear('+year+')" style="width:100%;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.55rem;font-size:0.82rem;cursor:pointer;margin-top:0.5rem">▲ 閉じる</button>';
+  }
 
   return html;
 }
@@ -6237,7 +6241,7 @@ function editTimelineMemo(year){
 
   var html='<div style="background:var(--bg);border-radius:16px;max-width:500px;margin:0 auto;padding:1.2rem">';
   html+='<div style="font-size:1rem;font-weight:700;color:var(--gold);text-align:center;margin-bottom:0.8rem">'+year+'年の目標設定</div>';
-  html+=buildTimelineEditorHTML(year);
+  html+=buildTimelineEditorHTML(year,false);
   html+='<button onclick="closeTimelineModal()" style="width:100%;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.7rem;font-size:0.82rem;cursor:pointer;margin-top:0.6rem">閉じる</button>';
   html+='</div>';
 
