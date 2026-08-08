@@ -4992,8 +4992,8 @@ function buildGoalsPage(){
 // STEP見出し：番号バッジ＋帯で強調表示
 function renderStepHeader(num,title){
   var h='<div style="border-left:3px solid var(--gold);padding:0.15rem 0 0.15rem 0.9rem;margin-bottom:0.8rem">';
-  h+='<div style="font-size:0.68rem;color:var(--gold);letter-spacing:0.15em;font-weight:700">STEP '+num+'</div>';
-  h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">'+title+'</div>';
+  h+='<div style="font-size:0.82rem;color:var(--gold);letter-spacing:0.15em;font-weight:700">STEP '+num+'</div>';
+  h+='<div style="font-family:\'Zen Old Mincho\',serif;font-size:1.45rem;font-weight:700;color:var(--ink)">'+title+'</div>';
   h+='</div>';
   return h;
 }
@@ -5010,8 +5010,8 @@ function toggleBucketPreview(){
 function renderBucketSection(ld){
   var html='<div style="margin-bottom:1.8rem">';
   html+=renderStepHeader(2,'やりたいことリスト');
-  html+='<p style="font-size:0.86rem;color:var(--ink2);line-height:1.9;margin:0 0 0.5rem">あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！</p>';
-  html+='<div style="margin-bottom:1rem"><span style="display:inline-block;font-size:0.72rem;color:#8b4500;background:rgba(255,179,71,0.14);border-radius:6px;padding:0.2rem 0.6rem">行動タイプ：転職・結婚・引っ越しなど、動くタイミングがあるもの</span></div>';
+  html+='<p style="font-size:1.05rem;color:var(--ink2);line-height:1.9;margin:0 0 0.5rem">あなたが思いつくやりたいことを、思いつくままに書き出しましょう。実現したい時期を決めると、運気カレンダーに自動で組み込まれます。出来るだけ好運気を狙って実現に向けて動きましょう！</p>';
+  html+='<div style="margin-bottom:1rem"><span style="display:inline-block;font-size:0.88rem;color:#8b4500;background:rgba(255,179,71,0.14);border-radius:6px;padding:0.3rem 0.7rem">行動タイプ：転職・結婚・引っ越しなど、動くタイミングがあるもの</span></div>';
 
   html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">';
   html+='<div style="font-size:0.82rem;font-weight:700;color:var(--ink3)">リスト一覧</div>';
@@ -5067,8 +5067,8 @@ function renderBucketSection(ld){
 function renderGoalToolSection(ld){
   var html='<div style="margin-bottom:1.8rem">';
   html+=renderStepHeader(1,'あなたが今一番叶えたいこと');
-  html+='<p style="font-size:0.86rem;color:var(--ink2);line-height:1.9;margin:0 0 0.7rem;word-break:keep-all;overflow-wrap:break-word">質問に答えるだけで、必要な8つの要素と具体的な行動を自動で整理します。</p>';
-  html+='<div style="margin-bottom:1rem"><span style="display:inline-block;font-size:0.72rem;color:#1a5c1a;background:rgba(42,140,74,0.1);border-radius:6px;padding:0.2rem 0.6rem">習慣タイプ：普段から積み重ねる行い</span></div>';
+  html+='<p style="font-size:1.05rem;color:var(--ink2);line-height:1.9;margin:0 0 0.7rem;word-break:keep-all;overflow-wrap:break-word">質問に答えるだけで、必要な8つの要素と具体的な行動を自動で整理します。</p>';
+  html+='<div style="margin-bottom:1rem"><span style="display:inline-block;font-size:0.88rem;color:#1a5c1a;background:rgba(42,140,74,0.1);border-radius:6px;padding:0.3rem 0.7rem">習慣タイプ：普段から積み重ねる行い</span></div>';
   if(ld&&ld.step>=4){
     html+=renderGoalList(ld);
     html+='<button onclick="startLifeDesign()" style="margin-top:0.5rem;background:transparent;color:var(--ink3);border:1px solid rgba(184,134,11,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-size:0.75rem;cursor:pointer;width:100%">やり直す</button>';
@@ -5540,7 +5540,7 @@ function renderTimeline(ld){
   if(!G)return '';
   var html='<div id="ld-timeline-section" style="scroll-margin-top:115px;margin-bottom:1.2rem">';
   html+=renderStepHeader(3,'花人占術スケジューラー');
-  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.7rem 0.8rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--ink);line-height:1.8">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>年をタップすると、その場で大運×年運のAI解説と月ごとの目標入力が開きます。<br><span style="font-size:0.72rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
+  html+='<div style="background:rgba(184,134,11,0.06);border-radius:8px;padding:0.9rem 1rem;margin-bottom:0.8rem;font-size:1.05rem;color:var(--ink);line-height:1.9">あなたの運気を見ながら、やりたいことを実現するための計画を立てましょう。<br>年をタップすると、その場で大運×年運のAI解説と月ごとの目標入力が開きます。<br><span style="font-size:0.92rem;color:var(--ink3)">◎好運気は動く「アクセル」、×低運気は準備・見直しの「ブレーキ」、と捉えるのが基本です。</span></div>';
 
   var currentYear=new Date().getFullYear();
   var endYear=currentYear+15;
