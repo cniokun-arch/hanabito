@@ -2485,7 +2485,7 @@ function initDaiunChart(){
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#5aaa7a"></span>吉</span>'
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#cc8833"></span>注意</span>'
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#660000"></span>凶</span>'
-    +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(130,60,180,0.15);border:1px dashed rgba(110,40,160,0.4)"></span>転化天蛹</span>'
+    +'<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="display:flex;align-items:center;gap:3px;cursor:pointer;color:#7c3aed;font-weight:700;text-decoration:underline;text-decoration-style:dotted"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(130,60,180,0.15);border:1px dashed rgba(110,40,160,0.4)"></span>転化天蛹</span>'
     +'<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="display:flex;align-items:center;gap:3px;cursor:pointer;color:#8a5a00;font-weight:700;text-decoration:underline;text-decoration-style:dotted"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(200,90,20,0.18);border:1px dashed rgba(180,70,10,0.5)"></span>運命の谷</span>';
 }
 </script>
@@ -3477,7 +3477,7 @@ function buildMeishikiPage(){
 
   // タブ4: 大運グラフ
   html+='<div class="daiun-tab-pane" id="dtab-graph" role="tabpanel">';
-  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝転化天蛹。オレンジの帯＝<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="color:#8a5a00;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">運命の谷</span>＝チャンスと谷底が隣り合う要注意期間。</p>';
+  html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">転化天蛹</span>。オレンジの帯＝<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="color:#8a5a00;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">運命の谷</span>＝チャンスと谷底が隣り合う要注意期間。</p>';
   html+='<div class="chart-wrap-inner"><canvas id="daiunLifeChart"></canvas></div>';
   html+='<div id="daiun-legend" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;font-size:0.7rem;color:var(--ink3)"></div>';
   html+='</div>';
