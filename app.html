@@ -860,7 +860,7 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
   <!-- 予定追加オーバーレイ -->
   <div class="about-overlay-wrap" id="cal-add-overlay">
     <div style="background:linear-gradient(135deg,#1a0a3a,#7c3aed);padding:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1rem;letter-spacing:0.1em;margin:0">✦ 予定を追加</h2>
+      <h2 id="cal-add-title" style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1rem;letter-spacing:0.1em;margin:0">✦ 予定を追加</h2>
       <button onclick="calCloseAdd()" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
     </div>
     <div style="padding:1.2rem;overflow-y:auto">
@@ -879,6 +879,13 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
           style="width:100%;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.95rem;font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--ink);box-sizing:border-box">
       </div>
 
+      <!-- 開始時刻 -->
+      <div style="margin-bottom:0.8rem">
+        <div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.4rem;font-weight:700">開始時刻（任意）</div>
+        <input id="cal-input-time" type="time"
+          style="width:100%;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.95rem;font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--ink);box-sizing:border-box">
+      </div>
+
       <!-- メモ -->
       <div style="margin-bottom:1.2rem">
         <div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.4rem;font-weight:700">メモ（任意）</div>
@@ -886,10 +893,13 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
           style="width:100%;padding:0.6rem 0.8rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.9rem;font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--ink);box-sizing:border-box;resize:none;height:80px"></textarea>
       </div>
 
-      <button onclick="calSaveSchedule()"
-        style="width:100%;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:1rem;font-family:'Noto Serif JP',serif;cursor:pointer;font-weight:700">
-        保存する
-      </button>
+      <div style="display:flex;gap:0.6rem">
+        <button id="cal-delete-btn" onclick="calDeleteFromModal()" style="display:none;flex:1;background:transparent;color:#c04040;border:1px solid rgba(192,64,64,0.4);border-radius:10px;padding:0.8rem;font-size:0.92rem;font-family:'Noto Serif JP',serif;cursor:pointer">削除</button>
+        <button onclick="calSaveSchedule()"
+          style="flex:2;background:linear-gradient(135deg,#7c3aed,#b8860b);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:1rem;font-family:'Noto Serif JP',serif;cursor:pointer;font-weight:700">
+          保存する
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2661,7 +2671,11 @@ function buildHomePage(){
 // ===== 運気カレンダー =====
 var calYear=new Date().getFullYear();
 var calMonth=new Date().getMonth();
-var calSelectedDate=null; // 選択中の日付文字列 'YYYY-MM-DD'
+var calSelectedDate=calDateKeyForInit(); // 選択中の日付文字列 'YYYY-MM-DD'。初期値は今日（nullのままだと、日付マスを一度もタップしないまま予定を保存しようとした時に保存処理が無反応になるバグがあったため）
+function calDateKeyForInit(){
+  var t=new Date();
+  return (t.getFullYear())+'-'+((t.getMonth()+1)<10?'0':'')+(t.getMonth()+1)+'-'+(t.getDate()<10?'0':'')+t.getDate();
+}
 
 // カレンダーの予定データをlocalStorageで管理
 function calGetSchedules(){
@@ -2795,7 +2809,7 @@ function renderCalendar(){
   html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-family:\'Noto Serif JP\',serif;font-weight:700;flex-shrink:0;margin-top:0.2rem">＋ 追加</button>';
   html+='</div>';
   html+='</div>';
-  html+='<div style="padding-top:0.9rem">';
+  html+='<div style="padding-top:0.9rem;min-height:280px">';
 
   if(selScheds.length===0){
     html+='<div style="text-align:center;padding:1.8rem 0.5rem;color:var(--ink3)">'
@@ -2805,13 +2819,14 @@ function renderCalendar(){
       +'</div>';
   } else {
     selScheds.forEach(function(s,idx){
-      html+='<div style="display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.8rem;background:rgba(184,134,11,0.06);border-radius:10px;margin-bottom:0.6rem">'
-        +'<span style="font-size:1.35rem">'+(s.mark||'🌸')+'</span>'
+      html+='<div onclick="calOpenAdd('+idx+')" style="display:flex;align-items:center;gap:0.9rem;padding:1.4rem 1.1rem;background:rgba(184,134,11,0.06);border-radius:12px;margin-bottom:0.9rem;cursor:pointer;min-height:2.6rem">'
+        +'<span style="font-size:1.7rem">'+(s.mark||'🌸')+'</span>'
         +'<div style="flex:1">'
-        +'<div style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</div>'
+        +(s.time?'<span style="font-size:0.78rem;color:var(--gold);font-weight:700;margin-right:0.4rem">'+escHtml(s.time)+'</span>':'')
+        +'<span style="font-size:1.05rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||'')+'</span>'
         +(s.memo?'<div style="font-size:0.82rem;color:var(--ink2);margin-top:0.15rem">'+escHtml(s.memo)+'</div>':'')
         +'</div>'
-        +'<button onclick="calDeleteSchedule(\''+dispDate+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
+        +'<button onclick="event.stopPropagation();calDeleteSchedule(\''+dispDate+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
         +'</div>';
     });
   }
@@ -3032,7 +3047,7 @@ function updateCalSelectedArea(dk){
   html+='<button onclick="calOpenAdd()" style="background:var(--gold);color:#fff;border:none;border-radius:8px;padding:0.5rem 1.1rem;font-size:0.92rem;cursor:pointer;font-weight:700;flex-shrink:0;margin-top:0.2rem">＋ 追加</button>';
   html+='</div>';
   html+='</div>';
-  html+='<div style="padding-top:0.9rem">';
+  html+='<div style="padding-top:0.9rem;min-height:280px">';
   if(selScheds.length===0){
     html+='<div style="text-align:center;padding:1.8rem 0.5rem;color:var(--ink3)">'
       +'<div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.5">🌸</div>'
@@ -3041,13 +3056,14 @@ function updateCalSelectedArea(dk){
       +'</div>';
   } else {
     selScheds.forEach(function(s,idx){
-      html+='<div style="display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.8rem;background:rgba(184,134,11,0.06);border-radius:10px;margin-bottom:0.6rem">'
-        +'<span style="font-size:1.35rem">'+(s.mark||'🌸')+'</span>'
+      html+='<div onclick="calOpenAdd('+idx+')" style="display:flex;align-items:center;gap:0.9rem;padding:1.4rem 1.1rem;background:rgba(184,134,11,0.06);border-radius:12px;margin-bottom:0.9rem;cursor:pointer;min-height:2.6rem">'
+        +'<span style="font-size:1.7rem">'+(s.mark||'🌸')+'</span>'
         +'<div style="flex:1">'
-        +'<div style="font-size:0.95rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||s.text||'')+'</div>'
+        +(s.time?'<span style="font-size:0.78rem;color:var(--gold);font-weight:700;margin-right:0.4rem">'+escHtml(s.time)+'</span>':'')
+        +'<span style="font-size:1.05rem;font-weight:700;color:var(--ink)">'+escHtml(s.title||s.text||'')+'</span>'
         +(s.memo?'<div style="font-size:0.82rem;color:var(--ink2);margin-top:0.15rem">'+escHtml(s.memo)+'</div>':'')
         +'</div>'
-        +'<button onclick="calDeleteSchedule(\''+dk+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
+        +'<button onclick="event.stopPropagation();calDeleteSchedule(\''+dk+'\','+idx+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem">✕</button>'
         +'</div>';
     });
   }
@@ -3055,7 +3071,8 @@ function updateCalSelectedArea(dk){
   area.innerHTML=html;
 }
 
-function calOpenAdd(){
+var calEditIdx=-1;
+function calOpenAdd(idx){
   var now=new Date();
   var dk=calSelectedDate||calDateKey(now.getFullYear(),now.getMonth()+1,now.getDate());
   var parts=dk.split('-');
@@ -3063,7 +3080,30 @@ function calOpenAdd(){
   var selDow=['日','月','火','水','木','金','土'][new Date(sy,sm-1,sd).getDay()];
   var lbl=document.getElementById('cal-add-date-label');
   if(lbl) lbl.textContent=sy+'年'+sm+'月'+sd+'日（'+selDow+'）の予定';
-  calSelectedMark='🌸';
+
+  var titleEl=document.getElementById('cal-add-title');
+  var delBtn=document.getElementById('cal-delete-btn');
+  calEditIdx=(typeof idx==='number')?idx:-1;
+
+  if(calEditIdx>=0){
+    // 編集モード：既存データを読み込んでフォームに反映
+    var data=calGetSchedules();
+    var s=(data[dk]||[])[calEditIdx];
+    if(!s){calEditIdx=-1;}
+    if(titleEl)titleEl.textContent='✎ 予定を編集';
+    document.getElementById('cal-input-title').value=s?s.title||'':'';
+    document.getElementById('cal-input-memo').value=s?s.memo||'':'';
+    document.getElementById('cal-input-time').value=s?s.time||'':'';
+    calSelectedMark=s?(s.mark||'🌸'):'🌸';
+    if(delBtn)delBtn.style.display='block';
+  } else {
+    if(titleEl)titleEl.textContent='✦ 予定を追加';
+    document.getElementById('cal-input-title').value='';
+    document.getElementById('cal-input-memo').value='';
+    document.getElementById('cal-input-time').value='';
+    calSelectedMark='🌸';
+    if(delBtn)delBtn.style.display='none';
+  }
   renderCalMarkButtons();
   var overlay=document.getElementById('cal-add-overlay');
   if(overlay) overlay.classList.add('show');
@@ -3074,7 +3114,9 @@ function calCloseAdd(){
   if(overlay) overlay.classList.remove('show');
   document.getElementById('cal-input-title').value='';
   document.getElementById('cal-input-memo').value='';
+  document.getElementById('cal-input-time').value='';
   calSelectedMark='🌸';
+  calEditIdx=-1;
   renderCalMarkButtons();
 }
 
@@ -3096,16 +3138,27 @@ function calSelectMark(m){
 }
 
 function calSaveSchedule(){
-  if(!calSelectedDate)return;
+  if(!calSelectedDate)calSelectedDate=calDateKeyForInit(); // 保険：万一空でも今日の日付にフォールバックし、無反応で保存に失敗しないようにする
   var title=document.getElementById('cal-input-title').value.trim();
   if(!title){alert('タイトルを入力してください');return;}
   var memo=document.getElementById('cal-input-memo').value.trim();
+  var time=document.getElementById('cal-input-time').value;
   var data=calGetSchedules();
   if(!data[calSelectedDate]) data[calSelectedDate]=[];
-  data[calSelectedDate].push({mark:calSelectedMark,title:title,memo:memo});
+  if(calEditIdx>=0&&data[calSelectedDate][calEditIdx]){
+    data[calSelectedDate][calEditIdx]={mark:calSelectedMark,title:title,memo:memo,time:time};
+  } else {
+    data[calSelectedDate].push({mark:calSelectedMark,title:title,memo:memo,time:time});
+  }
   calSaveSchedules(data);
   calCloseAdd();
   renderCalendar();
+}
+
+function calDeleteFromModal(){
+  if(!calSelectedDate||calEditIdx<0)return;
+  calDeleteSchedule(calSelectedDate,calEditIdx);
+  calCloseAdd();
 }
 
 function calDeleteSchedule(dk,idx){
