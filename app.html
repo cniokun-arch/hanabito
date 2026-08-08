@@ -6416,7 +6416,7 @@ function showTermPopup(cat,term){
   var popup=document.createElement('div');
   popup.style.cssText='background:var(--bg);border:1px solid rgba(184,134,11,0.4);border-radius:14px;padding:1.3rem;max-width:340px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)';
   popup.innerHTML='<div style="font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:0.6rem">'+term+(reading?'（'+reading+'）':'')+'</div><div style="font-size:1.05rem;color:var(--ink);line-height:1.9">'+desc+'</div>'
-    +(showArticleLink?'<div onclick="document.getElementById(\'tani-tenka-article-overlay\').classList.add(\'show\')" style="margin-top:1rem;text-align:center;color:#8a5a00;font-weight:700;font-size:0.92rem;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">📖 読み物「運命の谷と転化天蛹」を読む →</div>':'')
+    +(showArticleLink?'<div onclick="this.parentNode.parentNode.remove();document.getElementById(\'tani-tenka-article-overlay\').classList.add(\'show\')" style="margin-top:1rem;text-align:center;color:#8a5a00;font-weight:700;font-size:0.92rem;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">📖 読み物「運命の谷と転化天蛹」を読む →</div>':'')
     +'<button onclick="this.parentNode.parentNode.remove()" style="margin-top:1rem;width:100%;padding:0.75rem;background:rgba(184,134,11,0.15);border:none;border-radius:8px;cursor:pointer;font-size:1rem">閉じる</button>';
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
