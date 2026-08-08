@@ -2052,7 +2052,11 @@ function startApp(data){
   var hn=document.getElementById('header-name');if(hn)hn.textContent=data.account.nickname;
   if(!data.settings||data.settings.petals!==false)startPetals();
   currentMemberIdx=0;
-  loadKB();
+  loadKB().then(function(){
+    // KBの読み込みが遅れて、読み等がフォールバック値のまま表示されてしまうことがあるため、
+    // まだホーム画面にいる場合は読み込み完了後に再描画して正しい内容に更新する
+    if(currentNav==='home')renderCurrentPage();
+  });
   renderMemberTabs();
   switchNav('home',document.querySelector('.nav-btn'));
   maybeShowAddMemberHint();
@@ -6282,7 +6286,7 @@ async function generateYearAdvice(year){
 // 専門用語の読み仮名（プロプライエタリな用語のため、確実な読みが必要な場合はKBの「読み」フィールドを優先し、なければこの対応表を使う）
 var TERM_READINGS={
   '休眠':'きゅうみん','残雪':'ざんせつ','芽吹':'めぶき','青葉':'あおば','結蕾':'けつらい','静容':'せいよう',
-  '天華':'てんか','零花':'れいか','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'へいなぎ','引寒':'いんかん',
+  '天華':'てんか','零花':'れいか','豊穣':'ほうじょう','穂分':'ほわけ','平凪':'ひらなぎ','引寒':'いんかん',
   '比肩':'ひけん','劫財':'ごうざい','食神':'しょくじん','傷官':'しょうかん','偏財':'へんざい',
   '正財':'せいざい','偏官':'へんかん','正官':'せいかん','偏印':'へんいん','正印':'せいいん',
   '転化天蛹':'てんかてんよう'
