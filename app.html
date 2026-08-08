@@ -2354,21 +2354,10 @@ function switchDaiunTab(name,btn){
 
 // 大運グラフ(Chart.js)初期化
 var _daiunChart=null;
-function initDaiunChart(){
-  var G=getCurrentTargetG();
-  if(!G||!G.A2D||!G.BLK)return;
-  var canvas=document.getElementById('daiunLifeChart');
-  if(!canvas)return;
-  if(_daiunChart){_daiunChart.destroy();_daiunChart=null;}
+// 大運グラフのデータ計算（今の命式ページのグラフと新しい大運プレビューで共有）
+function computeLifeWaveData(G){
   var ht=G.ht,sats=G.sats||[];
-  var CY=new Date().getFullYear();
-  var currAgeIdx=CY-G.y;
-  if(typeof Chart==='undefined')return;
-
-  // ★ 正しいlifeWave: 大運干支（A2D）から運気を計算（index.htmlと同じ）
   var lifeWaveRaw=G.A2D.map(function(dk){return JUNI_WAVE[getJuniUnki(ht,dk.shi)]||0;});
-
-  // 引寒・休眠・残雪を連続グループとしてなだらかな弧に補間（index.htmlと完全同一）
   var SOFT_JUNI={'引寒':true,'休眠':true,'残雪':true};
   var lifeWave=lifeWaveRaw.slice();
   var i=0;
@@ -2391,6 +2380,22 @@ function initDaiunChart(){
       i++;
     }
   }
+  return {lifeWave:lifeWave,lifeWaveRaw:lifeWaveRaw};
+}
+
+function initDaiunChart(){
+  var G=getCurrentTargetG();
+  if(!G||!G.A2D||!G.BLK)return;
+  var canvas=document.getElementById('daiunLifeChart');
+  if(!canvas)return;
+  if(_daiunChart){_daiunChart.destroy();_daiunChart=null;}
+  var ht=G.ht,sats=G.sats||[];
+  var CY=new Date().getFullYear();
+  var currAgeIdx=CY-G.y;
+  if(typeof Chart==='undefined')return;
+
+  // ★ lifeWave計算は共有関数へ切り出し済み（大運プレビューと共通）
+  var lifeWave=computeLifeWaveData(G).lifeWave;
 
   _daiunChart=new Chart(canvas.getContext('2d'),{
     type:'line',
@@ -2487,6 +2492,94 @@ function initDaiunChart(){
     +'<span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#660000"></span>凶</span>'
     +'<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="display:flex;align-items:center;gap:3px;cursor:pointer;color:#7c3aed;font-weight:700;text-decoration:underline;text-decoration-style:dotted"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(130,60,180,0.15);border:1px dashed rgba(110,40,160,0.4)"></span>転化天蛹</span>'
     +'<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="display:flex;align-items:center;gap:3px;cursor:pointer;color:#8a5a00;font-weight:700;text-decoration:underline;text-decoration-style:dotted"><span style="display:inline-block;width:10px;height:10px;border-radius:1px;background:rgba(200,90,20,0.18);border:1px dashed rgba(180,70,10,0.5)"></span>運命の谷</span>';
+}
+
+// ============================================================
+// 大運グラフ プレビュー（大きく・タップで詳細が見られる新しい表示。
+// データはcomputeLifeWaveData()を共有し、今の大運グラフには一切手を加えない）
+// ============================================================
+var _daiunFocusChart=null;
+function buildDaiunFocusOverlay(){
+  var G=getCurrentTargetG();
+  if(!G||!G.A2D)return;
+  if(typeof Chart==='undefined')return;
+
+  var old=document.getElementById('daiun-focus-overlay');
+  if(old)old.remove();
+
+  var overlay=document.createElement('div');
+  overlay.id='daiun-focus-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch';
+
+  var html='<div style="position:sticky;top:0;z-index:2;background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.2)">'
+    +'<h2 style="color:#fff;font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;margin:0;letter-spacing:0.05em">✦ 大運グラフ（プレビュー）</h2>'
+    +'<button onclick="closeDaiunFocusOverlay()" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:40px;height:40px;cursor:pointer">✕</button>'
+    +'</div>';
+
+  html+='<div style="padding:1.2rem">';
+  html+='<p style="font-size:0.9rem;color:var(--ink3);margin-bottom:1rem">グラフをタップすると、その年齢の詳しい内容が下に表示されます。試作段階のプレビューです。</p>';
+  html+='<div style="position:relative;width:100%;height:420px"><canvas id="daiunFocusCanvas"></canvas></div>';
+  html+='<div id="daiun-focus-detail" style="margin-top:1.2rem;background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.25);border-radius:12px;padding:1.1rem;min-height:110px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink3);font-size:0.9rem">グラフ上のどこかをタップしてみてください</div>';
+  html+='</div>';
+
+  overlay.innerHTML=html;
+  document.body.appendChild(overlay);
+
+  var data=computeLifeWaveData(G);
+  var lifeWave=data.lifeWave;
+  var ht=G.ht,sats=G.sats||[];
+  var canvas=document.getElementById('daiunFocusCanvas');
+  var CY=new Date().getFullYear();
+
+  _daiunFocusChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{
+      labels:Array.from({length:MAX_AGE},function(_,i){return i+'歳';}),
+      datasets:[{
+        data:lifeWave,borderWidth:3,pointRadius:0,pointHitRadius:14,
+        fill:{target:'origin',above:'rgba(42,140,74,0.14)',below:'rgba(136,34,34,0.12)'},
+        tension:0.4,
+        segment:{borderColor:function(ctx){return getWaveColor((lifeWave[ctx.p0DataIndex]+lifeWave[ctx.p1DataIndex])/2);}}
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      onClick:function(evt,elements,chart){
+        var points=chart.getElementsAtEventForMode(evt,'index',{intersect:false},true);
+        if(!points.length)return;
+        var idx=points[0].index;
+        var dk=G.A2D[idx];
+        var dj=getJuniUnki(ht,dk.shi);
+        var isSk=sats.indexOf(dk.shi)>=0;
+        var w=lifeWave[idx];
+        var box=document.getElementById('daiun-focus-detail');
+        if(box){
+          box.style.display='block';
+          box.style.textAlign='left';
+          box.innerHTML='<div style="font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:0.4rem">'+idx+'歳（'+(G.y+idx)+'年）</div>'
+            +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>';
+        }
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:function(i){return i[0].label+'（'+(G.y+i[0].dataIndex)+'年）';},
+          label:function(i){var dk=G.A2D[i.dataIndex];var dj=getJuniUnki(ht,dk.shi);return['大運：'+dk.ks,'運気：'+dj+(sats.indexOf(dk.shi)>=0?' ⚠':''),'波：'+(i.raw>0?'+':'')+i.raw.toFixed(1)];}
+        }}
+      },
+      scales:{
+        x:{ticks:{font:{size:11},maxRotation:0,autoSkip:true,maxTicksLimit:16,color:'#7a6b52'},grid:{display:false}},
+        y:{min:-5,max:6,ticks:{font:{size:11},color:'#7a6b52',callback:function(v){return v>0?'+'+v:v;}},grid:{color:'rgba(0,0,0,0.04)'},border:{dash:[2,2]}}
+      }
+    }
+  });
+}
+
+function closeDaiunFocusOverlay(){
+  if(_daiunFocusChart){_daiunFocusChart.destroy();_daiunFocusChart=null;}
+  var overlay=document.getElementById('daiun-focus-overlay');
+  if(overlay)overlay.remove();
 }
 </script>
 <script>
@@ -3480,6 +3573,7 @@ function buildMeishikiPage(){
   html+='<p style="font-size:1rem;color:var(--ink3);margin-bottom:0.5rem">120年分の運気の流れ。グラフが上ほど好調、下ほど注意が必要な時期。紫の帯＝<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">転化天蛹</span>。オレンジの帯＝<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="color:#8a5a00;font-weight:700;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">運命の谷</span>＝チャンスと谷底が隣り合う要注意期間。</p>';
   html+='<div class="chart-wrap-inner"><canvas id="daiunLifeChart"></canvas></div>';
   html+='<div id="daiun-legend" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;font-size:0.7rem;color:var(--ink3)"></div>';
+  html+='<button onclick="buildDaiunFocusOverlay()" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:\'Noto Serif JP\',serif">🔍 新しい大運グラフを試す（プレビュー）</button>';
   html+='</div>';
 
   html+='</div>';// card終わり
