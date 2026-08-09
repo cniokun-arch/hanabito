@@ -2477,8 +2477,10 @@ function initDaiunChart(){
         ctx.fillStyle='rgba(130,60,180,0.10)';ctx.fillRect(x1,ca.top,x2-x1,ca.bottom-ca.top);
         ctx.strokeStyle='rgba(110,40,160,0.35)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
         ctx.strokeRect(x1,ca.top,x2-x1,ca.bottom-ca.top);ctx.setLineDash([]);
-        ctx.font='7px sans-serif';ctx.fillStyle='rgba(100,40,150,0.7)';ctx.textAlign='center';
-        ctx.fillText('転化天蛹',(x1+x2)/2,ca.top+10);
+        var chartH1=ca.bottom-ca.top;
+        var labelFontSize1=Math.max(9,Math.min(15,Math.round(chartH1*0.05)));
+        ctx.font='bold '+labelFontSize1+'px sans-serif';ctx.fillStyle='rgba(90,30,140,0.9)';ctx.textAlign='center';
+        ctx.fillText('転化天蛹',(x1+x2)/2,ca.top+labelFontSize1+4);
         i=j;
       }
       // 運命の谷（静容→天華→零花 の3期間セット。順行/逆行どちらの向きでも検出）
@@ -2500,8 +2502,10 @@ function initDaiunChart(){
           ctx.fillStyle='rgba(200,90,20,0.12)';ctx.fillRect(vx1,ca.top,vx2-vx1,ca.bottom-ca.top);
           ctx.strokeStyle='rgba(180,70,10,0.45)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
           ctx.strokeRect(vx1,ca.top,vx2-vx1,ca.bottom-ca.top);ctx.setLineDash([]);
-          ctx.font='7px sans-serif';ctx.fillStyle='rgba(160,60,10,0.8)';ctx.textAlign='center';
-          ctx.fillText('運命の谷',(vx1+vx2)/2,ca.bottom-16);
+          var chartH2=ca.bottom-ca.top;
+          var labelFontSize2=Math.max(9,Math.min(15,Math.round(chartH2*0.05)));
+          ctx.font='bold '+labelFontSize2+'px sans-serif';ctx.fillStyle='rgba(150,50,10,0.95)';ctx.textAlign='center';
+          ctx.fillText('運命の谷',(vx1+vx2)/2,ca.bottom-labelFontSize2+2);
         }
       }
       // 現在地マーカー
