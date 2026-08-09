@@ -1661,6 +1661,43 @@ function kbEntryFullTextCapped(entry){
   return full.length>250?full.slice(0,250)+'…':full;
 }
 
+// 十二運気→四季のマッピング（ホーム画面の「12運気について」の分類と同一）
+// 夏（静容・天華・零花）＝運命の谷、という対応になっている
+var JUNI_SEASON={'芽吹':'春','青葉':'春','結蕾':'春','静容':'夏','天華':'夏','零花':'夏','豊穣':'秋','穂分':'秋','平凪':'秋','引寒':'冬','休眠':'冬','残雪':'冬'};
+var SEASON_ICON={'春':'🌸','夏':'☀️','秋':'🍂','冬':'❄️'};
+var SEASON_COLOR={'春':'#2a7a3a','夏':'#c04040','秋':'#b8860b','冬':'#4a3c28'};
+
+// 指定した年齢（G.A2Dのインデックス）が、今「人生のどの季節・局面」にいるかの解説文を組み立てる
+function buildLifeSeasonMessage(G,age){
+  var ht=G.ht,sats=G.sats||[];
+  var dk=G.A2D[age];
+  if(!dk)return null;
+  var ju=getJuniUnki(ht,dk.shi);
+  var season=JUNI_SEASON[ju]||'';
+  var isSk=sats.indexOf(dk.shi)>=0;
+
+  var msg='';
+  if(ju==='静容'){
+    msg='運命の谷の入口。慎重な行動を心がける時。ここを乗り越えれば、間もなく人生最大級のチャンス「天華」が訪れます。';
+  } else if(ju==='天華'){
+    msg='運命の谷のただ中、人生最大級のチャンスの時。この機会を逃さず、動くべき時です。';
+  } else if(ju==='零花'){
+    msg='運命の谷の終盤、試練の時期。抜けるまであと少し、油断せず乗り越えましょう。';
+  } else if(season==='春'){
+    msg='人生の春の季節。もうすぐ運命の谷（夏）がやってきます。今のうちに準備をしておきましょう。';
+  } else if(season==='秋'){
+    msg='運命の谷（夏）を抜け、実りの秋の季節。落ち着いて、これまでの成果を形にしていく時です。';
+  } else if(season==='冬'){
+    msg='人生の冬の季節。次の春に向けて、じっくり充電する時です。';
+  }
+
+  if(isSk){
+    msg='人生の転換期「転化天蛹」の真っ只中。'+msg;
+  }
+
+  return {season:season,term:ju,message:msg,icon:SEASON_ICON[season]||'',color:SEASON_COLOR[season]||'var(--ink)',isSk:isSk};
+}
+
 // 魂のコア（人格核）：日干（核）×六花人の対応支2つ（外面・内面）から十二大従星を導く
 function getTamashiiNoCore(G){
   if(!G||!G.ht||G.nichiKanIdx===undefined||!G.sats||G.sats.length<2)return null;
@@ -2517,6 +2554,16 @@ function buildDaiunFocusOverlay(){
     +'</div>';
 
   html+='<div style="padding:1.2rem">';
+  var CYnow=new Date().getFullYear();
+  var currentAgeNow=CYnow-G.y;
+  var nowInfo=buildLifeSeasonMessage(G,Math.max(0,Math.min(currentAgeNow,MAX_AGE-1)));
+  if(nowInfo){
+    html+='<div id="daiun-season-banner" style="background:linear-gradient(135deg,rgba(184,134,11,0.08),rgba(124,58,237,0.06));border:2px solid '+nowInfo.color+';border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.1rem">'
+      +'<div style="font-size:0.78rem;color:var(--ink3);font-weight:700;margin-bottom:0.3rem">今のあなた（'+currentAgeNow+'歳）</div>'
+      +'<div style="font-size:1.15rem;font-weight:800;color:'+nowInfo.color+';margin-bottom:0.4rem">'+nowInfo.icon+' 人生の'+nowInfo.season+'の季節</div>'
+      +'<div style="font-size:0.92rem;color:var(--ink);line-height:1.8">'+nowInfo.message+'</div>'
+      +'</div>';
+  }
   html+='<p style="font-size:0.9rem;color:var(--ink3);margin-bottom:1rem">グラフをタップすると、その年齢の詳しい内容が下に表示されます。試作段階のプレビューです。</p>';
   html+='<div style="position:relative;width:100%;height:420px"><canvas id="daiunFocusCanvas"></canvas></div>';
   html+='<div id="daiun-focus-detail" style="margin-top:1.2rem;background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.25);border-radius:12px;padding:1.1rem;min-height:110px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink3);font-size:0.9rem">グラフ上のどこかをタップしてみてください</div>';
@@ -2536,12 +2583,14 @@ function buildDaiunFocusOverlay(){
     var dj=getJuniUnki(ht,dk.shi);
     var isSk=sats.indexOf(dk.shi)>=0;
     var w=lifeWave[idx];
+    var seasonInfo=buildLifeSeasonMessage(G,idx);
     var box=document.getElementById('daiun-focus-detail');
     if(box){
       box.style.display='block';
       box.style.textAlign='left';
       box.innerHTML='<div style="font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:0.4rem">'+idx+'歳（'+(G.y+idx)+'年）</div>'
-        +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>';
+        +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>'
+        +(seasonInfo?'<div style="margin-top:0.7rem;padding-top:0.7rem;border-top:1px dashed rgba(184,134,11,0.3);font-size:0.88rem;color:'+seasonInfo.color+';font-weight:700">'+seasonInfo.icon+' この年齢は「人生の'+seasonInfo.season+'」</div>':'');
     }
   }
 
