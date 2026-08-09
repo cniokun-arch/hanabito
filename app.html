@@ -2531,6 +2531,20 @@ function buildDaiunFocusOverlay(){
   var canvas=document.getElementById('daiunFocusCanvas');
   var CY=new Date().getFullYear();
 
+  function updateDaiunFocusDetail(idx){
+    var dk=G.A2D[idx];
+    var dj=getJuniUnki(ht,dk.shi);
+    var isSk=sats.indexOf(dk.shi)>=0;
+    var w=lifeWave[idx];
+    var box=document.getElementById('daiun-focus-detail');
+    if(box){
+      box.style.display='block';
+      box.style.textAlign='left';
+      box.innerHTML='<div style="font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:0.4rem">'+idx+'歳（'+(G.y+idx)+'年）</div>'
+        +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>';
+    }
+  }
+
   _daiunFocusChart=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{
@@ -2548,18 +2562,7 @@ function buildDaiunFocusOverlay(){
       onClick:function(evt,elements,chart){
         var points=chart.getElementsAtEventForMode(evt,'index',{intersect:false},true);
         if(!points.length)return;
-        var idx=points[0].index;
-        var dk=G.A2D[idx];
-        var dj=getJuniUnki(ht,dk.shi);
-        var isSk=sats.indexOf(dk.shi)>=0;
-        var w=lifeWave[idx];
-        var box=document.getElementById('daiun-focus-detail');
-        if(box){
-          box.style.display='block';
-          box.style.textAlign='left';
-          box.innerHTML='<div style="font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:0.4rem">'+idx+'歳（'+(G.y+idx)+'年）</div>'
-            +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>';
-        }
+        updateDaiunFocusDetail(points[0].index);
       },
       plugins:{
         legend:{display:false},
@@ -2572,6 +2575,27 @@ function buildDaiunFocusOverlay(){
         x:{ticks:{font:{size:11},maxRotation:0,autoSkip:true,maxTicksLimit:16,color:'#7a6b52'},grid:{display:false}},
         y:{min:-5,max:6,ticks:{font:{size:11},color:'#7a6b52',callback:function(v){return v>0?'+'+v:v;}},grid:{color:'rgba(0,0,0,0.04)'},border:{dash:[2,2]}}
       }
+    }
+  });
+
+  // ドラッグして指を動かしている間もリアルタイムに追従し、離した瞬間の位置でも
+  // 確実に詳細が表示されるようにする（onClickだけだとドラッグ後は反応しないため）
+  var isDraggingChart=false;
+  function handleChartPointer(evt){
+    if(!_daiunFocusChart)return;
+    var points=_daiunFocusChart.getElementsAtEventForMode(evt,'index',{intersect:false},true);
+    if(points.length)updateDaiunFocusDetail(points[0].index);
+  }
+  canvas.addEventListener('mousedown',function(evt){isDraggingChart=true;handleChartPointer(evt);});
+  canvas.addEventListener('mousemove',function(evt){if(isDraggingChart)handleChartPointer(evt);});
+  canvas.addEventListener('touchstart',function(evt){isDraggingChart=true;handleChartPointer(evt.touches[0]);},{passive:true});
+  canvas.addEventListener('touchmove',function(evt){if(isDraggingChart)handleChartPointer(evt.touches[0]);},{passive:true});
+  window.addEventListener('mouseup',function(evt){if(isDraggingChart){isDraggingChart=false;handleChartPointer(evt);}});
+  window.addEventListener('touchend',function(evt){
+    if(isDraggingChart){
+      isDraggingChart=false;
+      // touchendはtouches配列が空になるため、離れる直前の位置が入っているchangedTouchesを使う
+      if(evt.changedTouches&&evt.changedTouches[0])handleChartPointer(evt.changedTouches[0]);
     }
   });
 }
