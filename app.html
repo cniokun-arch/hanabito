@@ -2420,6 +2420,35 @@ function computeLifeWaveData(G){
   return {lifeWave:lifeWave,lifeWaveRaw:lifeWaveRaw};
 }
 
+// 運命の谷（静容→天華→零花 の3期間セット。順行/逆行どちらの向きでも検出）の
+// 年齢インデックス範囲を求める。グラフ描画とタップ詳細の両方で共有する
+function computeValleyRanges(G){
+  var ht=G.ht,n=G.A2D.length;
+  var vGroups=[];
+  var vgi=0;
+  while(vgi<n){
+    var vgj=vgi;
+    var curJu=getJuniUnki(ht,G.A2D[vgi].shi);
+    while(vgj+1<n&&getJuniUnki(ht,G.A2D[vgj+1].shi)===curJu)vgj++;
+    vGroups.push({start:vgi,end:vgj,ju:curJu});
+    vgi=vgj+1;
+  }
+  var ranges=[];
+  for(var vgk=0;vgk+2<vGroups.length;vgk++){
+    var vA=vGroups[vgk].ju,vB=vGroups[vgk+1].ju,vC=vGroups[vgk+2].ju;
+    if(vB==='天華'&&((vA==='静容'&&vC==='零花')||(vA==='零花'&&vC==='静容'))){
+      ranges.push({start:vGroups[vgk].start,end:vGroups[vgk+2].end});
+    }
+  }
+  return ranges;
+}
+function isAgeInValley(valleyRanges,age){
+  for(var i=0;i<valleyRanges.length;i++){
+    if(age>=valleyRanges[i].start&&age<=valleyRanges[i].end)return true;
+  }
+  return false;
+}
+
 function initDaiunChart(){
   var G=getCurrentTargetG();
   if(!G||!G.A2D||!G.BLK)return;
@@ -2468,6 +2497,7 @@ function initDaiunChart(){
     afterDraw:function(chart){
       var ctx=chart.ctx,ca=chart.chartArea,x=chart.scales.x,ysc=chart.scales.y,n=lifeWave.length;
       ctx.save();
+      chart._daiunLabelRegions=[]; // このチャート専用：ラベルのタップ判定範囲を記録
       // 転化天蛹帯（大運の支が対象支の期間）
       var satsSet={};sats.forEach(function(s){satsSet[s]=true;});
       for(var i=0;i<n;){
@@ -2480,7 +2510,9 @@ function initDaiunChart(){
         var chartH1=ca.bottom-ca.top;
         var labelFontSize1=Math.max(9,Math.min(15,Math.round(chartH1*0.05)));
         ctx.font='bold '+labelFontSize1+'px sans-serif';ctx.fillStyle='rgba(90,30,140,0.9)';ctx.textAlign='center';
-        ctx.fillText('転化天蛹',(x1+x2)/2,ca.top+labelFontSize1+4);
+        var tpLabelY=ca.top+labelFontSize1+4;
+        ctx.fillText('転化天蛹',(x1+x2)/2,tpLabelY);
+        chart._daiunLabelRegions.push({x1:(x1+x2)/2-40,x2:(x1+x2)/2+40,y1:tpLabelY-labelFontSize1-4,y2:tpLabelY+4,type:'転化天蛹'});
         i=j;
       }
       // 運命の谷（静容→天華→零花 の3期間セット。順行/逆行どちらの向きでも検出）
@@ -2505,7 +2537,9 @@ function initDaiunChart(){
           var chartH2=ca.bottom-ca.top;
           var labelFontSize2=Math.max(9,Math.min(15,Math.round(chartH2*0.05)));
           ctx.font='bold '+labelFontSize2+'px sans-serif';ctx.fillStyle='rgba(150,50,10,0.95)';ctx.textAlign='center';
-          ctx.fillText('運命の谷',(vx1+vx2)/2,ca.bottom-labelFontSize2+2);
+          var vlLabelY=ca.bottom-labelFontSize2+2;
+          ctx.fillText('運命の谷',(vx1+vx2)/2,vlLabelY);
+          chart._daiunLabelRegions.push({x1:(vx1+vx2)/2-40,x2:(vx1+vx2)/2+40,y1:vlLabelY-labelFontSize2-4,y2:vlLabelY+4,type:'special_運命の谷'});
         }
       }
       // 現在地マーカー
@@ -2579,6 +2613,7 @@ function buildDaiunFocusOverlay(){
   var data=computeLifeWaveData(G);
   var lifeWave=data.lifeWave;
   var ht=G.ht,sats=G.sats||[];
+  var valleyRanges=computeValleyRanges(G);
   var canvas=document.getElementById('daiunFocusCanvas');
   var CY=new Date().getFullYear();
 
@@ -2586,6 +2621,7 @@ function buildDaiunFocusOverlay(){
     var dk=G.A2D[idx];
     var dj=getJuniUnki(ht,dk.shi);
     var isSk=sats.indexOf(dk.shi)>=0;
+    var isValley=isAgeInValley(valleyRanges,idx);
     var w=lifeWave[idx];
     var seasonInfo=buildLifeSeasonMessage(G,idx);
     var box=document.getElementById('daiun-focus-detail');
@@ -2593,7 +2629,7 @@ function buildDaiunFocusOverlay(){
       box.style.display='block';
       box.style.textAlign='left';
       box.innerHTML='<div style="font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:0.4rem">'+idx+'歳（'+(G.y+idx)+'年）</div>'
-        +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>'
+        +'<div style="font-size:1rem;color:var(--ink);line-height:1.9">大運：'+dk.ks+'<br>十二運気：<span onclick="showTermPopup(\'十二運気\',\''+dj+'\')" style="color:'+getJuniColor(dj)+';font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">'+dj+'</span>'+(isSk?'　<span onclick="showTermPopup(\'転化天蛹\',\'転化天蛹\')" style="color:#7c3aed;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【転化天蛹】</span>':'')+(isValley?'　<span onclick="showTermPopup(\'special\',\'運命の谷\')" style="color:#8a5a00;font-weight:700;cursor:pointer;border-bottom:2px dotted currentColor">【運命の谷】</span>':'')+'<br>運気の強さ：'+(w>0?'+':'')+w.toFixed(1)+'</div>'
         +(seasonInfo?'<div style="margin-top:0.7rem;padding-top:0.7rem;border-top:1px dashed rgba(184,134,11,0.3);font-size:0.88rem;color:'+seasonInfo.color+';font-weight:700">'+seasonInfo.icon+' この年齢は「人生の'+seasonInfo.season+'」</div>':'');
     }
   }
@@ -2639,9 +2675,26 @@ function buildDaiunFocusOverlay(){
     var points=_daiunFocusChart.getElementsAtEventForMode(evt,'index',{intersect:false},true);
     if(points.length)updateDaiunFocusDetail(points[0].index);
   }
-  canvas.addEventListener('mousedown',function(evt){isDraggingChart=true;handleChartPointer(evt);});
+  // タップ位置が「転化天蛹」「運命の谷」のラベル文字の上かどうかを判定し、
+  // 当たっていればその場で説明ポップアップを開く（グラフの文字自体をタップできるようにする）
+  function checkLabelTap(evt){
+    if(!_daiunFocusChart||!_daiunFocusChart._daiunLabelRegions)return false;
+    var rect=canvas.getBoundingClientRect();
+    var px=evt.clientX-rect.left,py=evt.clientY-rect.top;
+    var regions=_daiunFocusChart._daiunLabelRegions;
+    for(var i=0;i<regions.length;i++){
+      var r=regions[i];
+      if(px>=r.x1&&px<=r.x2&&py>=r.y1&&py<=r.y2){
+        if(r.type==='転化天蛹')showTermPopup('転化天蛹','転化天蛹');
+        else showTermPopup('special','運命の谷');
+        return true;
+      }
+    }
+    return false;
+  }
+  canvas.addEventListener('mousedown',function(evt){if(checkLabelTap(evt))return;isDraggingChart=true;handleChartPointer(evt);});
   canvas.addEventListener('mousemove',function(evt){if(isDraggingChart)handleChartPointer(evt);});
-  canvas.addEventListener('touchstart',function(evt){isDraggingChart=true;handleChartPointer(evt.touches[0]);},{passive:true});
+  canvas.addEventListener('touchstart',function(evt){if(checkLabelTap(evt.touches[0]))return;isDraggingChart=true;handleChartPointer(evt.touches[0]);},{passive:true});
   canvas.addEventListener('touchmove',function(evt){if(isDraggingChart)handleChartPointer(evt.touches[0]);},{passive:true});
   window.addEventListener('mouseup',function(evt){if(isDraggingChart){isDraggingChart=false;handleChartPointer(evt);}});
   window.addEventListener('touchend',function(evt){
