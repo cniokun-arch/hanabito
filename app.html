@@ -3008,6 +3008,8 @@ function renderCalendar(){
   html+='<div data-cal-mon-label style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">🌱 '+(calMonth+1)+'月の目標</div>';
   html+='<div data-cal-mon-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
   html+='</div>';
+  html+='<button onclick="openSchedulerWindowOverlay()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:\'Noto Serif JP\',serif;margin-bottom:0.4rem">🌸 花人占術スケジューラーを起動</button>';
+  html+='<div style="text-align:center;margin-bottom:0.9rem"><span onclick="showGoalsAboutOverlay()" style="font-size:0.82rem;color:#8a5a00;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">花人占術スケジューラーとは？</span></div>';
   // 曜日ヘッダー（色帯・スワイプ機構の外に固定表示）
   html+='<div style="margin:0 -1rem;background:linear-gradient(180deg,rgba(184,134,11,0.16),rgba(184,134,11,0.06));border-top:2px solid rgba(184,134,11,0.35);border-bottom:2px solid rgba(184,134,11,0.35);padding:0.5rem 1rem;display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
   ['日','月','火','水','木','金','土'].forEach(function(d,i){
@@ -5767,8 +5769,38 @@ function closeInlineModal(){
 }
 
 function redrawGoalsPage(){
+  // ホーム画面から開いたスケジューラーのウインドウが表示中なら、そちらを再描画する。
+  // ここでcontent-areaを書き換えてしまうと、裏でホーム画面の中身が目標設定ページに
+  // 置き換わってしまう（ウインドウを閉じるまで気づかれない）バグになるため
+  var swBody=document.getElementById('scheduler-window-body');
+  if(swBody){
+    swBody.innerHTML=renderTimeline(getLifeDesignData());
+    return;
+  }
   var ca=document.getElementById('content-area');
   if(ca)ca.innerHTML=buildGoalsPage();
+}
+
+// ホーム画面から「花人占術スケジューラー」を独立ウインドウとして開く。
+// 目標設定タブのSTEP3（renderTimeline）とまったく同じデータ・仕組みを共有する
+function openSchedulerWindowOverlay(){
+  var old=document.getElementById('scheduler-window-overlay');
+  if(old)old.remove();
+  var overlay=document.createElement('div');
+  overlay.id='scheduler-window-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch';
+  var html='<div style="position:sticky;top:0;z-index:2;background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.2)">'
+    +'<h2 style="color:#fff;font-family:\'Zen Old Mincho\',serif;font-size:1.05rem;margin:0;letter-spacing:0.05em">🌸 花人占術スケジューラー</h2>'
+    +'<button onclick="closeSchedulerWindowOverlay()" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.3rem;border-radius:50%;width:40px;height:40px;cursor:pointer">✕</button>'
+    +'</div>';
+  html+='<div id="scheduler-window-body" style="padding:1.2rem"></div>';
+  overlay.innerHTML=html;
+  document.body.appendChild(overlay);
+  document.getElementById('scheduler-window-body').innerHTML=renderTimeline(getLifeDesignData());
+}
+function closeSchedulerWindowOverlay(){
+  var overlay=document.getElementById('scheduler-window-overlay');
+  if(overlay)overlay.remove();
 }
 
 function renderTimeline(ld){
