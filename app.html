@@ -3094,7 +3094,7 @@ function renderCalendar(){
   html+='</div>';
 
   body.innerHTML=html;
-  setTimeout(initCalSwipe,50);
+  initCalSwipe();
 }
 
 function buildCalGridHTML(G,py,pm,schedules,today){
@@ -5575,6 +5575,7 @@ function buildBucketItems(buckets){
     html+='<div style="background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:0.8rem;margin-bottom:0.7rem'+(b.done?';opacity:0.6':'')+'">';
     html+='<div style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.6rem">';
     html+='<label style="display:flex;align-items:center;flex-shrink:0;cursor:pointer;padding-top:0.3rem"><input type="checkbox" id="bucket-done-'+bi+'" '+(b.done?'checked':'')+' onchange="toggleBucketDoneLive('+bi+')" style="width:1.2rem;height:1.2rem;cursor:pointer"></label>';
+    html+='<span id="bucket-donebadge-'+bi+'" style="font-size:0.66rem;font-weight:800;color:#fff;background:#2a8c4a;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0;align-self:center;display:'+(b.done?'inline-block':'none')+'">✓ 達成</span>';
     html+='<div style="font-size:1.3rem;line-height:1.4;flex-shrink:0">'+num+'</div>';
     html+='<textarea id="bucket-text-'+bi+'" maxlength="60" placeholder="例：世界一周旅行をする" style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.9rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit;font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">'+(b.text||'')+'</textarea>';
     html+='<button onclick=\"removeBucketItem('+bi+')\" style=\"background:rgba(184,50,50,0.08);border:1px solid rgba(184,50,50,0.2);border-radius:6px;font-size:0.9rem;color:rgba(184,50,50,0.7);cursor:pointer;flex-shrink:0;padding:0.3rem 0.5rem\">×</button>';
@@ -5613,10 +5614,12 @@ function buildBucketItems(buckets){
 function toggleBucketDoneLive(idx){
   var del=document.getElementById('bucket-done-'+idx);
   var tel=document.getElementById('bucket-text-'+idx);
+  var badge=document.getElementById('bucket-donebadge-'+idx);
   if(!del||!tel)return;
   var wrap=tel.closest('div').parentNode;
   if(wrap)wrap.style.opacity=del.checked?'0.6':'1';
   tel.style.textDecoration=del.checked?'line-through':'none';
+  if(badge)badge.style.display=del.checked?'inline-block':'none';
 }
 
 function addNewBucketItem(){
@@ -5669,7 +5672,12 @@ function toggleBucketItemDone(idx){
   // 今表示されている画面だけを更新する。無条件でredrawGoalsPage()を呼ぶと、
   // ホーム画面にいる時でもcontent-areaが目標設定ページに書き換わり、
   // 見た目上ホームから勝手にタブが移動したように見えるバグになるため
-  if(currentNav==='home')renderCalendar();
+  // ホーム画面では、カレンダー全体を作り直すとスライダーが再初期化されて
+  // 一瞬前月が見えてしまうため、「今月のやりたいこと」欄だけをピンポイントで更新する
+  if(currentNav==='home'){
+    var bucketSecEl=document.getElementById('cal-bucket-section');
+    if(bucketSecEl)bucketSecEl.innerHTML=buildBucketItemsForMonthHTML(calYear,calMonth+1);
+  }
   if(currentNav==='goals'||document.getElementById('scheduler-window-body'))redrawGoalsPage();
 }
 
@@ -5684,6 +5692,7 @@ function buildBucketItemsForMonthHTML(year,month){
     html+='<label style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;cursor:pointer">'
       +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1.15rem;height:1.15rem;flex-shrink:0;cursor:pointer">'
       +'<span style="font-size:0.95rem;color:'+(b.done?'var(--ink3)':'var(--ink)')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">'+escHtml(b.text)+(b.age?'（'+escHtml(b.age)+'歳までに）':'')+'</span>'
+      +(b.done?'<span style="font-size:0.72rem;font-weight:800;color:#fff;background:#2a8c4a;border-radius:5px;padding:0.1rem 0.45rem;flex-shrink:0;text-decoration:none">✓ 達成</span>':'')
       +'</label>';
   });
   html+='</div>';
@@ -6045,6 +6054,7 @@ function buildTimelineEditorHTML(year,isAccordion){
         html+='<label style="display:flex;align-items:center;gap:0.4rem;padding:0.15rem 0;cursor:pointer">'
           +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1rem;height:1rem;flex-shrink:0;cursor:pointer">'
           +'<span style="font-size:0.76rem;color:'+(b.done?'var(--ink3)':'#1a6b3a')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">🌱 '+escHtml(b.text)+'</span>'
+          +(b.done?'<span style="font-size:0.66rem;font-weight:800;color:#fff;background:#2a8c4a;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0;text-decoration:none">✓ 達成</span>':'')
           +'</label>';
       });
       html+='</div>';
