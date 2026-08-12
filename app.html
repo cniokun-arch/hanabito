@@ -5666,8 +5666,11 @@ function toggleBucketItemDone(idx){
   if(!ld||!ld.buckets||!ld.buckets[idx])return;
   ld.buckets[idx].done=!ld.buckets[idx].done;
   saveLifeDesignData(ld);
-  renderCalendar();
-  redrawGoalsPage();
+  // 今表示されている画面だけを更新する。無条件でredrawGoalsPage()を呼ぶと、
+  // ホーム画面にいる時でもcontent-areaが目標設定ページに書き換わり、
+  // 見た目上ホームから勝手にタブが移動したように見えるバグになるため
+  if(currentNav==='home')renderCalendar();
+  if(currentNav==='goals'||document.getElementById('scheduler-window-body'))redrawGoalsPage();
 }
 
 // 「今月のやりたいこと」を表示するHTML断片を組み立てる（カレンダー・スケジューラー共通）
