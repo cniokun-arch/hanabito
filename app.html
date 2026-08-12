@@ -3422,7 +3422,9 @@ function calDeleteFromModal(){
 function calDeleteSchedule(dk,idx){
   if(!dk)return;
   var data=calGetSchedules();
-  if(!data[dk])return;
+  if(!data[dk]||!data[dk][idx])return;
+  var title=data[dk][idx].title||data[dk][idx].text||'この予定';
+  if(!confirm('「'+title+'」を削除しますか？'))return;
   data[dk].splice(idx,1);
   if(data[dk].length===0) delete data[dk];
   calSaveSchedules(data);
