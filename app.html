@@ -2962,6 +2962,7 @@ function calGoToday(){
 }
 
 function renderCalendar(){
+  cleanupLegacyBucketCalendarEntries();
   var G=getCurrentTargetG();
   var label=document.getElementById('cal-month-label');
   var body=document.getElementById('cal-body');
@@ -3027,6 +3028,7 @@ function renderCalendar(){
   html+='<div data-cal-mon-label style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">🌱 '+(calMonth+1)+'月の目標</div>';
   html+='<div data-cal-mon-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
   html+='</div>';
+  html+='<div id="cal-bucket-section">'+buildBucketItemsForMonthHTML(calYear,calMonth+1)+'</div>';
   html+='<button onclick="openSchedulerWindowOverlay()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:\'Noto Serif JP\',serif;margin-bottom:0.4rem">🌸 花人占術スケジューラーを起動</button>';
   html+='<div style="text-align:center;margin-bottom:0.9rem"><span onclick="document.getElementById(\'scheduler-about-overlay\').classList.add(\'show\')" style="font-size:0.82rem;color:#8a5a00;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">花人占術スケジューラーとは？</span></div>';
   // 曜日ヘッダー（色帯・スワイプ機構の外に固定表示）
@@ -3205,6 +3207,8 @@ function initCalSwipe(){
     if(monGoalEl)monGoalEl.textContent=monGoalU||'（未設定）';
     var monLblEl=document.querySelector('[data-cal-mon-label]');
     if(monLblEl)monLblEl.textContent=(calMonth+1)+'月の目標';
+    var bucketSecEl=document.getElementById('cal-bucket-section');
+    if(bucketSecEl)bucketSecEl.innerHTML=buildBucketItemsForMonthHTML(calYear,calMonth+1);
   }
 
   wrap.addEventListener('touchstart',function(e){
@@ -5566,12 +5570,13 @@ function buildBucketItems(buckets){
   var cy=today.getFullYear(),cm=today.getMonth()+1,cd=today.getDate();
   var numEmoji=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯','⑰','⑱','⑲','⑳'];
   for(var bi=0;bi<buckets.length;bi++){
-    var b=typeof buckets[bi]==='string'?{text:buckets[bi],age:'',startDate:''}:buckets[bi];
+    var b=typeof buckets[bi]==='string'?{text:buckets[bi],age:'',startDate:'',done:false}:buckets[bi];
     var num=numEmoji[bi]||(bi+1)+'.';
-    html+='<div style=\"background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:0.8rem;margin-bottom:0.7rem\">';
-    html+='<div style=\"display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.6rem\">';
-    html+='<div style=\"font-size:1.3rem;line-height:1.4;flex-shrink:0\">'+num+'</div>';
-    html+='<textarea id=\"bucket-text-'+bi+'\" maxlength=\"60\" placeholder=\"例：世界一周旅行をする\" style=\"flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.9rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit;font-weight:700\">'+(b.text||'')+'</textarea>';
+    html+='<div style="background:rgba(184,134,11,0.05);border:1px solid rgba(184,134,11,0.2);border-radius:12px;padding:0.8rem;margin-bottom:0.7rem'+(b.done?';opacity:0.6':'')+'">';
+    html+='<div style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.6rem">';
+    html+='<label style="display:flex;align-items:center;flex-shrink:0;cursor:pointer;padding-top:0.3rem"><input type="checkbox" id="bucket-done-'+bi+'" '+(b.done?'checked':'')+' onchange="toggleBucketDoneLive('+bi+')" style="width:1.2rem;height:1.2rem;cursor:pointer"></label>';
+    html+='<div style="font-size:1.3rem;line-height:1.4;flex-shrink:0">'+num+'</div>';
+    html+='<textarea id="bucket-text-'+bi+'" maxlength="60" placeholder="例：世界一周旅行をする" style="flex:1;padding:0.5rem;border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:0.9rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit;font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">'+(b.text||'')+'</textarea>';
     html+='<button onclick=\"removeBucketItem('+bi+')\" style=\"background:rgba(184,50,50,0.08);border:1px solid rgba(184,50,50,0.2);border-radius:6px;font-size:0.9rem;color:rgba(184,50,50,0.7);cursor:pointer;flex-shrink:0;padding:0.3rem 0.5rem\">×</button>';
     html+='</div>';
     html+='<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:0.6rem\">';
@@ -5604,6 +5609,16 @@ function buildBucketItems(buckets){
   return html;
 }
 
+// 達成チェックを入れた瞬間に、保存前でもその項目を薄く・取り消し線で見せる（軽量プレビュー）
+function toggleBucketDoneLive(idx){
+  var del=document.getElementById('bucket-done-'+idx);
+  var tel=document.getElementById('bucket-text-'+idx);
+  if(!del||!tel)return;
+  var wrap=tel.closest('div').parentNode;
+  if(wrap)wrap.style.opacity=del.checked?'0.6':'1';
+  tel.style.textDecoration=del.checked?'line-through':'none';
+}
+
 function addNewBucketItem(){
   var ld=getLifeDesignData();
   if(!ld)return;
@@ -5632,6 +5647,62 @@ function removeBucketItem(idx){
   if(listEl)listEl.innerHTML=buildBucketItems(items);
 }
 
+// 指定した年月（1〜12）が期限のやりたいことリスト項目を返す（カレンダー・スケジューラー共通で使う）
+function getBucketItemsForMonth(year,month){
+  var ld=getLifeDesignData();
+  if(!ld||!ld.buckets)return [];
+  var mm=(month<10?'0':'')+month;
+  return ld.buckets.map(function(b,idx){return {b:b,idx:idx};}).filter(function(o){
+    var b=o.b;
+    if(!b||!b.startDate||!b.text)return false;
+    var parts=b.startDate.split('-');
+    return parts.length>=2&&parseInt(parts[0])===year&&parts[1]===mm;
+  });
+}
+
+// やりたいことリストの達成チェックを、カレンダー・スケジューラーからも直接切り替えられるようにする
+function toggleBucketItemDone(idx){
+  var ld=getLifeDesignData();
+  if(!ld||!ld.buckets||!ld.buckets[idx])return;
+  ld.buckets[idx].done=!ld.buckets[idx].done;
+  saveLifeDesignData(ld);
+  renderCalendar();
+  redrawGoalsPage();
+}
+
+// 「今月のやりたいこと」を表示するHTML断片を組み立てる（カレンダー・スケジューラー共通）
+function buildBucketItemsForMonthHTML(year,month){
+  var matches=getBucketItemsForMonth(year,month);
+  if(!matches.length)return '';
+  var html='<div style="border:1px solid rgba(42,140,74,0.3);border-radius:10px;padding:0.8rem 0.9rem;margin-bottom:0.9rem;background:rgba(42,140,74,0.04)">';
+  html+='<div style="font-size:0.82rem;color:#1a6b3a;font-weight:800;margin-bottom:0.5rem">🌱 今月が期限のやりたいこと</div>';
+  matches.forEach(function(o){
+    var b=o.b;
+    html+='<label style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;cursor:pointer">'
+      +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1.15rem;height:1.15rem;flex-shrink:0;cursor:pointer">'
+      +'<span style="font-size:0.95rem;color:'+(b.done?'var(--ink3)':'var(--ink)')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">'+escHtml(b.text)+(b.age?'（'+escHtml(b.age)+'歳までに）':'')+'</span>'
+      +'</label>';
+  });
+  html+='</div>';
+  return html;
+}
+
+// 旧方式（バケットリストをカレンダーの1日予定として複製していた仕組み）で作られた
+// 古いデータが残っていれば、表示が二重にならないよう取り除く
+function cleanupLegacyBucketCalendarEntries(){
+  var calData=calGetSchedules();
+  var changed=false;
+  Object.keys(calData).forEach(function(dk){
+    var filtered=calData[dk].filter(function(s){return !s.bucketText;});
+    if(filtered.length!==calData[dk].length){
+      changed=true;
+      if(filtered.length===0)delete calData[dk];
+      else calData[dk]=filtered;
+    }
+  });
+  if(changed)calSaveSchedules(calData);
+}
+
 function collectBucketItems(){
   var items=[];
   var bi=0;
@@ -5641,12 +5712,14 @@ function collectBucketItems(){
     var ael=document.getElementById('bucket-age-'+bi);
     var syel=document.getElementById('bucket-sy-'+bi);
     var smel=document.getElementById('bucket-sm-'+bi);
+    var del=document.getElementById('bucket-done-'+bi);
     var sy=syel?syel.value:'';var sm=smel?smel.value:'';
     var startDate=sy&&sm?sy+'-'+sm+'-01':'';
     items.push({
       text:tel.value.trim(),
       age:ael?ael.value.trim():'',
-      startDate:startDate
+      startDate:startDate,
+      done:del?del.checked:false
     });
     bi++;
   }
@@ -5664,34 +5737,9 @@ function saveBucketEditor(){
   ld.buckets=items;
   saveLifeDesignData(ld);
 
-  // 開始日があるものをカレンダー＋タイムラインに登録
-  var calData=calGetSchedules();
-  for(var bi=0;bi<items.length;bi++){
-    var b=items[bi];
-    if(!b.startDate||!b.text)continue;
-    var parts=b.startDate.split('-');
-    if(parts.length<2)continue;
-    var sy=parseInt(parts[0]),sm=parseInt(parts[1]);
-    if(!sy||!sm)continue;
-    // カレンダーに登録（月初め1日・ホーム画面が実際に読む保存先へ）
-    var schedKey=calDateKey(sy,sm,1);
-    if(!calData[schedKey])calData[schedKey]=[];
-    calData[schedKey]=calData[schedKey].filter(function(s){return s.bucketText!==b.text;});
-    calData[schedKey].push({mark:'🌱',title:b.text+(b.age?'（'+b.age+'歳までに）':''),memo:'やりたいことリストより',bucketText:b.text});
-    // タイムラインにも登録（その年のメモに追加）
-    var tlData=getTimelineData();
-    var existing=tlData[sy]||{goal:'',months:Array(12).fill('')};
-    if(typeof existing==='string')existing={goal:existing,months:Array(12).fill('')};
-    if(!existing.months)existing.months=Array(12).fill('');
-    var monthIdx=sm-1;
-    var mGoal=existing.months[monthIdx]||'';
-    var newEntry='🌱 '+b.text;
-    if(mGoal.indexOf(newEntry)<0){
-      existing.months[monthIdx]=mGoal?(mGoal+'・'+newEntry):newEntry;
-    }
-    saveTimelineEntry(sy,existing);
-  }
-  calSaveSchedules(calData);
+  // やりたいことリストはld.bucketsを唯一のデータとし、カレンダー・タイムラインには複製しない
+  // （表示側がその場でld.bucketsを参照する方式にしたため。達成チェックなどが1箇所で完結する）
+  cleanupLegacyBucketCalendarEntries();
 
   closeBucketEditor();
   redrawGoalsPage();
@@ -5986,6 +6034,18 @@ function buildTimelineEditorHTML(year,isAccordion){
     if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px">'+mlabel+' '+mju+'</div>';}
     html+='<input id="tl-m'+mi+'-'+year+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
     html+='</div>';
+    var bucketMatches=getBucketItemsForMonth(year,mi+1);
+    if(bucketMatches.length){
+      html+='<div style="margin:0 0 0.5rem 2.6rem">';
+      bucketMatches.forEach(function(o){
+        var b=o.b;
+        html+='<label style="display:flex;align-items:center;gap:0.4rem;padding:0.15rem 0;cursor:pointer">'
+          +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1rem;height:1rem;flex-shrink:0;cursor:pointer">'
+          +'<span style="font-size:0.76rem;color:'+(b.done?'var(--ink3)':'#1a6b3a')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">🌱 '+escHtml(b.text)+'</span>'
+          +'</label>';
+      });
+      html+='</div>';
+    }
   }
 
   html+='<button onclick="saveTimelineData('+year+')" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:8px;padding:0.7rem;font-size:0.9rem;cursor:pointer;margin-top:0.6rem">保存</button>';
