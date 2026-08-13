@@ -5977,7 +5977,7 @@ function renderYearGoalListHTML(year,arr){
   var html='';
   arr.forEach(function(g,gi){
     html+='<div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;align-items:flex-start">';
-    html+='<textarea id="tl-goal-'+year+'-'+gi+'" maxlength="80" placeholder="この年の大きな目標を入力..." style="flex:1;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit">'+escHtml(g)+'</textarea>';
+    html+='<textarea id="tl-goal-'+year+'-'+gi+'" maxlength="80" placeholder="この年の大きな目標を入力..." style="flex:1;min-width:0;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit;overflow-wrap:break-word;word-break:break-word">'+escHtml(g)+'</textarea>';
     if(arr.length>1)html+='<button onclick="removeYearGoalItem('+year+','+gi+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem;flex-shrink:0">✕</button>';
     html+='</div>';
   });
@@ -5989,7 +5989,7 @@ function renderMonthGoalListHTML(year,mi,arr){
   var html='';
   arr.forEach(function(g,gi){
     html+='<div style="display:flex;gap:0.3rem;margin-bottom:0.3rem;align-items:flex-start">';
-    html+='<textarea id="tl-m'+mi+'-'+year+'-'+gi+'" maxlength="60" placeholder="目標..." rows="2" style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink);resize:vertical;font-family:inherit;line-height:1.5">'+escHtml(g)+'</textarea>';
+    html+='<textarea id="tl-m'+mi+'-'+year+'-'+gi+'" maxlength="60" placeholder="目標..." rows="2" style="flex:1;min-width:0;width:100%;box-sizing:border-box;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink);resize:vertical;font-family:inherit;line-height:1.5;overflow-wrap:break-word;word-break:break-word">'+escHtml(g)+'</textarea>';
     if(arr.length>1)html+='<button onclick="removeMonthGoalItem('+year+','+mi+','+gi+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem;flex-shrink:0">✕</button>';
     html+='</div>';
   });
@@ -6144,7 +6144,7 @@ function buildTimelineEditorHTML(year,isAccordion){
     html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.15rem">';
     html+='<div style="font-size:0.92rem;font-weight:800;color:var(--ink);min-width:2.4rem;padding-top:0.45rem">'+MONTH_NAMES[mi]+'</div>';
     if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:60px;font-size:0.86rem;font-weight:800;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.2rem 0.4rem;background:rgba(0,0,0,0.04);border-radius:4px;margin-top:0.25rem;flex-shrink:0">'+mlabel+' '+mju+'</div>';}
-    html+='<div style="flex:1">';
+    html+='<div style="flex:1;min-width:0">';
     html+='<div id="tl-m-list-'+mi+'-'+year+'">'+renderMonthGoalListHTML(year,mi,normalizeGoalArr(tdata.months[mi]))+'</div>';
     html+='<button onclick="addMonthGoalItem('+year+','+mi+')" style="width:100%;background:transparent;color:var(--gold);border:1px dashed rgba(184,134,11,0.3);border-radius:6px;padding:0.25rem;font-size:0.7rem;cursor:pointer">＋ 追加</button>';
     html+='</div>';
