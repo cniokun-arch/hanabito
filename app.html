@@ -4710,6 +4710,7 @@ function ctxCopy(){
 }
 function ctxDelete(){
   if(!_ctxTarget)return;
+  if(!confirm('このメッセージを削除しますか？')){hideCtxMenu();return;}
   hideCtxMenu();
   // aiHistoryから削除
   var idx=_ctxTarget.idx;
@@ -5656,6 +5657,8 @@ function addNewBucketItem(){
 
 function removeBucketItem(idx){
   var items=collectBucketItems();
+  var text=items[idx]&&items[idx].text;
+  if(text&&!confirm('「'+text+'」を削除しますか？'))return;
   items.splice(idx,1);
   var ld=getLifeDesignData();
   if(!ld)return;
@@ -6029,6 +6032,8 @@ function addYearGoalItem(year){
 }
 function removeYearGoalItem(year,idx){
   var tdata=collectTimelineFormData(year);
+  var text=tdata.goal[idx];
+  if(text&&!confirm('「'+text+'」を削除しますか？'))return;
   tdata.goal.splice(idx,1);
   saveTimelineEntry(year,tdata);
   var listEl=document.getElementById('tl-goal-list-'+year);
@@ -6047,6 +6052,8 @@ function addMonthGoalItem(year,mi){
 }
 function removeMonthGoalItem(year,mi,idx){
   var tdata=collectTimelineFormData(year);
+  var text=tdata.months[mi][idx];
+  if(text&&!confirm('「'+text+'」を削除しますか？'))return;
   tdata.months[mi].splice(idx,1);
   saveTimelineEntry(year,tdata);
   var listEl=document.getElementById('tl-m-list-'+mi+'-'+year);
