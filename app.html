@@ -6041,19 +6041,20 @@ function buildTimelineEditorHTML(year,isAccordion){
     var mgrade=UNKI_GRADE[mju]||0;
     var mlabel=mgrade>=3?'◎':mgrade>=2?'○':mgrade>=1?'△':mgrade<0?'×':'―';
     var mcolor=getJuniColor(mju);
-    html+='<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">';
-    html+='<div style="font-size:0.76rem;color:var(--ink3);min-width:2.2rem">'+MONTH_NAMES[mi]+'</div>';
-    if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px">'+mlabel+' '+mju+'</div>';}
-    html+='<input id="tl-m'+mi+'-'+year+'" type="text" value="'+(tdata.months[mi]||'').replace(/"/g,'&quot;')+'" maxlength="40" placeholder="目標..." style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink)">';
+    html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.4rem">';
+    html+='<div style="font-size:0.76rem;color:var(--ink3);min-width:2.2rem;padding-top:0.4rem">'+MONTH_NAMES[mi]+'</div>';
+    if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:54px;font-size:0.72rem;font-weight:700;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.15rem 0.3rem;background:rgba(0,0,0,0.04);border-radius:4px;margin-top:0.25rem;flex-shrink:0">'+mlabel+' '+mju+'</div>';}
+    html+='<textarea id="tl-m'+mi+'-'+year+'" maxlength="60" placeholder="目標..." rows="2" style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink);resize:vertical;font-family:inherit;line-height:1.5">'+(tdata.months[mi]||'')+'</textarea>';
     html+='</div>';
     var bucketMatches=getBucketItemsForMonth(year,mi+1);
     if(bucketMatches.length){
       html+='<div style="margin:0 0 0.5rem 2.6rem">';
       bucketMatches.forEach(function(o){
         var b=o.b;
-        html+='<label style="display:flex;align-items:center;gap:0.4rem;padding:0.15rem 0;cursor:pointer">'
+        html+='<label style="display:flex;align-items:center;gap:0.4rem;padding:0.15rem 0;cursor:pointer;flex-wrap:wrap">'
           +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1rem;height:1rem;flex-shrink:0;cursor:pointer">'
           +'<span style="font-size:0.76rem;color:'+(b.done?'var(--ink3)':'#1a6b3a')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">🌱 '+escHtml(b.text)+'</span>'
+          +'<span style="font-size:0.64rem;font-weight:700;color:#fff;background:#8a5a00;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0">やりたいことリスト期限</span>'
           +(b.done?'<span style="font-size:0.66rem;font-weight:800;color:#fff;background:#2a8c4a;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0;text-decoration:none">✓ 達成</span>':'')
           +'</label>';
       });
