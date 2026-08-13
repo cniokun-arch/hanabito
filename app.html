@@ -1663,6 +1663,21 @@ function getJuniColor(j){return({'結蕾':'#1a6b3a','豊穣':'#8b4513','青葉':
 // KBの1項目（例：KB['各柱に宿る十二運気の作用']['休眠']）に含まれる全フィールドを、
 // フィールド名をハードコードせず自動で結合して返す。「読み」（ふりがな用）だけは除く。
 // Makotoが管理画面でKBに新しい項目（対策・注意など）を追加しても、コード修正なしでAIに渡るようにするため
+// 年間目標・月ごとの目標は複数登録できるよう配列で管理する。
+// 旧データ（1つの文字列だった頃の保存分）にも対応し、常に配列として返す
+function normalizeGoalArr(val){
+  if(Array.isArray(val))return val.filter(function(s){return s&&String(s).trim();});
+  if(typeof val==='string'&&val.trim())return [val];
+  return [];
+}
+// 複数の目標を箇条書きで表示するHTML（ホーム画面カレンダーの目標カード用）
+function renderGoalArrDisplayHTML(arr){
+  if(!arr||arr.length===0)return '<div style="font-size:1.1rem;font-weight:700;color:var(--ink3)">（未設定）</div>';
+  return arr.map(function(g){
+    return '<div style="font-size:1.05rem;font-weight:700;line-height:1.6;color:var(--ink);margin-bottom:0.3rem">・'+escHtml(g)+'</div>';
+  }).join('');
+}
+
 function kbEntryFullText(entry){
   if(!entry)return '';
   var parts=[];
@@ -3015,18 +3030,18 @@ function renderCalendar(){
   var tlDataCal=getTimelineData();
   var tdataCal=tlDataCal[calYear]||null;
   if(typeof tdataCal==='string')tdataCal={goal:tdataCal,months:Array(12).fill('')};
-  var yrGoal=tdataCal&&tdataCal.goal?tdataCal.goal:'';
-  var monGoal=tdataCal&&tdataCal.months&&tdataCal.months[calMonth]?tdataCal.months[calMonth]:'';
+  var yrGoalArr=tdataCal?normalizeGoalArr(tdataCal.goal):[];
+  var monGoalArr=tdataCal&&tdataCal.months?normalizeGoalArr(tdataCal.months[calMonth]):[];
   html+='<div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:0.5rem">';
   html+='<button onclick="editTimelineMemo('+calYear+')" style="font-size:0.78rem;color:var(--gold);background:transparent;border:1px solid rgba(184,134,11,0.4);border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-weight:700">編集</button>';
   html+='</div>';
   html+='<div style="border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.7rem;background:#fff">';
   html+='<div style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">📌 '+calYear+'年の目標</div>';
-  html+='<div data-cal-yr-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(yrGoal?'var(--ink)':'var(--ink3)')+'">'+(yrGoal||'（未設定）')+'</div>';
+  html+='<div data-cal-yr-goal>'+renderGoalArrDisplayHTML(yrGoalArr)+'</div>';
   html+='</div>';
   html+='<div style="border:1px solid rgba(184,134,11,0.3);border-radius:10px;padding:0.9rem 1rem;margin-bottom:0.7rem;background:#fff">';
   html+='<div data-cal-mon-label style="font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:0.4rem">🌱 '+(calMonth+1)+'月の目標</div>';
-  html+='<div data-cal-mon-goal style="font-size:1.1rem;font-weight:700;line-height:1.6;color:'+(monGoal?'var(--ink)':'var(--ink3)')+'">'+(monGoal||'（未設定）')+'</div>';
+  html+='<div data-cal-mon-goal>'+renderGoalArrDisplayHTML(monGoalArr)+'</div>';
   html+='</div>';
   html+='<div id="cal-bucket-section">'+buildBucketItemsForMonthHTML(calYear,calMonth+1)+'</div>';
   html+='<button onclick="openSchedulerWindowOverlay()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:\'Noto Serif JP\',serif;margin-bottom:0.4rem">🌸 花人占術スケジューラーを起動</button>';
@@ -3199,12 +3214,12 @@ function initCalSwipe(){
     var tlDataU=getTimelineData();
     var tdataU=tlDataU[calYear]||null;
     if(typeof tdataU==='string')tdataU={goal:tdataU,months:Array(12).fill('')};
-    var yrGoalU=tdataU&&tdataU.goal?tdataU.goal:'';
-    var monGoalU=tdataU&&tdataU.months&&tdataU.months[calMonth]?tdataU.months[calMonth]:'';
+    var yrGoalArrU=tdataU?normalizeGoalArr(tdataU.goal):[];
+    var monGoalArrU=tdataU&&tdataU.months?normalizeGoalArr(tdataU.months[calMonth]):[];
     var yrGoalEl=document.querySelector('[data-cal-yr-goal]');
     var monGoalEl=document.querySelector('[data-cal-mon-goal]');
-    if(yrGoalEl)yrGoalEl.textContent=yrGoalU||'（未設定）';
-    if(monGoalEl)monGoalEl.textContent=monGoalU||'（未設定）';
+    if(yrGoalEl)yrGoalEl.innerHTML=renderGoalArrDisplayHTML(yrGoalArrU);
+    if(monGoalEl)monGoalEl.innerHTML=renderGoalArrDisplayHTML(monGoalArrU);
     var monLblEl=document.querySelector('[data-cal-mon-label]');
     if(monLblEl)monLblEl.textContent=(calMonth+1)+'月の目標';
     var bucketSecEl=document.getElementById('cal-bucket-section');
@@ -5914,7 +5929,7 @@ function renderTimeline(ld,standalone){
     var yrLabel=yrGrade>=3?'◎':yrGrade>=2?'○':yrGrade>=1?'△':yrGrade<0?'×':'―';
 
     var tdata=tlData[y]||null;
-    var hasGoal=tdata&&(tdata.goal||(tdata.months&&tdata.months.some(function(m){return m;})));
+    var hasGoal=tdata&&(normalizeGoalArr(tdata.goal).length>0||(tdata.months&&tdata.months.some(function(m){return normalizeGoalArr(m).length>0;})));
     var isExpanded=!!window._tlExpanded[y];
 
     var borderStyle=isCurrentYear?'2px solid rgba(184,134,11,0.7)':'1px solid rgba(184,134,11,0.18)';
@@ -5956,6 +5971,88 @@ function toggleTimelineYear(year){
 }
 
 // 年を開いた時の中身（大運/年運のAI解説・年間目標・月別目標）を組み立てる
+// 年間目標のリスト部分（#tl-goal-list-{year}の中身）を組み立てる
+function renderYearGoalListHTML(year,arr){
+  if(arr.length===0)arr=[''];
+  var html='';
+  arr.forEach(function(g,gi){
+    html+='<div style="display:flex;gap:0.4rem;margin-bottom:0.5rem;align-items:flex-start">';
+    html+='<textarea id="tl-goal-'+year+'-'+gi+'" maxlength="80" placeholder="この年の大きな目標を入力..." style="flex:1;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:56px;font-family:inherit">'+escHtml(g)+'</textarea>';
+    if(arr.length>1)html+='<button onclick="removeYearGoalItem('+year+','+gi+')" style="background:none;border:none;color:var(--ink3);font-size:1.1rem;cursor:pointer;padding:0.3rem;flex-shrink:0">✕</button>';
+    html+='</div>';
+  });
+  return html;
+}
+// 月ごとの目標のリスト部分（#tl-m-list-{mi}-{year}の中身）を組み立てる
+function renderMonthGoalListHTML(year,mi,arr){
+  if(arr.length===0)arr=[''];
+  var html='';
+  arr.forEach(function(g,gi){
+    html+='<div style="display:flex;gap:0.3rem;margin-bottom:0.3rem;align-items:flex-start">';
+    html+='<textarea id="tl-m'+mi+'-'+year+'-'+gi+'" maxlength="60" placeholder="目標..." rows="2" style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink);resize:vertical;font-family:inherit;line-height:1.5">'+escHtml(g)+'</textarea>';
+    if(arr.length>1)html+='<button onclick="removeMonthGoalItem('+year+','+mi+','+gi+')" style="background:none;border:none;color:var(--ink3);font-size:1rem;cursor:pointer;padding:0.2rem;flex-shrink:0">✕</button>';
+    html+='</div>';
+  });
+  return html;
+}
+// 今フォーム上に入力されている内容（未保存分も含む）を全て集めて、年データとして返す
+function collectTimelineFormData(year){
+  function collectArr(prefix){
+    var arr=[];var gi=0;
+    while(true){
+      var el=document.getElementById(prefix+gi);
+      if(!el)break;
+      if(el.value.trim())arr.push(el.value.trim());
+      gi++;
+    }
+    return arr;
+  }
+  var tlData=getTimelineData();
+  var existing=tlData[year];
+  if(typeof existing==='string')existing={goal:existing,months:Array(12).fill('')};
+  var tdata={goal:collectArr('tl-goal-'+year+'-'),months:[],advice:existing&&existing.advice?existing.advice:undefined};
+  for(var mi=0;mi<12;mi++){tdata.months[mi]=collectArr('tl-m'+mi+'-'+year+'-');}
+  return tdata;
+}
+// 年間目標・月ごとの目標を追加/削除するたびに、他の未保存フィールドも失わないよう
+// フォーム全体を集めて保存し直し、変更した一覧部分だけをピンポイントで再描画する
+function addYearGoalItem(year){
+  var tdata=collectTimelineFormData(year);
+  tdata.goal.push('');
+  saveTimelineEntry(year,tdata);
+  var listEl=document.getElementById('tl-goal-list-'+year);
+  if(listEl){
+    listEl.innerHTML=renderYearGoalListHTML(year,tdata.goal);
+    var newIdx=tdata.goal.length-1;
+    setTimeout(function(){var el=document.getElementById('tl-goal-'+year+'-'+newIdx);if(el)el.focus({preventScroll:true});},50);
+  }
+}
+function removeYearGoalItem(year,idx){
+  var tdata=collectTimelineFormData(year);
+  tdata.goal.splice(idx,1);
+  saveTimelineEntry(year,tdata);
+  var listEl=document.getElementById('tl-goal-list-'+year);
+  if(listEl)listEl.innerHTML=renderYearGoalListHTML(year,tdata.goal);
+}
+function addMonthGoalItem(year,mi){
+  var tdata=collectTimelineFormData(year);
+  tdata.months[mi].push('');
+  saveTimelineEntry(year,tdata);
+  var listEl=document.getElementById('tl-m-list-'+mi+'-'+year);
+  if(listEl){
+    listEl.innerHTML=renderMonthGoalListHTML(year,mi,tdata.months[mi]);
+    var newIdx=tdata.months[mi].length-1;
+    setTimeout(function(){var el=document.getElementById('tl-m'+mi+'-'+year+'-'+newIdx);if(el)el.focus({preventScroll:true});},50);
+  }
+}
+function removeMonthGoalItem(year,mi,idx){
+  var tdata=collectTimelineFormData(year);
+  tdata.months[mi].splice(idx,1);
+  saveTimelineEntry(year,tdata);
+  var listEl=document.getElementById('tl-m-list-'+mi+'-'+year);
+  if(listEl)listEl.innerHTML=renderMonthGoalListHTML(year,mi,tdata.months[mi]);
+}
+
 function buildTimelineEditorHTML(year,isAccordion){
   if(isAccordion===undefined)isAccordion=true;
   var tlData2=getTimelineData();
@@ -6035,7 +6132,8 @@ function buildTimelineEditorHTML(year,isAccordion){
   html+='<p style="font-size:0.82rem;color:#8a5a00;font-weight:700;text-align:center;margin:0.9rem 0 1.1rem">↑ このアドバイスを元に、年間目標と月ごとの目標を立ててみましょう</p>';
 
   html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.3rem;font-weight:700">年間目標</div>';
-  html+='<textarea id="tl-goal-'+year+'" maxlength="80" placeholder="この年の大きな目標を入力..." style="width:100%;box-sizing:border-box;padding:0.6rem;border:1px solid rgba(184,134,11,0.4);border-radius:8px;font-size:0.88rem;background:var(--bg2);color:var(--ink);resize:none;height:64px;font-family:inherit;margin-bottom:1rem">'+(tdata.goal||'')+'</textarea>';
+  html+='<div id="tl-goal-list-'+year+'">'+renderYearGoalListHTML(year,normalizeGoalArr(tdata.goal))+'</div>';
+  html+='<button onclick="addYearGoalItem('+year+')" style="width:100%;background:transparent;color:var(--gold);border:1px dashed rgba(184,134,11,0.4);border-radius:8px;padding:0.45rem;font-size:0.78rem;cursor:pointer;margin-bottom:1rem">＋ 年間目標を追加</button>';
 
   html+='<div style="font-size:0.8rem;color:var(--ink3);margin-bottom:0.5rem;font-weight:700">月ごとの目標（運気をタップで説明）</div>';
   for(var mi=0;mi<12;mi++){
@@ -6043,10 +6141,13 @@ function buildTimelineEditorHTML(year,isAccordion){
     var mgrade=UNKI_GRADE[mju]||0;
     var mlabel=mgrade>=3?'◎':mgrade>=2?'○':mgrade>=1?'△':mgrade<0?'×':'―';
     var mcolor=getJuniColor(mju);
-    html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.4rem">';
+    html+='<div style="display:flex;align-items:flex-start;gap:0.4rem;margin-bottom:0.15rem">';
     html+='<div style="font-size:0.92rem;font-weight:800;color:var(--ink);min-width:2.4rem;padding-top:0.45rem">'+MONTH_NAMES[mi]+'</div>';
     if(mju){html+='<div onclick="showJuniPopup(this.dataset.ju,this.dataset.lb)" data-ju="'+mju+'" data-lb="'+mlabel+'" style="min-width:60px;font-size:0.86rem;font-weight:800;color:'+mcolor+';cursor:pointer;white-space:nowrap;padding:0.2rem 0.4rem;background:rgba(0,0,0,0.04);border-radius:4px;margin-top:0.25rem;flex-shrink:0">'+mlabel+' '+mju+'</div>';}
-    html+='<textarea id="tl-m'+mi+'-'+year+'" maxlength="60" placeholder="目標..." rows="2" style="flex:1;padding:0.4rem 0.5rem;border:1px solid rgba(184,134,11,0.2);border-radius:6px;font-size:0.8rem;background:var(--bg2);color:var(--ink);resize:vertical;font-family:inherit;line-height:1.5">'+(tdata.months[mi]||'')+'</textarea>';
+    html+='<div style="flex:1">';
+    html+='<div id="tl-m-list-'+mi+'-'+year+'">'+renderMonthGoalListHTML(year,mi,normalizeGoalArr(tdata.months[mi]))+'</div>';
+    html+='<button onclick="addMonthGoalItem('+year+','+mi+')" style="width:100%;background:transparent;color:var(--gold);border:1px dashed rgba(184,134,11,0.3);border-radius:6px;padding:0.25rem;font-size:0.7rem;cursor:pointer">＋ 追加</button>';
+    html+='</div>';
     html+='</div>';
     var bucketMatches=getBucketItemsForMonth(year,mi+1);
     if(bucketMatches.length){
@@ -6056,7 +6157,7 @@ function buildTimelineEditorHTML(year,isAccordion){
         html+='<label style="display:flex;align-items:center;gap:0.4rem;padding:0.15rem 0;cursor:pointer;flex-wrap:wrap">'
           +'<input type="checkbox" '+(b.done?'checked':'')+' onchange="toggleBucketItemDone('+o.idx+')" style="width:1rem;height:1rem;flex-shrink:0;cursor:pointer">'
           +'<span style="font-size:0.76rem;color:'+(b.done?'var(--ink3)':'#1a6b3a')+';font-weight:700;'+(b.done?'text-decoration:line-through':'')+'">🌱 '+escHtml(b.text)+'</span>'
-          +'<span style="font-size:0.64rem;font-weight:700;color:#fff;background:#8a5a00;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0">やりたいことリスト期限</span>'
+          +'<span onclick="event.preventDefault();openBucketListEditor()" style="font-size:0.64rem;font-weight:700;color:#fff;background:#8a5a00;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0;cursor:pointer;text-decoration:underline;text-decoration-style:dotted">やりたいことリスト期限</span>'
           +(b.done?'<span style="font-size:0.66rem;font-weight:800;color:#fff;background:#2a8c4a;border-radius:5px;padding:0.06rem 0.35rem;flex-shrink:0;text-decoration:none">✓ 達成</span>':'')
           +'</label>';
       });
@@ -6820,20 +6921,8 @@ function renderLayer3Html(text){
 }
 
 function saveTimelineData(year){
-  var goalEl=document.getElementById('tl-goal-'+year);
-  var goal=goalEl?goalEl.value.trim():'';
-  var months=[];
-  for(var mi=0;mi<12;mi++){
-    var el=document.getElementById('tl-m'+mi+'-'+year);
-    months.push(el?el.value.trim():'');
-  }
-  var tlData=getTimelineData();
-  var existing=tlData[year];
-  if(existing&&typeof existing==='object'&&existing.advice){
-    saveTimelineEntry(year,{goal:goal,months:months,advice:existing.advice});
-  } else {
-    saveTimelineEntry(year,{goal:goal,months:months});
-  }
+  var tdata=collectTimelineFormData(year);
+  saveTimelineEntry(year,tdata);
   closeTimelineModal();
   showToast(year+'年の目標を保存しました');
   redrawGoalsPage();
