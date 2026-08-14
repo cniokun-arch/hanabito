@@ -785,6 +785,9 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
       <div class="hmenu-item" onclick="closeHmenu();document.getElementById('tani-tenka-article-overlay').classList.add('show')">
         <span class="hmenu-item-icon">🌌</span>運命の谷・転化天蛹について
       </div>
+      <div class="hmenu-item" onclick="closeHmenu();document.getElementById('hanabito-philosophy-overlay').classList.add('show')">
+        <span class="hmenu-item-icon">✦</span>花人占術が目指すもの
+      </div>
       <div class="hmenu-item" onclick="closeHmenu();showAIGuide()">
         <span class="hmenu-item-icon">🤖</span>AI相談の使い方
       </div>
@@ -1069,6 +1072,59 @@ body::-webkit-scrollbar-thumb:hover { background: rgba(184,134,11,0.85); }
 
       <div style="text-align:center;margin-top:1.8rem">
         <button onclick="document.getElementById('tani-tenka-article-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 花人占術が目指すもの 読み物オーバーレイ -->
+  <div class="about-overlay-wrap" id="hanabito-philosophy-overlay">
+    <div style="background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:1.6rem 1.2rem 1.3rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <h2 style="font-family:'Zen Old Mincho',serif;color:#fff;font-size:1rem;letter-spacing:0.08em;margin:0;line-height:1.6">『花人占術』が目指すもの<br><span style="font-size:1.02rem;font-weight:700">なぜ、このアプリは「運気」と「行動」を繋ぐのか</span></h2>
+      <button onclick="document.getElementById('hanabito-philosophy-overlay').classList.remove('show')" style="background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:#fff;font-size:1.5rem;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;flex-shrink:0">✕</button>
+    </div>
+    <div style="padding:1.5rem 1.3rem 2.5rem">
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">「運気が良いと言われたのに、何も良いことが起きなかった」「『今は運気が悪い時期だから』と、怯えて何もできずに過ごしてしまった」</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">もしあなたがこれまでにそんな経験をしたことがあるなら、それは運気の「使い方」を少しだけ誤っていたのかもしれません。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.2rem">『花人占術』は、未来を言い当てるための占いではありません。あなたの心理（本音）を呼び覚まし、運気の波に合わせて行動を起こすことで、人生の成功確率を飛躍的に高めるための「行動変容ツール」です。</p>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:2.1;margin:0 0 1.6rem">なぜこのアプリが生まれたのか。その背景には、数千年の歴史を持つ東洋哲学の至極まっとうな理（ことわり）と、ひとつの現実的な確信があります。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">1. 運気とは「天の気」であり「波」である</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">東洋哲学の原点である「陰陽五行説」において、人間もまた自然界の一部として捉えられます。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">自然界に「春・夏・秋・冬」の季節があり、「晴れ・雨・嵐」の天気があるように、私たちの人生にもエネルギーの循環（バイオリズム）が存在します。これが「運気」の正体です。</p>
+      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.9rem 1.1rem;margin:0 0 1.2rem">
+        <div style="font-size:0.86rem;color:var(--ink);line-height:2.1">・春（芽吹き・準備）：種を蒔き、根を張る時期<br>・夏（開花・拡大）：太陽を浴び、一気に行動して花を咲かせる時期<br>・秋（収穫・結果）：実りを刈り取り、成果を受け取る時期<br>・冬（蓄積・充電）：不要なものを手放し、次の春に備えて内面を磨く時期</div>
+      </div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">どんなに素晴らしい種（才能や目標）を持っていても、真冬の雪原に蒔けば芽は出ずに枯れてしまいます。逆に、春の暖かな雨の日に蒔けば、小さな種でも驚くほど容易に芽を出します。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">運気が良い時に成功するのは、魔法がかかったからではありません。「努力が実りやすい完璧なタイミング（天の気）で行動したから」です。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">2. 「歪み」が破綻を生み、「順応」が成功を生む</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">陰陽五行説や道教の思想には、「物極必反（ぶっきょくひつはん）」という法則があります。物事が極点に達すると反転する、という自然の自浄作用です。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">身の丈に合わない無理な生活や、不誠実な生き方、自分の本音を偽った行動は、東洋医学でいう「虚（きょ）＝実体のない膨張」の状態です。この「虚」のまま突き進むと、運気の切り替わり（季節の変わり目）が来た瞬間に、溜まった歪みが一気に崩壊（破綻）として表面化します。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">一方で、自分の本心に素直になり、運気の波（季節）に順応して生きる人は、どんな転換期が来てもブレることがありません。</p>
+      <p style="font-size:0.86rem;color:var(--ink3);line-height:1.9;margin:0 0 1rem">（※ この破綻と成功は普段の生活、生き方によって自分の人生に影響してきますが、それまで少しずつ蓄積されたものが爆発するかのように極端に現れるのが「転化天蛹」の時期でもあります。）</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">「自分の本当の望み（心理）」を知り、「最適な時期（運気）」を選んで、「具体的な一歩（行動）」を踏み出す。これこそが、東洋思想が教える「運を最大限に活かし、現実を変える」唯一の方法なのです。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">3. だから『花人占術』は「カレンダー」に落とし込む</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">「運気の波」を理解しても、頭で思っているだけでは現実は１ミリも動きません。そこで『花人占術』は、以下のステップであなたを現実のゴールへと導きます。</p>
+      <div style="background:rgba(184,134,11,0.06);border-radius:10px;padding:0.9rem 1.1rem;margin:0 0 1.2rem;text-align:center">
+        <div style="font-size:0.88rem;color:#8a5a00;font-weight:700;line-height:2.1">【心理テスト】心の中の本当の目標・本音を抽出する<br>↓<br>【花人占術】あなたに訪れる「最適なタイミング（季節）」を割り出す<br>↓<br>【カレンダー連携】運気に合わせた行動を「予定」として組み込む</div>
+      </div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">・心理学による目標設定：「自分が本当に望んでいること」を心理アプローチで明確にします。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">・運気の波に乗るスケジュール：「今は根を張る時期だから勉強の予定を入れる」「次は開花の時期だからプレゼンや挑戦の予定を入れる」といったように、運気に合わせてカレンダーへ行動を組み込みます。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem">・達成度をチェックしていくことで、どれだけ実現できたかを確認、実感することが出来ます。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">このアプリを使うことで、あなたが得られる「３つの利点」</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem"><span style="font-weight:700;color:var(--ink)">① 根拠のある「行動の決断力」がつく</span><br>「いつ動けばいいか分からない」という迷いがなくなります。運気というバックボーンがあることで、自信を持って最初の一歩を踏み出せます。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem"><span style="font-weight:700;color:var(--ink)">② 無駄な焦りと失敗（リスク）が激減する</span><br>運気が低迷している時期は「休む・学ぶ・準備する」という正しい過ごし方ができます。無理な暴走による破綻を防ぎ、エネルギーを効率的に温存できます。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1.6rem"><span style="font-weight:700;color:var(--ink)">③ 目標の「実現確率」が飛躍的に跳ね上がる</span><br>あなたの本音（心理）✕ 最適なタイミング（運気）✕ 毎日の行動（カレンダー）が一致するため、闇雲に努力するよりも遥かに少ない労力で、最大の成果（目標達成）を引き寄せることができます。</p>
+
+      <div style="font-family:'Zen Old Mincho',serif;font-size:1.1rem;color:#8a5a00;letter-spacing:0.04em;margin-bottom:0.9rem;border-bottom:2px solid rgba(184,134,11,0.3);padding-bottom:0.45rem">おわりに</div>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">この世界という庭に、どんな大輪の花（あなたの人生）を咲かせるか。それを決めるのは、他の誰でもないあなた自身です。</p>
+      <p style="font-size:0.93rem;color:var(--ink);line-height:2.05;margin:0 0 1rem">『花人占術』は、あなたが最高のタイミングで種を蒔き、最高の季節に最高の花を咲かせるための、一番身近な「人生のガーデナー（伴走者）」であり続けることが出来るのです。</p>
+      <p style="font-size:0.95rem;color:#8a5a00;font-weight:700;line-height:2.1;text-align:center;margin:1.4rem 0 0">花人占術とこのアプリを活用し、<br>あなたの人生を、あなたの望みが叶う世界へと変えていってください。</p>
+
+      <div style="text-align:center;margin-top:1.8rem">
+        <button onclick="document.getElementById('hanabito-philosophy-overlay').classList.remove('show')" style="background:#4a3c28;color:#fff;border:none;border-radius:8px;padding:0.75rem 2.5rem;font-family:'Noto Serif JP',serif;font-size:1rem;cursor:pointer;letter-spacing:0.1em">← 戻る</button>
       </div>
     </div>
   </div>
@@ -2839,7 +2895,7 @@ function buildHomePage(){
   var rokkaClass='rokka-'+htBase;
   var html='<div class="page active">';
 
-  // 案内バナー2つ（花人占術とは？／このアプリの利用方法）：初めての人がいつでも迷わず戻れる常設の入口
+  // 案内バナー3つ（花人占術とは？／このアプリの利用方法／花人占術が目指すもの）：初めての人がいつでも迷わず戻れる常設の入口
   html+='<div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem">'
     +'<div onclick="showAboutOverlay()" style="cursor:pointer;background:linear-gradient(135deg,#b8860b,#d4a017);border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.6rem;box-shadow:0 2px 8px rgba(184,134,11,0.25)">'
     +'<span style="font-size:1.3rem">🌸</span>'
@@ -2850,6 +2906,11 @@ function buildHomePage(){
     +'<span style="font-size:1.3rem">📖</span>'
     +'<span style="flex:1;color:#8a5a00;font-size:0.92rem;font-weight:700">このアプリの利用方法</span>'
     +'<span style="color:#8a5a00;font-size:0.9rem">›</span>'
+    +'</div>'
+    +'<div onclick="document.getElementById(\'hanabito-philosophy-overlay\').classList.add(\'show\')" style="cursor:pointer;background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.6rem;box-shadow:0 2px 8px rgba(124,58,237,0.2)">'
+    +'<span style="font-size:1.3rem">✦</span>'
+    +'<span style="flex:1;color:#fff;font-size:0.92rem;font-weight:700">花人占術が目指すもの</span>'
+    +'<span style="color:rgba(255,255,255,0.8);font-size:0.9rem">›</span>'
     +'</div>'
     +'</div>';
 
