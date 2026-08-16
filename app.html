@@ -5674,19 +5674,56 @@ function buildBucketItems(buckets){
     html+='<div style=\"background:rgba(100,149,237,0.08);border-radius:8px;padding:0.5rem\">';
     html+='<div style=\"font-size:0.7rem;color:#2a7aaa;font-weight:700;margin-bottom:4px\">📅 いつ始める？</div>';
     html+='<div style=\"display:flex;gap:0.3rem;align-items:center\">';
-    html+='<select id=\"bucket-sy-'+bi+'\" style=\"flex:1;padding:0.35rem;border:1px solid rgba(100,149,237,0.25);border-radius:6px;font-size:0.82rem;background:var(--bg);color:var(--ink)\">';
+    html+='<select id=\"bucket-sy-'+bi+'\" onchange=\"updateBucketTimingInfo('+bi+')\" style=\"flex:1;padding:0.35rem;border:1px solid rgba(100,149,237,0.25);border-radius:6px;font-size:0.82rem;background:var(--bg);color:var(--ink)\">';
     html+='<option value=\"\">年</option>';
     for(var yy=curY;yy<=curY+30;yy++){html+='<option value=\"'+yy+'\"'+(sdY==yy?' selected':'')+'>'+yy+'年</option>';}
     html+='</select>';
-    html+='<select id=\"bucket-sm-'+bi+'\" style=\"flex:1;padding:0.35rem;border:1px solid rgba(100,149,237,0.25);border-radius:6px;font-size:0.82rem;background:var(--bg);color:var(--ink)\">';
+    html+='<select id=\"bucket-sm-'+bi+'\" onchange=\"updateBucketTimingInfo('+bi+')\" style=\"flex:1;padding:0.35rem;border:1px solid rgba(100,149,237,0.25);border-radius:6px;font-size:0.82rem;background:var(--bg);color:var(--ink)\">';
     html+='<option value=\"\">月</option>';
     for(var mm=1;mm<=12;mm++){html+='<option value=\"'+(mm<10?'0'+mm:mm)+'\"'+(sdM==(mm<10?'0'+mm:String(mm))?' selected':'')+'>'+mm+'月</option>';}
     html+='</select>';
-    html+='</div></div>';
+    html+='</div>';
+    html+='<div id=\"bucket-timing-info-'+bi+'\" style=\"margin-top:0.4rem\">'+buildBucketTimingInfoHTML(sdY?parseInt(sdY):null,sdM?parseInt(sdM):null)+'</div>';
+    html+='</div>';
     html+='</div>';
     html+='</div>';
   }
   return html;
+}
+
+// 選んだ年月の運気（大運×十二運気、年運、月運）を表示するHTMLを組み立てる
+function buildBucketTimingInfoHTML(year,month){
+  if(!year)return '';
+  var Graw=getCurrentTargetG();
+  var G=Graw?doCalc(parseInt(Graw.y),parseInt(Graw.m),parseInt(Graw.d),Graw.gender||'男'):null;
+  if(!G)return '';
+  var yrShi=JUNISHI[((year-1984)%12+12)%12];
+  var yrJu=getJuniUnki(G.ht,yrShi);
+  var drows=getDaiunRows(G);
+  var daiunRow=null;
+  for(var di=0;di<drows.length;di++){if(drows[di].startY<=year&&year<=drows[di].endY){daiunRow=drows[di];break;}}
+  var html='<div style="font-size:0.72rem;color:var(--ink3);line-height:1.7">';
+  if(daiunRow)html+='大運：<span onclick="showTermPopup(\'十二運気\',\''+daiunRow.ju+'\')" style="color:'+getJuniColor(daiunRow.ju)+';font-weight:700;cursor:pointer">'+daiunRow.th+'×'+daiunRow.ju+'</span>　';
+  html+='年運：<span onclick="showTermPopup(\'十二運気\',\''+yrJu+'\')" style="color:'+getJuniColor(yrJu)+';font-weight:700;cursor:pointer">'+yrJu+'</span>';
+  if(month){
+    var setsuD=getSetsuDate(year,month);
+    var repDay=Math.min(setsuD.getDate()+2,28);
+    var mks=getMonthKS(year,month,repDay);
+    var monJu=getJuniUnki(G.ht,mks[1]);
+    html+='　月運：<span onclick="showTermPopup(\'十二運気\',\''+monJu+'\')" style="color:'+getJuniColor(monJu)+';font-weight:700;cursor:pointer">'+monJu+'</span>';
+  }
+  html+='</div>';
+  return html;
+}
+// 「いつ始める？」の年月を変更した時に、運気表示をその場で更新する
+function updateBucketTimingInfo(bi){
+  var syEl=document.getElementById('bucket-sy-'+bi);
+  var smEl=document.getElementById('bucket-sm-'+bi);
+  var infoEl=document.getElementById('bucket-timing-info-'+bi);
+  if(!syEl||!infoEl)return;
+  var y=syEl.value?parseInt(syEl.value):null;
+  var m=smEl&&smEl.value?parseInt(smEl.value):null;
+  infoEl.innerHTML=buildBucketTimingInfoHTML(y,m);
 }
 
 // 達成チェックを入れた瞬間に、保存前でもその項目を薄く・取り消し線で見せる（軽量プレビュー）
