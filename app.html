@@ -2917,8 +2917,12 @@ function buildHomePage(){
   // 六花人バナー
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
+  html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
+    +'<span style="flex:1;max-width:36px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em;white-space:nowrap">'+name+'さんに咲く運命の花は</span>'
+    +'<span style="flex:1;max-width:36px;height:1px;background:linear-gradient(90deg,rgba(184,134,11,0.7),transparent)"></span>'
+    +'</div>';
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
-    +'<div style="font-size:0.86rem;color:rgba(255,255,255,0.7);letter-spacing:0.2em;margin-bottom:0.3rem">'+name+'さんに咲く花は</div>'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBaseRuby(htBase)+'</div>'
     +'<div style="display:inline-block;background:rgba(255,255,255,0.28);border-radius:20px;padding:0.35rem 1.1rem;color:#fff;font-weight:700;font-size:1.05rem;margin-top:0.5rem">'+htDisplayHinataHikageRuby(G.ht)+'</div>';
 
