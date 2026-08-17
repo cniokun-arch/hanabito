@@ -2896,31 +2896,36 @@ function initRokkaNameMarquee(){
   var copy1=document.getElementById('rokka-name-copy1');
   var copy2=document.getElementById('rokka-name-copy2');
   if(!wrap||!text||!copy1||!copy2)return;
+
+  // 既にループが動いていれば必ず止める（二重起動を防ぐ）
+  if(window._rokkaMarqueeRAF){cancelAnimationFrame(window._rokkaMarqueeRAF);window._rokkaMarqueeRAF=null;}
+
   var copy1Rect=copy1.getBoundingClientRect();
-  var copy2Rect=copy2.getBoundingClientRect();
   var overflow=copy1Rect.width-wrap.clientWidth;
-  var styleEl=document.getElementById('rokka-marquee-dynamic-style');
-  if(!styleEl){
-    styleEl=document.createElement('style');
-    styleEl.id='rokka-marquee-dynamic-style';
-    document.head.appendChild(styleEl);
+  if(overflow<=4){
+    text.style.transform='';
+    return;
   }
-  if(overflow>4){
-    // scrollDistは「copy1の幅＋隙間」という計算値ではなく、
-    // copy1とcopy2の実際の描画位置の差を直接測ることで、丸め誤差によるループ時のズレ（点滅）を防ぐ
-    var scrollDist=copy2Rect.left-copy1Rect.left;
-    var pauseSec=5; // 開始時、およびループして1文字目が最初の位置に戻ってきた時の静止時間
-    var moveSec=scrollDist/60; // 速度を一定（60px/秒）に保つ
-    var totalSec=pauseSec+moveSec;
-    var pausePct=(pauseSec/totalSec*100).toFixed(2);
-    // 0%〜pausePct%の間は静止（＝ループの先頭に戻るたびにここで5秒止まる）、
-    // そこから100%まで一定速度で移動する
-    styleEl.textContent='@keyframes rokka-name-marquee-dyn{0%,'+pausePct+'%{transform:translateX(0) translateZ(0)}100%{transform:translateX(-'+scrollDist+'px) translateZ(0)}}';
-    text.style.animation='rokka-name-marquee-dyn '+totalSec+'s linear infinite';
-  } else {
-    styleEl.textContent='';
-    text.style.animation='';
+  var copy2Rect=copy2.getBoundingClientRect();
+  // scrollDistは、copy1とcopy2の実際の描画位置の差を直接測ることで正確に求める
+  var scrollDist=copy2Rect.left-copy1Rect.left;
+  var pauseMs=5000; // 開始時、およびループして1文字目が最初の位置に戻ってきた時の静止時間
+  var speed=60; // px/秒（速度を一定に保つ）
+  var moveMs=(scrollDist/speed)*1000;
+  var cycleMs=pauseMs+moveMs;
+  var startTime=null;
+
+  // CSSアニメーションのinfiniteループに頼らず、requestAnimationFrameで毎フレーム
+  // 位置を直接計算して設定する。「ループの境目」という特別な瞬間が存在しないため、
+  // ブラウザ側のGPU描画レイヤーの作り直しによる瞬間的な消失が根本的に起こらない
+  function step(ts){
+    if(startTime===null)startTime=ts;
+    var elapsed=(ts-startTime)%cycleMs;
+    var x=elapsed<pauseMs?0:-((elapsed-pauseMs)/moveMs)*scrollDist;
+    text.style.transform='translateX('+x+'px)';
+    window._rokkaMarqueeRAF=requestAnimationFrame(step);
   }
+  window._rokkaMarqueeRAF=requestAnimationFrame(step);
 }
 
 function buildHomePage(){
@@ -2957,7 +2962,7 @@ function buildHomePage(){
   html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
     +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
     +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap">'
-    +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap;will-change:transform;backface-visibility:hidden;transform:translateZ(0)">'
+    +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap">'
     +'<span id="rokka-name-copy1" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
     +'<span id="rokka-name-gap" style="display:inline-block;width:48px"></span>'
     +'<span id="rokka-name-copy2" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
