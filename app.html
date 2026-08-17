@@ -2894,9 +2894,11 @@ function initRokkaNameMarquee(){
   var wrap=document.getElementById('rokka-name-wrap');
   var text=document.getElementById('rokka-name-text');
   var copy1=document.getElementById('rokka-name-copy1');
-  if(!wrap||!text||!copy1)return;
-  var copy1Width=copy1.getBoundingClientRect().width;
-  var overflow=copy1Width-wrap.clientWidth;
+  var copy2=document.getElementById('rokka-name-copy2');
+  if(!wrap||!text||!copy1||!copy2)return;
+  var copy1Rect=copy1.getBoundingClientRect();
+  var copy2Rect=copy2.getBoundingClientRect();
+  var overflow=copy1Rect.width-wrap.clientWidth;
   var styleEl=document.getElementById('rokka-marquee-dynamic-style');
   if(!styleEl){
     styleEl=document.createElement('style');
@@ -2904,10 +2906,9 @@ function initRokkaNameMarquee(){
     document.head.appendChild(styleEl);
   }
   if(overflow>4){
-    // 複製した文章＋隙間（48px）ぶんだけ動かすと、ちょうど2つ目の文章が
-    // 1つ目の開始位置にぴったり重なるので、切れ目なく流れ続けて見える
-    var gap=48;
-    var scrollDist=copy1Width+gap;
+    // scrollDistは「copy1の幅＋隙間」という計算値ではなく、
+    // copy1とcopy2の実際の描画位置の差を直接測ることで、丸め誤差によるループ時のズレ（点滅）を防ぐ
+    var scrollDist=copy2Rect.left-copy1Rect.left;
     var pauseSec=5; // 開始時、およびループして1文字目が最初の位置に戻ってきた時の静止時間
     var moveSec=scrollDist/60; // 速度を一定（60px/秒）に保つ
     var totalSec=pauseSec+moveSec;
