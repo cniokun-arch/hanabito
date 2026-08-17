@@ -120,8 +120,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .unki-widget{background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:10px;overflow:hidden;margin-bottom:0.8rem}
 .unki-widget-header{background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between}
 .unki-widget-title{font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.55rem;font-weight:700;letter-spacing:0.15em;text-shadow:0 1px 3px rgba(0,0,0,0.25)}
-@keyframes rokka-name-marquee{0%,15%{transform:translateX(0)}50%,70%{transform:translateX(var(--rn-scroll,0))}100%{transform:translateX(0)}}
-.rokka-name-scroll{animation:rokka-name-marquee 7s ease-in-out infinite}
+@keyframes rokka-name-marquee{0%,8%{transform:translateX(0)}88%,100%{transform:translateX(var(--rn-scroll,0))}}
+.rokka-name-scroll{animation:rokka-name-marquee 10s linear infinite}
 .unki-widget-tabs{display:flex;gap:0}
 .unki-widget-tab{font-family:'Noto Serif JP',serif;font-size:0.94rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.6);cursor:pointer;background:rgba(255,255,255,0.2);color:#fff;transition:all 0.15s}
 .unki-widget-tab:first-child{border-radius:12px 0 0 12px}
@@ -2896,7 +2896,10 @@ function initRokkaNameMarquee(){
   if(!wrap||!text)return;
   var overflow=text.scrollWidth-wrap.clientWidth;
   if(overflow>4){
-    text.style.setProperty('--rn-scroll','-'+overflow+'px');
+    // 文字が画面外まで完全に抜けきってから、数文字分の余白を挟んでループする
+    var gap=48; // 数文字分の余白
+    var scrollDist=text.scrollWidth+gap;
+    text.style.setProperty('--rn-scroll','-'+scrollDist+'px');
     text.classList.add('rokka-name-scroll');
   } else {
     text.classList.remove('rokka-name-scroll');
