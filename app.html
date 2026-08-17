@@ -2914,7 +2914,7 @@ function initRokkaNameMarquee(){
     var pausePct=(pauseSec/totalSec*100).toFixed(2);
     // 0%〜pausePct%の間は静止（＝ループの先頭に戻るたびにここで5秒止まる）、
     // そこから100%まで一定速度で移動する
-    styleEl.textContent='@keyframes rokka-name-marquee-dyn{0%,'+pausePct+'%{transform:translateX(0)}100%{transform:translateX(-'+scrollDist+'px)}}';
+    styleEl.textContent='@keyframes rokka-name-marquee-dyn{0%,'+pausePct+'%{transform:translateX(0) translateZ(0)}100%{transform:translateX(-'+scrollDist+'px) translateZ(0)}}';
     text.style.animation='rokka-name-marquee-dyn '+totalSec+'s linear infinite';
   } else {
     styleEl.textContent='';
@@ -2956,7 +2956,7 @@ function buildHomePage(){
   html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
     +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
     +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap">'
-    +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap">'
+    +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap;will-change:transform;backface-visibility:hidden;transform:translateZ(0)">'
     +'<span id="rokka-name-copy1" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
     +'<span id="rokka-name-gap" style="display:inline-block;width:48px"></span>'
     +'<span id="rokka-name-copy2" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
