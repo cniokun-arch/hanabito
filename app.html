@@ -120,6 +120,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .unki-widget{background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:10px;overflow:hidden;margin-bottom:0.8rem}
 .unki-widget-header{background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between}
 .unki-widget-title{font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.55rem;font-weight:700;letter-spacing:0.15em;text-shadow:0 1px 3px rgba(0,0,0,0.25)}
+@keyframes rokka-name-marquee{0%,15%{transform:translateX(0)}50%,70%{transform:translateX(var(--rn-scroll,0))}100%{transform:translateX(0)}}
+.rokka-name-scroll{animation:rokka-name-marquee 7s ease-in-out infinite}
 .unki-widget-tabs{display:flex;gap:0}
 .unki-widget-tab{font-family:'Noto Serif JP',serif;font-size:0.94rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.6);cursor:pointer;background:rgba(255,255,255,0.2);color:#fff;transition:all 0.15s}
 .unki-widget-tab:first-child{border-radius:12px 0 0 12px}
@@ -2886,6 +2888,22 @@ function addSwipeListener(el,onLeft,onRight){
   },{passive:true});
 }
 
+// 「〜さんに咲く運命の花は」の名前部分が長くてはみ出す場合、
+// 左詰めで表示した後、自動でゆっくり右から左へスクロールさせて全文を見せる
+function initRokkaNameMarquee(){
+  var wrap=document.getElementById('rokka-name-wrap');
+  var text=document.getElementById('rokka-name-text');
+  if(!wrap||!text)return;
+  var overflow=text.scrollWidth-wrap.clientWidth;
+  if(overflow>4){
+    text.style.setProperty('--rn-scroll','-'+overflow+'px');
+    text.classList.add('rokka-name-scroll');
+  } else {
+    text.classList.remove('rokka-name-scroll');
+    text.style.removeProperty('--rn-scroll');
+  }
+}
+
 function buildHomePage(){
   var G=getCurrentTargetG();
   var name=getCurrentTargetName();
@@ -2918,9 +2936,11 @@ function buildHomePage(){
   var HT_COLORS={'天花人':'linear-gradient(135deg,#6a4c93,#9b72cf)','白花人':'linear-gradient(135deg,#888,#bbb)','離花人':'linear-gradient(135deg,#c0392b,#e74c3c)','風花人':'linear-gradient(135deg,#1a7a4a,#27ae60)','仙花人':'linear-gradient(135deg,#1a5a8a,#2980b9)','水花人':'linear-gradient(135deg,#16a085,#1abc9c)'};
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
-    +'<span style="flex:1;max-width:36px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
-    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em;white-space:nowrap">'+name+'さんに咲く運命の花は</span>'
-    +'<span style="flex:1;max-width:36px;height:1px;background:linear-gradient(90deg,rgba(184,134,11,0.7),transparent)"></span>'
+    +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
+    +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap">'
+    +'<span id="rokka-name-text" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em;white-space:nowrap">'+name+'さんに咲く運命の花は</span>'
+    +'</div>'
+    +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,rgba(184,134,11,0.7),transparent)"></span>'
     +'</div>';
   html+='<div style="background:'+htBg+';border-radius:12px;padding:1rem 1.2rem;text-align:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.15)">'
     +'<div style="font-family:\'Zen Old Mincho\',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.15em">'+htDisplayBaseRuby(htBase)+'</div>'
@@ -2993,6 +3013,7 @@ function buildHomePage(){
     currentUnkiTab='day';
     unkiOffset=0;
     renderCalendar();
+    initRokkaNameMarquee();
     // 運気ウィジェットにスワイプ追加（前後の日/月/年に移動）
     var unkiBody=document.querySelector('.unki-widget-body');
     addSwipeListener(unkiBody,
