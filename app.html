@@ -2972,7 +2972,7 @@ function buildHomePage(){
     +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap;text-overflow:ellipsis">'
     +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap">'
     +'<span id="rokka-name-copy1" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
-    +'<span id="rokka-name-gap" style="display:inline-block;width:48px"></span>'
+    +'<span id="rokka-name-gap" style="display:inline-block;padding:0 20px;color:rgba(184,134,11,0.5);font-size:1rem">✦</span>'
     +'<span id="rokka-name-copy2" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
     +'</span>'
     +'</div>'
@@ -3050,6 +3050,10 @@ function buildHomePage(){
     unkiOffset=0;
     renderCalendar();
     initRokkaNameMarquee();
+    // フォント読み込み完了後に測った方が幅が正確なため、読み込み完了後にもう一度測り直す
+    if(document.fonts&&document.fonts.ready){
+      document.fonts.ready.then(function(){initRokkaNameMarquee();});
+    }
     // 運気ウィジェットにスワイプ追加（前後の日/月/年に移動）
     var unkiBody=document.querySelector('.unki-widget-body');
     addSwipeListener(unkiBody,
