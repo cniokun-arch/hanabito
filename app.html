@@ -2895,6 +2895,7 @@ function initRokkaNameMarquee(){
   var text=document.getElementById('rokka-name-text');
   var copy1=document.getElementById('rokka-name-copy1');
   var copy2=document.getElementById('rokka-name-copy2');
+  var gapEl=document.getElementById('rokka-name-gap');
   if(!wrap||!text||!copy1||!copy2)return;
 
   // 既にループが動いていれば必ず止める（二重起動を防ぐ）
@@ -2902,10 +2903,17 @@ function initRokkaNameMarquee(){
 
   var copy1Rect=copy1.getBoundingClientRect();
   var overflow=copy1Rect.width-wrap.clientWidth;
-  if(overflow<=4){
+  // はみ出しがわずかな場合（短い名前など）はループさせる必要がないため、
+  // ある程度まとまってはみ出している時だけスクロールさせる
+  if(overflow<=30){
     text.style.transform='';
+    // 複製した2つ目の文章と隙間は、ループしない時は完全に隠して絶対に見えないようにする
+    if(gapEl)gapEl.style.display='none';
+    copy2.style.display='none';
     return;
   }
+  if(gapEl)gapEl.style.display='';
+  copy2.style.display='';
   var copy2Rect=copy2.getBoundingClientRect();
   // scrollDistは、copy1とcopy2の実際の描画位置の差を直接測ることで正確に求める
   var scrollDist=copy2Rect.left-copy1Rect.left;
@@ -2961,7 +2969,7 @@ function buildHomePage(){
   var htBg=HT_COLORS[htBase]||'linear-gradient(135deg,#b8860b,#d4a520)';
   html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
     +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
-    +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap">'
+    +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap;text-overflow:ellipsis">'
     +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap">'
     +'<span id="rokka-name-copy1" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
     +'<span id="rokka-name-gap" style="display:inline-block;width:48px"></span>'
