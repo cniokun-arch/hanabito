@@ -120,8 +120,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .unki-widget{background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:10px;overflow:hidden;margin-bottom:0.8rem}
 .unki-widget-header{background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between}
 .unki-widget-title{font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.55rem;font-weight:700;letter-spacing:0.15em;text-shadow:0 1px 3px rgba(0,0,0,0.25)}
-@keyframes rokka-name-marquee{0%{transform:translateX(0)}100%{transform:translateX(var(--rn-scroll,0))}}
-.rokka-name-scroll{animation:rokka-name-marquee linear infinite}
+/* 「〜さんに咲く運命の花は」のスクロール演出は、静止時間を動的に計算する必要があるため
+   固定キーフレームではなく、initRokkaNameMarquee()内でJSにより<style>タグへ動的に生成する */
 .unki-widget-tabs{display:flex;gap:0}
 .unki-widget-tab{font-family:'Noto Serif JP',serif;font-size:0.94rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.6);cursor:pointer;background:rgba(255,255,255,0.2);color:#fff;transition:all 0.15s}
 .unki-widget-tab:first-child{border-radius:12px 0 0 12px}
@@ -2897,19 +2897,28 @@ function initRokkaNameMarquee(){
   if(!wrap||!text||!copy1)return;
   var copy1Width=copy1.getBoundingClientRect().width;
   var overflow=copy1Width-wrap.clientWidth;
+  var styleEl=document.getElementById('rokka-marquee-dynamic-style');
+  if(!styleEl){
+    styleEl=document.createElement('style');
+    styleEl.id='rokka-marquee-dynamic-style';
+    document.head.appendChild(styleEl);
+  }
   if(overflow>4){
     // 複製した文章＋隙間（48px）ぶんだけ動かすと、ちょうど2つ目の文章が
     // 1つ目の開始位置にぴったり重なるので、切れ目なく流れ続けて見える
     var gap=48;
     var scrollDist=copy1Width+gap;
-    text.style.setProperty('--rn-scroll','-'+scrollDist+'px');
-    // 速度を一定（60px/秒）に保つため、距離に応じてアニメーション時間を調整
-    text.style.animationDuration=(scrollDist/60)+'s';
-    text.classList.add('rokka-name-scroll');
+    var pauseSec=5; // 開始時、およびループして1文字目が最初の位置に戻ってきた時の静止時間
+    var moveSec=scrollDist/60; // 速度を一定（60px/秒）に保つ
+    var totalSec=pauseSec+moveSec;
+    var pausePct=(pauseSec/totalSec*100).toFixed(2);
+    // 0%〜pausePct%の間は静止（＝ループの先頭に戻るたびにここで5秒止まる）、
+    // そこから100%まで一定速度で移動する
+    styleEl.textContent='@keyframes rokka-name-marquee-dyn{0%,'+pausePct+'%{transform:translateX(0)}100%{transform:translateX(-'+scrollDist+'px)}}';
+    text.style.animation='rokka-name-marquee-dyn '+totalSec+'s linear infinite';
   } else {
-    text.classList.remove('rokka-name-scroll');
-    text.style.removeProperty('--rn-scroll');
-    text.style.removeProperty('animation-duration');
+    styleEl.textContent='';
+    text.style.animation='';
   }
 }
 
