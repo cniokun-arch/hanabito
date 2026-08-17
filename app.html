@@ -120,8 +120,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Serif JP',serif;col
 .unki-widget{background:#fff;border:1px solid rgba(184,134,11,0.28);border-radius:10px;overflow:hidden;margin-bottom:0.8rem}
 .unki-widget-header{background:linear-gradient(135deg,#3a2a00,#7c3aed 60%,#b8860b);padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between}
 .unki-widget-title{font-family:'Zen Old Mincho',serif;color:#fff;font-size:1.55rem;font-weight:700;letter-spacing:0.15em;text-shadow:0 1px 3px rgba(0,0,0,0.25)}
-@keyframes rokka-name-marquee{0%,8%{transform:translateX(0)}88%,100%{transform:translateX(var(--rn-scroll,0))}}
-.rokka-name-scroll{animation:rokka-name-marquee 10s linear infinite}
+@keyframes rokka-name-marquee{0%{transform:translateX(0)}100%{transform:translateX(var(--rn-scroll,0))}}
+.rokka-name-scroll{animation:rokka-name-marquee linear infinite}
 .unki-widget-tabs{display:flex;gap:0}
 .unki-widget-tab{font-family:'Noto Serif JP',serif;font-size:0.94rem;padding:4px 12px;border:1px solid rgba(255,255,255,0.6);cursor:pointer;background:rgba(255,255,255,0.2);color:#fff;transition:all 0.15s}
 .unki-widget-tab:first-child{border-radius:12px 0 0 12px}
@@ -2893,17 +2893,23 @@ function addSwipeListener(el,onLeft,onRight){
 function initRokkaNameMarquee(){
   var wrap=document.getElementById('rokka-name-wrap');
   var text=document.getElementById('rokka-name-text');
-  if(!wrap||!text)return;
-  var overflow=text.scrollWidth-wrap.clientWidth;
+  var copy1=document.getElementById('rokka-name-copy1');
+  if(!wrap||!text||!copy1)return;
+  var copy1Width=copy1.getBoundingClientRect().width;
+  var overflow=copy1Width-wrap.clientWidth;
   if(overflow>4){
-    // 文字が画面外まで完全に抜けきってから、数文字分の余白を挟んでループする
-    var gap=48; // 数文字分の余白
-    var scrollDist=text.scrollWidth+gap;
+    // 複製した文章＋隙間（48px）ぶんだけ動かすと、ちょうど2つ目の文章が
+    // 1つ目の開始位置にぴったり重なるので、切れ目なく流れ続けて見える
+    var gap=48;
+    var scrollDist=copy1Width+gap;
     text.style.setProperty('--rn-scroll','-'+scrollDist+'px');
+    // 速度を一定（60px/秒）に保つため、距離に応じてアニメーション時間を調整
+    text.style.animationDuration=(scrollDist/60)+'s';
     text.classList.add('rokka-name-scroll');
   } else {
     text.classList.remove('rokka-name-scroll');
     text.style.removeProperty('--rn-scroll');
+    text.style.removeProperty('animation-duration');
   }
 }
 
@@ -2941,7 +2947,11 @@ function buildHomePage(){
   html+='<div style="display:flex;align-items:center;justify-content:center;gap:0.7rem;margin-bottom:0.7rem">'
     +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,134,11,0.7))"></span>'
     +'<div id="rokka-name-wrap" style="overflow:hidden;flex:1;min-width:0;white-space:nowrap">'
-    +'<span id="rokka-name-text" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em;white-space:nowrap">'+name+'さんに咲く運命の花は</span>'
+    +'<span id="rokka-name-text" style="display:inline-block;white-space:nowrap">'
+    +'<span id="rokka-name-copy1" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
+    +'<span id="rokka-name-gap" style="display:inline-block;width:48px"></span>'
+    +'<span id="rokka-name-copy2" style="display:inline-block;font-family:\'Zen Old Mincho\',serif;font-size:1.2rem;font-weight:700;color:#8a5a00;letter-spacing:0.12em">'+name+'さんに咲く運命の花は</span>'
+    +'</span>'
     +'</div>'
     +'<span style="flex:0 1 24px;height:1px;background:linear-gradient(90deg,rgba(184,134,11,0.7),transparent)"></span>'
     +'</div>';
