@@ -3066,25 +3066,11 @@ function renderCalendar(){
   var u=getCurrentUnki(G);
   var daiTh=(G.T||[])[JIKKAN.indexOf(u.currDaiun.kan)]||'—';
 
-  // 今年・今月・大運バッジ
-  var html='<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;justify-content:center">'
-    +'<div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:20px;padding:0.25rem 0.8rem;display:flex;align-items:center;gap:0.3rem">'
-    +'<span style="font-size:0.7rem;color:var(--ink3)">今年</span>'
-    +'<span style="font-size:0.85rem;font-weight:700;color:'+yrJuColor+'">'+yrJu+'</span>'
-    +'</div>'
-    +'<div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:0.25rem 0.8rem;display:flex;align-items:center;gap:0.3rem">'
-    +'<span style="font-size:0.7rem;color:var(--ink3)">'+(calMonth+1)+'月</span>'
-    +'<span style="font-size:0.85rem;font-weight:700;color:'+monJuColor+'">'+monJu+'</span>'
-    +'</div>'
-    +'</div>'
-    // 大運情報を1行で
-    +'<div style="text-align:center;margin-bottom:0.7rem">'
-    +'<span style="font-size:0.75rem;color:var(--ink3)">現在の大運：</span>'
-    +'<span style="font-size:0.82rem;font-weight:700;color:var(--ink)">'+u.currDaiun.ks+'</span>'
-    +'<span style="font-size:0.75rem;color:var(--purple);margin-left:0.4rem">'+daiTh+'</span>'
-    +'<span style="font-size:0.75rem;color:var(--ink3);margin-left:0.3rem">／</span>'
-    +'<span style="font-size:0.82rem;font-weight:700;color:'+getJuniColor(u.daiJu)+';margin-left:0.3rem">'+u.daiJu+'</span>'
-    +'<span style="font-size:0.75rem;color:var(--ink3);margin-left:0.3rem">（'+u.age+'歳）</span>'
+  // 「目標とスケジュール」見出し
+  var html='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem">'
+    +'<span style="font-size:1.3rem">🎯</span>'
+    +'<span style="font-family:\'Zen Old Mincho\',serif;font-size:1.25rem;font-weight:700;color:var(--ink);letter-spacing:0.08em">目標とスケジュール</span>'
+    +'<span style="flex:1;height:2px;background:linear-gradient(90deg,rgba(184,134,11,0.4),transparent)"></span>'
     +'</div>';
 
   // 今月・今年の目標をカレンダーに表示
@@ -3109,6 +3095,17 @@ function renderCalendar(){
   html+='</div></div>';
   html+='<button onclick="openSchedulerWindowOverlay()" style="width:100%;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fff;border:none;border-radius:10px;padding:0.8rem;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:\'Noto Serif JP\',serif;margin-bottom:0.4rem">🌸 花人占術スケジューラーを起動</button>';
   html+='<div style="text-align:center;margin-bottom:0.9rem"><span onclick="document.getElementById(\'scheduler-about-overlay\').classList.add(\'show\')" style="font-size:0.82rem;color:#8a5a00;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">花人占術スケジューラーとは？</span></div>';
+  // カレンダー直上：西暦（左）・月（右）と、その年月の運気をハイパーリンク付きで大きく表示
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.7rem 0.3rem;margin-bottom:0.4rem">';
+  html+='<div style="text-align:left">';
+  html+='<div style="font-size:1.5rem;font-weight:800;color:var(--ink);font-family:\'Zen Old Mincho\',serif">'+calYear+'年</div>';
+  html+='<span onclick="showTermPopup(\'十二運気\',\''+yrJu+'\')" style="font-size:1.15rem;font-weight:800;color:'+yrJuColor+';cursor:pointer;text-decoration:underline;text-decoration-style:dotted">'+yrJu+'</span>';
+  html+='</div>';
+  html+='<div style="text-align:right">';
+  html+='<div style="font-size:1.5rem;font-weight:800;color:var(--ink);font-family:\'Zen Old Mincho\',serif">'+(calMonth+1)+'月</div>';
+  html+='<span onclick="showTermPopup(\'十二運気\',\''+monJu+'\')" style="font-size:1.15rem;font-weight:800;color:'+monJuColor+';cursor:pointer;text-decoration:underline;text-decoration-style:dotted">'+monJu+'</span>';
+  html+='</div>';
+  html+='</div>';
   // 曜日ヘッダー（色帯・スワイプ機構の外に固定表示）
   html+='<div style="margin:0 -1rem;background:linear-gradient(180deg,rgba(184,134,11,0.16),rgba(184,134,11,0.06));border-top:2px solid rgba(184,134,11,0.35);border-bottom:2px solid rgba(184,134,11,0.35);padding:0.5rem 1rem;display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
   ['日','月','火','水','木','金','土'].forEach(function(d,i){
